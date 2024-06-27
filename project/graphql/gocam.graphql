@@ -1,0 +1,229 @@
+# metamodel_version: 1.7.0
+type Activity
+  {
+    id: Uriorcurie!
+    enabledBy: InformationBiomacromoleculeTermObject
+    molecularFunction: MolecularFunctionAssociation
+    occursIn: CellularAnatomicalEntityAssociation
+    partOf: BiologicalProcessAssociation
+    hasDirectInput: MoleculeAssociation
+    causalAssociations: [CausalAssociation]
+    provenances: [ProvenanceInfo]
+  }
+
+interface Association
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+  }
+
+type BiologicalProcessAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: BiologicalProcessTermObject
+    happensDuring: PhaseTermObject
+    partOf: BiologicalProcessTermObject
+  }
+
+type BiologicalProcessTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type CausalAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    predicate: PredicateTermObject
+    downstreamActivity: Activity
+  }
+
+type CellTypeTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type CellularAnatomicalEntityAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: CellularAnatomicalEntityTermObject
+  }
+
+type CellularAnatomicalEntityTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type EvidenceItem
+  {
+    term: EvidenceTermObject
+    reference: PublicationObject
+    withObjects: [Object]
+    provenances: [ProvenanceInfo]
+  }
+
+type EvidenceTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type GeneProductTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type GrossAnatomicalStructureTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+interface InformationBiomacromoleculeTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type Model
+  {
+    id: Uriorcurie!
+    title: String
+    taxon: TaxonTermObject
+    status: ModelStateEnum
+    comments: [String]
+    activities: [Activity]
+    objects: [Object]
+    provenances: [ProvenanceInfo]
+  }
+
+type MolecularFunctionAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: MolecularFunctionTermObject
+  }
+
+type MolecularFunctionTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type MoleculeAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: MoleculeTermObject
+  }
+
+type MoleculeTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type Object
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type PhaseTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type PredicateTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type ProteinComplexTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+type ProvenanceInfo
+  {
+    contributor: String
+    created: String
+    date: String
+    providedBy: String
+  }
+
+type PublicationObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+    abstractText: String
+    fullText: String
+  }
+
+type TaxonTermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+
+interface TermAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: TermObject
+  }
+
+interface TermObject
+  {
+    id: Uriorcurie!
+    label: String
+    type: Uriorcurie
+    obsolete: Boolean
+  }
+

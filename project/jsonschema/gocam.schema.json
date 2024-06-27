@@ -1,0 +1,750 @@
+{
+    "$defs": {
+        "Activity": {
+            "additionalProperties": false,
+            "description": "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex",
+            "properties": {
+                "causal_associations": {
+                    "description": "The causal associations that connect this activity to other activities",
+                    "items": {
+                        "$ref": "#/$defs/CausalAssociation"
+                    },
+                    "type": "array"
+                },
+                "enabled_by": {
+                    "description": "The gene product or complex that carries out the activity",
+                    "type": "string"
+                },
+                "has_direct_input": {
+                    "$ref": "#/$defs/MoleculeAssociation",
+                    "description": "The input molecules that are directly consumed by the activity"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "molecular_function": {
+                    "$ref": "#/$defs/MolecularFunctionAssociation",
+                    "description": "The molecular function that is carried out by the gene product or complex"
+                },
+                "occurs_in": {
+                    "$ref": "#/$defs/CellularAnatomicalEntityAssociation",
+                    "description": "The cellular location in which the activity occurs"
+                },
+                "part_of": {
+                    "$ref": "#/$defs/BiologicalProcessAssociation",
+                    "description": "The larger biological process in which the activity is a part"
+                },
+                "provenances": {
+                    "description": "Provenance information for the activity",
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "Activity",
+            "type": "object"
+        },
+        "BiologicalProcessAssociation": {
+            "additionalProperties": false,
+            "description": "An association between an activity and a biological process term",
+            "properties": {
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "BiologicalProcessAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "BiologicalProcessAssociation",
+            "type": "object"
+        },
+        "BiologicalProcessTermObject": {
+            "additionalProperties": false,
+            "description": "A termm object that represents a biological process term from GO",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:BiologicalProcessTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "BiologicalProcessTermObject",
+            "type": "object"
+        },
+        "CausalAssociation": {
+            "additionalProperties": false,
+            "description": "A causal association between two activities",
+            "properties": {
+                "downstream_activity": {
+                    "type": "string"
+                },
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "predicate": {
+                    "type": "string"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "type": {
+                    "enum": [
+                        "CausalAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "CausalAssociation",
+            "type": "object"
+        },
+        "CausalPredicateEnum": {
+            "description": "",
+            "enum": [
+                "causally upstream of, positive effect",
+                "causally upstream of, negative effect",
+                "causally upstream of",
+                "immediately causally upstream of",
+                "causally upstream of or within",
+                "causally upstream of or within, negative effect",
+                "causally upstream of or within, positive effect",
+                "regulates",
+                "negatively regulates",
+                "positively regulates"
+            ],
+            "title": "CausalPredicateEnum",
+            "type": "string"
+        },
+        "CellTypeTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a cell type term from CL",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:CellTypeTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "CellTypeTermObject",
+            "type": "object"
+        },
+        "CellularAnatomicalEntityAssociation": {
+            "additionalProperties": false,
+            "description": "An association between an activity and a cellular anatomical entity term",
+            "properties": {
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "CellularAnatomicalEntityAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "CellularAnatomicalEntityAssociation",
+            "type": "object"
+        },
+        "CellularAnatomicalEntityTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a cellular anatomical entity term from GO",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:CellularAnatomicalEntityTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "CellularAnatomicalEntityTermObject",
+            "type": "object"
+        },
+        "EvidenceItem": {
+            "additionalProperties": false,
+            "description": "",
+            "properties": {
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "with_objects": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "title": "EvidenceItem",
+            "type": "object"
+        },
+        "EvidenceTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents an evidence term from ECO",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:EvidenceTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "EvidenceTermObject",
+            "type": "object"
+        },
+        "GeneProductTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a gene product term from GO or UniProtKB",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:GeneProductTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "GeneProductTermObject",
+            "type": "object"
+        },
+        "GrossAnatomicalStructureTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a gross anatomical structure term from UBERON",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:GrossAnatomicalStructureTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "GrossAnatomicalStructureTermObject",
+            "type": "object"
+        },
+        "InformationBiomacromoleculeCategory": {
+            "description": "",
+            "enum": [
+                "GeneOrReferenceProtein",
+                "ProteinIsoform",
+                "MacromolecularComplex",
+                "Unknown"
+            ],
+            "title": "InformationBiomacromoleculeCategory",
+            "type": "string"
+        },
+        "Model": {
+            "additionalProperties": false,
+            "description": "A model of a biological program consisting of a set of causally connected activities",
+            "properties": {
+                "activities": {
+                    "items": {
+                        "$ref": "#/$defs/Activity"
+                    },
+                    "type": "array"
+                },
+                "comments": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "objects": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/Object"
+                            },
+                            {
+                                "$ref": "#/$defs/PublicationObject"
+                            },
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "status": {
+                    "$ref": "#/$defs/ModelStateEnum"
+                },
+                "taxon": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "Model",
+            "type": "object"
+        },
+        "ModelStateEnum": {
+            "description": "Status of a model",
+            "enum": [
+                "production",
+                "development"
+            ],
+            "title": "ModelStateEnum",
+            "type": "string"
+        },
+        "MolecularFunctionAssociation": {
+            "additionalProperties": false,
+            "description": "An association between an activity and a molecular function term",
+            "properties": {
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "MolecularFunctionAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "MolecularFunctionAssociation",
+            "type": "object"
+        },
+        "MolecularFunctionTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a molecular function term from GO",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:MolecularFunctionTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "MolecularFunctionTermObject",
+            "type": "object"
+        },
+        "MoleculeAssociation": {
+            "additionalProperties": false,
+            "description": "An association between an activity and a molecule term",
+            "properties": {
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "MoleculeAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "MoleculeAssociation",
+            "type": "object"
+        },
+        "MoleculeTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a molecule term from CHEBI or UniProtKB",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:MoleculeTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "MoleculeTermObject",
+            "type": "object"
+        },
+        "Object": {
+            "additionalProperties": false,
+            "description": "An abstract class for all identified objects in a model",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:Object"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "Object",
+            "type": "object"
+        },
+        "PhaseTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a phase term from GO or UBERON",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:PhaseTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "PhaseTermObject",
+            "type": "object"
+        },
+        "PredicateTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a taxon term from NCBITaxon",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:PredicateTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "PredicateTermObject",
+            "type": "object"
+        },
+        "ProteinComplexTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a protein complex term from GO",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:ProteinComplexTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "ProteinComplexTermObject",
+            "type": "object"
+        },
+        "ProvenanceInfo": {
+            "additionalProperties": false,
+            "description": "Provenance information for an object",
+            "properties": {
+                "contributor": {
+                    "type": "string"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "provided_by": {
+                    "type": "string"
+                }
+            },
+            "title": "ProvenanceInfo",
+            "type": "object"
+        },
+        "PublicationObject": {
+            "additionalProperties": false,
+            "description": "An object that represents a publication or other kind of reference",
+            "properties": {
+                "abstract_text": {
+                    "type": "string"
+                },
+                "full_text": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:PublicationObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "PublicationObject",
+            "type": "object"
+        },
+        "TaxonTermObject": {
+            "additionalProperties": false,
+            "description": "A term object that represents a taxon term from NCBITaxon",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "obsolete": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "gocam:TaxonTermObject"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "title": "TaxonTermObject",
+            "type": "object"
+        }
+    },
+    "$id": "https://w3id.org/gocam",
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "additionalProperties": true,
+    "metamodel_version": "1.7.0",
+    "title": "gocam",
+    "type": "object",
+    "version": null
+}

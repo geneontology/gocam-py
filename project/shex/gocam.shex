@@ -1,0 +1,312 @@
+# metamodel_version: 1.7.0
+BASE <https://w3id.org/gocam/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX pav: <http://purl.org/pav/>
+PREFIX linkml: <https://w3id.org/linkml/>
+PREFIX dct: <http://example.org/UNKNOWN/dct/>
+PREFIX rdfs1: <http://example.org/UNKNOWN/rdfs/>
+
+
+linkml:String xsd:string
+
+linkml:Integer xsd:integer
+
+linkml:Boolean xsd:boolean
+
+linkml:Float xsd:float
+
+linkml:Double xsd:double
+
+linkml:Decimal xsd:decimal
+
+linkml:Time xsd:time
+
+linkml:Date xsd:date
+
+linkml:Datetime xsd:dateTime
+
+linkml:DateOrDatetime linkml:DateOrDatetime
+
+linkml:Uriorcurie IRI
+
+linkml:Curie xsd:string
+
+linkml:Uri IRI
+
+linkml:Ncname xsd:string
+
+linkml:Objectidentifier IRI
+
+linkml:Nodeidentifier NONLITERAL
+
+linkml:Jsonpointer xsd:string
+
+linkml:Jsonpath xsd:string
+
+linkml:Sparqlpath xsd:string
+
+<Activity> CLOSED {
+    (  $<Activity_tes> (  <enabled_by> @<InformationBiomacromoleculeTermObject> ? ;
+          <molecular_function> @<MolecularFunctionAssociation> ? ;
+          <occurs_in> @<CellularAnatomicalEntityAssociation> ? ;
+          <part_of> @<BiologicalProcessAssociation> ? ;
+          <has_direct_input> @<MoleculeAssociation> ? ;
+          <causal_associations> @<CausalAssociation> * ;
+          <provenances> @<ProvenanceInfo> *
+       ) ;
+       rdf:type [ <Activity> ]
+    )
+}
+
+<Association>  (
+    @<CausalAssociation> OR @<TermAssociation>
+)
+
+<Association_struct> {
+    (  $<Association_tes> (  <type> @linkml:String ? ;
+          <evidence> @<EvidenceItem> * ;
+          <provenances> @<ProvenanceInfo> *
+       ) ;
+       rdf:type [ <Association> ] ?
+    )
+}
+
+<BiologicalProcessAssociation> CLOSED {
+    (  $<BiologicalProcessAssociation_tes> (  &<TermAssociation_tes> ;
+          rdf:type [ <TermAssociation> ] ? ;
+          <term> @<BiologicalProcessTermObject> ? ;
+          <happens_during> @<PhaseTermObject> ? ;
+          <part_of> @<BiologicalProcessTermObject> ?
+       ) ;
+       rdf:type [ <BiologicalProcessAssociation> ] ?
+    )
+}
+
+<BiologicalProcessTermObject> CLOSED {
+    (  $<BiologicalProcessTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <BiologicalProcessTermObject> ]
+    )
+}
+
+<CausalAssociation> CLOSED {
+    (  $<CausalAssociation_tes> (  &<Association_tes> ;
+          rdf:type [ <Association> ] ? ;
+          <predicate> @<PredicateTermObject> ? ;
+          <downstream_activity> @<Activity> ?
+       ) ;
+       rdf:type [ <CausalAssociation> ] ?
+    )
+}
+
+<CellTypeTermObject> CLOSED {
+    (  $<CellTypeTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <CellTypeTermObject> ]
+    )
+}
+
+<CellularAnatomicalEntityAssociation> CLOSED {
+    (  $<CellularAnatomicalEntityAssociation_tes> (  &<TermAssociation_tes> ;
+          rdf:type [ <TermAssociation> ] ? ;
+          <term> @<CellularAnatomicalEntityTermObject> ?
+       ) ;
+       rdf:type [ <CellularAnatomicalEntityAssociation> ] ?
+    )
+}
+
+<CellularAnatomicalEntityTermObject> CLOSED {
+    (  $<CellularAnatomicalEntityTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <CellularAnatomicalEntityTermObject> ]
+    )
+}
+
+<EvidenceItem> CLOSED {
+    (  $<EvidenceItem_tes> (  <term> @<EvidenceTermObject> ? ;
+          <reference> @<PublicationObject> ? ;
+          <with_objects> @<Object> * ;
+          <provenances> @<ProvenanceInfo> *
+       ) ;
+       rdf:type [ <EvidenceItem> ] ?
+    )
+}
+
+<EvidenceTermObject> CLOSED {
+    (  $<EvidenceTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <EvidenceTermObject> ]
+    )
+}
+
+<GeneProductTermObject> CLOSED {
+    (  $<GeneProductTermObject_tes> (  &<InformationBiomacromoleculeTermObject_tes> ;
+          rdf:type [ <InformationBiomacromoleculeTermObject> ] ?
+       ) ;
+       rdf:type [ <GeneProductTermObject> ]
+    )
+}
+
+<GrossAnatomicalStructureTermObject> CLOSED {
+    (  $<GrossAnatomicalStructureTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <GrossAnatomicalStructureTermObject> ]
+    )
+}
+
+<InformationBiomacromoleculeTermObject>  (
+    @<GeneProductTermObject> OR @<ProteinComplexTermObject>
+)
+
+<InformationBiomacromoleculeTermObject_struct> {
+    (  $<InformationBiomacromoleculeTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <InformationBiomacromoleculeTermObject> ]
+    )
+}
+
+<Model> CLOSED {
+    (  $<Model_tes> (  dct:title @linkml:String ? ;
+          <taxon> @<TaxonTermObject> ? ;
+          pav:status [ <https://w3id.org/gocam/ModelStateEnum#production> <https://w3id.org/gocam/ModelStateEnum#development> ] ? ;
+          rdfs1:comment @linkml:String * ;
+          <activities> @<Activity> * ;
+          <objects> @<Object> * ;
+          <provenances> @<ProvenanceInfo> *
+       ) ;
+       rdf:type [ <Model> ]
+    )
+}
+
+<MolecularFunctionAssociation> CLOSED {
+    (  $<MolecularFunctionAssociation_tes> (  &<TermAssociation_tes> ;
+          rdf:type [ <TermAssociation> ] ? ;
+          <term> @<MolecularFunctionTermObject> ?
+       ) ;
+       rdf:type [ <MolecularFunctionAssociation> ] ?
+    )
+}
+
+<MolecularFunctionTermObject> CLOSED {
+    (  $<MolecularFunctionTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <MolecularFunctionTermObject> ]
+    )
+}
+
+<MoleculeAssociation> CLOSED {
+    (  $<MoleculeAssociation_tes> (  &<TermAssociation_tes> ;
+          rdf:type [ <TermAssociation> ] ? ;
+          <term> @<MoleculeTermObject> ?
+       ) ;
+       rdf:type [ <MoleculeAssociation> ] ?
+    )
+}
+
+<MoleculeTermObject> CLOSED {
+    (  $<MoleculeTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <MoleculeTermObject> ]
+    )
+}
+
+<Object>  (
+    CLOSED {
+       (  $<Object_tes> (  rdfs1:label @linkml:String ? ;
+             <type> @linkml:Uriorcurie ? ;
+             <obsolete> @linkml:Boolean ?
+          ) ;
+          rdf:type [ <Object> ]
+       )
+    } OR @<PublicationObject> OR @<TermObject>
+)
+
+<PhaseTermObject> CLOSED {
+    (  $<PhaseTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <PhaseTermObject> ]
+    )
+}
+
+<PredicateTermObject> CLOSED {
+    (  $<PredicateTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <PredicateTermObject> ]
+    )
+}
+
+<ProteinComplexTermObject> CLOSED {
+    (  $<ProteinComplexTermObject_tes> (  &<InformationBiomacromoleculeTermObject_tes> ;
+          rdf:type [ <InformationBiomacromoleculeTermObject> ] ?
+       ) ;
+       rdf:type [ <ProteinComplexTermObject> ]
+    )
+}
+
+<ProvenanceInfo> CLOSED {
+    (  $<ProvenanceInfo_tes> (  dct:contributor @linkml:String ? ;
+          dct:created @linkml:String ? ;
+          dct:date @linkml:String ? ;
+          pav:providedBy @linkml:String ?
+       ) ;
+       rdf:type [ <ProvenanceInfo> ] ?
+    )
+}
+
+<PublicationObject> CLOSED {
+    (  $<PublicationObject_tes> (  &<Object_tes> ;
+          rdf:type [ <Object> ] ? ;
+          <abstract_text> @linkml:String ? ;
+          <full_text> @linkml:String ?
+       ) ;
+       rdf:type [ <PublicationObject> ]
+    )
+}
+
+<TaxonTermObject> CLOSED {
+    (  $<TaxonTermObject_tes> (  &<TermObject_tes> ;
+          rdf:type [ <TermObject> ] ?
+       ) ;
+       rdf:type [ <TaxonTermObject> ]
+    )
+}
+
+<TermAssociation>  (
+    @<BiologicalProcessAssociation> OR @<CellularAnatomicalEntityAssociation> OR @<MolecularFunctionAssociation> OR
+    @<MoleculeAssociation>
+)
+
+<TermAssociation_struct> {
+    (  $<TermAssociation_tes> (  &<Association_tes> ;
+          rdf:type [ <Association> ] ? ;
+          <term> @<TermObject> ?
+       ) ;
+       rdf:type [ <TermAssociation> ] ?
+    )
+}
+
+<TermObject>  (
+    @<BiologicalProcessTermObject> OR @<CellTypeTermObject> OR @<CellularAnatomicalEntityTermObject> OR @<EvidenceTermObject> OR
+    @<GrossAnatomicalStructureTermObject> OR @<InformationBiomacromoleculeTermObject> OR @<MolecularFunctionTermObject> OR
+    @<MoleculeTermObject> OR @<PhaseTermObject> OR @<PredicateTermObject> OR @<TaxonTermObject>
+)
+
+<TermObject_struct> {
+    (  $<TermObject_tes> (  &<Object_tes> ;
+          rdf:type [ <Object> ] ?
+       ) ;
+       rdf:type [ <TermObject> ]
+    )
+}
+

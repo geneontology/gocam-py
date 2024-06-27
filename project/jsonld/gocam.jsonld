@@ -1,0 +1,1831 @@
+{
+  "name": "gocam",
+  "description": "GO CAM LinkML schema (experimental)\n\nThe central class in this datamodel is a [Model](Model.md). A model consists of a set of\n[MolecularActivity](MolecularActivity.md) objects, from which hangs various elements connected by different kinds of [Association](Association.md)",
+  "see_also": [
+    "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7012280/",
+    "https://docs.google.com/presentation/d/1ja0Vkw0AoENJ58emM77dGnqPtY1nfIJMeyVnObBxIxI/edit#slide=id.p8"
+  ],
+  "id": "https://w3id.org/gocam",
+  "imports": [
+    "linkml:types"
+  ],
+  "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "prefixes": [
+    {
+      "prefix_prefix": "pav",
+      "prefix_reference": "http://purl.org/pav/"
+    },
+    {
+      "prefix_prefix": "dce",
+      "prefix_reference": "http://purl.org/dc/elements/1.1/"
+    },
+    {
+      "prefix_prefix": "lego",
+      "prefix_reference": "http://geneontology.org/lego/"
+    },
+    {
+      "prefix_prefix": "linkml",
+      "prefix_reference": "https://w3id.org/linkml/"
+    },
+    {
+      "prefix_prefix": "biolink",
+      "prefix_reference": "https://w3id.org/biolink/vocab/"
+    },
+    {
+      "prefix_prefix": "gocam",
+      "prefix_reference": "https://w3id.org/gocam/"
+    },
+    {
+      "prefix_prefix": "OBAN",
+      "prefix_reference": "http://purl.org/oban/"
+    },
+    {
+      "prefix_prefix": "goshapes",
+      "prefix_reference": "http://purl.obolibrary.org/obo/go/shapes/"
+    },
+    {
+      "prefix_prefix": "RO",
+      "prefix_reference": "http://purl.obolibrary.org/obo/RO_"
+    },
+    {
+      "prefix_prefix": "NCBITaxon",
+      "prefix_reference": "http://purl.obolibrary.org/obo/NCBITaxon_"
+    },
+    {
+      "prefix_prefix": "BFO",
+      "prefix_reference": "http://purl.obolibrary.org/obo/BFO_"
+    },
+    {
+      "prefix_prefix": "GO",
+      "prefix_reference": "http://purl.obolibrary.org/obo/GO_"
+    },
+    {
+      "prefix_prefix": "ECO",
+      "prefix_reference": "http://purl.obolibrary.org/obo/ECO_"
+    },
+    {
+      "prefix_prefix": "gomodel",
+      "prefix_reference": "http://model.geneontology.org/"
+    },
+    {
+      "prefix_prefix": "oio",
+      "prefix_reference": "http://www.geneontology.org/formats/oboInOwl#"
+    },
+    {
+      "prefix_prefix": "orcid",
+      "prefix_reference": "https://orcid.org/"
+    },
+    {
+      "prefix_prefix": "UniProtKB",
+      "prefix_reference": "http://identifiers.org/uniprot/"
+    },
+    {
+      "prefix_prefix": "PMID",
+      "prefix_reference": "http://identifiers.org/pmid/"
+    },
+    {
+      "prefix_prefix": "dcterms",
+      "prefix_reference": "http://purl.org/dc/terms/"
+    }
+  ],
+  "default_prefix": "gocam",
+  "default_range": "string",
+  "types": [
+    {
+      "name": "string",
+      "definition_uri": "https://w3id.org/linkml/String",
+      "description": "A character string",
+      "notes": [
+        "In RDF serializations, a slot with range of string is treated as a literal or type xsd:string.   If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"string\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "exact_mappings": [
+        "schema:Text"
+      ],
+      "base": "str",
+      "uri": "http://www.w3.org/2001/XMLSchema#string",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "integer",
+      "definition_uri": "https://w3id.org/linkml/Integer",
+      "description": "An integer",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"integer\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "exact_mappings": [
+        "schema:Integer"
+      ],
+      "base": "int",
+      "uri": "http://www.w3.org/2001/XMLSchema#integer",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "boolean",
+      "definition_uri": "https://w3id.org/linkml/Boolean",
+      "description": "A binary (true or false) value",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"boolean\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "exact_mappings": [
+        "schema:Boolean"
+      ],
+      "base": "Bool",
+      "uri": "http://www.w3.org/2001/XMLSchema#boolean",
+      "repr": "bool",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "float",
+      "definition_uri": "https://w3id.org/linkml/Float",
+      "description": "A real number that conforms to the xsd:float specification",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"float\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "exact_mappings": [
+        "schema:Float"
+      ],
+      "base": "float",
+      "uri": "http://www.w3.org/2001/XMLSchema#float",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "double",
+      "definition_uri": "https://w3id.org/linkml/Double",
+      "description": "A real number that conforms to the xsd:double specification",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"double\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "close_mappings": [
+        "schema:Float"
+      ],
+      "base": "float",
+      "uri": "http://www.w3.org/2001/XMLSchema#double",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "decimal",
+      "definition_uri": "https://w3id.org/linkml/Decimal",
+      "description": "A real number with arbitrary precision that conforms to the xsd:decimal specification",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"decimal\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "broad_mappings": [
+        "schema:Number"
+      ],
+      "base": "Decimal",
+      "uri": "http://www.w3.org/2001/XMLSchema#decimal",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "time",
+      "definition_uri": "https://w3id.org/linkml/Time",
+      "description": "A time object represents a (local) time of day, independent of any particular day",
+      "notes": [
+        "URI is dateTime because OWL reasoners do not work with straight date or time",
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"time\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "exact_mappings": [
+        "schema:Time"
+      ],
+      "base": "XSDTime",
+      "uri": "http://www.w3.org/2001/XMLSchema#time",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "date",
+      "definition_uri": "https://w3id.org/linkml/Date",
+      "description": "a date (year, month and day) in an idealized calendar",
+      "notes": [
+        "URI is dateTime because OWL reasoners don't work with straight date or time",
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"date\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "exact_mappings": [
+        "schema:Date"
+      ],
+      "base": "XSDDate",
+      "uri": "http://www.w3.org/2001/XMLSchema#date",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "datetime",
+      "definition_uri": "https://w3id.org/linkml/Datetime",
+      "description": "The combination of a date and time",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"datetime\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "exact_mappings": [
+        "schema:DateTime"
+      ],
+      "base": "XSDDateTime",
+      "uri": "http://www.w3.org/2001/XMLSchema#dateTime",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "date_or_datetime",
+      "definition_uri": "https://w3id.org/linkml/DateOrDatetime",
+      "description": "Either a date or a datetime",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"date_or_datetime\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "str",
+      "uri": "https://w3id.org/linkml/DateOrDatetime",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "uriorcurie",
+      "definition_uri": "https://w3id.org/linkml/Uriorcurie",
+      "description": "a URI or a CURIE",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"uriorcurie\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "URIorCURIE",
+      "uri": "http://www.w3.org/2001/XMLSchema#anyURI",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "curie",
+      "definition_uri": "https://w3id.org/linkml/Curie",
+      "conforms_to": "https://www.w3.org/TR/curie/",
+      "description": "a compact URI",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"curie\"."
+      ],
+      "comments": [
+        "in RDF serializations this MUST be expanded to a URI",
+        "in non-RDF serializations MAY be serialized as the compact representation"
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "Curie",
+      "uri": "http://www.w3.org/2001/XMLSchema#string",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "uri",
+      "definition_uri": "https://w3id.org/linkml/Uri",
+      "conforms_to": "https://www.ietf.org/rfc/rfc3987.txt",
+      "description": "a complete URI",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"uri\"."
+      ],
+      "comments": [
+        "in RDF serializations a slot with range of uri is treated as a literal or type xsd:anyURI unless it is an identifier or a reference to an identifier, in which case it is translated directly to a node"
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "close_mappings": [
+        "schema:URL"
+      ],
+      "base": "URI",
+      "uri": "http://www.w3.org/2001/XMLSchema#anyURI",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "ncname",
+      "definition_uri": "https://w3id.org/linkml/Ncname",
+      "description": "Prefix part of CURIE",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"ncname\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "NCName",
+      "uri": "http://www.w3.org/2001/XMLSchema#string",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "objectidentifier",
+      "definition_uri": "https://w3id.org/linkml/Objectidentifier",
+      "description": "A URI or CURIE that represents an object in the model.",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"objectidentifier\"."
+      ],
+      "comments": [
+        "Used for inheritance and type checking"
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "ElementIdentifier",
+      "uri": "http://www.w3.org/ns/shex#iri",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "nodeidentifier",
+      "definition_uri": "https://w3id.org/linkml/Nodeidentifier",
+      "description": "A URI, CURIE or BNODE that represents a node in a model.",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"nodeidentifier\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "NodeIdentifier",
+      "uri": "http://www.w3.org/ns/shex#nonLiteral",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "jsonpointer",
+      "definition_uri": "https://w3id.org/linkml/Jsonpointer",
+      "conforms_to": "https://datatracker.ietf.org/doc/html/rfc6901",
+      "description": "A string encoding a JSON Pointer. The value of the string MUST conform to JSON Point syntax and SHOULD dereference to a valid object within the current instance document when encoded in tree form.",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"jsonpointer\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "str",
+      "uri": "http://www.w3.org/2001/XMLSchema#string",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "jsonpath",
+      "definition_uri": "https://w3id.org/linkml/Jsonpath",
+      "conforms_to": "https://www.ietf.org/archive/id/draft-goessner-dispatch-jsonpath-00.html",
+      "description": "A string encoding a JSON Path. The value of the string MUST conform to JSON Point syntax and SHOULD dereference to zero or more valid objects within the current instance document when encoded in tree form.",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"jsonpath\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "str",
+      "uri": "http://www.w3.org/2001/XMLSchema#string",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    },
+    {
+      "name": "sparqlpath",
+      "definition_uri": "https://w3id.org/linkml/Sparqlpath",
+      "conforms_to": "https://www.w3.org/TR/sparql11-query/#propertypaths",
+      "description": "A string encoding a SPARQL Property Path. The value of the string MUST conform to SPARQL syntax and SHOULD dereference to zero or more valid objects within the current instance document when encoded as RDF.",
+      "notes": [
+        "If you are authoring schemas in LinkML YAML, the type is referenced with the lower case \"sparqlpath\"."
+      ],
+      "from_schema": "https://w3id.org/linkml/types",
+      "imported_from": "linkml:types",
+      "base": "str",
+      "uri": "http://www.w3.org/2001/XMLSchema#string",
+      "repr": "str",
+      "@type": "TypeDefinition"
+    }
+  ],
+  "enums": [
+    {
+      "name": "ModelStateEnum",
+      "definition_uri": "https://w3id.org/gocam/ModelStateEnum",
+      "description": "Status of a model",
+      "from_schema": "https://w3id.org/gocam",
+      "permissible_values": [
+        {
+          "text": "production"
+        },
+        {
+          "text": "development"
+        }
+      ]
+    },
+    {
+      "name": "InformationBiomacromoleculeCategory",
+      "definition_uri": "https://w3id.org/gocam/InformationBiomacromoleculeCategory",
+      "from_schema": "https://w3id.org/gocam",
+      "permissible_values": [
+        {
+          "text": "GeneOrReferenceProtein",
+          "meaning": "biolink.GeneOrGeneProduct"
+        },
+        {
+          "text": "ProteinIsoform"
+        },
+        {
+          "text": "MacromolecularComplex"
+        },
+        {
+          "text": "Unknown"
+        }
+      ]
+    },
+    {
+      "name": "CausalPredicateEnum",
+      "definition_uri": "https://w3id.org/gocam/CausalPredicateEnum",
+      "from_schema": "https://w3id.org/gocam",
+      "permissible_values": [
+        {
+          "text": "causally upstream of, positive effect",
+          "meaning": "RO:0002304"
+        },
+        {
+          "text": "causally upstream of, negative effect",
+          "meaning": "RO:0002305"
+        },
+        {
+          "text": "causally upstream of",
+          "meaning": "RO:0002411"
+        },
+        {
+          "text": "immediately causally upstream of",
+          "meaning": "RO:0002412"
+        },
+        {
+          "text": "causally upstream of or within",
+          "meaning": "RO:0002418"
+        },
+        {
+          "text": "causally upstream of or within, negative effect",
+          "meaning": "RO:0004046"
+        },
+        {
+          "text": "causally upstream of or within, positive effect",
+          "meaning": "RO:0004047"
+        },
+        {
+          "text": "regulates",
+          "meaning": "RO:0002211"
+        },
+        {
+          "text": "negatively regulates",
+          "meaning": "RO:0002212"
+        },
+        {
+          "text": "positively regulates",
+          "meaning": "RO:0002213"
+        }
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "model__id",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/id",
+      "identifier": true,
+      "alias": "id",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "uriorcurie",
+      "required": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "model__title",
+      "from_schema": "https://w3id.org/gocam",
+      "mappings": [
+        "http://example.org/UNKNOWN/dct/title"
+      ],
+      "slot_uri": "http://example.org/UNKNOWN/dct/title",
+      "alias": "title",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "model__taxon",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/taxon",
+      "alias": "taxon",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "TaxonTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "model__status",
+      "from_schema": "https://w3id.org/gocam",
+      "mappings": [
+        "http://purl.org/pav/status"
+      ],
+      "slot_uri": "http://purl.org/pav/status",
+      "alias": "status",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "ModelStateEnum",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "model__comments",
+      "from_schema": "https://w3id.org/gocam",
+      "mappings": [
+        "http://example.org/UNKNOWN/rdfs/comment"
+      ],
+      "slot_uri": "http://example.org/UNKNOWN/rdfs/comment",
+      "multivalued": true,
+      "alias": "comments",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "model__activities",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/activities",
+      "multivalued": true,
+      "alias": "activities",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "Activity",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "model__objects",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/objects",
+      "multivalued": true,
+      "alias": "objects",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "Object",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "model__provenances",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/provenances",
+      "multivalued": true,
+      "alias": "provenances",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "ProvenanceInfo",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__id",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/id",
+      "identifier": true,
+      "alias": "id",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "uriorcurie",
+      "required": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__enabled_by",
+      "description": "The gene product or complex that carries out the activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/enabled_by",
+      "alias": "enabled_by",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "InformationBiomacromoleculeTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__molecular_function",
+      "description": "The molecular function that is carried out by the gene product or complex",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/molecular_function",
+      "alias": "molecular_function",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "MolecularFunctionAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__occurs_in",
+      "description": "The cellular location in which the activity occurs",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/occurs_in",
+      "alias": "occurs_in",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "CellularAnatomicalEntityAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__part_of",
+      "description": "The larger biological process in which the activity is a part",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "BiologicalProcessAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__has_direct_input",
+      "description": "The input molecules that are directly consumed by the activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/has_direct_input",
+      "alias": "has_direct_input",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "MoleculeAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__causal_associations",
+      "description": "The causal associations that connect this activity to other activities",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/causal_associations",
+      "multivalued": true,
+      "alias": "causal_associations",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "CausalAssociation",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__provenances",
+      "description": "Provenance information for the activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/provenances",
+      "multivalued": true,
+      "alias": "provenances",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "ProvenanceInfo",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "evidenceItem__term",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "EvidenceItem",
+      "domain_of": [
+        "EvidenceItem"
+      ],
+      "range": "EvidenceTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "evidenceItem__reference",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/reference",
+      "alias": "reference",
+      "owner": "EvidenceItem",
+      "domain_of": [
+        "EvidenceItem"
+      ],
+      "range": "PublicationObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "evidenceItem__with_objects",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/with_objects",
+      "multivalued": true,
+      "alias": "with_objects",
+      "owner": "EvidenceItem",
+      "domain_of": [
+        "EvidenceItem"
+      ],
+      "range": "Object",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "evidenceItem__provenances",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/provenances",
+      "multivalued": true,
+      "alias": "provenances",
+      "owner": "EvidenceItem",
+      "domain_of": [
+        "EvidenceItem"
+      ],
+      "range": "ProvenanceInfo",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "association__type",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/type",
+      "designates_type": true,
+      "alias": "type",
+      "owner": "Association",
+      "domain_of": [
+        "Association"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "association__evidence",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/evidence",
+      "multivalued": true,
+      "alias": "evidence",
+      "owner": "Association",
+      "domain_of": [
+        "Association"
+      ],
+      "range": "EvidenceItem",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "association__provenances",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/provenances",
+      "multivalued": true,
+      "alias": "provenances",
+      "owner": "Association",
+      "domain_of": [
+        "Association"
+      ],
+      "range": "ProvenanceInfo",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "causalAssociation__predicate",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/predicate",
+      "alias": "predicate",
+      "owner": "CausalAssociation",
+      "domain_of": [
+        "CausalAssociation"
+      ],
+      "range": "PredicateTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "causalAssociation__downstream_activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/downstream_activity",
+      "alias": "downstream_activity",
+      "owner": "CausalAssociation",
+      "domain_of": [
+        "CausalAssociation"
+      ],
+      "range": "Activity",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "termAssociation__term",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "TermAssociation",
+      "domain_of": [
+        "TermAssociation"
+      ],
+      "range": "TermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "object__id",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/id",
+      "identifier": true,
+      "alias": "id",
+      "owner": "Object",
+      "domain_of": [
+        "Object"
+      ],
+      "range": "uriorcurie",
+      "required": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "object__label",
+      "from_schema": "https://w3id.org/gocam",
+      "mappings": [
+        "http://example.org/UNKNOWN/rdfs/label"
+      ],
+      "slot_uri": "http://example.org/UNKNOWN/rdfs/label",
+      "alias": "label",
+      "owner": "Object",
+      "domain_of": [
+        "Object"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "object__type",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/type",
+      "designates_type": true,
+      "alias": "type",
+      "owner": "Object",
+      "domain_of": [
+        "Object"
+      ],
+      "range": "uriorcurie",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "object__obsolete",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/obsolete",
+      "alias": "obsolete",
+      "owner": "Object",
+      "domain_of": [
+        "Object"
+      ],
+      "range": "boolean",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "publicationObject__abstract_text",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/abstract_text",
+      "alias": "abstract_text",
+      "owner": "PublicationObject",
+      "domain_of": [
+        "PublicationObject"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "publicationObject__full_text",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/full_text",
+      "alias": "full_text",
+      "owner": "PublicationObject",
+      "domain_of": [
+        "PublicationObject"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "provenanceInfo__contributor",
+      "from_schema": "https://w3id.org/gocam",
+      "mappings": [
+        "http://example.org/UNKNOWN/dct/contributor"
+      ],
+      "slot_uri": "http://example.org/UNKNOWN/dct/contributor",
+      "alias": "contributor",
+      "owner": "ProvenanceInfo",
+      "domain_of": [
+        "ProvenanceInfo"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "provenanceInfo__created",
+      "from_schema": "https://w3id.org/gocam",
+      "mappings": [
+        "http://example.org/UNKNOWN/dct/created"
+      ],
+      "slot_uri": "http://example.org/UNKNOWN/dct/created",
+      "alias": "created",
+      "owner": "ProvenanceInfo",
+      "domain_of": [
+        "ProvenanceInfo"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "provenanceInfo__date",
+      "from_schema": "https://w3id.org/gocam",
+      "mappings": [
+        "http://example.org/UNKNOWN/dct/date"
+      ],
+      "slot_uri": "http://example.org/UNKNOWN/dct/date",
+      "alias": "date",
+      "owner": "ProvenanceInfo",
+      "domain_of": [
+        "ProvenanceInfo"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "provenanceInfo__provided_by",
+      "from_schema": "https://w3id.org/gocam",
+      "mappings": [
+        "http://purl.org/pav/providedBy"
+      ],
+      "slot_uri": "http://purl.org/pav/providedBy",
+      "alias": "provided_by",
+      "owner": "ProvenanceInfo",
+      "domain_of": [
+        "ProvenanceInfo"
+      ],
+      "range": "string",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "happens_during",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/happens_during",
+      "range": "PhaseTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "part_of",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "range": "BiologicalProcessTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "MolecularFunctionAssociation_term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "termAssociation__term",
+      "domain": "MolecularFunctionAssociation",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "MolecularFunctionAssociation",
+      "domain_of": [
+        "MolecularFunctionAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "term",
+      "range": "MolecularFunctionTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "BiologicalProcessAssociation_term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "termAssociation__term",
+      "domain": "BiologicalProcessAssociation",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "BiologicalProcessAssociation",
+      "domain_of": [
+        "BiologicalProcessAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "term",
+      "range": "BiologicalProcessTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "BiologicalProcessAssociation_happens_during",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "happens_during",
+      "domain": "BiologicalProcessAssociation",
+      "slot_uri": "https://w3id.org/gocam/happens_during",
+      "alias": "happens_during",
+      "owner": "BiologicalProcessAssociation",
+      "domain_of": [
+        "BiologicalProcessAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "happens_during",
+      "range": "PhaseTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "BiologicalProcessAssociation_part_of",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "part_of",
+      "domain": "BiologicalProcessAssociation",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "BiologicalProcessAssociation",
+      "domain_of": [
+        "BiologicalProcessAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "part_of",
+      "range": "BiologicalProcessTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "CellularAnatomicalEntityAssociation_term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "termAssociation__term",
+      "domain": "CellularAnatomicalEntityAssociation",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "CellularAnatomicalEntityAssociation",
+      "domain_of": [
+        "CellularAnatomicalEntityAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "term",
+      "range": "CellularAnatomicalEntityTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "MoleculeAssociation_term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "termAssociation__term",
+      "domain": "MoleculeAssociation",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "MoleculeAssociation",
+      "domain_of": [
+        "MoleculeAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "term",
+      "range": "MoleculeTermObject",
+      "@type": "SlotDefinition"
+    }
+  ],
+  "classes": [
+    {
+      "name": "Model",
+      "definition_uri": "https://w3id.org/gocam/Model",
+      "description": "A model of a biological program consisting of a set of causally connected activities",
+      "from_schema": "https://w3id.org/gocam",
+      "slots": [
+        "model__id",
+        "model__title",
+        "model__taxon",
+        "model__status",
+        "model__comments",
+        "model__activities",
+        "model__objects",
+        "model__provenances"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "id",
+          "identifier": true,
+          "range": "uriorcurie",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "title",
+          "slot_uri": "dct:title",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "taxon",
+          "range": "TaxonTermObject",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "status",
+          "slot_uri": "pav:status",
+          "range": "ModelStateEnum",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "comments",
+          "slot_uri": "rdfs:comment",
+          "multivalued": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "activities",
+          "multivalued": true,
+          "range": "Activity",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "objects",
+          "multivalued": true,
+          "range": "Object",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "provenances",
+          "multivalued": true,
+          "range": "ProvenanceInfo",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/Model",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "Activity",
+      "definition_uri": "https://w3id.org/gocam/Activity",
+      "description": "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex",
+      "from_schema": "https://w3id.org/gocam",
+      "aliases": [
+        "annoton"
+      ],
+      "slots": [
+        "activity__id",
+        "activity__enabled_by",
+        "activity__molecular_function",
+        "activity__occurs_in",
+        "activity__part_of",
+        "activity__has_direct_input",
+        "activity__causal_associations",
+        "activity__provenances"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "id",
+          "identifier": true,
+          "range": "uriorcurie",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "enabled_by",
+          "description": "The gene product or complex that carries out the activity",
+          "range": "InformationBiomacromoleculeTermObject",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "molecular_function",
+          "description": "The molecular function that is carried out by the gene product or complex",
+          "range": "MolecularFunctionAssociation",
+          "inlined": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "occurs_in",
+          "description": "The cellular location in which the activity occurs",
+          "range": "CellularAnatomicalEntityAssociation",
+          "inlined": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "part_of",
+          "description": "The larger biological process in which the activity is a part",
+          "range": "BiologicalProcessAssociation",
+          "inlined": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "has_direct_input",
+          "description": "The input molecules that are directly consumed by the activity",
+          "range": "MoleculeAssociation",
+          "inlined": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "causal_associations",
+          "description": "The causal associations that connect this activity to other activities",
+          "multivalued": true,
+          "range": "CausalAssociation",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "provenances",
+          "description": "Provenance information for the activity",
+          "multivalued": true,
+          "range": "ProvenanceInfo",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/Activity",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "EvidenceItem",
+      "definition_uri": "https://w3id.org/gocam/EvidenceItem",
+      "from_schema": "https://w3id.org/gocam",
+      "slots": [
+        "evidenceItem__term",
+        "evidenceItem__reference",
+        "evidenceItem__with_objects",
+        "evidenceItem__provenances"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "term",
+          "range": "EvidenceTermObject",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "reference",
+          "range": "PublicationObject",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "with_objects",
+          "multivalued": true,
+          "range": "Object",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "provenances",
+          "multivalued": true,
+          "range": "ProvenanceInfo",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/EvidenceItem",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "Association",
+      "definition_uri": "https://w3id.org/gocam/Association",
+      "description": "An abstract grouping for different kinds of evidence-associated provenance",
+      "from_schema": "https://w3id.org/gocam",
+      "abstract": true,
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "type",
+          "designates_type": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "evidence",
+          "multivalued": true,
+          "range": "EvidenceItem",
+          "inlined": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "provenances",
+          "multivalued": true,
+          "range": "ProvenanceInfo",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/Association",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "CausalAssociation",
+      "definition_uri": "https://w3id.org/gocam/CausalAssociation",
+      "description": "A causal association between two activities",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "Association",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "causalAssociation__predicate",
+        "causalAssociation__downstream_activity"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "predicate",
+          "range": "PredicateTermObject",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "downstream_activity",
+          "range": "Activity",
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/CausalAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "TermAssociation",
+      "definition_uri": "https://w3id.org/gocam/TermAssociation",
+      "description": "An association between an activity and a term, potentially with extensions",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "Association",
+      "abstract": true,
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "termAssociation__term"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "term",
+          "range": "TermObject",
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/TermAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "MolecularFunctionAssociation",
+      "definition_uri": "https://w3id.org/gocam/MolecularFunctionAssociation",
+      "description": "An association between an activity and a molecular function term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermAssociation",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "MolecularFunctionAssociation_term"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/MolecularFunctionAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "BiologicalProcessAssociation",
+      "definition_uri": "https://w3id.org/gocam/BiologicalProcessAssociation",
+      "description": "An association between an activity and a biological process term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermAssociation",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "BiologicalProcessAssociation_term",
+        "BiologicalProcessAssociation_happens_during",
+        "BiologicalProcessAssociation_part_of"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/BiologicalProcessAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "CellularAnatomicalEntityAssociation",
+      "definition_uri": "https://w3id.org/gocam/CellularAnatomicalEntityAssociation",
+      "description": "An association between an activity and a cellular anatomical entity term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermAssociation",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "CellularAnatomicalEntityAssociation_term"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/CellularAnatomicalEntityAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "MoleculeAssociation",
+      "definition_uri": "https://w3id.org/gocam/MoleculeAssociation",
+      "description": "An association between an activity and a molecule term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermAssociation",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "MoleculeAssociation_term"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/MoleculeAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "Object",
+      "definition_uri": "https://w3id.org/gocam/Object",
+      "description": "An abstract class for all identified objects in a model",
+      "from_schema": "https://w3id.org/gocam",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "id",
+          "identifier": true,
+          "range": "uriorcurie",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "label",
+          "slot_uri": "rdfs:label",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "type",
+          "designates_type": true,
+          "range": "uriorcurie",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "obsolete",
+          "range": "boolean",
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/Object",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "TermObject",
+      "definition_uri": "https://w3id.org/gocam/TermObject",
+      "description": "An abstract class for all ontology term objects",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "Object",
+      "abstract": true,
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/TermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "PublicationObject",
+      "id_prefixes": [
+        "PMID",
+        "GOREF",
+        "DOI"
+      ],
+      "definition_uri": "https://w3id.org/gocam/PublicationObject",
+      "description": "An object that represents a publication or other kind of reference",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "Object",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete",
+        "publicationObject__abstract_text",
+        "publicationObject__full_text"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "abstract_text",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "full_text",
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/PublicationObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "EvidenceTermObject",
+      "id_prefixes": [
+        "ECO"
+      ],
+      "definition_uri": "https://w3id.org/gocam/EvidenceTermObject",
+      "description": "A term object that represents an evidence term from ECO",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/EvidenceTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "MolecularFunctionTermObject",
+      "id_prefixes": [
+        "GO"
+      ],
+      "definition_uri": "https://w3id.org/gocam/MolecularFunctionTermObject",
+      "description": "A term object that represents a molecular function term from GO",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/MolecularFunctionTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "BiologicalProcessTermObject",
+      "id_prefixes": [
+        "GO"
+      ],
+      "definition_uri": "https://w3id.org/gocam/BiologicalProcessTermObject",
+      "description": "A termm object that represents a biological process term from GO",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/BiologicalProcessTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "CellularAnatomicalEntityTermObject",
+      "id_prefixes": [
+        "GO"
+      ],
+      "definition_uri": "https://w3id.org/gocam/CellularAnatomicalEntityTermObject",
+      "description": "A term object that represents a cellular anatomical entity term from GO",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/CellularAnatomicalEntityTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "MoleculeTermObject",
+      "id_prefixes": [
+        "CHEBI",
+        "UniProtKB"
+      ],
+      "definition_uri": "https://w3id.org/gocam/MoleculeTermObject",
+      "description": "A term object that represents a molecule term from CHEBI or UniProtKB",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/MoleculeTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "CellTypeTermObject",
+      "id_prefixes": [
+        "CL",
+        "PO",
+        "FAO",
+        "DDANAT"
+      ],
+      "definition_uri": "https://w3id.org/gocam/CellTypeTermObject",
+      "description": "A term object that represents a cell type term from CL",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/CellTypeTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "GrossAnatomicalStructureTermObject",
+      "id_prefixes": [
+        "UBERON",
+        "PO",
+        "FAO",
+        "DDANAT"
+      ],
+      "definition_uri": "https://w3id.org/gocam/GrossAnatomicalStructureTermObject",
+      "description": "A term object that represents a gross anatomical structure term from UBERON",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/GrossAnatomicalStructureTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "PhaseTermObject",
+      "id_prefixes": [
+        "GO",
+        "UBERON",
+        "PO"
+      ],
+      "definition_uri": "https://w3id.org/gocam/PhaseTermObject",
+      "description": "A term object that represents a phase term from GO or UBERON",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/PhaseTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "InformationBiomacromoleculeTermObject",
+      "definition_uri": "https://w3id.org/gocam/InformationBiomacromoleculeTermObject",
+      "description": "An abstract class for all information biomacromolecule term objects",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "abstract": true,
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/InformationBiomacromoleculeTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "GeneProductTermObject",
+      "definition_uri": "https://w3id.org/gocam/GeneProductTermObject",
+      "description": "A term object that represents a gene product term from GO or UniProtKB",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "InformationBiomacromoleculeTermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/GeneProductTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "ProteinComplexTermObject",
+      "definition_uri": "https://w3id.org/gocam/ProteinComplexTermObject",
+      "description": "A term object that represents a protein complex term from GO",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "InformationBiomacromoleculeTermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/ProteinComplexTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "TaxonTermObject",
+      "id_prefixes": [
+        "NCBITaxon"
+      ],
+      "definition_uri": "https://w3id.org/gocam/TaxonTermObject",
+      "description": "A term object that represents a taxon term from NCBITaxon",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/TaxonTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "PredicateTermObject",
+      "id_prefixes": [
+        "RO"
+      ],
+      "definition_uri": "https://w3id.org/gocam/PredicateTermObject",
+      "description": "A term object that represents a taxon term from NCBITaxon",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermObject",
+      "slots": [
+        "object__id",
+        "object__label",
+        "object__type",
+        "object__obsolete"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/PredicateTermObject",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "ProvenanceInfo",
+      "definition_uri": "https://w3id.org/gocam/ProvenanceInfo",
+      "description": "Provenance information for an object",
+      "from_schema": "https://w3id.org/gocam",
+      "slots": [
+        "provenanceInfo__contributor",
+        "provenanceInfo__created",
+        "provenanceInfo__date",
+        "provenanceInfo__provided_by"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "contributor",
+          "slot_uri": "dct:contributor",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "created",
+          "slot_uri": "dct:created",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "date",
+          "slot_uri": "dct:date",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "provided_by",
+          "slot_uri": "pav:providedBy",
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/ProvenanceInfo",
+      "@type": "ClassDefinition"
+    }
+  ],
+  "metamodel_version": "1.7.0",
+  "source_file": "gocam.yaml",
+  "source_file_date": "2024-06-26T14:03:44",
+  "source_file_size": 9812,
+  "generation_date": "2024-06-26T15:20:53",
+  "@type": "SchemaDefinition",
+  "@context": [
+    "project/jsonld/gocam.context.jsonld",
+    "https://w3id.org/linkml/types.context.jsonld",
+    {
+      "@base": "https://w3id.org/gocam/"
+    }
+  ]
+}

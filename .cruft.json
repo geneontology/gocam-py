@@ -1,0 +1,27 @@
+{
+  "template": "https://github.com/linkml/linkml-project-cookiecutter",
+  "commit": "b2da87eb7835bfec748a76823d098cac85e8363a",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "gocam",
+      "__project_slug": "gocam",
+      "github_org": "geneontology",
+      "__source_path": "src/gocam/schema/gocam.yaml",
+      "project_description": "GO CAM Data Model (Python)",
+      "full_name": "My Name",
+      "email": "my-name@my-org.org",
+      "__author": "My Name <my-name@my-org.org>",
+      "license": "BSD-3",
+      "main_schema_class": "Activity",
+      "create_python_classes": "Yes",
+      "use_schemasheets": "No",
+      "google_sheet_id": "1wVoaiFg47aT9YWNeRfTZ8tYHN8s8PAuDx5i2HUcDpvQ",
+      "google_sheet_tabs": "personinfo enums",
+      "__google_sheet_module": "personinfo_enums",
+      "github_token_for_pypi_deployment": "PYPI_PASSWORD",
+      "_template": "https://github.com/linkml/linkml-project-cookiecutter"
+    }
+  },
+  "directory": null
+}

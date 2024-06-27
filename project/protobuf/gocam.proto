@@ -1,0 +1,199 @@
+ syntax="proto3";
+ package
+// metamodel_version: 1.7.0
+// An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex
+message Activity
+ {
+  uriorcurie id = 0
+  informationBiomacromoleculeTermObject enabledBy = 0
+  molecularFunctionAssociation molecularFunction = 0
+  cellularAnatomicalEntityAssociation occursIn = 0
+  biologicalProcessAssociation partOf = 0
+  moleculeAssociation hasDirectInput = 0
+ repeated  causalAssociation causalAssociations = 0
+ repeated  provenanceInfo provenances = 0
+ }
+// An association between an activity and a biological process term
+message BiologicalProcessAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+  biologicalProcessTermObject term = 0
+  phaseTermObject happensDuring = 0
+  biologicalProcessTermObject partOf = 0
+ }
+// A termm object that represents a biological process term from GO
+message BiologicalProcessTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// A causal association between two activities
+message CausalAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+  predicateTermObject predicate = 0
+  activity downstreamActivity = 0
+ }
+// A term object that represents a cell type term from CL
+message CellTypeTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// An association between an activity and a cellular anatomical entity term
+message CellularAnatomicalEntityAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+  cellularAnatomicalEntityTermObject term = 0
+ }
+// A term object that represents a cellular anatomical entity term from GO
+message CellularAnatomicalEntityTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+message EvidenceItem
+ {
+  evidenceTermObject term = 0
+  publicationObject reference = 0
+ repeated  object withObjects = 0
+ repeated  provenanceInfo provenances = 0
+ }
+// A term object that represents an evidence term from ECO
+message EvidenceTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// A term object that represents a gene product term from GO or UniProtKB
+message GeneProductTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// A term object that represents a gross anatomical structure term from UBERON
+message GrossAnatomicalStructureTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// A model of a biological program consisting of a set of causally connected activities
+message Model
+ {
+  uriorcurie id = 0
+  string title = 0
+  taxonTermObject taxon = 0
+  modelStateEnum status = 0
+ repeated  string comments = 0
+ repeated  activity activities = 0
+ repeated  object objects = 0
+ repeated  provenanceInfo provenances = 0
+ }
+// An association between an activity and a molecular function term
+message MolecularFunctionAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+  molecularFunctionTermObject term = 0
+ }
+// A term object that represents a molecular function term from GO
+message MolecularFunctionTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// An association between an activity and a molecule term
+message MoleculeAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+  moleculeTermObject term = 0
+ }
+// A term object that represents a molecule term from CHEBI or UniProtKB
+message MoleculeTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// An abstract class for all identified objects in a model
+message Object
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// A term object that represents a phase term from GO or UBERON
+message PhaseTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// A term object that represents a taxon term from NCBITaxon
+message PredicateTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// A term object that represents a protein complex term from GO
+message ProteinComplexTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
+// Provenance information for an object
+message ProvenanceInfo
+ {
+  string contributor = 0
+  string created = 0
+  string date = 0
+  string providedBy = 0
+ }
+// An object that represents a publication or other kind of reference
+message PublicationObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+  string abstractText = 0
+  string fullText = 0
+ }
+// A term object that represents a taxon term from NCBITaxon
+message TaxonTermObject
+ {
+  uriorcurie id = 0
+  string label = 0
+  uriorcurie type = 0
+  boolean obsolete = 0
+ }
