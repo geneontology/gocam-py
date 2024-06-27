@@ -16,8 +16,8 @@ nav:
   # - Home: home.md
   - Index: index.md
   - About: about.md
-site_url: https://geneontology.github.io/gocam
-repo_url: https://github.com/geneontology/gocam
+site_url: https://geneontology.github.io/gocam-by
+repo_url: https://github.com/geneontology/gocam-by
 
 # Uncomment this block to enable use of Google Analytics.
 # Replace the property value with your own ID.
