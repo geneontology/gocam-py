@@ -39,3 +39,7 @@ docs = ["linkml", "mkdocs-material"]
 [tool.poetry.scripts]
 gocam = "gocam.cli:cli"
 
+[tool.pytest.ini_options]
+markers = [
+    "integration"
+]
