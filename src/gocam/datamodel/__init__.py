@@ -1,5 +1,5 @@
 from pathlib import Path
-from .gocam import *
+from gocam.datamodel.gocam import *
 
 THIS_PATH = Path(__file__).parent
 

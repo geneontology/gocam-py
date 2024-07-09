@@ -3,7 +3,7 @@ import os
 import glob
 
 from linkml_runtime.loaders import yaml_loader
-from gocam.datamodel.gocam import Model
+from gocam.datamodel import Model
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 DATA_DIR = os.path.join(ROOT, "src", "data", "examples")

@@ -1,12 +1,10 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import ClassVar, Dict, Iterable, Iterator, Optional, Tuple, List
+from typing import Dict, Iterator, Optional, Tuple, List
 
 import requests
-import requests_cache
 import yaml
-from oaklib import BasicOntologyInterface, get_adapter
 
 from gocam.datamodel import Model, Activity, MolecularFunctionAssociation, BiologicalProcessAssociation, \
     CellularAnatomicalEntityAssociation, CausalAssociation, Object, EvidenceItem, ProvenanceInfo
@@ -78,13 +76,6 @@ class MinervaWrapper:
 
     TODO: Implement a fact counter to ensure all facts are encountered for and nothing dropped on floor
     """
-
-    name: ClassVar[str] = "gocam"
-
-    default_object_type = "Activity"
-
-    _label_adapter: BasicOntologyInterface = None
-
     session: requests.Session = field(default_factory=lambda: requests.Session())
 
 

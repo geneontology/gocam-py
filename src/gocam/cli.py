@@ -2,14 +2,11 @@ import json
 import logging
 import sys
 import warnings
-from typing import Optional
 
 import click
 import yaml
-from linkml_runtime.dumpers import json_dumper
-from pydantic import BaseModel
 
-from gocam.translation.minerva_wrapper import MinervaWrapper
+from gocam.translation import MinervaWrapper
 
 index_type_option = click.option(
     "--index-type",
