@@ -32,6 +32,12 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
+      - name: Generate project files
+        run: make clean all
+
+      - name: Test project
+        run: make test
+
       - name: Build source and wheel archives
         run: poetry build
 
