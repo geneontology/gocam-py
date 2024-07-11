@@ -4,7 +4,8 @@ import pytest
 import yaml
 from click.testing import CliRunner
 
-from gocam.cli import fetch
+from gocam import __version__
+from gocam.cli import fetch, cli
 from tests import INPUT_DIR
 
 
@@ -37,3 +38,9 @@ def test_fetch_json(runner, api_mock):
 
     parsed_output = json.loads(result.output)
     assert parsed_output["id"] == "gomodel:5b91dbd100002057"
+
+
+def test_version(runner):
+    result = runner.invoke(cli, ["--version"])
+    assert result.exit_code == 0
+    assert __version__ in result.output

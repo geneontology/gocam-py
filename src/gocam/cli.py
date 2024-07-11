@@ -5,6 +5,7 @@ import sys
 import click
 import yaml
 
+from gocam import __version__
 from gocam.translation import MinervaWrapper
 
 
@@ -17,6 +18,7 @@ from gocam.translation import MinervaWrapper
     show_default=True,
     help="If set then show full stacktrace on error",
 )
+@click.version_option(__version__)
 def cli(verbose: int, quiet: bool, stacktrace: bool):
     """A CLI for interacting with GO-CAMs."""
     if not stacktrace:

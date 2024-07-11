@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gocam"
-version = "0.1.0"
+version = "0.0.0"
 description = "GO CAM Data Model (Python)"
 authors = ["The Gene Ontology Consortium <help@geneontology.org>"]
 license = "BSD-3"
