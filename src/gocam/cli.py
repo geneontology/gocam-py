@@ -1,33 +1,11 @@
 import json
 import logging
 import sys
-import warnings
 
 import click
 import yaml
 
 from gocam.translation import MinervaWrapper
-
-index_type_option = click.option(
-    "--index-type",
-    "-t",
-    default="simple",
-    show_default=True,
-    help="Type of index to create. Values: simple, llm",
-)
-
-logger = logging.getLogger(__name__)
-
-warnings.filterwarnings("ignore", module="duckdb_engine")
-
-def get_wrapper():
-    return MinervaWrapper()
-
-
-format_choice = click.Choice(["json", "yaml", "tsv"])
-
-
-include_internal_option = click.option("--include-internal/--no-include-internal", default=False, show_default=True)
 
 
 @click.group()
@@ -39,15 +17,17 @@ include_internal_option = click.option("--include-internal/--no-include-internal
     show_default=True,
     help="If set then show full stacktrace on error",
 )
-@click.pass_context
-def cli(ctx, verbose: int, quiet: bool, stacktrace: bool):
-    """A CLI for interacting with the linkml-store."""
+def cli(verbose: int, quiet: bool, stacktrace: bool):
+    """A CLI for interacting with GO-CAMs."""
     if not stacktrace:
         sys.tracebacklimit = 0
+
     logger = logging.getLogger()
     # Set handler for the root logger to output to the console
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    console_handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    )
 
     # Clear existing handlers to avoid duplicate messages if function runs multiple times
     logger.handlers = []
@@ -65,22 +45,31 @@ def cli(ctx, verbose: int, quiet: bool, stacktrace: bool):
 
 
 @cli.command()
-@click.option("--format", "-f", type=format_choice, help="Input format")
+@click.option(
+    "--format",
+    "-f",
+    type=click.Choice(["json", "yaml"]),
+    default="yaml",
+    show_default=True,
+    help="Input format",
+)
 @click.argument("model_ids", nargs=-1)
 def fetch(model_ids, format):
-    wrapper = get_wrapper()
+    """Fetch GO-CAM models."""
+    wrapper = MinervaWrapper()
+
     if not model_ids:
         model_ids = wrapper.models_ids()
+
     for model_id in model_ids:
-        model = wrapper.object_by_id(model_id)
+        model = wrapper.fetch_model(model_id)
         model_dict = model.model_dump(exclude_none=True, exclude_unset=True)
-        if format is None:
-            format = "yaml"
+
         if format == "json":
-            print(json.dumps(model_dict, indent=2))
+            click.echo(json.dumps(model_dict, indent=2))
         elif format == "yaml":
-            print("---")
-            print(yaml.dump(model_dict, sort_keys=False))
+            click.echo("---")
+            click.echo(yaml.dump(model_dict, sort_keys=False))
         else:
             click.echo(model.model_dump())
 

@@ -122,7 +122,7 @@ class MinervaWrapper:
         if not gocam_id:
             raise ValueError(f"Missing GO-CAM ID: {gocam_id}")
         local_id = gocam_id.replace("gocam:", "")
-        url = f"{self.gocam_endpoint_base}/{local_id}"
+        url = f"{self.gocam_endpoint_base}{local_id}"
         logger.info(f"Fetch Minerva JSON from: {url}")
         response = self.session.get(url)
         response.raise_for_status()

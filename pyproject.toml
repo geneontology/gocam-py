@@ -23,6 +23,7 @@ schemasheets = "^0.1.14"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.2.2"
+requests-mock = "^1.12.1"
 
 [tool.poetry-dynamic-versioning]
 enable = true

@@ -17,7 +17,7 @@ def test_api(model_local_id):
     assert model is not None
 
 
-@pytest.mark.parametrize("base_name", ["minerva-example"])
+@pytest.mark.parametrize("base_name", ["minerva-663d668500002178", "minerva-5b91dbd100002057"])
 def test_object(base_name):
     mw = MinervaWrapper()
     with open(INPUT_DIR / f"{base_name}.json", "r") as f:
