@@ -15,23 +15,22 @@ jobs:
       id-token: write  # to verify the deployment originates from an appropriate source
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # otherwise, you will failed to push refs to dest repo
+          fetch-depth: 0  # otherwise, it will fail to push refs to dest repo
 
-      - name: Set up Python.
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-
-      - name: Install Poetry.
+      - name: Install Poetry
         run: pipx install poetry
 
-      - name: Install dependencies.
-        run: poetry install -E docs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
 
-      - name: Build documentation.
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Build documentation
         run: |
           mkdir -p docs
           touch docs/.nojekyll

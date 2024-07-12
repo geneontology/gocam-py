@@ -9,28 +9,37 @@ jobs:
   build-n-publish:
     name: Build and publish Python 🐍 distributions 📦 to PyPI
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/gocam
+    permissions:
+      # this permission is mandatory for trusted publishing
+      id-token: write
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
+      - uses: actions/checkout@v4
 
       - name: Install Poetry
         run: |
           pipx install poetry
-          poetry self add "poetry-dynamic-versioning[plugin]"
+          pipx inject poetry "poetry-dynamic-versioning[plugin]"
 
-      # - name: Install dependencies
-      #   run: poetry install --no-interaction
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Generate project files
+        run: make clean all
+
+      - name: Test project
+        run: make test
 
       - name: Build source and wheel archives
         run: poetry build
 
       - name: Publish distribution 📦 to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.2.2
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
+        uses: pypa/gh-action-pypi-publish@release/v1

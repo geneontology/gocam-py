@@ -105,7 +105,7 @@ create-data-harmonizer:
 	npm init data-harmonizer $(SOURCE_SCHEMA_PATH)
 
 all: site
-site: gen-project gendoc
+site: gen-project gendoc $(PYDANTIC)
 %.yaml: gen-project
 deploy: all mkd-gh-deploy
 
@@ -143,7 +143,7 @@ test-schema:
 	$(RUN) gen-project ${CONFIG_YAML} -d tmp $(SOURCE_SCHEMA_PATH)
 
 test-python:
-	$(RUN) python -m unittest discover
+	$(RUN) pytest tests
 
 lint:
 	$(RUN) linkml-lint $(SOURCE_SCHEMA_PATH)
@@ -219,6 +219,6 @@ clean:
 	rm -rf $(DEST)
 	rm -rf tmp
 	rm -fr docs/*
-	rm -fr $(PYMODEL)/*
+	rm -fr $(PYDANTIC)
 
 include project.Makefile
