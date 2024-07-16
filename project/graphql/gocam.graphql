@@ -45,6 +45,15 @@ type CausalAssociation
     downstreamActivity: Activity
   }
 
+type CellTypeAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: CellTypeTermObject
+    partOf: GrossAnatomyAssociation
+  }
+
 type CellTypeTermObject
   {
     id: Uriorcurie!
@@ -59,6 +68,7 @@ type CellularAnatomicalEntityAssociation
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
     term: CellularAnatomicalEntityTermObject
+    partOf: CellTypeAssociation
   }
 
 type CellularAnatomicalEntityTermObject
@@ -99,6 +109,15 @@ type GrossAnatomicalStructureTermObject
     label: String
     type: Uriorcurie
     obsolete: Boolean
+  }
+
+type GrossAnatomyAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: GrossAnatomicalStructureTermObject
+    partOf: GrossAnatomyAssociation
   }
 
 interface InformationBiomacromoleculeTermObject

@@ -11,65 +11,65 @@ gocam:Model a owl:Class,
         linkml:ClassDefinition ;
     rdfs:label "Model" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:provenances ],
+            owl:allValuesFrom linkml:String ;
+            owl:onProperty gocam:title ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
+            owl:onProperty gocam:title ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
             owl:onProperty gocam:id ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:status ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:TaxonTermObject ;
-            owl:onProperty gocam:taxon ],
         [ a owl:Restriction ;
             owl:allValuesFrom gocam:Activity ;
             owl:onProperty gocam:activities ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:status ],
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:title ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:activities ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty gocam:taxon ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:ProvenanceInfo ;
-            owl:onProperty gocam:provenances ],
+            owl:onProperty gocam:id ],
         [ a owl:Restriction ;
             owl:allValuesFrom gocam:ModelStateEnum ;
             owl:onProperty gocam:status ],
         [ a owl:Restriction ;
-            owl:allValuesFrom linkml:String ;
-            owl:onProperty gocam:comments ],
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:objects ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty gocam:comments ],
         [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:status ],
+        [ a owl:Restriction ;
             owl:allValuesFrom linkml:Uriorcurie ;
             owl:onProperty gocam:id ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:taxon ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:TaxonTermObject ;
+            owl:onProperty gocam:taxon ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:status ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:ProvenanceInfo ;
+            owl:onProperty gocam:provenances ],
         [ a owl:Restriction ;
             owl:allValuesFrom gocam:Object ;
             owl:onProperty gocam:objects ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty gocam:taxon ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:title ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:title ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:objects ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty gocam:id ],
+            owl:onProperty gocam:provenances ],
         [ a owl:Restriction ;
             owl:allValuesFrom linkml:String ;
-            owl:onProperty gocam:title ],
+            owl:onProperty gocam:comments ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty gocam:activities ] ;
+            owl:onProperty gocam:taxon ] ;
     skos:definition "A model of a biological program consisting of a set of causally connected activities" ;
     skos:inScheme <https://w3id.org/gocam> .
 
@@ -78,13 +78,25 @@ gocam:EvidenceItem a owl:Class,
     rdfs:label "EvidenceItem" ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:minCardinality 0 ;
+            owl:onProperty gocam:reference ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:EvidenceTermObject ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:Object ;
             owl:onProperty gocam:with_objects ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty gocam:provenances ],
+            owl:onProperty gocam:with_objects ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:PublicationObject ;
+            owl:onProperty gocam:reference ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty gocam:reference ],
+            owl:onProperty gocam:provenances ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty gocam:reference ],
@@ -92,20 +104,9 @@ gocam:EvidenceItem a owl:Class,
             owl:allValuesFrom gocam:ProvenanceInfo ;
             owl:onProperty gocam:provenances ],
         [ a owl:Restriction ;
-            owl:allValuesFrom gocam:PublicationObject ;
-            owl:onProperty gocam:reference ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:Object ;
-            owl:onProperty gocam:with_objects ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:term ],
-        [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty gocam:term ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:EvidenceTermObject ;
             owl:onProperty gocam:term ] ;
+    skos:definition "An individual piece of evidence that is associated with an assertion in a model" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 <biolink.GeneOrGeneProduct> a owl:Class,
@@ -168,79 +169,72 @@ gocam:Activity a owl:Class,
     rdfs:label "Activity" ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty gocam:part_of ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
             owl:onProperty gocam:molecular_function ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:id ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:CausalAssociation ;
-            owl:onProperty gocam:causal_associations ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:ProvenanceInfo ;
-            owl:onProperty gocam:provenances ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:enabled_by ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:provenances ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:BiologicalProcessAssociation ;
-            owl:onProperty gocam:part_of ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:causal_associations ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:occurs_in ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:has_direct_input ],
         [ a owl:Restriction ;
             owl:allValuesFrom gocam:MolecularFunctionAssociation ;
             owl:onProperty gocam:molecular_function ],
         [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:causal_associations ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:occurs_in ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:BiologicalProcessAssociation ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
             owl:allValuesFrom gocam:MoleculeAssociation ;
             owl:onProperty gocam:has_direct_input ],
         [ a owl:Restriction ;
-            owl:allValuesFrom gocam:InformationBiomacromoleculeTermObject ;
-            owl:onProperty gocam:enabled_by ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:enabled_by ],
-        [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty gocam:molecular_function ],
-        [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty gocam:id ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
             owl:onProperty gocam:part_of ],
         [ a owl:Restriction ;
             owl:allValuesFrom linkml:Uriorcurie ;
             owl:onProperty gocam:id ],
         [ a owl:Restriction ;
+            owl:allValuesFrom gocam:InformationBiomacromoleculeTermObject ;
+            owl:onProperty gocam:enabled_by ],
+        [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty gocam:has_direct_input ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:occurs_in ],
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:provenances ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:molecular_function ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:ProvenanceInfo ;
+            owl:onProperty gocam:provenances ],
         [ a owl:Restriction ;
             owl:allValuesFrom gocam:CellularAnatomicalEntityAssociation ;
-            owl:onProperty gocam:occurs_in ] ;
+            owl:onProperty gocam:occurs_in ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:id ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:enabled_by ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:occurs_in ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:has_direct_input ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:enabled_by ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:CausalAssociation ;
+            owl:onProperty gocam:causal_associations ],
+        [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty gocam:id ] ;
     skos:altLabel "annoton" ;
-    skos:definition "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex" ;
-    skos:inScheme <https://w3id.org/gocam> .
-
-gocam:CellTypeTermObject a owl:Class,
-        linkml:ClassDefinition ;
-    rdfs:label "CellTypeTermObject" ;
-    rdfs:subClassOf gocam:TermObject ;
-    skos:definition "A term object that represents a cell type term from CL" ;
+    skos:definition "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:GeneProductTermObject a owl:Class,
@@ -248,13 +242,6 @@ gocam:GeneProductTermObject a owl:Class,
     rdfs:label "GeneProductTermObject" ;
     rdfs:subClassOf gocam:InformationBiomacromoleculeTermObject ;
     skos:definition "A term object that represents a gene product term from GO or UniProtKB" ;
-    skos:inScheme <https://w3id.org/gocam> .
-
-gocam:GrossAnatomicalStructureTermObject a owl:Class,
-        linkml:ClassDefinition ;
-    rdfs:label "GrossAnatomicalStructureTermObject" ;
-    rdfs:subClassOf gocam:TermObject ;
-    skos:definition "A term object that represents a gross anatomical structure term from UBERON" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 <https://w3id.org/gocam/InformationBiomacromoleculeCategory#MacromolecularComplex> a owl:Class,
@@ -292,6 +279,7 @@ gocam:ProteinComplexTermObject a owl:Class,
 gocam:activities a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "activities" ;
+    skos:definition "All of the activities that are part of the model" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:causal_associations a owl:ObjectProperty,
@@ -303,6 +291,7 @@ gocam:causal_associations a owl:ObjectProperty,
 gocam:comments a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "comments" ;
+    skos:definition "Comments about the model" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:evidence a owl:ObjectProperty,
@@ -313,43 +302,47 @@ gocam:evidence a owl:ObjectProperty,
 gocam:objects a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "objects" ;
+    skos:definition "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside." ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:with_objects a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "with_objects" ;
+    skos:altLabel "with",
+        "with/from" ;
+    skos:definition "Supporting database entities or terms" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:BiologicalProcessAssociation a owl:Class,
         linkml:ClassDefinition ;
     rdfs:label "BiologicalProcessAssociation" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:allValuesFrom gocam:BiologicalProcessTermObject ;
-            owl:onProperty gocam:part_of ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:happens_during ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:BiologicalProcessTermObject ;
-            owl:onProperty gocam:term ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:part_of ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:term ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:happens_during ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:term ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:part_of ],
-        [ a owl:Restriction ;
             owl:allValuesFrom gocam:PhaseTermObject ;
             owl:onProperty gocam:happens_during ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:happens_during ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:BiologicalProcessTermObject ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:BiologicalProcessTermObject ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:happens_during ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:part_of ],
         gocam:TermAssociation ;
     skos:definition "An association between an activity and a biological process term" ;
     skos:inScheme <https://w3id.org/gocam> .
@@ -359,12 +352,12 @@ gocam:CausalAssociation a owl:Class,
     rdfs:label "CausalAssociation" ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty gocam:predicate ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:Activity ;
             owl:onProperty gocam:downstream_activity ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
+            owl:onProperty gocam:predicate ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
             owl:onProperty gocam:downstream_activity ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
@@ -373,20 +366,61 @@ gocam:CausalAssociation a owl:Class,
             owl:allValuesFrom gocam:PredicateTermObject ;
             owl:onProperty gocam:predicate ],
         [ a owl:Restriction ;
-            owl:minCardinality 0 ;
+            owl:allValuesFrom gocam:Activity ;
             owl:onProperty gocam:downstream_activity ],
         gocam:Association ;
     skos:definition "A causal association between two activities" ;
+    skos:inScheme <https://w3id.org/gocam> .
+
+gocam:CellTypeAssociation a owl:Class,
+        linkml:ClassDefinition ;
+    rdfs:label "CellTypeAssociation" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:CellTypeTermObject ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:GrossAnatomyAssociation ;
+            owl:onProperty gocam:part_of ],
+        gocam:TermAssociation ;
+    skos:definition "An association between an activity and a cell type term" ;
+    skos:inScheme <https://w3id.org/gocam> .
+
+gocam:CellTypeTermObject a owl:Class,
+        linkml:ClassDefinition ;
+    rdfs:label "CellTypeTermObject" ;
+    rdfs:subClassOf gocam:TermObject ;
+    skos:definition "A term object that represents a cell type term from CL" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:CellularAnatomicalEntityAssociation a owl:Class,
         linkml:ClassDefinition ;
     rdfs:label "CellularAnatomicalEntityAssociation" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:term ],
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:CellTypeAssociation ;
+            owl:onProperty gocam:part_of ],
         [ a owl:Restriction ;
             owl:allValuesFrom gocam:CellularAnatomicalEntityTermObject ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
             owl:onProperty gocam:term ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
@@ -409,14 +443,21 @@ gocam:EvidenceTermObject a owl:Class,
     skos:definition "A term object that represents an evidence term from ECO" ;
     skos:inScheme <https://w3id.org/gocam> .
 
+gocam:GrossAnatomicalStructureTermObject a owl:Class,
+        linkml:ClassDefinition ;
+    rdfs:label "GrossAnatomicalStructureTermObject" ;
+    rdfs:subClassOf gocam:TermObject ;
+    skos:definition "A term object that represents a gross anatomical structure term from UBERON" ;
+    skos:inScheme <https://w3id.org/gocam> .
+
 gocam:MolecularFunctionAssociation a owl:Class,
         linkml:ClassDefinition ;
     rdfs:label "MolecularFunctionAssociation" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
+            owl:allValuesFrom gocam:MolecularFunctionTermObject ;
             owl:onProperty gocam:term ],
         [ a owl:Restriction ;
-            owl:allValuesFrom gocam:MolecularFunctionTermObject ;
+            owl:maxCardinality 1 ;
             owl:onProperty gocam:term ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
@@ -436,13 +477,13 @@ gocam:MoleculeAssociation a owl:Class,
         linkml:ClassDefinition ;
     rdfs:label "MoleculeAssociation" ;
     rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom gocam:MoleculeTermObject ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty gocam:term ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty gocam:term ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:MoleculeTermObject ;
             owl:onProperty gocam:term ],
         gocam:TermAssociation ;
     skos:definition "An association between an activity and a molecule term" ;
@@ -474,19 +515,19 @@ gocam:PublicationObject a owl:Class,
     rdfs:label "PublicationObject" ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty gocam:full_text ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
             owl:onProperty gocam:abstract_text ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom linkml:String ;
+            owl:onProperty gocam:full_text ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty gocam:abstract_text ],
         [ a owl:Restriction ;
-            owl:allValuesFrom linkml:String ;
-            owl:onProperty gocam:abstract_text ],
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:full_text ],
         [ a owl:Restriction ;
             owl:allValuesFrom linkml:String ;
-            owl:onProperty gocam:full_text ],
+            owl:onProperty gocam:abstract_text ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
             owl:onProperty gocam:full_text ],
@@ -524,6 +565,8 @@ gocam:date a owl:ObjectProperty,
 gocam:downstream_activity a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "downstream_activity" ;
+    skos:altLabel "object" ;
+    skos:definition "The activity unit that is downstream of this one" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:enabled_by a owl:ObjectProperty,
@@ -568,6 +611,7 @@ gocam:occurs_in a owl:ObjectProperty,
 gocam:predicate a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "predicate" ;
+    skos:definition "The RO relation that represents the type of relationship" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:provided_by a owl:ObjectProperty,
@@ -578,21 +622,26 @@ gocam:provided_by a owl:ObjectProperty,
 gocam:reference a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "reference" ;
+    skos:definition "The publication of reference that describes the evidence" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:status a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "status" ;
+    skos:altLabel "model state" ;
+    skos:definition "The status of the model" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:taxon a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "taxon" ;
+    skos:definition "The primary taxon that the model is about" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:title a owl:ObjectProperty,
         linkml:SlotDefinition ;
     rdfs:label "title" ;
+    skos:definition "The human-readable descriptive title of the model" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:Association a owl:Class,
@@ -600,24 +649,24 @@ gocam:Association a owl:Class,
     rdfs:label "Association" ;
     rdfs:subClassOf [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty gocam:evidence ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:EvidenceItem ;
-            owl:onProperty gocam:evidence ],
+            owl:onProperty gocam:type ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty gocam:provenances ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:evidence ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:ProvenanceInfo ;
+            owl:onProperty gocam:provenances ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:EvidenceItem ;
+            owl:onProperty gocam:evidence ],
         [ a owl:Restriction ;
             owl:allValuesFrom linkml:String ;
             owl:onProperty gocam:type ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty gocam:type ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom gocam:ProvenanceInfo ;
-            owl:onProperty gocam:provenances ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
             owl:onProperty gocam:type ] ;
     skos:definition "An abstract grouping for different kinds of evidence-associated provenance" ;
     skos:inScheme <https://w3id.org/gocam> .
@@ -626,26 +675,42 @@ gocam:BiologicalProcessTermObject a owl:Class,
         linkml:ClassDefinition ;
     rdfs:label "BiologicalProcessTermObject" ;
     rdfs:subClassOf gocam:TermObject ;
-    skos:definition "A termm object that represents a biological process term from GO" ;
+    skos:definition "A term object that represents a biological process term from GO" ;
+    skos:inScheme <https://w3id.org/gocam> .
+
+gocam:GrossAnatomyAssociation a owl:Class,
+        linkml:ClassDefinition ;
+    rdfs:label "GrossAnatomyAssociation" ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:allValuesFrom gocam:GrossAnatomyAssociation ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:part_of ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:term ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom gocam:GrossAnatomicalStructureTermObject ;
+            owl:onProperty gocam:term ],
+        gocam:TermAssociation ;
+    skos:definition "An association between an activity and a gross anatomical structure term" ;
     skos:inScheme <https://w3id.org/gocam> .
 
 gocam:ProvenanceInfo a owl:Class,
         linkml:ClassDefinition ;
     rdfs:label "ProvenanceInfo" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:contributor ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:contributor ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:created ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:provided_by ],
-        [ a owl:Restriction ;
             owl:allValuesFrom linkml:String ;
+            owl:onProperty gocam:contributor ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
             owl:onProperty gocam:created ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
@@ -655,19 +720,28 @@ gocam:ProvenanceInfo a owl:Class,
             owl:onProperty gocam:provided_by ],
         [ a owl:Restriction ;
             owl:allValuesFrom linkml:String ;
-            owl:onProperty gocam:provided_by ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom linkml:String ;
-            owl:onProperty gocam:contributor ],
+            owl:onProperty gocam:created ],
         [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty gocam:date ],
         [ a owl:Restriction ;
-            owl:allValuesFrom linkml:String ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:provided_by ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
             owl:onProperty gocam:date ],
         [ a owl:Restriction ;
             owl:maxCardinality 1 ;
-            owl:onProperty gocam:date ] ;
+            owl:onProperty gocam:contributor ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom linkml:String ;
+            owl:onProperty gocam:date ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:contributor ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom linkml:String ;
+            owl:onProperty gocam:provided_by ] ;
     skos:definition "Provenance information for an object" ;
     skos:inScheme <https://w3id.org/gocam> .
 
@@ -688,43 +762,51 @@ gocam:Object a owl:Class,
         linkml:ClassDefinition ;
     rdfs:label "Object" ;
     rdfs:subClassOf [ a owl:Restriction ;
-            owl:minCardinality 1 ;
-            owl:onProperty gocam:id ],
-        [ a owl:Restriction ;
-            owl:minCardinality 0 ;
-            owl:onProperty gocam:obsolete ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:obsolete ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom linkml:String ;
-            owl:onProperty gocam:label ],
-        [ a owl:Restriction ;
             owl:minCardinality 0 ;
             owl:onProperty gocam:label ],
         [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:label ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:id ],
-        [ a owl:Restriction ;
-            owl:maxCardinality 1 ;
-            owl:onProperty gocam:type ],
-        [ a owl:Restriction ;
             owl:minCardinality 0 ;
-            owl:onProperty gocam:type ],
-        [ a owl:Restriction ;
-            owl:allValuesFrom linkml:Uriorcurie ;
             owl:onProperty gocam:type ],
         [ a owl:Restriction ;
             owl:allValuesFrom linkml:Boolean ;
             owl:onProperty gocam:obsolete ],
         [ a owl:Restriction ;
+            owl:minCardinality 1 ;
+            owl:onProperty gocam:id ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:id ],
+        [ a owl:Restriction ;
+            owl:minCardinality 0 ;
+            owl:onProperty gocam:obsolete ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom linkml:String ;
+            owl:onProperty gocam:label ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:label ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:obsolete ],
+        [ a owl:Restriction ;
             owl:allValuesFrom linkml:Uriorcurie ;
-            owl:onProperty gocam:id ] ;
+            owl:onProperty gocam:id ],
+        [ a owl:Restriction ;
+            owl:allValuesFrom linkml:Uriorcurie ;
+            owl:onProperty gocam:type ],
+        [ a owl:Restriction ;
+            owl:maxCardinality 1 ;
+            owl:onProperty gocam:type ] ;
     skos:definition "An abstract class for all identified objects in a model" ;
     skos:inScheme <https://w3id.org/gocam> .
+
+gocam:InformationBiomacromoleculeCategory a owl:Class,
+        linkml:EnumDefinition ;
+    owl:unionOf ( <biolink.GeneOrGeneProduct> <https://w3id.org/gocam/InformationBiomacromoleculeCategory#ProteinIsoform> <https://w3id.org/gocam/InformationBiomacromoleculeCategory#MacromolecularComplex> <https://w3id.org/gocam/InformationBiomacromoleculeCategory#Unknown> ) ;
+    linkml:permissible_values <biolink.GeneOrGeneProduct>,
+        <https://w3id.org/gocam/InformationBiomacromoleculeCategory#MacromolecularComplex>,
+        <https://w3id.org/gocam/InformationBiomacromoleculeCategory#ProteinIsoform>,
+        <https://w3id.org/gocam/InformationBiomacromoleculeCategory#Unknown> .
 
 gocam:TermAssociation a owl:Class,
         linkml:ClassDefinition ;
@@ -742,20 +824,6 @@ gocam:TermAssociation a owl:Class,
     skos:definition "An association between an activity and a term, potentially with extensions" ;
     skos:inScheme <https://w3id.org/gocam> .
 
-gocam:part_of a owl:ObjectProperty,
-        linkml:SlotDefinition ;
-    rdfs:label "part_of" ;
-    skos:definition "The larger biological process in which the activity is a part" ;
-    skos:inScheme <https://w3id.org/gocam> .
-
-gocam:InformationBiomacromoleculeCategory a owl:Class,
-        linkml:EnumDefinition ;
-    owl:unionOf ( <biolink.GeneOrGeneProduct> <https://w3id.org/gocam/InformationBiomacromoleculeCategory#ProteinIsoform> <https://w3id.org/gocam/InformationBiomacromoleculeCategory#MacromolecularComplex> <https://w3id.org/gocam/InformationBiomacromoleculeCategory#Unknown> ) ;
-    linkml:permissible_values <biolink.GeneOrGeneProduct>,
-        <https://w3id.org/gocam/InformationBiomacromoleculeCategory#MacromolecularComplex>,
-        <https://w3id.org/gocam/InformationBiomacromoleculeCategory#ProteinIsoform>,
-        <https://w3id.org/gocam/InformationBiomacromoleculeCategory#Unknown> .
-
 gocam:provenances a owl:ObjectProperty,
         linkml:SlotDefinition .
 
@@ -769,8 +837,11 @@ gocam:TermObject a owl:Class,
     skos:definition "An abstract class for all ontology term objects" ;
     skos:inScheme <https://w3id.org/gocam> .
 
-gocam:term a owl:ObjectProperty,
-        linkml:SlotDefinition .
+gocam:part_of a owl:ObjectProperty,
+        linkml:SlotDefinition ;
+    rdfs:label "part_of" ;
+    skos:definition "The larger biological process in which the activity is a part" ;
+    skos:inScheme <https://w3id.org/gocam> .
 
 gocam:CausalPredicateEnum a owl:Class,
         linkml:EnumDefinition ;
@@ -786,6 +857,9 @@ gocam:CausalPredicateEnum a owl:Class,
         RO:0004046,
         RO:0004047 .
 
+gocam:term a owl:ObjectProperty,
+        linkml:SlotDefinition .
+
 gocam:type a owl:ObjectProperty,
         linkml:SlotDefinition .
 
@@ -796,37 +870,7 @@ gocam:type a owl:ObjectProperty,
     skos:definition """GO CAM LinkML schema (experimental)
 
 The central class in this datamodel is a [Model](Model.md). A model consists of a set of
-[MolecularActivity](MolecularActivity.md) objects, from which hangs various elements connected by different kinds of [Association](Association.md)""" .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:TermAssociation ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:TermAssociation .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:TaxonTermObject ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:TaxonTermObject .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:PhaseTermObject ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:PhaseTermObject .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:Association ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:Association .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:BiologicalProcessAssociation ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:BiologicalProcessAssociation .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:CausalAssociation ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:CausalAssociation .
+[Activity](Activity.md) objects.""" .
 
 [] a owl:Restriction ;
     rdfs:subClassOf gocam:PublicationObject ;
@@ -834,34 +878,19 @@ The central class in this datamodel is a [Model](Model.md). A model consists of 
     owl:someValuesFrom gocam:PublicationObject .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:EvidenceTermObject ;
+    rdfs:subClassOf gocam:BiologicalProcessTermObject ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:EvidenceTermObject .
+    owl:someValuesFrom gocam:BiologicalProcessTermObject .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:TermObject ;
+    rdfs:subClassOf gocam:PredicateTermObject ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:TermObject .
+    owl:someValuesFrom gocam:PredicateTermObject .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:MolecularFunctionTermObject ;
+    rdfs:subClassOf gocam:BiologicalProcessAssociation ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:MolecularFunctionTermObject .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:GrossAnatomicalStructureTermObject ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:GrossAnatomicalStructureTermObject .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:CellularAnatomicalEntityAssociation ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:CellularAnatomicalEntityAssociation .
-
-[] a owl:Restriction ;
-    rdfs:subClassOf gocam:MolecularFunctionAssociation ;
-    owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:MolecularFunctionAssociation .
+    owl:someValuesFrom gocam:BiologicalProcessAssociation .
 
 [] a owl:Restriction ;
     rdfs:subClassOf gocam:Object ;
@@ -869,14 +898,19 @@ The central class in this datamodel is a [Model](Model.md). A model consists of 
     owl:someValuesFrom gocam:Object .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:BiologicalProcessTermObject ;
+    rdfs:subClassOf gocam:InformationBiomacromoleculeTermObject ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:BiologicalProcessTermObject .
+    owl:someValuesFrom gocam:InformationBiomacromoleculeTermObject .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:ProteinComplexTermObject ;
+    rdfs:subClassOf gocam:Association ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:ProteinComplexTermObject .
+    owl:someValuesFrom gocam:Association .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:CellTypeTermObject ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:CellTypeTermObject .
 
 [] a owl:Restriction ;
     rdfs:subClassOf gocam:CellularAnatomicalEntityTermObject ;
@@ -884,9 +918,9 @@ The central class in this datamodel is a [Model](Model.md). A model consists of 
     owl:someValuesFrom gocam:CellularAnatomicalEntityTermObject .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:InformationBiomacromoleculeTermObject ;
+    rdfs:subClassOf gocam:MoleculeTermObject ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:InformationBiomacromoleculeTermObject .
+    owl:someValuesFrom gocam:MoleculeTermObject .
 
 [] a owl:Restriction ;
     rdfs:subClassOf gocam:MoleculeAssociation ;
@@ -899,17 +933,67 @@ The central class in this datamodel is a [Model](Model.md). A model consists of 
     owl:someValuesFrom gocam:GeneProductTermObject .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:PredicateTermObject ;
+    rdfs:subClassOf gocam:CausalAssociation ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:PredicateTermObject .
+    owl:someValuesFrom gocam:CausalAssociation .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:MoleculeTermObject ;
+    rdfs:subClassOf gocam:EvidenceTermObject ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:MoleculeTermObject .
+    owl:someValuesFrom gocam:EvidenceTermObject .
 
 [] a owl:Restriction ;
-    rdfs:subClassOf gocam:CellTypeTermObject ;
+    rdfs:subClassOf gocam:PhaseTermObject ;
     owl:onProperty gocam:type ;
-    owl:someValuesFrom gocam:CellTypeTermObject .
+    owl:someValuesFrom gocam:PhaseTermObject .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:GrossAnatomicalStructureTermObject ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:GrossAnatomicalStructureTermObject .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:MolecularFunctionAssociation ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:MolecularFunctionAssociation .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:GrossAnatomyAssociation ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:GrossAnatomyAssociation .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:TermAssociation ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:TermAssociation .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:CellTypeAssociation ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:CellTypeAssociation .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:ProteinComplexTermObject ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:ProteinComplexTermObject .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:TermObject ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:TermObject .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:TaxonTermObject ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:TaxonTermObject .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:MolecularFunctionTermObject ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:MolecularFunctionTermObject .
+
+[] a owl:Restriction ;
+    rdfs:subClassOf gocam:CellularAnatomicalEntityAssociation ;
+    owl:onProperty gocam:type ;
+    owl:someValuesFrom gocam:CellularAnatomicalEntityAssociation .
 

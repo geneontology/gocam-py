@@ -1,55 +1,65 @@
 -- # Class: "Model" Description: "A model of a biological program consisting of a set of causally connected activities"
---     * Slot: id Description: 
---     * Slot: title Description: 
---     * Slot: taxon Description: 
---     * Slot: status Description: 
--- # Class: "Activity" Description: "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex"
---     * Slot: id Description: 
+--     * Slot: id Description: The identifier of the model. Should be in gocam namespace.
+--     * Slot: title Description: The human-readable descriptive title of the model
+--     * Slot: taxon Description: The primary taxon that the model is about
+--     * Slot: status Description: The status of the model
+-- # Class: "Activity" Description: "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model"
+--     * Slot: id Description: Identifier of the activity unit. Should be in gocam namespace.
 --     * Slot: enabled_by Description: The gene product or complex that carries out the activity
 --     * Slot: Model_id Description: Autocreated FK slot
 --     * Slot: molecular_function_id Description: The molecular function that is carried out by the gene product or complex
 --     * Slot: occurs_in_id Description: The cellular location in which the activity occurs
 --     * Slot: part_of_id Description: The larger biological process in which the activity is a part
 --     * Slot: has_direct_input_id Description: The input molecules that are directly consumed by the activity
--- # Class: "EvidenceItem" Description: ""
+-- # Class: "EvidenceItem" Description: "An individual piece of evidence that is associated with an assertion in a model"
 --     * Slot: id Description: 
---     * Slot: term Description: 
---     * Slot: reference Description: 
+--     * Slot: term Description: The ECO term representing the type of evidence
+--     * Slot: reference Description: The publication of reference that describes the evidence
 --     * Slot: Association_id Description: Autocreated FK slot
 --     * Slot: CausalAssociation_id Description: Autocreated FK slot
 --     * Slot: TermAssociation_id Description: Autocreated FK slot
 --     * Slot: MolecularFunctionAssociation_id Description: Autocreated FK slot
 --     * Slot: BiologicalProcessAssociation_id Description: Autocreated FK slot
 --     * Slot: CellularAnatomicalEntityAssociation_id Description: Autocreated FK slot
+--     * Slot: CellTypeAssociation_id Description: Autocreated FK slot
+--     * Slot: GrossAnatomyAssociation_id Description: Autocreated FK slot
 --     * Slot: MoleculeAssociation_id Description: Autocreated FK slot
 -- # Class: "Association" Description: "An abstract grouping for different kinds of evidence-associated provenance"
 --     * Slot: id Description: 
 --     * Slot: type Description: 
 -- # Class: "CausalAssociation" Description: "A causal association between two activities"
 --     * Slot: id Description: 
---     * Slot: predicate Description: 
---     * Slot: downstream_activity Description: 
+--     * Slot: predicate Description: The RO relation that represents the type of relationship
+--     * Slot: downstream_activity Description: The activity unit that is downstream of this one
 --     * Slot: type Description: 
 --     * Slot: Activity_id Description: Autocreated FK slot
 -- # Class: "TermAssociation" Description: "An association between an activity and a term, potentially with extensions"
 --     * Slot: id Description: 
---     * Slot: term Description: 
+--     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
 -- # Class: "MolecularFunctionAssociation" Description: "An association between an activity and a molecular function term"
 --     * Slot: id Description: 
---     * Slot: term Description: 
+--     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
 -- # Class: "BiologicalProcessAssociation" Description: "An association between an activity and a biological process term"
 --     * Slot: id Description: 
---     * Slot: term Description: 
+--     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
 -- # Class: "CellularAnatomicalEntityAssociation" Description: "An association between an activity and a cellular anatomical entity term"
 --     * Slot: id Description: 
---     * Slot: term Description: 
+--     * Slot: term Description: The ontology term that describes the nature of the association
+--     * Slot: type Description: 
+-- # Class: "CellTypeAssociation" Description: "An association between an activity and a cell type term"
+--     * Slot: id Description: 
+--     * Slot: term Description: The ontology term that describes the nature of the association
+--     * Slot: type Description: 
+-- # Class: "GrossAnatomyAssociation" Description: "An association between an activity and a gross anatomical structure term"
+--     * Slot: id Description: 
+--     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
 -- # Class: "MoleculeAssociation" Description: "An association between an activity and a molecule term"
 --     * Slot: id Description: 
---     * Slot: term Description: 
+--     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
 -- # Class: "Object" Description: "An abstract class for all identified objects in a model"
 --     * Slot: id Description: 
@@ -79,7 +89,7 @@
 --     * Slot: label Description: 
 --     * Slot: type Description: 
 --     * Slot: obsolete Description: 
--- # Class: "BiologicalProcessTermObject" Description: "A termm object that represents a biological process term from GO"
+-- # Class: "BiologicalProcessTermObject" Description: "A term object that represents a biological process term from GO"
 --     * Slot: id Description: 
 --     * Slot: label Description: 
 --     * Slot: type Description: 
@@ -149,13 +159,15 @@
 --     * Slot: MolecularFunctionAssociation_id Description: Autocreated FK slot
 --     * Slot: BiologicalProcessAssociation_id Description: Autocreated FK slot
 --     * Slot: CellularAnatomicalEntityAssociation_id Description: Autocreated FK slot
+--     * Slot: CellTypeAssociation_id Description: Autocreated FK slot
+--     * Slot: GrossAnatomyAssociation_id Description: Autocreated FK slot
 --     * Slot: MoleculeAssociation_id Description: Autocreated FK slot
 -- # Class: "Model_comments" Description: ""
 --     * Slot: Model_id Description: Autocreated FK slot
---     * Slot: comments Description: 
+--     * Slot: comments Description: Comments about the model
 -- # Class: "EvidenceItem_with_objects" Description: ""
 --     * Slot: EvidenceItem_id Description: Autocreated FK slot
---     * Slot: with_objects_id Description: 
+--     * Slot: with_objects_id Description: Supporting database entities or terms
 
 CREATE TABLE "Association" (
 	id INTEGER NOT NULL, 
@@ -305,6 +317,20 @@ CREATE TABLE "CellularAnatomicalEntityAssociation" (
 	PRIMARY KEY (id), 
 	FOREIGN KEY(term) REFERENCES "CellularAnatomicalEntityTermObject" (id)
 );
+CREATE TABLE "CellTypeAssociation" (
+	id INTEGER NOT NULL, 
+	term TEXT, 
+	type TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(term) REFERENCES "CellTypeTermObject" (id)
+);
+CREATE TABLE "GrossAnatomyAssociation" (
+	id INTEGER NOT NULL, 
+	term TEXT, 
+	type TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(term) REFERENCES "GrossAnatomicalStructureTermObject" (id)
+);
 CREATE TABLE "MoleculeAssociation" (
 	id INTEGER NOT NULL, 
 	term TEXT, 
@@ -364,6 +390,8 @@ CREATE TABLE "EvidenceItem" (
 	"MolecularFunctionAssociation_id" INTEGER, 
 	"BiologicalProcessAssociation_id" INTEGER, 
 	"CellularAnatomicalEntityAssociation_id" INTEGER, 
+	"CellTypeAssociation_id" INTEGER, 
+	"GrossAnatomyAssociation_id" INTEGER, 
 	"MoleculeAssociation_id" INTEGER, 
 	PRIMARY KEY (id), 
 	FOREIGN KEY(term) REFERENCES "EvidenceTermObject" (id), 
@@ -374,6 +402,8 @@ CREATE TABLE "EvidenceItem" (
 	FOREIGN KEY("MolecularFunctionAssociation_id") REFERENCES "MolecularFunctionAssociation" (id), 
 	FOREIGN KEY("BiologicalProcessAssociation_id") REFERENCES "BiologicalProcessAssociation" (id), 
 	FOREIGN KEY("CellularAnatomicalEntityAssociation_id") REFERENCES "CellularAnatomicalEntityAssociation" (id), 
+	FOREIGN KEY("CellTypeAssociation_id") REFERENCES "CellTypeAssociation" (id), 
+	FOREIGN KEY("GrossAnatomyAssociation_id") REFERENCES "GrossAnatomyAssociation" (id), 
 	FOREIGN KEY("MoleculeAssociation_id") REFERENCES "MoleculeAssociation" (id)
 );
 CREATE TABLE "ProvenanceInfo" (
@@ -391,6 +421,8 @@ CREATE TABLE "ProvenanceInfo" (
 	"MolecularFunctionAssociation_id" INTEGER, 
 	"BiologicalProcessAssociation_id" INTEGER, 
 	"CellularAnatomicalEntityAssociation_id" INTEGER, 
+	"CellTypeAssociation_id" INTEGER, 
+	"GrossAnatomyAssociation_id" INTEGER, 
 	"MoleculeAssociation_id" INTEGER, 
 	PRIMARY KEY (id), 
 	FOREIGN KEY("Model_id") REFERENCES "Model" (id), 
@@ -402,6 +434,8 @@ CREATE TABLE "ProvenanceInfo" (
 	FOREIGN KEY("MolecularFunctionAssociation_id") REFERENCES "MolecularFunctionAssociation" (id), 
 	FOREIGN KEY("BiologicalProcessAssociation_id") REFERENCES "BiologicalProcessAssociation" (id), 
 	FOREIGN KEY("CellularAnatomicalEntityAssociation_id") REFERENCES "CellularAnatomicalEntityAssociation" (id), 
+	FOREIGN KEY("CellTypeAssociation_id") REFERENCES "CellTypeAssociation" (id), 
+	FOREIGN KEY("GrossAnatomyAssociation_id") REFERENCES "GrossAnatomyAssociation" (id), 
 	FOREIGN KEY("MoleculeAssociation_id") REFERENCES "MoleculeAssociation" (id)
 );
 CREATE TABLE "EvidenceItem_with_objects" (

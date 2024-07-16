@@ -78,21 +78,21 @@ class Model(ConfiguredBaseModel):
     """
     A model of a biological program consisting of a set of causally connected activities
     """
-    id: str = Field(...)
-    title: Optional[str] = Field(None)
-    taxon: Optional[str] = Field(None)
-    status: Optional[ModelStateEnum] = Field(None)
-    comments: Optional[List[str]] = Field(default_factory=list)
-    activities: Optional[List[Activity]] = Field(default_factory=list)
-    objects: Optional[List[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default_factory=list)
-    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
+    id: str = Field(..., description="""The identifier of the model. Should be in gocam namespace.""")
+    title: Optional[str] = Field(None, description="""The human-readable descriptive title of the model""")
+    taxon: Optional[str] = Field(None, description="""The primary taxon that the model is about""")
+    status: Optional[ModelStateEnum] = Field(None, description="""The status of the model""")
+    comments: Optional[List[str]] = Field(default_factory=list, description="""Comments about the model""")
+    activities: Optional[List[Activity]] = Field(default_factory=list, description="""All of the activities that are part of the model""")
+    objects: Optional[List[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default_factory=list, description="""All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.""")
+    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list, description="""Model-level provenance information""")
 
 
 class Activity(ConfiguredBaseModel):
     """
-    An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex
+    An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model
     """
-    id: str = Field(...)
+    id: str = Field(..., description="""Identifier of the activity unit. Should be in gocam namespace.""")
     enabled_by: Optional[str] = Field(None, description="""The gene product or complex that carries out the activity""")
     molecular_function: Optional[MolecularFunctionAssociation] = Field(None, description="""The molecular function that is carried out by the gene product or complex""")
     occurs_in: Optional[CellularAnatomicalEntityAssociation] = Field(None, description="""The cellular location in which the activity occurs""")
@@ -103,10 +103,13 @@ class Activity(ConfiguredBaseModel):
 
 
 class EvidenceItem(ConfiguredBaseModel):
-    term: Optional[str] = Field(None)
-    reference: Optional[str] = Field(None)
-    with_objects: Optional[List[str]] = Field(default_factory=list)
-    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
+    """
+    An individual piece of evidence that is associated with an assertion in a model
+    """
+    term: Optional[str] = Field(None, description="""The ECO term representing the type of evidence""")
+    reference: Optional[str] = Field(None, description="""The publication of reference that describes the evidence""")
+    with_objects: Optional[List[str]] = Field(default_factory=list, description="""Supporting database entities or terms""")
+    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list, description="""Provenance about the assertion, e.g. who made it""")
 
 
 class Association(ConfiguredBaseModel):
@@ -122,8 +125,8 @@ class CausalAssociation(Association):
     """
     A causal association between two activities
     """
-    predicate: Optional[str] = Field(None)
-    downstream_activity: Optional[str] = Field(None)
+    predicate: Optional[str] = Field(None, description="""The RO relation that represents the type of relationship""")
+    downstream_activity: Optional[str] = Field(None, description="""The activity unit that is downstream of this one""")
     type: Literal["CausalAssociation"] = Field("CausalAssociation")
     evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
@@ -133,7 +136,7 @@ class TermAssociation(Association):
     """
     An association between an activity and a term, potentially with extensions
     """
-    term: Optional[str] = Field(None)
+    term: Optional[str] = Field(None, description="""The ontology term that describes the nature of the association""")
     type: Literal["TermAssociation"] = Field("TermAssociation")
     evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
@@ -143,7 +146,7 @@ class MolecularFunctionAssociation(TermAssociation):
     """
     An association between an activity and a molecular function term
     """
-    term: Optional[str] = Field(None)
+    term: Optional[str] = Field(None, description="""The ontology term that describes the nature of the association""")
     type: Literal["MolecularFunctionAssociation"] = Field("MolecularFunctionAssociation")
     evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
@@ -153,7 +156,7 @@ class BiologicalProcessAssociation(TermAssociation):
     """
     An association between an activity and a biological process term
     """
-    term: Optional[str] = Field(None)
+    term: Optional[str] = Field(None, description="""The ontology term that describes the nature of the association""")
     type: Literal["BiologicalProcessAssociation"] = Field("BiologicalProcessAssociation")
     evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
@@ -163,8 +166,28 @@ class CellularAnatomicalEntityAssociation(TermAssociation):
     """
     An association between an activity and a cellular anatomical entity term
     """
-    term: Optional[str] = Field(None)
+    term: Optional[str] = Field(None, description="""The ontology term that describes the nature of the association""")
     type: Literal["CellularAnatomicalEntityAssociation"] = Field("CellularAnatomicalEntityAssociation")
+    evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
+    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
+
+
+class CellTypeAssociation(TermAssociation):
+    """
+    An association between an activity and a cell type term
+    """
+    term: Optional[str] = Field(None, description="""The ontology term that describes the nature of the association""")
+    type: Literal["CellTypeAssociation"] = Field("CellTypeAssociation")
+    evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
+    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
+
+
+class GrossAnatomyAssociation(TermAssociation):
+    """
+    An association between an activity and a gross anatomical structure term
+    """
+    term: Optional[str] = Field(None, description="""The ontology term that describes the nature of the association""")
+    type: Literal["GrossAnatomyAssociation"] = Field("GrossAnatomyAssociation")
     evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
 
@@ -173,7 +196,7 @@ class MoleculeAssociation(TermAssociation):
     """
     An association between an activity and a molecule term
     """
-    term: Optional[str] = Field(None)
+    term: Optional[str] = Field(None, description="""The ontology term that describes the nature of the association""")
     type: Literal["MoleculeAssociation"] = Field("MoleculeAssociation")
     evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
@@ -233,7 +256,7 @@ class MolecularFunctionTermObject(TermObject):
 
 class BiologicalProcessTermObject(TermObject):
     """
-    A termm object that represents a biological process term from GO
+    A term object that represents a biological process term from GO
     """
     id: str = Field(...)
     label: Optional[str] = Field(None)
@@ -362,6 +385,8 @@ TermAssociation.model_rebuild()
 MolecularFunctionAssociation.model_rebuild()
 BiologicalProcessAssociation.model_rebuild()
 CellularAnatomicalEntityAssociation.model_rebuild()
+CellTypeAssociation.model_rebuild()
+GrossAnatomyAssociation.model_rebuild()
 MoleculeAssociation.model_rebuild()
 Object.model_rebuild()
 TermObject.model_rebuild()

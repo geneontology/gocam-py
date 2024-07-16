@@ -1,6 +1,6 @@
 {
   "name": "gocam",
-  "description": "GO CAM LinkML schema (experimental)\n\nThe central class in this datamodel is a [Model](Model.md). A model consists of a set of\n[MolecularActivity](MolecularActivity.md) objects, from which hangs various elements connected by different kinds of [Association](Association.md)",
+  "description": "GO CAM LinkML schema (experimental)\n\nThe central class in this datamodel is a [Model](Model.md). A model consists of a set of\n[Activity](Activity.md) objects.",
   "see_also": [
     "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7012280/",
     "https://docs.google.com/presentation/d/1ja0Vkw0AoENJ58emM77dGnqPtY1nfIJMeyVnObBxIxI/edit#slide=id.p8"
@@ -486,6 +486,7 @@
   "slots": [
     {
       "name": "model__id",
+      "description": "The identifier of the model. Should be in gocam namespace.",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/id",
       "identifier": true,
@@ -500,6 +501,7 @@
     },
     {
       "name": "model__title",
+      "description": "The human-readable descriptive title of the model",
       "from_schema": "https://w3id.org/gocam",
       "mappings": [
         "http://example.org/UNKNOWN/dct/title"
@@ -515,6 +517,7 @@
     },
     {
       "name": "model__taxon",
+      "description": "The primary taxon that the model is about",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/taxon",
       "alias": "taxon",
@@ -527,7 +530,11 @@
     },
     {
       "name": "model__status",
+      "description": "The status of the model",
       "from_schema": "https://w3id.org/gocam",
+      "aliases": [
+        "model state"
+      ],
       "mappings": [
         "http://purl.org/pav/status"
       ],
@@ -542,6 +549,7 @@
     },
     {
       "name": "model__comments",
+      "description": "Comments about the model",
       "from_schema": "https://w3id.org/gocam",
       "mappings": [
         "http://example.org/UNKNOWN/rdfs/comment"
@@ -558,6 +566,7 @@
     },
     {
       "name": "model__activities",
+      "description": "All of the activities that are part of the model",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/activities",
       "multivalued": true,
@@ -573,6 +582,7 @@
     },
     {
       "name": "model__objects",
+      "description": "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/objects",
       "multivalued": true,
@@ -588,6 +598,7 @@
     },
     {
       "name": "model__provenances",
+      "description": "Model-level provenance information",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/provenances",
       "multivalued": true,
@@ -603,6 +614,10 @@
     },
     {
       "name": "activity__id",
+      "description": "Identifier of the activity unit. Should be in gocam namespace.",
+      "comments": [
+        "Typically does not need to be exposed to end-user, this exists to allow activity flows"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/id",
       "identifier": true,
@@ -631,6 +646,9 @@
     {
       "name": "activity__molecular_function",
       "description": "The molecular function that is carried out by the gene product or complex",
+      "todos": [
+        "currently BP, CC etc are at the level of the activity, not the MolecularFunctionAssociation"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/molecular_function",
       "alias": "molecular_function",
@@ -718,6 +736,7 @@
     },
     {
       "name": "evidenceItem__term",
+      "description": "The ECO term representing the type of evidence",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/term",
       "alias": "term",
@@ -730,6 +749,7 @@
     },
     {
       "name": "evidenceItem__reference",
+      "description": "The publication of reference that describes the evidence",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/reference",
       "alias": "reference",
@@ -742,7 +762,12 @@
     },
     {
       "name": "evidenceItem__with_objects",
+      "description": "Supporting database entities or terms",
       "from_schema": "https://w3id.org/gocam",
+      "aliases": [
+        "with",
+        "with/from"
+      ],
       "slot_uri": "https://w3id.org/gocam/with_objects",
       "multivalued": true,
       "alias": "with_objects",
@@ -755,6 +780,7 @@
     },
     {
       "name": "evidenceItem__provenances",
+      "description": "Provenance about the assertion, e.g. who made it",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/provenances",
       "multivalued": true,
@@ -812,6 +838,7 @@
     },
     {
       "name": "causalAssociation__predicate",
+      "description": "The RO relation that represents the type of relationship",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/predicate",
       "alias": "predicate",
@@ -824,7 +851,11 @@
     },
     {
       "name": "causalAssociation__downstream_activity",
+      "description": "The activity unit that is downstream of this one",
       "from_schema": "https://w3id.org/gocam",
+      "aliases": [
+        "object"
+      ],
       "slot_uri": "https://w3id.org/gocam/downstream_activity",
       "alias": "downstream_activity",
       "owner": "CausalAssociation",
@@ -836,6 +867,7 @@
     },
     {
       "name": "termAssociation__term",
+      "description": "The ontology term that describes the nature of the association",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/term",
       "alias": "term",
@@ -986,6 +1018,7 @@
     },
     {
       "name": "happens_during",
+      "description": "Optional extension describing where the BP takes place",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/happens_during",
       "range": "PhaseTermObject",
@@ -993,6 +1026,7 @@
     },
     {
       "name": "part_of",
+      "description": "Optional extension allowing hierarchical nesting of BPs",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/part_of",
       "range": "BiologicalProcessTermObject",
@@ -1032,6 +1066,7 @@
     },
     {
       "name": "BiologicalProcessAssociation_happens_during",
+      "description": "Optional extension describing where the BP takes place",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "happens_during",
       "domain": "BiologicalProcessAssociation",
@@ -1048,6 +1083,7 @@
     },
     {
       "name": "BiologicalProcessAssociation_part_of",
+      "description": "Optional extension allowing hierarchical nesting of BPs",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "part_of",
       "domain": "BiologicalProcessAssociation",
@@ -1076,6 +1112,92 @@
       "is_usage_slot": true,
       "usage_slot_name": "term",
       "range": "CellularAnatomicalEntityTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "CellularAnatomicalEntityAssociation_part_of",
+      "description": "Optional extension allowing hierarchical nesting of BPs",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "part_of",
+      "domain": "CellularAnatomicalEntityAssociation",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "CellularAnatomicalEntityAssociation",
+      "domain_of": [
+        "CellularAnatomicalEntityAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "part_of",
+      "range": "CellTypeAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "CellTypeAssociation_term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "termAssociation__term",
+      "domain": "CellTypeAssociation",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "CellTypeAssociation",
+      "domain_of": [
+        "CellTypeAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "term",
+      "range": "CellTypeTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "CellTypeAssociation_part_of",
+      "description": "Optional extension allowing hierarchical nesting of BPs",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "part_of",
+      "domain": "CellTypeAssociation",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "CellTypeAssociation",
+      "domain_of": [
+        "CellTypeAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "part_of",
+      "range": "GrossAnatomyAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "GrossAnatomyAssociation_term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "termAssociation__term",
+      "domain": "GrossAnatomyAssociation",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "GrossAnatomyAssociation",
+      "domain_of": [
+        "GrossAnatomyAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "term",
+      "range": "GrossAnatomicalStructureTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "GrossAnatomyAssociation_part_of",
+      "description": "Optional extension allowing hierarchical nesting of BPs",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "part_of",
+      "domain": "GrossAnatomyAssociation",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "GrossAnatomyAssociation",
+      "domain_of": [
+        "GrossAnatomyAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "part_of",
+      "range": "GrossAnatomyAssociation",
+      "inlined": true,
       "@type": "SlotDefinition"
     },
     {
@@ -1115,34 +1237,43 @@
       "attributes": [
         {
           "name": "id",
+          "description": "The identifier of the model. Should be in gocam namespace.",
           "identifier": true,
           "range": "uriorcurie",
           "@type": "SlotDefinition"
         },
         {
           "name": "title",
+          "description": "The human-readable descriptive title of the model",
           "slot_uri": "dct:title",
           "@type": "SlotDefinition"
         },
         {
           "name": "taxon",
+          "description": "The primary taxon that the model is about",
           "range": "TaxonTermObject",
           "@type": "SlotDefinition"
         },
         {
           "name": "status",
+          "description": "The status of the model",
+          "aliases": [
+            "model state"
+          ],
           "slot_uri": "pav:status",
           "range": "ModelStateEnum",
           "@type": "SlotDefinition"
         },
         {
           "name": "comments",
+          "description": "Comments about the model",
           "slot_uri": "rdfs:comment",
           "multivalued": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "activities",
+          "description": "All of the activities that are part of the model",
           "multivalued": true,
           "range": "Activity",
           "inlined_as_list": true,
@@ -1150,6 +1281,7 @@
         },
         {
           "name": "objects",
+          "description": "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.",
           "multivalued": true,
           "range": "Object",
           "inlined_as_list": true,
@@ -1157,6 +1289,7 @@
         },
         {
           "name": "provenances",
+          "description": "Model-level provenance information",
           "multivalued": true,
           "range": "ProvenanceInfo",
           "inlined_as_list": true,
@@ -1169,7 +1302,7 @@
     {
       "name": "Activity",
       "definition_uri": "https://w3id.org/gocam/Activity",
-      "description": "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex",
+      "description": "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model",
       "from_schema": "https://w3id.org/gocam",
       "aliases": [
         "annoton"
@@ -1188,6 +1321,10 @@
       "attributes": [
         {
           "name": "id",
+          "description": "Identifier of the activity unit. Should be in gocam namespace.",
+          "comments": [
+            "Typically does not need to be exposed to end-user, this exists to allow activity flows"
+          ],
           "identifier": true,
           "range": "uriorcurie",
           "@type": "SlotDefinition"
@@ -1201,6 +1338,9 @@
         {
           "name": "molecular_function",
           "description": "The molecular function that is carried out by the gene product or complex",
+          "todos": [
+            "currently BP, CC etc are at the level of the activity, not the MolecularFunctionAssociation"
+          ],
           "range": "MolecularFunctionAssociation",
           "inlined": true,
           "@type": "SlotDefinition"
@@ -1249,6 +1389,7 @@
     {
       "name": "EvidenceItem",
       "definition_uri": "https://w3id.org/gocam/EvidenceItem",
+      "description": "An individual piece of evidence that is associated with an assertion in a model",
       "from_schema": "https://w3id.org/gocam",
       "slots": [
         "evidenceItem__term",
@@ -1260,22 +1401,30 @@
       "attributes": [
         {
           "name": "term",
+          "description": "The ECO term representing the type of evidence",
           "range": "EvidenceTermObject",
           "@type": "SlotDefinition"
         },
         {
           "name": "reference",
+          "description": "The publication of reference that describes the evidence",
           "range": "PublicationObject",
           "@type": "SlotDefinition"
         },
         {
           "name": "with_objects",
+          "description": "Supporting database entities or terms",
+          "aliases": [
+            "with",
+            "with/from"
+          ],
           "multivalued": true,
           "range": "Object",
           "@type": "SlotDefinition"
         },
         {
           "name": "provenances",
+          "description": "Provenance about the assertion, e.g. who made it",
           "multivalued": true,
           "range": "ProvenanceInfo",
           "inlined_as_list": true,
@@ -1338,11 +1487,16 @@
       "attributes": [
         {
           "name": "predicate",
+          "description": "The RO relation that represents the type of relationship",
           "range": "PredicateTermObject",
           "@type": "SlotDefinition"
         },
         {
           "name": "downstream_activity",
+          "description": "The activity unit that is downstream of this one",
+          "aliases": [
+            "object"
+          ],
           "range": "Activity",
           "@type": "SlotDefinition"
         }
@@ -1367,6 +1521,7 @@
       "attributes": [
         {
           "name": "term",
+          "description": "The ontology term that describes the nature of the association",
           "range": "TermObject",
           "@type": "SlotDefinition"
         }
@@ -1378,6 +1533,9 @@
       "name": "MolecularFunctionAssociation",
       "definition_uri": "https://w3id.org/gocam/MolecularFunctionAssociation",
       "description": "An association between an activity and a molecular function term",
+      "todos": [
+        "account for non-MF activity types in Reactome"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "is_a": "TermAssociation",
       "slots": [
@@ -1418,10 +1576,45 @@
         "association__type",
         "association__evidence",
         "association__provenances",
-        "CellularAnatomicalEntityAssociation_term"
+        "CellularAnatomicalEntityAssociation_term",
+        "CellularAnatomicalEntityAssociation_part_of"
       ],
       "slot_usage": {},
       "class_uri": "https://w3id.org/gocam/CellularAnatomicalEntityAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "CellTypeAssociation",
+      "definition_uri": "https://w3id.org/gocam/CellTypeAssociation",
+      "description": "An association between an activity and a cell type term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermAssociation",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "CellTypeAssociation_term",
+        "CellTypeAssociation_part_of"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/CellTypeAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "GrossAnatomyAssociation",
+      "definition_uri": "https://w3id.org/gocam/GrossAnatomyAssociation",
+      "description": "An association between an activity and a gross anatomical structure term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "TermAssociation",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "GrossAnatomyAssociation_term",
+        "GrossAnatomyAssociation_part_of"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/GrossAnatomyAssociation",
       "@type": "ClassDefinition"
     },
     {
@@ -1573,7 +1766,7 @@
         "GO"
       ],
       "definition_uri": "https://w3id.org/gocam/BiologicalProcessTermObject",
-      "description": "A termm object that represents a biological process term from GO",
+      "description": "A term object that represents a biological process term from GO",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "TermObject",
       "slots": [
@@ -1817,9 +2010,9 @@
   ],
   "metamodel_version": "1.7.0",
   "source_file": "gocam.yaml",
-  "source_file_date": "2024-06-26T14:03:44",
-  "source_file_size": 9812,
-  "generation_date": "2024-06-26T15:20:53",
+  "source_file_date": "2024-07-11T11:34:01",
+  "source_file_size": 12290,
+  "generation_date": "2024-07-16T15:08:35",
   "@type": "SchemaDefinition",
   "@context": [
     "project/jsonld/gocam.context.jsonld",

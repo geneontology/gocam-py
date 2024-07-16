@@ -2,7 +2,7 @@
     "$defs": {
         "Activity": {
             "additionalProperties": false,
-            "description": "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex",
+            "description": "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model",
             "properties": {
                 "causal_associations": {
                     "description": "The causal associations that connect this activity to other activities",
@@ -20,6 +20,7 @@
                     "description": "The input molecules that are directly consumed by the activity"
                 },
                 "id": {
+                    "description": "Identifier of the activity unit. Should be in gocam namespace.",
                     "type": "string"
                 },
                 "molecular_function": {
@@ -65,6 +66,7 @@
                     "type": "array"
                 },
                 "term": {
+                    "description": "The ontology term that describes the nature of the association",
                     "type": "string"
                 },
                 "type": {
@@ -79,7 +81,7 @@
         },
         "BiologicalProcessTermObject": {
             "additionalProperties": false,
-            "description": "A termm object that represents a biological process term from GO",
+            "description": "A term object that represents a biological process term from GO",
             "properties": {
                 "id": {
                     "type": "string"
@@ -108,6 +110,7 @@
             "description": "A causal association between two activities",
             "properties": {
                 "downstream_activity": {
+                    "description": "The activity unit that is downstream of this one",
                     "type": "string"
                 },
                 "evidence": {
@@ -117,6 +120,7 @@
                     "type": "array"
                 },
                 "predicate": {
+                    "description": "The RO relation that represents the type of relationship",
                     "type": "string"
                 },
                 "provenances": {
@@ -151,6 +155,36 @@
             ],
             "title": "CausalPredicateEnum",
             "type": "string"
+        },
+        "CellTypeAssociation": {
+            "additionalProperties": false,
+            "description": "An association between an activity and a cell type term",
+            "properties": {
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "description": "The ontology term that describes the nature of the association",
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "CellTypeAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "CellTypeAssociation",
+            "type": "object"
         },
         "CellTypeTermObject": {
             "additionalProperties": false,
@@ -195,6 +229,7 @@
                     "type": "array"
                 },
                 "term": {
+                    "description": "The ontology term that describes the nature of the association",
                     "type": "string"
                 },
                 "type": {
@@ -235,21 +270,25 @@
         },
         "EvidenceItem": {
             "additionalProperties": false,
-            "description": "",
+            "description": "An individual piece of evidence that is associated with an assertion in a model",
             "properties": {
                 "provenances": {
+                    "description": "Provenance about the assertion, e.g. who made it",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
                     "type": "array"
                 },
                 "reference": {
+                    "description": "The publication of reference that describes the evidence",
                     "type": "string"
                 },
                 "term": {
+                    "description": "The ECO term representing the type of evidence",
                     "type": "string"
                 },
                 "with_objects": {
+                    "description": "Supporting database entities or terms",
                     "items": {
                         "type": "string"
                     },
@@ -337,6 +376,36 @@
             "title": "GrossAnatomicalStructureTermObject",
             "type": "object"
         },
+        "GrossAnatomyAssociation": {
+            "additionalProperties": false,
+            "description": "An association between an activity and a gross anatomical structure term",
+            "properties": {
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "description": "The ontology term that describes the nature of the association",
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "GrossAnatomyAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "GrossAnatomyAssociation",
+            "type": "object"
+        },
         "InformationBiomacromoleculeCategory": {
             "description": "",
             "enum": [
@@ -353,21 +422,25 @@
             "description": "A model of a biological program consisting of a set of causally connected activities",
             "properties": {
                 "activities": {
+                    "description": "All of the activities that are part of the model",
                     "items": {
                         "$ref": "#/$defs/Activity"
                     },
                     "type": "array"
                 },
                 "comments": {
+                    "description": "Comments about the model",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "id": {
+                    "description": "The identifier of the model. Should be in gocam namespace.",
                     "type": "string"
                 },
                 "objects": {
+                    "description": "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.",
                     "items": {
                         "anyOf": [
                             {
@@ -417,18 +490,22 @@
                     "type": "array"
                 },
                 "provenances": {
+                    "description": "Model-level provenance information",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
                     "type": "array"
                 },
                 "status": {
-                    "$ref": "#/$defs/ModelStateEnum"
+                    "$ref": "#/$defs/ModelStateEnum",
+                    "description": "The status of the model"
                 },
                 "taxon": {
+                    "description": "The primary taxon that the model is about",
                     "type": "string"
                 },
                 "title": {
+                    "description": "The human-readable descriptive title of the model",
                     "type": "string"
                 }
             },
@@ -464,6 +541,7 @@
                     "type": "array"
                 },
                 "term": {
+                    "description": "The ontology term that describes the nature of the association",
                     "type": "string"
                 },
                 "type": {
@@ -519,6 +597,7 @@
                     "type": "array"
                 },
                 "term": {
+                    "description": "The ontology term that describes the nature of the association",
                     "type": "string"
                 },
                 "type": {

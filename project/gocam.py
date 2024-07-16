@@ -1,12 +1,12 @@
 # Auto generated from gocam.yaml by pythongen.py version: 0.0.1
-# Generation date: 2024-06-26T15:20:53
+# Generation date: 2024-07-16T15:08:36
 # Schema: gocam
 #
 # id: https://w3id.org/gocam
 # description: GO CAM LinkML schema (experimental)
 #
 #   The central class in this datamodel is a [Model](Model.md). A model consists of a set of
-#   [MolecularActivity](MolecularActivity.md) objects, from which hangs various elements connected by different kinds of [Association](Association.md)
+#   [Activity](Activity.md) objects.
 # license: https://creativecommons.org/publicdomain/zero/1.0/
 
 import dataclasses
@@ -197,7 +197,7 @@ class Model(YAMLRoot):
 class Activity(YAMLRoot):
     """
     An individual activity in a causal model, representing the individual molecular activity of a single gene product
-    or complex
+    or complex in the context of a particular model
     """
     _inherited_slots: ClassVar[List[str]] = []
 
@@ -249,6 +249,9 @@ class Activity(YAMLRoot):
 
 @dataclass
 class EvidenceItem(YAMLRoot):
+    """
+    An individual piece of evidence that is associated with an assertion in a model
+    """
     _inherited_slots: ClassVar[List[str]] = []
 
     class_class_uri: ClassVar[URIRef] = GOCAM["EvidenceItem"]
@@ -440,10 +443,66 @@ class CellularAnatomicalEntityAssociation(TermAssociation):
     class_model_uri: ClassVar[URIRef] = GOCAM.CellularAnatomicalEntityAssociation
 
     term: Optional[Union[str, CellularAnatomicalEntityTermObjectId]] = None
+    part_of: Optional[Union[dict, "CellTypeAssociation"]] = None
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
         if self.term is not None and not isinstance(self.term, CellularAnatomicalEntityTermObjectId):
             self.term = CellularAnatomicalEntityTermObjectId(self.term)
+
+        if self.part_of is not None and not isinstance(self.part_of, CellTypeAssociation):
+            self.part_of = CellTypeAssociation(**as_dict(self.part_of))
+
+        super().__post_init__(**kwargs)
+        self.unknown_type = str(self.class_name)
+
+
+@dataclass
+class CellTypeAssociation(TermAssociation):
+    """
+    An association between an activity and a cell type term
+    """
+    _inherited_slots: ClassVar[List[str]] = []
+
+    class_class_uri: ClassVar[URIRef] = GOCAM["CellTypeAssociation"]
+    class_class_curie: ClassVar[str] = "gocam:CellTypeAssociation"
+    class_name: ClassVar[str] = "CellTypeAssociation"
+    class_model_uri: ClassVar[URIRef] = GOCAM.CellTypeAssociation
+
+    term: Optional[Union[str, CellTypeTermObjectId]] = None
+    part_of: Optional[Union[dict, "GrossAnatomyAssociation"]] = None
+
+    def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
+        if self.term is not None and not isinstance(self.term, CellTypeTermObjectId):
+            self.term = CellTypeTermObjectId(self.term)
+
+        if self.part_of is not None and not isinstance(self.part_of, GrossAnatomyAssociation):
+            self.part_of = GrossAnatomyAssociation(**as_dict(self.part_of))
+
+        super().__post_init__(**kwargs)
+        self.unknown_type = str(self.class_name)
+
+
+@dataclass
+class GrossAnatomyAssociation(TermAssociation):
+    """
+    An association between an activity and a gross anatomical structure term
+    """
+    _inherited_slots: ClassVar[List[str]] = []
+
+    class_class_uri: ClassVar[URIRef] = GOCAM["GrossAnatomyAssociation"]
+    class_class_curie: ClassVar[str] = "gocam:GrossAnatomyAssociation"
+    class_name: ClassVar[str] = "GrossAnatomyAssociation"
+    class_model_uri: ClassVar[URIRef] = GOCAM.GrossAnatomyAssociation
+
+    term: Optional[Union[str, GrossAnatomicalStructureTermObjectId]] = None
+    part_of: Optional[Union[dict, "GrossAnatomyAssociation"]] = None
+
+    def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
+        if self.term is not None and not isinstance(self.term, GrossAnatomicalStructureTermObjectId):
+            self.term = GrossAnatomicalStructureTermObjectId(self.term)
+
+        if self.part_of is not None and not isinstance(self.part_of, GrossAnatomyAssociation):
+            self.part_of = GrossAnatomyAssociation(**as_dict(self.part_of))
 
         super().__post_init__(**kwargs)
         self.unknown_type = str(self.class_name)
@@ -634,7 +693,7 @@ class MolecularFunctionTermObject(TermObject):
 @dataclass
 class BiologicalProcessTermObject(TermObject):
     """
-    A termm object that represents a biological process term from GO
+    A term object that represents a biological process term from GO
     """
     _inherited_slots: ClassVar[List[str]] = []
 
@@ -1131,6 +1190,21 @@ slots.BiologicalProcessAssociation_part_of = Slot(uri=GOCAM.part_of, name="Biolo
 
 slots.CellularAnatomicalEntityAssociation_term = Slot(uri=GOCAM.term, name="CellularAnatomicalEntityAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.CellularAnatomicalEntityAssociation_term, domain=CellularAnatomicalEntityAssociation, range=Optional[Union[str, CellularAnatomicalEntityTermObjectId]])
+
+slots.CellularAnatomicalEntityAssociation_part_of = Slot(uri=GOCAM.part_of, name="CellularAnatomicalEntityAssociation_part_of", curie=GOCAM.curie('part_of'),
+                   model_uri=GOCAM.CellularAnatomicalEntityAssociation_part_of, domain=CellularAnatomicalEntityAssociation, range=Optional[Union[dict, "CellTypeAssociation"]])
+
+slots.CellTypeAssociation_term = Slot(uri=GOCAM.term, name="CellTypeAssociation_term", curie=GOCAM.curie('term'),
+                   model_uri=GOCAM.CellTypeAssociation_term, domain=CellTypeAssociation, range=Optional[Union[str, CellTypeTermObjectId]])
+
+slots.CellTypeAssociation_part_of = Slot(uri=GOCAM.part_of, name="CellTypeAssociation_part_of", curie=GOCAM.curie('part_of'),
+                   model_uri=GOCAM.CellTypeAssociation_part_of, domain=CellTypeAssociation, range=Optional[Union[dict, "GrossAnatomyAssociation"]])
+
+slots.GrossAnatomyAssociation_term = Slot(uri=GOCAM.term, name="GrossAnatomyAssociation_term", curie=GOCAM.curie('term'),
+                   model_uri=GOCAM.GrossAnatomyAssociation_term, domain=GrossAnatomyAssociation, range=Optional[Union[str, GrossAnatomicalStructureTermObjectId]])
+
+slots.GrossAnatomyAssociation_part_of = Slot(uri=GOCAM.part_of, name="GrossAnatomyAssociation_part_of", curie=GOCAM.curie('part_of'),
+                   model_uri=GOCAM.GrossAnatomyAssociation_part_of, domain=GrossAnatomyAssociation, range=Optional[Union[dict, "GrossAnatomyAssociation"]])
 
 slots.MoleculeAssociation_term = Slot(uri=GOCAM.term, name="MoleculeAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.MoleculeAssociation_term, domain=MoleculeAssociation, range=Optional[Union[str, MoleculeTermObjectId]])

@@ -1,7 +1,7 @@
  syntax="proto3";
  package
 // metamodel_version: 1.7.0
-// An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex
+// An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model
 message Activity
  {
   uriorcurie id = 0
@@ -23,7 +23,7 @@ message BiologicalProcessAssociation
   phaseTermObject happensDuring = 0
   biologicalProcessTermObject partOf = 0
  }
-// A termm object that represents a biological process term from GO
+// A term object that represents a biological process term from GO
 message BiologicalProcessTermObject
  {
   uriorcurie id = 0
@@ -40,6 +40,15 @@ message CausalAssociation
   predicateTermObject predicate = 0
   activity downstreamActivity = 0
  }
+// An association between an activity and a cell type term
+message CellTypeAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+  cellTypeTermObject term = 0
+  grossAnatomyAssociation partOf = 0
+ }
 // A term object that represents a cell type term from CL
 message CellTypeTermObject
  {
@@ -55,6 +64,7 @@ message CellularAnatomicalEntityAssociation
  repeated  evidenceItem evidence = 0
  repeated  provenanceInfo provenances = 0
   cellularAnatomicalEntityTermObject term = 0
+  cellTypeAssociation partOf = 0
  }
 // A term object that represents a cellular anatomical entity term from GO
 message CellularAnatomicalEntityTermObject
@@ -64,6 +74,7 @@ message CellularAnatomicalEntityTermObject
   uriorcurie type = 0
   boolean obsolete = 0
  }
+// An individual piece of evidence that is associated with an assertion in a model
 message EvidenceItem
  {
   evidenceTermObject term = 0
@@ -94,6 +105,15 @@ message GrossAnatomicalStructureTermObject
   string label = 0
   uriorcurie type = 0
   boolean obsolete = 0
+ }
+// An association between an activity and a gross anatomical structure term
+message GrossAnatomyAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+  grossAnatomicalStructureTermObject term = 0
+  grossAnatomyAssociation partOf = 0
  }
 // A model of a biological program consisting of a set of causally connected activities
 message Model
