@@ -1,20 +1,20 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Dict, Iterator, Optional, List, DefaultDict
+from typing import DefaultDict, Dict, Iterator, List, Optional
 
 import requests
 import yaml
 
 from gocam.datamodel import (
-    Model,
     Activity,
-    MolecularFunctionAssociation,
     BiologicalProcessAssociation,
-    CellularAnatomicalEntityAssociation,
     CausalAssociation,
-    Object,
+    CellularAnatomicalEntityAssociation,
     EvidenceItem,
+    Model,
+    MolecularFunctionAssociation,
+    Object,
     ProvenanceInfo,
 )
 
