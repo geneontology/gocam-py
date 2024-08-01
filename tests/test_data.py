@@ -1,16 +1,19 @@
 """Data test."""
-import os
+
 import glob
+import os
 
+import pytest
 from linkml_runtime.loaders import yaml_loader
+
 from gocam.datamodel import Model
+from tests import EXAMPLES_DIR
 
-ROOT = os.path.join(os.path.dirname(__file__), '..')
-DATA_DIR = os.path.join(ROOT, "src", "data", "examples")
-
-EXAMPLE_FILES = glob.glob(os.path.join(DATA_DIR, '*.yaml'))
+EXAMPLE_FILES = glob.glob(os.path.join(EXAMPLES_DIR, "*.yaml"))
 
 
+# linkml-linkml_runtime.loaders.yaml_loader still uses load_obj. Disable capturing this warning.
+@pytest.mark.filterwarnings("ignore::pydantic.warnings.PydanticDeprecatedSince20")
 def test_data():
     """Data test."""
     for path in EXAMPLE_FILES:
