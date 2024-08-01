@@ -1,12 +1,16 @@
 import json
 import logging
+import os
 import sys
 
 import click
+import ndex2
 import yaml
 
 from gocam import __version__
+from gocam.datamodel import Model
 from gocam.translation import MinervaWrapper
+from gocam.translation.cx2 import model_to_cx2
 
 
 @click.group()
@@ -74,6 +78,63 @@ def fetch(model_ids, format):
             click.echo(yaml.dump(model_dict, sort_keys=False))
         else:
             click.echo(model.model_dump())
+
+
+@cli.command()
+@click.option(
+    "--input-format",
+    "-I",
+    type=click.Choice(["json", "yaml"]),
+    help="Input format. Not required unless reading from stdin.",
+)
+@click.option("--output-format", "-O", type=click.Choice(["cx2"]), required=True)
+@click.option("--output", "-o", type=click.File("w"), default="-")
+@click.option("--ndex-upload", is_flag=True, help="Upload to NDEx")
+@click.argument("model", type=click.File("r"), default="-")
+def convert(model, input_format, output_format, output, ndex_upload):
+    """Convert GO-CAM models."""
+    if ndex_upload and output_format != "cx2":
+        raise click.UsageError("NDEx upload requires output format to be CX2")
+
+    if input_format is None:
+        if model.name.endswith(".json"):
+            input_format = "json"
+        elif model.name.endswith(".yaml"):
+            input_format = "yaml"
+        else:
+            raise click.BadParameter("Could not infer input format")
+
+    if input_format == "json":
+        deserialized = json.load(model)
+    elif input_format == "yaml":
+        deserialized = yaml.safe_load(model)
+    else:
+        raise click.UsageError("Invalid input format")
+
+    try:
+        model = Model.model_validate(deserialized)
+    except Exception as e:
+        raise click.UsageError(f"Could not load model: {e}")
+
+    if output_format == "cx2":
+        cx2 = model_to_cx2(model)
+
+        if ndex_upload:
+            # This is very basic proof-of-concept usage of the NDEx client. Once we have a better
+            # idea of how we want to use it, we can refactor this to allow more CLI options for
+            # connection details, visibility, adding the new network to a group, etc. At that point
+            # we can also consider moving upload functionality to a separate command.
+            client = ndex2.client.Ndex2(
+                host=os.getenv("NDEX_HOST"),
+                username=os.getenv("NDEX_USERNAME"),
+                password=os.getenv("NDEX_PASSWORD"),
+            )
+            url = client.save_new_cx2_network(cx2, visibility="PRIVATE")
+            # This replacement suggested by
+            # https://ndex2.readthedocs.io/en/latest/quicktutorial.html#upload-new-network-to-ndex
+            click.echo(f"View network at: {url.replace('v3', 'viewer')}")
+        else:
+            click.echo(json.dumps(cx2), file=output)
 
 
 if __name__ == "__main__":
