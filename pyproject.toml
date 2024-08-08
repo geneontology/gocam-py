@@ -11,6 +11,7 @@ include = ["README.md", "src/gocam/schema", "project"]
 python = "^3.9"
 click = "^8"
 linkml-runtime = "^1.1.24"
+ndex2 = "^3.9.0"
 pydantic = "^2"
 pyyaml = "^6"
 requests = "^2"
