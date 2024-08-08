@@ -25,9 +25,9 @@ class Width(int, Enum):
 
 class ArrowShape(str, Enum):
     CIRCLE = "circle"
-    DELTA = "delta"
     DIAMOND = "diamond"
-    SQUARE = "square"
+    TEE = "tee"
+    TRIANGLE = "triangle"
 
 
 class LineStyle(str, Enum):
@@ -75,28 +75,28 @@ RELATIONS = {
     ),
     "RO:0002212": RelationStyle(
         line_style=LineStyle.DASHED,
-        arrow_shape=ArrowShape.SQUARE,
+        arrow_shape=ArrowShape.TEE,
         label="negatively regulates",
         color=Color.RED,
         width=Width.INDIRECT,
     ),
     "RO:0002630": RelationStyle(
         line_style=LineStyle.SOLID,
-        arrow_shape=ArrowShape.SQUARE,
+        arrow_shape=ArrowShape.TEE,
         label="directly negatively regulates",
         color=Color.RED,
         width=Width.DIRECT,
     ),
     "RO:0002213": RelationStyle(
         line_style=LineStyle.DASHED,
-        arrow_shape=ArrowShape.DELTA,
+        arrow_shape=ArrowShape.TRIANGLE,
         label="positively regulates",
         color=Color.GREEN,
         width=Width.INDIRECT,
     ),
     "RO:0002629": RelationStyle(
         line_style=LineStyle.SOLID,
-        arrow_shape=ArrowShape.DELTA,
+        arrow_shape=ArrowShape.TRIANGLE,
         label="directly positively regulates",
         color=Color.GREEN,
         width=Width.DIRECT,
@@ -145,14 +145,14 @@ RELATIONS = {
     ),
     "RO:0002408": RelationStyle(
         line_style=LineStyle.SOLID,
-        arrow_shape=ArrowShape.SQUARE,
+        arrow_shape=ArrowShape.TEE,
         label="directly inhibits",
         color=Color.RED,
         width=Width.DIRECT,
     ),
     "RO:0002406": RelationStyle(
         line_style=LineStyle.SOLID,
-        arrow_shape=ArrowShape.DELTA,
+        arrow_shape=ArrowShape.TRIANGLE,
         label="directly activates",
         color=Color.GREEN,
         width=Width.DIRECT,
