@@ -5,7 +5,7 @@
 message Activity
  {
   uriorcurie id = 0
-  informationBiomacromoleculeTermObject enabledBy = 0
+  enabledByAssociation enabledBy = 0
   molecularFunctionAssociation molecularFunction = 0
   cellularAnatomicalEntityAssociation occursIn = 0
   biologicalProcessAssociation partOf = 0
@@ -73,6 +73,23 @@ message CellularAnatomicalEntityTermObject
   string label = 0
   uriorcurie type = 0
   boolean obsolete = 0
+ }
+// An association between an activity and a gene product
+message EnabledByGeneProductAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+  geneProductTermObject term = 0
+ }
+// An association between an activity and a protein complex
+message EnabledByProteinComplexAssociation
+ {
+  string type = 0
+ repeated  evidenceItem evidence = 0
+ repeated  provenanceInfo provenances = 0
+ repeated  geneProductTermObject members = 0
+  proteinComplexTermObject term = 0
  }
 // An individual piece of evidence that is associated with an assertion in a model
 message EvidenceItem

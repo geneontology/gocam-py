@@ -5,8 +5,8 @@
 --     * Slot: status Description: The status of the model
 -- # Class: "Activity" Description: "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model"
 --     * Slot: id Description: Identifier of the activity unit. Should be in gocam namespace.
---     * Slot: enabled_by Description: The gene product or complex that carries out the activity
 --     * Slot: Model_id Description: Autocreated FK slot
+--     * Slot: enabled_by_id Description: The gene product or complex that carries out the activity
 --     * Slot: molecular_function_id Description: The molecular function that is carried out by the gene product or complex
 --     * Slot: occurs_in_id Description: The cellular location in which the activity occurs
 --     * Slot: part_of_id Description: The larger biological process in which the activity is a part
@@ -16,6 +16,9 @@
 --     * Slot: term Description: The ECO term representing the type of evidence
 --     * Slot: reference Description: The publication of reference that describes the evidence
 --     * Slot: Association_id Description: Autocreated FK slot
+--     * Slot: EnabledByAssociation_id Description: Autocreated FK slot
+--     * Slot: EnabledByGeneProductAssociation_id Description: Autocreated FK slot
+--     * Slot: EnabledByProteinComplexAssociation_id Description: Autocreated FK slot
 --     * Slot: CausalAssociation_id Description: Autocreated FK slot
 --     * Slot: TermAssociation_id Description: Autocreated FK slot
 --     * Slot: MolecularFunctionAssociation_id Description: Autocreated FK slot
@@ -26,6 +29,18 @@
 --     * Slot: MoleculeAssociation_id Description: Autocreated FK slot
 -- # Class: "Association" Description: "An abstract grouping for different kinds of evidence-associated provenance"
 --     * Slot: id Description: 
+--     * Slot: type Description: 
+-- # Class: "EnabledByAssociation" Description: "An association between an activity and the gene product or complex that carries it out"
+--     * Slot: id Description: 
+--     * Slot: term Description: The gene product or complex that carries out the activity
+--     * Slot: type Description: 
+-- # Class: "EnabledByGeneProductAssociation" Description: "An association between an activity and a gene product"
+--     * Slot: id Description: 
+--     * Slot: term Description: The gene product or complex that carries out the activity
+--     * Slot: type Description: 
+-- # Class: "EnabledByProteinComplexAssociation" Description: "An association between an activity and a protein complex"
+--     * Slot: id Description: 
+--     * Slot: term Description: The gene product or complex that carries out the activity
 --     * Slot: type Description: 
 -- # Class: "CausalAssociation" Description: "A causal association between two activities"
 --     * Slot: id Description: 
@@ -154,6 +169,9 @@
 --     * Slot: Activity_id Description: Autocreated FK slot
 --     * Slot: EvidenceItem_id Description: Autocreated FK slot
 --     * Slot: Association_id Description: Autocreated FK slot
+--     * Slot: EnabledByAssociation_id Description: Autocreated FK slot
+--     * Slot: EnabledByGeneProductAssociation_id Description: Autocreated FK slot
+--     * Slot: EnabledByProteinComplexAssociation_id Description: Autocreated FK slot
 --     * Slot: CausalAssociation_id Description: Autocreated FK slot
 --     * Slot: TermAssociation_id Description: Autocreated FK slot
 --     * Slot: MolecularFunctionAssociation_id Description: Autocreated FK slot
@@ -168,6 +186,9 @@
 -- # Class: "EvidenceItem_with_objects" Description: ""
 --     * Slot: EvidenceItem_id Description: Autocreated FK slot
 --     * Slot: with_objects_id Description: Supporting database entities or terms
+-- # Class: "EnabledByProteinComplexAssociation_members" Description: ""
+--     * Slot: EnabledByProteinComplexAssociation_id Description: Autocreated FK slot
+--     * Slot: members_id Description: The gene products that are part of the complex
 
 CREATE TABLE "Association" (
 	id INTEGER NOT NULL, 
@@ -289,6 +310,27 @@ CREATE TABLE "Model" (
 	PRIMARY KEY (id), 
 	FOREIGN KEY(taxon) REFERENCES "TaxonTermObject" (id)
 );
+CREATE TABLE "EnabledByAssociation" (
+	id INTEGER NOT NULL, 
+	term TEXT, 
+	type TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(term) REFERENCES "InformationBiomacromoleculeTermObject" (id)
+);
+CREATE TABLE "EnabledByGeneProductAssociation" (
+	id INTEGER NOT NULL, 
+	term TEXT, 
+	type TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(term) REFERENCES "GeneProductTermObject" (id)
+);
+CREATE TABLE "EnabledByProteinComplexAssociation" (
+	id INTEGER NOT NULL, 
+	term TEXT, 
+	type TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(term) REFERENCES "ProteinComplexTermObject" (id)
+);
 CREATE TABLE "TermAssociation" (
 	id INTEGER NOT NULL, 
 	term TEXT, 
@@ -340,15 +382,15 @@ CREATE TABLE "MoleculeAssociation" (
 );
 CREATE TABLE "Activity" (
 	id TEXT NOT NULL, 
-	enabled_by TEXT, 
 	"Model_id" TEXT, 
+	enabled_by_id INTEGER, 
 	molecular_function_id INTEGER, 
 	occurs_in_id INTEGER, 
 	part_of_id INTEGER, 
 	has_direct_input_id INTEGER, 
 	PRIMARY KEY (id), 
-	FOREIGN KEY(enabled_by) REFERENCES "InformationBiomacromoleculeTermObject" (id), 
 	FOREIGN KEY("Model_id") REFERENCES "Model" (id), 
+	FOREIGN KEY(enabled_by_id) REFERENCES "EnabledByAssociation" (id), 
 	FOREIGN KEY(molecular_function_id) REFERENCES "MolecularFunctionAssociation" (id), 
 	FOREIGN KEY(occurs_in_id) REFERENCES "CellularAnatomicalEntityAssociation" (id), 
 	FOREIGN KEY(part_of_id) REFERENCES "BiologicalProcessAssociation" (id), 
@@ -369,6 +411,13 @@ CREATE TABLE "Model_comments" (
 	PRIMARY KEY ("Model_id", comments), 
 	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
 );
+CREATE TABLE "EnabledByProteinComplexAssociation_members" (
+	"EnabledByProteinComplexAssociation_id" INTEGER, 
+	members_id TEXT, 
+	PRIMARY KEY ("EnabledByProteinComplexAssociation_id", members_id), 
+	FOREIGN KEY("EnabledByProteinComplexAssociation_id") REFERENCES "EnabledByProteinComplexAssociation" (id), 
+	FOREIGN KEY(members_id) REFERENCES "GeneProductTermObject" (id)
+);
 CREATE TABLE "CausalAssociation" (
 	id INTEGER NOT NULL, 
 	predicate TEXT, 
@@ -385,6 +434,9 @@ CREATE TABLE "EvidenceItem" (
 	term TEXT, 
 	reference TEXT, 
 	"Association_id" INTEGER, 
+	"EnabledByAssociation_id" INTEGER, 
+	"EnabledByGeneProductAssociation_id" INTEGER, 
+	"EnabledByProteinComplexAssociation_id" INTEGER, 
 	"CausalAssociation_id" INTEGER, 
 	"TermAssociation_id" INTEGER, 
 	"MolecularFunctionAssociation_id" INTEGER, 
@@ -397,6 +449,9 @@ CREATE TABLE "EvidenceItem" (
 	FOREIGN KEY(term) REFERENCES "EvidenceTermObject" (id), 
 	FOREIGN KEY(reference) REFERENCES "PublicationObject" (id), 
 	FOREIGN KEY("Association_id") REFERENCES "Association" (id), 
+	FOREIGN KEY("EnabledByAssociation_id") REFERENCES "EnabledByAssociation" (id), 
+	FOREIGN KEY("EnabledByGeneProductAssociation_id") REFERENCES "EnabledByGeneProductAssociation" (id), 
+	FOREIGN KEY("EnabledByProteinComplexAssociation_id") REFERENCES "EnabledByProteinComplexAssociation" (id), 
 	FOREIGN KEY("CausalAssociation_id") REFERENCES "CausalAssociation" (id), 
 	FOREIGN KEY("TermAssociation_id") REFERENCES "TermAssociation" (id), 
 	FOREIGN KEY("MolecularFunctionAssociation_id") REFERENCES "MolecularFunctionAssociation" (id), 
@@ -416,6 +471,9 @@ CREATE TABLE "ProvenanceInfo" (
 	"Activity_id" TEXT, 
 	"EvidenceItem_id" INTEGER, 
 	"Association_id" INTEGER, 
+	"EnabledByAssociation_id" INTEGER, 
+	"EnabledByGeneProductAssociation_id" INTEGER, 
+	"EnabledByProteinComplexAssociation_id" INTEGER, 
 	"CausalAssociation_id" INTEGER, 
 	"TermAssociation_id" INTEGER, 
 	"MolecularFunctionAssociation_id" INTEGER, 
@@ -429,6 +487,9 @@ CREATE TABLE "ProvenanceInfo" (
 	FOREIGN KEY("Activity_id") REFERENCES "Activity" (id), 
 	FOREIGN KEY("EvidenceItem_id") REFERENCES "EvidenceItem" (id), 
 	FOREIGN KEY("Association_id") REFERENCES "Association" (id), 
+	FOREIGN KEY("EnabledByAssociation_id") REFERENCES "EnabledByAssociation" (id), 
+	FOREIGN KEY("EnabledByGeneProductAssociation_id") REFERENCES "EnabledByGeneProductAssociation" (id), 
+	FOREIGN KEY("EnabledByProteinComplexAssociation_id") REFERENCES "EnabledByProteinComplexAssociation" (id), 
 	FOREIGN KEY("CausalAssociation_id") REFERENCES "CausalAssociation" (id), 
 	FOREIGN KEY("TermAssociation_id") REFERENCES "TermAssociation" (id), 
 	FOREIGN KEY("MolecularFunctionAssociation_id") REFERENCES "MolecularFunctionAssociation" (id), 

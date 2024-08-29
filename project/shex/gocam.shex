@@ -47,7 +47,7 @@ linkml:Jsonpath xsd:string
 linkml:Sparqlpath xsd:string
 
 <Activity> CLOSED {
-    (  $<Activity_tes> (  <enabled_by> @<InformationBiomacromoleculeTermObject> ? ;
+    (  $<Activity_tes> (  <enabled_by> @<EnabledByAssociation> ? ;
           <molecular_function> @<MolecularFunctionAssociation> ? ;
           <occurs_in> @<CellularAnatomicalEntityAssociation> ? ;
           <part_of> @<BiologicalProcessAssociation> ? ;
@@ -60,7 +60,7 @@ linkml:Sparqlpath xsd:string
 }
 
 <Association>  (
-    @<CausalAssociation> OR @<TermAssociation>
+    @<CausalAssociation> OR @<EnabledByAssociation> OR @<TermAssociation>
 )
 
 <Association_struct> {
@@ -134,6 +134,38 @@ linkml:Sparqlpath xsd:string
           rdf:type [ <TermObject> ] ?
        ) ;
        rdf:type [ <CellularAnatomicalEntityTermObject> ]
+    )
+}
+
+<EnabledByAssociation>  (
+    @<EnabledByGeneProductAssociation> OR @<EnabledByProteinComplexAssociation>
+)
+
+<EnabledByAssociation_struct> {
+    (  $<EnabledByAssociation_tes> (  &<Association_tes> ;
+          rdf:type [ <Association> ] ? ;
+          <term> @<InformationBiomacromoleculeTermObject> ?
+       ) ;
+       rdf:type [ <EnabledByAssociation> ] ?
+    )
+}
+
+<EnabledByGeneProductAssociation> CLOSED {
+    (  $<EnabledByGeneProductAssociation_tes> (  &<EnabledByAssociation_tes> ;
+          rdf:type [ <EnabledByAssociation> ] ? ;
+          <term> @<GeneProductTermObject> ?
+       ) ;
+       rdf:type [ <EnabledByGeneProductAssociation> ] ?
+    )
+}
+
+<EnabledByProteinComplexAssociation> CLOSED {
+    (  $<EnabledByProteinComplexAssociation_tes> (  &<EnabledByAssociation_tes> ;
+          rdf:type [ <EnabledByAssociation> ] ? ;
+          <members> @<GeneProductTermObject> * ;
+          <term> @<ProteinComplexTermObject> ?
+       ) ;
+       rdf:type [ <EnabledByProteinComplexAssociation> ] ?
     )
 }
 

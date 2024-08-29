@@ -12,8 +12,15 @@
                     "type": "array"
                 },
                 "enabled_by": {
-                    "description": "The gene product or complex that carries out the activity",
-                    "type": "string"
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/EnabledByGeneProductAssociation"
+                        },
+                        {
+                            "$ref": "#/$defs/EnabledByProteinComplexAssociation"
+                        }
+                    ],
+                    "description": "The gene product or complex that carries out the activity"
                 },
                 "has_direct_input": {
                     "$ref": "#/$defs/MoleculeAssociation",
@@ -266,6 +273,73 @@
                 "id"
             ],
             "title": "CellularAnatomicalEntityTermObject",
+            "type": "object"
+        },
+        "EnabledByGeneProductAssociation": {
+            "additionalProperties": false,
+            "description": "An association between an activity and a gene product",
+            "properties": {
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "description": "The gene product or complex that carries out the activity",
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "EnabledByGeneProductAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "EnabledByGeneProductAssociation",
+            "type": "object"
+        },
+        "EnabledByProteinComplexAssociation": {
+            "additionalProperties": false,
+            "description": "An association between an activity and a protein complex",
+            "properties": {
+                "evidence": {
+                    "items": {
+                        "$ref": "#/$defs/EvidenceItem"
+                    },
+                    "type": "array"
+                },
+                "members": {
+                    "description": "The gene products that are part of the complex",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "provenances": {
+                    "items": {
+                        "$ref": "#/$defs/ProvenanceInfo"
+                    },
+                    "type": "array"
+                },
+                "term": {
+                    "description": "The gene product or complex that carries out the activity",
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "EnabledByProteinComplexAssociation"
+                    ],
+                    "type": "string"
+                }
+            },
+            "title": "EnabledByProteinComplexAssociation",
             "type": "object"
         },
         "EvidenceItem": {
