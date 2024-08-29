@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import DefaultDict, Dict, Iterator, List, Optional
+from typing import DefaultDict, Dict, Iterator, List, Optional, Set
 
 import requests
 import yaml
@@ -12,6 +12,9 @@ from gocam.datamodel import (
     CausalAssociation,
     CellularAnatomicalEntityAssociation,
     EvidenceItem,
+    EnabledByAssociation,
+    EnabledByProteinComplexAssociation,
+    EnabledByGeneProductAssociation,
     Model,
     MolecularFunctionAssociation,
     Object,
@@ -20,6 +23,7 @@ from gocam.datamodel import (
 
 ENABLED_BY = "RO:0002333"
 PART_OF = "BFO:0000050"
+HAS_PART = "BFO:0000051"
 OCCURS_IN = "BFO:0000066"
 
 logger = logging.getLogger(__name__)
@@ -65,6 +69,10 @@ MAIN_TYPES = [
     "evidence",
     "chemical entity",
     "anatomical entity",
+]
+
+COMPLEX_TYPES = [
+    "protein-containing complex",
 ]
 
 
@@ -158,6 +166,7 @@ class MinervaWrapper:
         individual_to_type: Dict[str, Optional[str]] = {}
         individual_to_term: Dict[str, str] = {}
         individual_to_annotations: Dict[str, Dict] = {}
+        complex_individuals: Set[str] = set()
         id2obj: Dict[str, Dict] = {}
         activities: List[Activity] = []
         activities_by_mf_id: DefaultDict[str, List[Activity]] = defaultdict(list)
@@ -211,6 +220,13 @@ class MinervaWrapper:
                 logger.warning(f"Could not find type for {individual}")
                 continue
             individual_to_type[individual["id"]] = typ
+
+            # Check to see if one of the types is a complex type
+            for t in typs:
+                if t in COMPLEX_TYPES:
+                    complex_individuals.add(individual["id"])
+                    break
+
             terms = list(filter(None, (_cls(x) for x in individual.get("type", []))))
             if len(terms) > 1:
                 logger.warning(f"Multiple terms for {individual}: {terms}")
@@ -238,9 +254,26 @@ class MinervaWrapper:
             gene_id = individual_to_term[o]
 
             evs = _evidence_from_fact(fact)
+            enabled_by_association: EnabledByAssociation
+            if o in complex_individuals:
+                has_part_facts = [
+                    fact
+                    for fact in facts_by_property.get(HAS_PART, [])
+                    if fact["subject"] == o
+                ]
+                members = [
+                    individual_to_term[fact["object"]]
+                    for fact in has_part_facts
+                    if fact["object"] in individual_to_term
+                ]
+                enabled_by_association = EnabledByProteinComplexAssociation(
+                    term=gene_id, members=members
+                )
+            else:
+                enabled_by_association = EnabledByGeneProductAssociation(term=gene_id)
             activity = Activity(
                 id=s,
-                enabled_by=gene_id,
+                enabled_by=enabled_by_association,
                 molecular_function=MolecularFunctionAssociation(
                     term=individual_to_term[s], evidence=evs
                 ),
