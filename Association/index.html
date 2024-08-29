@@ -208,6 +208,8 @@
 <div class="mermaid"> classDiagram
     class Association
     click Association href "../Association"
+      Association &lt;|-- EnabledByAssociation
+        click EnabledByAssociation href "../EnabledByAssociation"
       Association &lt;|-- CausalAssociation
         click CausalAssociation href "../CausalAssociation"
       Association &lt;|-- TermAssociation
@@ -238,6 +240,7 @@
 <h2 id="inheritance">Inheritance</h2>
 <ul>
 <li><strong>Association</strong><ul>
+<li><a href="../EnabledByAssociation/">EnabledByAssociation</a></li>
 <li><a href="../CausalAssociation/">CausalAssociation</a></li>
 <li><a href="../TermAssociation/">TermAssociation</a></li>
 </ul>

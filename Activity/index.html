@@ -224,8 +224,8 @@
 
 
 
-    Activity --&gt; "0..1" InformationBiomacromoleculeTermObject : enabled_by
-    click InformationBiomacromoleculeTermObject href "../InformationBiomacromoleculeTermObject"
+    Activity --&gt; "0..1" EnabledByAssociation : enabled_by
+    click EnabledByAssociation href "../EnabledByAssociation"
 
 
       Activity : has_direct_input
@@ -297,7 +297,7 @@
 </tr>
 <tr>
 <td><a href="../enabled_by/">enabled_by</a></td>
-<td>0..1 <br/> <a href="../InformationBiomacromoleculeTermObject/">InformationBiomacromoleculeTermObject</a></td>
+<td>0..1 <br/> <a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
 <td>The gene product or complex that carries out the activity</td>
 <td>direct</td>
 </tr>
@@ -425,8 +425,8 @@ attributes:
     rank: 1000
     domain_of:
     - Activity
-    range: InformationBiomacromoleculeTermObject
-    inlined: false
+    range: EnabledByAssociation
+    inlined: true
   molecular_function:
     name: molecular_function
     description: The molecular function that is carried out by the gene product or
@@ -528,8 +528,8 @@ attributes:
     owner: Activity
     domain_of:
     - Activity
-    range: InformationBiomacromoleculeTermObject
-    inlined: false
+    range: EnabledByAssociation
+    inlined: true
   molecular_function:
     name: molecular_function
     description: The molecular function that is carried out by the gene product or

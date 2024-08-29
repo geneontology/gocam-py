@@ -299,6 +299,24 @@
 <td><a href="./">EvidenceItem</a></td>
 </tr>
 <tr>
+<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
 <td><a href="../CausalAssociation/">CausalAssociation</a></td>
 <td><a href="../evidence/">evidence</a></td>
 <td>range</td>
@@ -388,6 +406,7 @@ attributes:
     rank: 1000
     domain_of:
     - EvidenceItem
+    - EnabledByAssociation
     - TermAssociation
     range: EvidenceTermObject
   reference:
@@ -442,6 +461,7 @@ attributes:
     owner: EvidenceItem
     domain_of:
     - EvidenceItem
+    - EnabledByAssociation
     - TermAssociation
     range: EvidenceTermObject
   reference:
