@@ -28,8 +28,8 @@ def model_to_cx2(gocam: Model) -> list:
             continue
 
         node_attributes = {
-            "name": _get_object_label(activity.enabled_by),
-            "represents": activity.enabled_by,
+            "name": _get_object_label(activity.enabled_by.term),
+            "represents": activity.enabled_by.term,
         }
 
         if activity.molecular_function:

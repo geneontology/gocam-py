@@ -93,8 +93,8 @@ classes:
           - Typically does not need to be exposed to end-user, this exists to allow activity flows
       enabled_by:
         description: The gene product or complex that carries out the activity
-        range: InformationBiomacromoleculeTermObject
-        inlined: false
+        range: EnabledByAssociation
+        inlined: true
       molecular_function:
         description: The molecular function that is carried out by the gene product or complex
         range: MolecularFunctionAssociation
@@ -160,6 +160,35 @@ classes:
         range: ProvenanceInfo
         inlined_as_list: true
         multivalued: true
+
+  EnabledByAssociation:
+    description: >-
+      An association between an activity and the gene product or complex that carries it out
+    is_a: Association
+    abstract: true
+    attributes:
+      term:
+        description: The gene product or complex that carries out the activity
+        range: InformationBiomacromoleculeTermObject
+
+  EnabledByGeneProductAssociation:
+    description: An association between an activity and a gene product
+    is_a: EnabledByAssociation
+    slot_usage:
+      term:
+        range: GeneProductTermObject
+
+  EnabledByProteinComplexAssociation:
+    description: An association between an activity and a protein complex
+    is_a: EnabledByAssociation
+    attributes:
+      members:
+        description: The gene products that are part of the complex
+        range: GeneProductTermObject
+        multivalued: true
+    slot_usage:
+      term:
+        range: ProteinComplexTermObject
 
   CausalAssociation:
     description: A causal association between two activities

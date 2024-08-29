@@ -93,7 +93,7 @@ class Activity(ConfiguredBaseModel):
     An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model
     """
     id: str = Field(..., description="""Identifier of the activity unit. Should be in gocam namespace.""")
-    enabled_by: Optional[str] = Field(None, description="""The gene product or complex that carries out the activity""")
+    enabled_by: Optional[Union[EnabledByAssociation,EnabledByGeneProductAssociation,EnabledByProteinComplexAssociation]] = Field(None, description="""The gene product or complex that carries out the activity""")
     molecular_function: Optional[MolecularFunctionAssociation] = Field(None, description="""The molecular function that is carried out by the gene product or complex""")
     occurs_in: Optional[CellularAnatomicalEntityAssociation] = Field(None, description="""The cellular location in which the activity occurs""")
     part_of: Optional[BiologicalProcessAssociation] = Field(None, description="""The larger biological process in which the activity is a part""")
@@ -117,6 +117,37 @@ class Association(ConfiguredBaseModel):
     An abstract grouping for different kinds of evidence-associated provenance
     """
     type: Literal["Association"] = Field("Association")
+    evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
+    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
+
+
+class EnabledByAssociation(Association):
+    """
+    An association between an activity and the gene product or complex that carries it out
+    """
+    term: Optional[str] = Field(None, description="""The gene product or complex that carries out the activity""")
+    type: Literal["EnabledByAssociation"] = Field("EnabledByAssociation")
+    evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
+    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
+
+
+class EnabledByGeneProductAssociation(EnabledByAssociation):
+    """
+    An association between an activity and a gene product
+    """
+    term: Optional[str] = Field(None, description="""The gene product or complex that carries out the activity""")
+    type: Literal["EnabledByGeneProductAssociation"] = Field("EnabledByGeneProductAssociation")
+    evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
+    provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
+
+
+class EnabledByProteinComplexAssociation(EnabledByAssociation):
+    """
+    An association between an activity and a protein complex
+    """
+    members: Optional[List[str]] = Field(default_factory=list, description="""The gene products that are part of the complex""")
+    term: Optional[str] = Field(None, description="""The gene product or complex that carries out the activity""")
+    type: Literal["EnabledByProteinComplexAssociation"] = Field("EnabledByProteinComplexAssociation")
     evidence: Optional[List[EvidenceItem]] = Field(default_factory=list)
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list)
 
@@ -380,6 +411,9 @@ Model.model_rebuild()
 Activity.model_rebuild()
 EvidenceItem.model_rebuild()
 Association.model_rebuild()
+EnabledByAssociation.model_rebuild()
+EnabledByGeneProductAssociation.model_rebuild()
+EnabledByProteinComplexAssociation.model_rebuild()
 CausalAssociation.model_rebuild()
 TermAssociation.model_rebuild()
 MolecularFunctionAssociation.model_rebuild()

@@ -2,7 +2,7 @@
 type Activity
   {
     id: Uriorcurie!
-    enabledBy: InformationBiomacromoleculeTermObject
+    enabledBy: EnabledByAssociation
     molecularFunction: MolecularFunctionAssociation
     occursIn: CellularAnatomicalEntityAssociation
     partOf: BiologicalProcessAssociation
@@ -77,6 +77,31 @@ type CellularAnatomicalEntityTermObject
     label: String
     type: Uriorcurie
     obsolete: Boolean
+  }
+
+interface EnabledByAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: InformationBiomacromoleculeTermObject
+  }
+
+type EnabledByGeneProductAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    term: GeneProductTermObject
+  }
+
+type EnabledByProteinComplexAssociation
+  {
+    type: String
+    evidence: [EvidenceItem]
+    provenances: [ProvenanceInfo]
+    members: [GeneProductTermObject]
+    term: ProteinComplexTermObject
   }
 
 type EvidenceItem

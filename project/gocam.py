@@ -1,5 +1,5 @@
 # Auto generated from gocam.yaml by pythongen.py version: 0.0.1
-# Generation date: 2024-07-16T15:08:36
+# Generation date: 2024-08-28T17:21:26
 # Schema: gocam
 #
 # id: https://w3id.org/gocam
@@ -207,7 +207,7 @@ class Activity(YAMLRoot):
     class_model_uri: ClassVar[URIRef] = GOCAM.Activity
 
     id: Union[str, ActivityId] = None
-    enabled_by: Optional[Union[str, InformationBiomacromoleculeTermObjectId]] = None
+    enabled_by: Optional[Union[dict, "EnabledByAssociation"]] = None
     molecular_function: Optional[Union[dict, "MolecularFunctionAssociation"]] = None
     occurs_in: Optional[Union[dict, "CellularAnatomicalEntityAssociation"]] = None
     part_of: Optional[Union[dict, "BiologicalProcessAssociation"]] = None
@@ -221,8 +221,8 @@ class Activity(YAMLRoot):
         if not isinstance(self.id, ActivityId):
             self.id = ActivityId(self.id)
 
-        if self.enabled_by is not None and not isinstance(self.enabled_by, InformationBiomacromoleculeTermObjectId):
-            self.enabled_by = InformationBiomacromoleculeTermObjectId(self.enabled_by)
+        if self.enabled_by is not None and not isinstance(self.enabled_by, EnabledByAssociation):
+            self.enabled_by = EnabledByAssociation(**as_dict(self.enabled_by))
 
         if self.molecular_function is not None and not isinstance(self.molecular_function, MolecularFunctionAssociation):
             self.molecular_function = MolecularFunctionAssociation(**as_dict(self.molecular_function))
@@ -328,6 +328,77 @@ class Association(YAMLRoot):
                                  f"has no subclass with ['class_name']='{kwargs[type_designator]}'")
             return super().__new__(target_cls,*args,**kwargs)
 
+
+
+@dataclass
+class EnabledByAssociation(Association):
+    """
+    An association between an activity and the gene product or complex that carries it out
+    """
+    _inherited_slots: ClassVar[List[str]] = []
+
+    class_class_uri: ClassVar[URIRef] = GOCAM["EnabledByAssociation"]
+    class_class_curie: ClassVar[str] = "gocam:EnabledByAssociation"
+    class_name: ClassVar[str] = "EnabledByAssociation"
+    class_model_uri: ClassVar[URIRef] = GOCAM.EnabledByAssociation
+
+    term: Optional[Union[str, InformationBiomacromoleculeTermObjectId]] = None
+
+    def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
+        if self.term is not None and not isinstance(self.term, InformationBiomacromoleculeTermObjectId):
+            self.term = InformationBiomacromoleculeTermObjectId(self.term)
+
+        super().__post_init__(**kwargs)
+        self.unknown_type = str(self.class_name)
+
+
+@dataclass
+class EnabledByGeneProductAssociation(EnabledByAssociation):
+    """
+    An association between an activity and a gene product
+    """
+    _inherited_slots: ClassVar[List[str]] = []
+
+    class_class_uri: ClassVar[URIRef] = GOCAM["EnabledByGeneProductAssociation"]
+    class_class_curie: ClassVar[str] = "gocam:EnabledByGeneProductAssociation"
+    class_name: ClassVar[str] = "EnabledByGeneProductAssociation"
+    class_model_uri: ClassVar[URIRef] = GOCAM.EnabledByGeneProductAssociation
+
+    term: Optional[Union[str, GeneProductTermObjectId]] = None
+
+    def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
+        if self.term is not None and not isinstance(self.term, GeneProductTermObjectId):
+            self.term = GeneProductTermObjectId(self.term)
+
+        super().__post_init__(**kwargs)
+        self.unknown_type = str(self.class_name)
+
+
+@dataclass
+class EnabledByProteinComplexAssociation(EnabledByAssociation):
+    """
+    An association between an activity and a protein complex
+    """
+    _inherited_slots: ClassVar[List[str]] = []
+
+    class_class_uri: ClassVar[URIRef] = GOCAM["EnabledByProteinComplexAssociation"]
+    class_class_curie: ClassVar[str] = "gocam:EnabledByProteinComplexAssociation"
+    class_name: ClassVar[str] = "EnabledByProteinComplexAssociation"
+    class_model_uri: ClassVar[URIRef] = GOCAM.EnabledByProteinComplexAssociation
+
+    members: Optional[Union[Union[str, GeneProductTermObjectId], List[Union[str, GeneProductTermObjectId]]]] = empty_list()
+    term: Optional[Union[str, ProteinComplexTermObjectId]] = None
+
+    def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
+        if not isinstance(self.members, list):
+            self.members = [self.members] if self.members is not None else []
+        self.members = [v if isinstance(v, GeneProductTermObjectId) else GeneProductTermObjectId(v) for v in self.members]
+
+        if self.term is not None and not isinstance(self.term, ProteinComplexTermObjectId):
+            self.term = ProteinComplexTermObjectId(self.term)
+
+        super().__post_init__(**kwargs)
+        self.unknown_type = str(self.class_name)
 
 
 @dataclass
@@ -1090,7 +1161,7 @@ slots.activity__id = Slot(uri=GOCAM.id, name="activity__id", curie=GOCAM.curie('
                    model_uri=GOCAM.activity__id, domain=None, range=URIRef)
 
 slots.activity__enabled_by = Slot(uri=GOCAM.enabled_by, name="activity__enabled_by", curie=GOCAM.curie('enabled_by'),
-                   model_uri=GOCAM.activity__enabled_by, domain=None, range=Optional[Union[str, InformationBiomacromoleculeTermObjectId]])
+                   model_uri=GOCAM.activity__enabled_by, domain=None, range=Optional[Union[dict, EnabledByAssociation]])
 
 slots.activity__molecular_function = Slot(uri=GOCAM.molecular_function, name="activity__molecular_function", curie=GOCAM.curie('molecular_function'),
                    model_uri=GOCAM.activity__molecular_function, domain=None, range=Optional[Union[dict, MolecularFunctionAssociation]])
@@ -1130,6 +1201,12 @@ slots.association__evidence = Slot(uri=GOCAM.evidence, name="association__eviden
 
 slots.association__provenances = Slot(uri=GOCAM.provenances, name="association__provenances", curie=GOCAM.curie('provenances'),
                    model_uri=GOCAM.association__provenances, domain=None, range=Optional[Union[Union[dict, ProvenanceInfo], List[Union[dict, ProvenanceInfo]]]])
+
+slots.enabledByAssociation__term = Slot(uri=GOCAM.term, name="enabledByAssociation__term", curie=GOCAM.curie('term'),
+                   model_uri=GOCAM.enabledByAssociation__term, domain=None, range=Optional[Union[str, InformationBiomacromoleculeTermObjectId]])
+
+slots.enabledByProteinComplexAssociation__members = Slot(uri=GOCAM.members, name="enabledByProteinComplexAssociation__members", curie=GOCAM.curie('members'),
+                   model_uri=GOCAM.enabledByProteinComplexAssociation__members, domain=None, range=Optional[Union[Union[str, GeneProductTermObjectId], List[Union[str, GeneProductTermObjectId]]]])
 
 slots.causalAssociation__predicate = Slot(uri=GOCAM.predicate, name="causalAssociation__predicate", curie=GOCAM.curie('predicate'),
                    model_uri=GOCAM.causalAssociation__predicate, domain=None, range=Optional[Union[str, PredicateTermObjectId]])
@@ -1175,6 +1252,12 @@ slots.happens_during = Slot(uri=GOCAM.happens_during, name="happens_during", cur
 
 slots.part_of = Slot(uri=GOCAM.part_of, name="part_of", curie=GOCAM.curie('part_of'),
                    model_uri=GOCAM.part_of, domain=None, range=Optional[Union[str, BiologicalProcessTermObjectId]])
+
+slots.EnabledByGeneProductAssociation_term = Slot(uri=GOCAM.term, name="EnabledByGeneProductAssociation_term", curie=GOCAM.curie('term'),
+                   model_uri=GOCAM.EnabledByGeneProductAssociation_term, domain=EnabledByGeneProductAssociation, range=Optional[Union[str, GeneProductTermObjectId]])
+
+slots.EnabledByProteinComplexAssociation_term = Slot(uri=GOCAM.term, name="EnabledByProteinComplexAssociation_term", curie=GOCAM.curie('term'),
+                   model_uri=GOCAM.EnabledByProteinComplexAssociation_term, domain=EnabledByProteinComplexAssociation, range=Optional[Union[str, ProteinComplexTermObjectId]])
 
 slots.MolecularFunctionAssociation_term = Slot(uri=GOCAM.term, name="MolecularFunctionAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.MolecularFunctionAssociation_term, domain=MolecularFunctionAssociation, range=Optional[Union[str, MolecularFunctionTermObjectId]])

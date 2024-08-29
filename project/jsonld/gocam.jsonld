@@ -640,7 +640,8 @@
       "domain_of": [
         "Activity"
       ],
-      "range": "InformationBiomacromoleculeTermObject",
+      "range": "EnabledByAssociation",
+      "inlined": true,
       "@type": "SlotDefinition"
     },
     {
@@ -837,6 +838,33 @@
       "@type": "SlotDefinition"
     },
     {
+      "name": "enabledByAssociation__term",
+      "description": "The gene product or complex that carries out the activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "EnabledByAssociation",
+      "domain_of": [
+        "EnabledByAssociation"
+      ],
+      "range": "InformationBiomacromoleculeTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "enabledByProteinComplexAssociation__members",
+      "description": "The gene products that are part of the complex",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/members",
+      "multivalued": true,
+      "alias": "members",
+      "owner": "EnabledByProteinComplexAssociation",
+      "domain_of": [
+        "EnabledByProteinComplexAssociation"
+      ],
+      "range": "GeneProductTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
       "name": "causalAssociation__predicate",
       "description": "The RO relation that represents the type of relationship",
       "from_schema": "https://w3id.org/gocam",
@@ -1030,6 +1058,38 @@
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/part_of",
       "range": "BiologicalProcessTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "EnabledByGeneProductAssociation_term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "enabledByAssociation__term",
+      "domain": "EnabledByGeneProductAssociation",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "EnabledByGeneProductAssociation",
+      "domain_of": [
+        "EnabledByGeneProductAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "term",
+      "range": "GeneProductTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "EnabledByProteinComplexAssociation_term",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "enabledByAssociation__term",
+      "domain": "EnabledByProteinComplexAssociation",
+      "slot_uri": "https://w3id.org/gocam/term",
+      "alias": "term",
+      "owner": "EnabledByProteinComplexAssociation",
+      "domain_of": [
+        "EnabledByProteinComplexAssociation"
+      ],
+      "is_usage_slot": true,
+      "usage_slot_name": "term",
+      "range": "ProteinComplexTermObject",
       "@type": "SlotDefinition"
     },
     {
@@ -1332,7 +1392,8 @@
         {
           "name": "enabled_by",
           "description": "The gene product or complex that carries out the activity",
-          "range": "InformationBiomacromoleculeTermObject",
+          "range": "EnabledByAssociation",
+          "inlined": true,
           "@type": "SlotDefinition"
         },
         {
@@ -1468,6 +1529,73 @@
         }
       ],
       "class_uri": "https://w3id.org/gocam/Association",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "EnabledByAssociation",
+      "definition_uri": "https://w3id.org/gocam/EnabledByAssociation",
+      "description": "An association between an activity and the gene product or complex that carries it out",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "Association",
+      "abstract": true,
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "enabledByAssociation__term"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "term",
+          "description": "The gene product or complex that carries out the activity",
+          "range": "InformationBiomacromoleculeTermObject",
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/EnabledByAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "EnabledByGeneProductAssociation",
+      "definition_uri": "https://w3id.org/gocam/EnabledByGeneProductAssociation",
+      "description": "An association between an activity and a gene product",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "EnabledByAssociation",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "EnabledByGeneProductAssociation_term"
+      ],
+      "slot_usage": {},
+      "class_uri": "https://w3id.org/gocam/EnabledByGeneProductAssociation",
+      "@type": "ClassDefinition"
+    },
+    {
+      "name": "EnabledByProteinComplexAssociation",
+      "definition_uri": "https://w3id.org/gocam/EnabledByProteinComplexAssociation",
+      "description": "An association between an activity and a protein complex",
+      "from_schema": "https://w3id.org/gocam",
+      "is_a": "EnabledByAssociation",
+      "slots": [
+        "association__type",
+        "association__evidence",
+        "association__provenances",
+        "enabledByProteinComplexAssociation__members",
+        "EnabledByProteinComplexAssociation_term"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "members",
+          "description": "The gene products that are part of the complex",
+          "multivalued": true,
+          "range": "GeneProductTermObject",
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/EnabledByProteinComplexAssociation",
       "@type": "ClassDefinition"
     },
     {
@@ -2010,9 +2138,9 @@
   ],
   "metamodel_version": "1.7.0",
   "source_file": "gocam.yaml",
-  "source_file_date": "2024-07-11T11:34:01",
-  "source_file_size": 12290,
-  "generation_date": "2024-07-16T15:08:35",
+  "source_file_date": "2024-08-28T16:22:21",
+  "source_file_size": 13188,
+  "generation_date": "2024-08-28T17:21:26",
   "@type": "SchemaDefinition",
   "@context": [
     "project/jsonld/gocam.context.jsonld",
