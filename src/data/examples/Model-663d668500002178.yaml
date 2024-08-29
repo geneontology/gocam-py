@@ -12,7 +12,8 @@ comments:
 - reference https://www.pombase.org/reference/PMID:38133430
 activities:
 - id: gomodel:663d668500002178/663d668500002532
-  enabled_by: PomBase:SPAC22F8.11
+  enabled_by:
+    term: PomBase:SPAC22F8.11
   molecular_function:
     evidence:
     - term: ECO:0000318
@@ -99,7 +100,8 @@ activities:
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002565
 - id: gomodel:663d668500002178/663d668500002294
-  enabled_by: PomBase:SPCC794.08
+  enabled_by:
+    term: PomBase:SPCC794.08
   molecular_function:
     evidence:
     - term: ECO:0000266
@@ -145,7 +147,8 @@ activities:
     predicate: RO:0002629
     downstream_activity: gomodel:663d668500002178/663d668500002205
 - id: gomodel:663d668500002178/663d668500002179
-  enabled_by: PomBase:SPAC20G8.03
+  enabled_by:
+    term: PomBase:SPAC20G8.03
   molecular_function:
     evidence:
     - term: ECO:0000315
@@ -244,7 +247,8 @@ activities:
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002281
 - id: gomodel:663d668500002178/663d668500002574
-  enabled_by: PomBase:SPCC970.08
+  enabled_by:
+    term: PomBase:SPCC970.08
   molecular_function:
     evidence:
     - term: ECO:0000318
@@ -317,7 +321,8 @@ activities:
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002267
 - id: gomodel:663d668500002178/663d668500002565
-  enabled_by: PomBase:SPAC607.04
+  enabled_by:
+    term: PomBase:SPAC607.04
   molecular_function:
     evidence:
     - term: ECO:0000318
@@ -380,7 +385,8 @@ activities:
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002550
 - id: gomodel:663d668500002178/663d668500002211
-  enabled_by: PomBase:SPAC19G12.14
+  enabled_by:
+    term: PomBase:SPAC19G12.14
   molecular_function:
     evidence:
     - term: ECO:0000315
@@ -412,7 +418,8 @@ activities:
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002532
 - id: gomodel:663d668500002178/663d668500002550
-  enabled_by: PomBase:SPCC4B3.10c
+  enabled_by:
+    term: PomBase:SPCC4B3.10c
   molecular_function:
     evidence:
     - term: ECO:0000314
@@ -504,7 +511,8 @@ activities:
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002574
 - id: gomodel:663d668500002178/663d668500002205
-  enabled_by: PomBase:SPBC577.06c
+  enabled_by:
+    term: PomBase:SPBC577.06c
   molecular_function:
     evidence:
     - term: ECO:0000266
@@ -526,7 +534,8 @@ activities:
         date: '2024-05-23'
     term: GO:0046854
 - id: gomodel:663d668500002178/663d668500002281
-  enabled_by: PomBase:SPAC1D4.08
+  enabled_by:
+    term: PomBase:SPAC1D4.08
   molecular_function:
     evidence:
     - term: ECO:0000269
@@ -561,7 +570,8 @@ activities:
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002205
 - id: gomodel:663d668500002178/663d668500002267
-  enabled_by: PomBase:SPCC1672.06c
+  enabled_by:
+    term: PomBase:SPCC1672.06c
   molecular_function:
     evidence:
     - term: ECO:0000314
