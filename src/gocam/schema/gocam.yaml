@@ -113,6 +113,10 @@ classes:
         description: The input molecules that are directly consumed by the activity
         range: MoleculeAssociation
         inlined: true
+      has_direct_output:
+        description: The output molecules that are directly produced by the activity
+        range: MoleculeAssociation
+        inlined: true
       causal_associations:
         description: The causal associations that connect this activity to other activities
         range: CausalAssociation
