@@ -55,3 +55,39 @@ def test_protein_complex():
         "MGI:MGI:1929608",
         "MGI:MGI:103038",
     ]
+
+
+def test_has_direct_input_and_has_direct_output():
+    """Test that direct input/output molecule associations are added to activities"""
+    mw = MinervaWrapper()
+    with open(INPUT_DIR / "minerva-665912ed00002626.json", "r") as f:
+        minerva_object = json.load(f)
+    model = mw.minerva_object_to_model(minerva_object)
+
+    activities_with_direct_input = []
+    activities_with_direct_output = []
+    for activity in model.activities:
+        if activity.has_direct_input:
+            activities_with_direct_input.append(activity)
+        if activity.has_direct_output:
+            activities_with_direct_output.append(activity)
+
+    # Basic sanity check on the number of activities with direct input/output
+    assert len(activities_with_direct_input) == 3
+    assert len(activities_with_direct_output) == 7
+
+    # Verify that one activity has uric acid as a direct input
+    uric_acid_input_activities = [
+        a
+        for a in activities_with_direct_input
+        if a.has_direct_input.term == "CHEBI:27226"
+    ]
+    assert len(uric_acid_input_activities) == 1
+
+    # Verify that three activities have urea as a direct output
+    urea_output_activities = [
+        a
+        for a in activities_with_direct_output
+        if a.has_direct_output.term == "CHEBI:16199"
+    ]
+    assert len(urea_output_activities) == 3

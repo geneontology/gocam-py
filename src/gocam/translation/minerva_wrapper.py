@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import DefaultDict, Dict, Iterator, List, Optional, Set
+from typing import DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
 
 import requests
 import yaml
@@ -11,12 +11,13 @@ from gocam.datamodel import (
     BiologicalProcessAssociation,
     CausalAssociation,
     CellularAnatomicalEntityAssociation,
-    EvidenceItem,
     EnabledByAssociation,
-    EnabledByProteinComplexAssociation,
     EnabledByGeneProductAssociation,
+    EnabledByProteinComplexAssociation,
+    EvidenceItem,
     Model,
     MolecularFunctionAssociation,
+    MoleculeAssociation,
     Object,
     ProvenanceInfo,
 )
@@ -25,6 +26,8 @@ ENABLED_BY = "RO:0002333"
 PART_OF = "BFO:0000050"
 HAS_PART = "BFO:0000051"
 OCCURS_IN = "BFO:0000066"
+HAS_INPUT = "RO:0002233"
+HAS_OUTPUT = "RO:0002234"
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +173,7 @@ class MinervaWrapper:
         id2obj: Dict[str, Dict] = {}
         activities: List[Activity] = []
         activities_by_mf_id: DefaultDict[str, List[Activity]] = defaultdict(list)
-        facts_by_property = defaultdict(list)
+        facts_by_property: DefaultDict[str, List[Dict]] = defaultdict(list)
 
         def _cls(obj: Dict) -> Optional[str]:
             if obj.get("type", None) == "complement":
@@ -208,6 +211,19 @@ class MinervaWrapper:
                 )
                 evs.append(ev)
             return evs
+
+        def _iter_activities_by_fact_subject(
+            *,
+            fact_property: str,
+        ) -> Iterator[Tuple[Activity, str, List[EvidenceItem]]]:
+            for fact in facts_by_property.get(fact_property, []):
+                s, o = fact["subject"], fact["object"]
+                if o not in individual_to_term:
+                    logger.warning(f"Missing {o} in {individual_to_term}")
+                    continue
+                for activity in activities_by_mf_id.get(s, []):
+                    evs = _evidence_from_fact(fact)
+                    yield activity, individual_to_term[o], evs
 
         for individual in obj["individuals"]:
             typs = [x["label"] for x in individual.get("root-type", []) if x]
@@ -281,27 +297,39 @@ class MinervaWrapper:
             activities.append(activity)
             activities_by_mf_id[s].append(activity)
 
-        for fact in facts_by_property.get(PART_OF, []):
-            s, o = fact["subject"], fact["object"]
-            if o not in individual_to_term:
-                logger.warning(f"Missing {o} in {individual_to_term}")
-                continue
-            for a in activities_by_mf_id.get(s, []):
-                evs = _evidence_from_fact(fact)
-                a.part_of = BiologicalProcessAssociation(
-                    term=individual_to_term[o], evidence=evs
-                )
+        for activity, term, evs in _iter_activities_by_fact_subject(
+            fact_property=PART_OF
+        ):
+            if activity.part_of is not None:
+                logger.warning(f"Overwriting part_of for Activity: {activity.id}")
+            activity.part_of = BiologicalProcessAssociation(term=term, evidence=evs)
 
-        for fact in facts_by_property.get(OCCURS_IN, []):
-            s, o = fact["subject"], fact["object"]
-            if o not in individual_to_term:
-                logger.warning(f"Missing {o} in {individual_to_term}")
-                continue
-            for a in activities_by_mf_id.get(s, []):
-                evs = _evidence_from_fact(fact)
-                a.occurs_in = CellularAnatomicalEntityAssociation(
-                    term=individual_to_term[o], evidence=evs
+        for activity, term, evs in _iter_activities_by_fact_subject(
+            fact_property=OCCURS_IN
+        ):
+            if activity.occurs_in is not None:
+                logger.warning(f"Overwriting occurs_in for Activity: {activity.id}")
+            activity.occurs_in = CellularAnatomicalEntityAssociation(
+                term=term, evidence=evs
+            )
+
+        for activity, term, evs in _iter_activities_by_fact_subject(
+            fact_property=HAS_INPUT
+        ):
+            if activity.has_direct_input is not None:
+                logger.warning(
+                    f"Overwriting has_direct_input for Activity: {activity.id}"
                 )
+            activity.has_direct_input = MoleculeAssociation(term=term, evidence=evs)
+
+        for activity, term, evs in _iter_activities_by_fact_subject(
+            fact_property=HAS_OUTPUT
+        ):
+            if activity.has_direct_output is not None:
+                logger.warning(
+                    f"Overwriting has_direct_output for Activity: {activity.id}"
+                )
+            activity.has_direct_output = MoleculeAssociation(term=term, evidence=evs)
 
         for fact_property, facts in facts_by_property.items():
             for fact in facts:
