@@ -1,5 +1,5 @@
 # Auto generated from gocam.yaml by pythongen.py version: 0.0.1
-# Generation date: 2024-08-28T17:21:26
+# Generation date: 2024-08-30T10:47:21
 # Schema: gocam
 #
 # id: https://w3id.org/gocam
@@ -212,6 +212,7 @@ class Activity(YAMLRoot):
     occurs_in: Optional[Union[dict, "CellularAnatomicalEntityAssociation"]] = None
     part_of: Optional[Union[dict, "BiologicalProcessAssociation"]] = None
     has_direct_input: Optional[Union[dict, "MoleculeAssociation"]] = None
+    has_direct_output: Optional[Union[dict, "MoleculeAssociation"]] = None
     causal_associations: Optional[Union[Union[dict, "CausalAssociation"], List[Union[dict, "CausalAssociation"]]]] = empty_list()
     provenances: Optional[Union[Union[dict, "ProvenanceInfo"], List[Union[dict, "ProvenanceInfo"]]]] = empty_list()
 
@@ -235,6 +236,9 @@ class Activity(YAMLRoot):
 
         if self.has_direct_input is not None and not isinstance(self.has_direct_input, MoleculeAssociation):
             self.has_direct_input = MoleculeAssociation(**as_dict(self.has_direct_input))
+
+        if self.has_direct_output is not None and not isinstance(self.has_direct_output, MoleculeAssociation):
+            self.has_direct_output = MoleculeAssociation(**as_dict(self.has_direct_output))
 
         if not isinstance(self.causal_associations, list):
             self.causal_associations = [self.causal_associations] if self.causal_associations is not None else []
@@ -1174,6 +1178,9 @@ slots.activity__part_of = Slot(uri=GOCAM.part_of, name="activity__part_of", curi
 
 slots.activity__has_direct_input = Slot(uri=GOCAM.has_direct_input, name="activity__has_direct_input", curie=GOCAM.curie('has_direct_input'),
                    model_uri=GOCAM.activity__has_direct_input, domain=None, range=Optional[Union[dict, MoleculeAssociation]])
+
+slots.activity__has_direct_output = Slot(uri=GOCAM.has_direct_output, name="activity__has_direct_output", curie=GOCAM.curie('has_direct_output'),
+                   model_uri=GOCAM.activity__has_direct_output, domain=None, range=Optional[Union[dict, MoleculeAssociation]])
 
 slots.activity__causal_associations = Slot(uri=GOCAM.causal_associations, name="activity__causal_associations", curie=GOCAM.curie('causal_associations'),
                    model_uri=GOCAM.activity__causal_associations, domain=None, range=Optional[Union[Union[dict, CausalAssociation], List[Union[dict, CausalAssociation]]]])

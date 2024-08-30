@@ -10,6 +10,7 @@ message Activity
   cellularAnatomicalEntityAssociation occursIn = 0
   biologicalProcessAssociation partOf = 0
   moleculeAssociation hasDirectInput = 0
+  moleculeAssociation hasDirectOutput = 0
  repeated  causalAssociation causalAssociations = 0
  repeated  provenanceInfo provenances = 0
  }

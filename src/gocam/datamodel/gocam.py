@@ -98,6 +98,7 @@ class Activity(ConfiguredBaseModel):
     occurs_in: Optional[CellularAnatomicalEntityAssociation] = Field(None, description="""The cellular location in which the activity occurs""")
     part_of: Optional[BiologicalProcessAssociation] = Field(None, description="""The larger biological process in which the activity is a part""")
     has_direct_input: Optional[MoleculeAssociation] = Field(None, description="""The input molecules that are directly consumed by the activity""")
+    has_direct_output: Optional[MoleculeAssociation] = Field(None, description="""The output molecules that are directly produced by the activity""")
     causal_associations: Optional[List[CausalAssociation]] = Field(default_factory=list, description="""The causal associations that connect this activity to other activities""")
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list, description="""Provenance information for the activity""")
 

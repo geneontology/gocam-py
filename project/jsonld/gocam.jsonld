@@ -704,6 +704,20 @@
       "@type": "SlotDefinition"
     },
     {
+      "name": "activity__has_direct_output",
+      "description": "The output molecules that are directly produced by the activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/has_direct_output",
+      "alias": "has_direct_output",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "MoleculeAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
       "name": "activity__causal_associations",
       "description": "The causal associations that connect this activity to other activities",
       "from_schema": "https://w3id.org/gocam",
@@ -1374,6 +1388,7 @@
         "activity__occurs_in",
         "activity__part_of",
         "activity__has_direct_input",
+        "activity__has_direct_output",
         "activity__causal_associations",
         "activity__provenances"
       ],
@@ -1423,6 +1438,13 @@
         {
           "name": "has_direct_input",
           "description": "The input molecules that are directly consumed by the activity",
+          "range": "MoleculeAssociation",
+          "inlined": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "has_direct_output",
+          "description": "The output molecules that are directly produced by the activity",
           "range": "MoleculeAssociation",
           "inlined": true,
           "@type": "SlotDefinition"
@@ -2138,9 +2160,9 @@
   ],
   "metamodel_version": "1.7.0",
   "source_file": "gocam.yaml",
-  "source_file_date": "2024-08-28T16:22:21",
-  "source_file_size": 13188,
-  "generation_date": "2024-08-28T17:21:26",
+  "source_file_date": "2024-08-29T14:40:00",
+  "source_file_size": 13355,
+  "generation_date": "2024-08-30T10:47:20",
   "@type": "SchemaDefinition",
   "@context": [
     "project/jsonld/gocam.context.jsonld",

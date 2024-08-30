@@ -7,6 +7,7 @@ type Activity
     occursIn: CellularAnatomicalEntityAssociation
     partOf: BiologicalProcessAssociation
     hasDirectInput: MoleculeAssociation
+    hasDirectOutput: MoleculeAssociation
     causalAssociations: [CausalAssociation]
     provenances: [ProvenanceInfo]
   }

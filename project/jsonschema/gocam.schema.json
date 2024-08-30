@@ -26,6 +26,10 @@
                     "$ref": "#/$defs/MoleculeAssociation",
                     "description": "The input molecules that are directly consumed by the activity"
                 },
+                "has_direct_output": {
+                    "$ref": "#/$defs/MoleculeAssociation",
+                    "description": "The output molecules that are directly produced by the activity"
+                },
                 "id": {
                     "description": "Identifier of the activity unit. Should be in gocam namespace.",
                     "type": "string"

@@ -11,6 +11,7 @@
 --     * Slot: occurs_in_id Description: The cellular location in which the activity occurs
 --     * Slot: part_of_id Description: The larger biological process in which the activity is a part
 --     * Slot: has_direct_input_id Description: The input molecules that are directly consumed by the activity
+--     * Slot: has_direct_output_id Description: The output molecules that are directly produced by the activity
 -- # Class: "EvidenceItem" Description: "An individual piece of evidence that is associated with an assertion in a model"
 --     * Slot: id Description: 
 --     * Slot: term Description: The ECO term representing the type of evidence
@@ -388,13 +389,15 @@ CREATE TABLE "Activity" (
 	occurs_in_id INTEGER, 
 	part_of_id INTEGER, 
 	has_direct_input_id INTEGER, 
+	has_direct_output_id INTEGER, 
 	PRIMARY KEY (id), 
 	FOREIGN KEY("Model_id") REFERENCES "Model" (id), 
 	FOREIGN KEY(enabled_by_id) REFERENCES "EnabledByAssociation" (id), 
 	FOREIGN KEY(molecular_function_id) REFERENCES "MolecularFunctionAssociation" (id), 
 	FOREIGN KEY(occurs_in_id) REFERENCES "CellularAnatomicalEntityAssociation" (id), 
 	FOREIGN KEY(part_of_id) REFERENCES "BiologicalProcessAssociation" (id), 
-	FOREIGN KEY(has_direct_input_id) REFERENCES "MoleculeAssociation" (id)
+	FOREIGN KEY(has_direct_input_id) REFERENCES "MoleculeAssociation" (id), 
+	FOREIGN KEY(has_direct_output_id) REFERENCES "MoleculeAssociation" (id)
 );
 CREATE TABLE "Object" (
 	id TEXT NOT NULL, 

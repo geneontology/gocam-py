@@ -52,6 +52,7 @@ linkml:Sparqlpath xsd:string
           <occurs_in> @<CellularAnatomicalEntityAssociation> ? ;
           <part_of> @<BiologicalProcessAssociation> ? ;
           <has_direct_input> @<MoleculeAssociation> ? ;
+          <has_direct_output> @<MoleculeAssociation> ? ;
           <causal_associations> @<CausalAssociation> * ;
           <provenances> @<ProvenanceInfo> *
        ) ;
