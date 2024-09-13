@@ -96,6 +96,8 @@ def test_multivalued_input_and_output():
         minerva_object = json.load(f)
     model = mw.minerva_object_to_model(minerva_object)
 
-    cs_activity = next(a for a in model.activities if a.molecular_function.term == "GO:0004108")
+    cs_activity = next(
+        a for a in model.activities if a.molecular_function.term == "GO:0004108"
+    )
     assert len(cs_activity.has_input) == 3
     assert len(cs_activity.has_output) == 2

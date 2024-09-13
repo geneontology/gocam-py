@@ -68,7 +68,9 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
 
 def _setattr_with_warning(obj, attr, value):
     if getattr(obj, attr, None) is not None:
-        logger.warning(f"Overwriting {attr} for {obj.id if hasattr(obj, 'id') else obj}")
+        logger.warning(
+            f"Overwriting {attr} for {obj.id if hasattr(obj, 'id') else obj}"
+        )
     setattr(obj, attr, value)
 
 
@@ -320,8 +322,6 @@ class MinervaWrapper:
         for activity, term, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
-            if activity.has_input is None:
-                activity.has_input = []
             activity.has_input.append(MoleculeAssociation(term=term, evidence=evs))
 
         for activity, term, evs in _iter_activities_by_fact_subject(
@@ -333,8 +333,6 @@ class MinervaWrapper:
         for activity, term, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
-            if activity.has_output is None:
-                activity.has_output = []
             activity.has_output.append(MoleculeAssociation(term=term, evidence=evs))
 
         for activity, term, evs in _iter_activities_by_fact_subject(
@@ -368,8 +366,6 @@ class MinervaWrapper:
                     downstream_activity=object_activity.id,
                     evidence=evs,
                 )
-                if not subject_activity.causal_associations:
-                    subject_activity.causal_associations = []
                 subject_activity.causal_associations.append(rel)
 
         annotations = _annotations(obj)
