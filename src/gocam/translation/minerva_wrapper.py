@@ -28,6 +28,8 @@ HAS_PART = "BFO:0000051"
 OCCURS_IN = "BFO:0000066"
 HAS_INPUT = "RO:0002233"
 HAS_OUTPUT = "RO:0002234"
+HAS_PRIMARY_INPUT = "RO:0004009"
+HAS_PRIMARY_OUTPUT = "RO:0004008"
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +64,12 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
     for a in obj["annotations"]:
         anns[a["key"]].append(a["value"])
     return anns
+
+
+def _setattr_with_warning(obj, attr, value):
+    if getattr(obj, attr, None) is not None:
+        logger.warning(f"Overwriting {attr} for {obj.id if hasattr(obj, 'id') else obj}")
+    setattr(obj, attr, value)
 
 
 MAIN_TYPES = [
@@ -300,36 +308,40 @@ class MinervaWrapper:
         for activity, term, evs in _iter_activities_by_fact_subject(
             fact_property=PART_OF
         ):
-            if activity.part_of is not None:
-                logger.warning(f"Overwriting part_of for Activity: {activity.id}")
-            activity.part_of = BiologicalProcessAssociation(term=term, evidence=evs)
+            association = BiologicalProcessAssociation(term=term, evidence=evs)
+            _setattr_with_warning(activity, "part_of", association)
 
         for activity, term, evs in _iter_activities_by_fact_subject(
             fact_property=OCCURS_IN
         ):
-            if activity.occurs_in is not None:
-                logger.warning(f"Overwriting occurs_in for Activity: {activity.id}")
-            activity.occurs_in = CellularAnatomicalEntityAssociation(
-                term=term, evidence=evs
-            )
+            association = CellularAnatomicalEntityAssociation(term=term, evidence=evs)
+            _setattr_with_warning(activity, "occurs_in", association)
 
         for activity, term, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
-            if activity.has_direct_input is not None:
-                logger.warning(
-                    f"Overwriting has_direct_input for Activity: {activity.id}"
-                )
-            activity.has_direct_input = MoleculeAssociation(term=term, evidence=evs)
+            if activity.has_input is None:
+                activity.has_input = []
+            activity.has_input.append(MoleculeAssociation(term=term, evidence=evs))
+
+        for activity, term, evs in _iter_activities_by_fact_subject(
+            fact_property=HAS_PRIMARY_INPUT
+        ):
+            association = MoleculeAssociation(term=term, evidence=evs)
+            _setattr_with_warning(activity, "has_primary_input", association)
 
         for activity, term, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
-            if activity.has_direct_output is not None:
-                logger.warning(
-                    f"Overwriting has_direct_output for Activity: {activity.id}"
-                )
-            activity.has_direct_output = MoleculeAssociation(term=term, evidence=evs)
+            if activity.has_output is None:
+                activity.has_output = []
+            activity.has_output.append(MoleculeAssociation(term=term, evidence=evs))
+
+        for activity, term, evs in _iter_activities_by_fact_subject(
+            fact_property=HAS_PRIMARY_OUTPUT
+        ):
+            association = MoleculeAssociation(term=term, evidence=evs)
+            _setattr_with_warning(activity, "has_primary_output", association)
 
         for fact_property, facts in facts_by_property.items():
             for fact in facts:

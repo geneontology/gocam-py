@@ -57,37 +57,45 @@ def test_protein_complex():
     ]
 
 
-def test_has_direct_input_and_has_direct_output():
-    """Test that direct input/output molecule associations are added to activities"""
+def test_has_input_and_has_output():
+    """Test that input/output molecule associations are added to activities"""
     mw = MinervaWrapper()
     with open(INPUT_DIR / "minerva-665912ed00002626.json", "r") as f:
         minerva_object = json.load(f)
     model = mw.minerva_object_to_model(minerva_object)
 
-    activities_with_direct_input = []
-    activities_with_direct_output = []
+    activities_with_input = []
+    activities_with_output = []
     for activity in model.activities:
-        if activity.has_direct_input:
-            activities_with_direct_input.append(activity)
-        if activity.has_direct_output:
-            activities_with_direct_output.append(activity)
+        if activity.has_input:
+            activities_with_input.append(activity)
+        if activity.has_output:
+            activities_with_output.append(activity)
 
-    # Basic sanity check on the number of activities with direct input/output
-    assert len(activities_with_direct_input) == 3
-    assert len(activities_with_direct_output) == 7
+    # Basic sanity check on the number of activities with input/output
+    assert len(activities_with_input) == 3
+    assert len(activities_with_output) == 7
 
-    # Verify that one activity has uric acid as a direct input
+    # Verify that one activity has uric acid as an input
     uric_acid_input_activities = [
-        a
-        for a in activities_with_direct_input
-        if a.has_direct_input.term == "CHEBI:27226"
+        a for a in activities_with_input if a.has_input[0].term == "CHEBI:27226"
     ]
     assert len(uric_acid_input_activities) == 1
 
-    # Verify that three activities have urea as a direct output
+    # Verify that three activities have urea as an output
     urea_output_activities = [
-        a
-        for a in activities_with_direct_output
-        if a.has_direct_output.term == "CHEBI:16199"
+        a for a in activities_with_output if a.has_output[0].term == "CHEBI:16199"
     ]
     assert len(urea_output_activities) == 3
+
+
+def test_multivalued_input_and_output():
+    """Test that activities with multiple inputs and outputs are correctly translated."""
+    mw = MinervaWrapper()
+    with open(INPUT_DIR / "minerva-633b013300000306.json", "r") as f:
+        minerva_object = json.load(f)
+    model = mw.minerva_object_to_model(minerva_object)
+
+    cs_activity = next(a for a in model.activities if a.molecular_function.term == "GO:0004108")
+    assert len(cs_activity.has_input) == 3
+    assert len(cs_activity.has_output) == 2
