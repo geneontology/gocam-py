@@ -1,5 +1,5 @@
 # Auto generated from gocam.yaml by pythongen.py version: 0.0.1
-# Generation date: 2024-08-30T10:47:21
+# Generation date: 2024-09-13T15:30:52
 # Schema: gocam
 #
 # id: https://w3id.org/gocam
@@ -211,8 +211,10 @@ class Activity(YAMLRoot):
     molecular_function: Optional[Union[dict, "MolecularFunctionAssociation"]] = None
     occurs_in: Optional[Union[dict, "CellularAnatomicalEntityAssociation"]] = None
     part_of: Optional[Union[dict, "BiologicalProcessAssociation"]] = None
-    has_direct_input: Optional[Union[dict, "MoleculeAssociation"]] = None
-    has_direct_output: Optional[Union[dict, "MoleculeAssociation"]] = None
+    has_input: Optional[Union[Union[dict, "MoleculeAssociation"], List[Union[dict, "MoleculeAssociation"]]]] = empty_list()
+    has_primary_input: Optional[Union[dict, "MoleculeAssociation"]] = None
+    has_output: Optional[Union[Union[dict, "MoleculeAssociation"], List[Union[dict, "MoleculeAssociation"]]]] = empty_list()
+    has_primary_output: Optional[Union[dict, "MoleculeAssociation"]] = None
     causal_associations: Optional[Union[Union[dict, "CausalAssociation"], List[Union[dict, "CausalAssociation"]]]] = empty_list()
     provenances: Optional[Union[Union[dict, "ProvenanceInfo"], List[Union[dict, "ProvenanceInfo"]]]] = empty_list()
 
@@ -234,11 +236,19 @@ class Activity(YAMLRoot):
         if self.part_of is not None and not isinstance(self.part_of, BiologicalProcessAssociation):
             self.part_of = BiologicalProcessAssociation(**as_dict(self.part_of))
 
-        if self.has_direct_input is not None and not isinstance(self.has_direct_input, MoleculeAssociation):
-            self.has_direct_input = MoleculeAssociation(**as_dict(self.has_direct_input))
+        if not isinstance(self.has_input, list):
+            self.has_input = [self.has_input] if self.has_input is not None else []
+        self.has_input = [v if isinstance(v, MoleculeAssociation) else MoleculeAssociation(**as_dict(v)) for v in self.has_input]
 
-        if self.has_direct_output is not None and not isinstance(self.has_direct_output, MoleculeAssociation):
-            self.has_direct_output = MoleculeAssociation(**as_dict(self.has_direct_output))
+        if self.has_primary_input is not None and not isinstance(self.has_primary_input, MoleculeAssociation):
+            self.has_primary_input = MoleculeAssociation(**as_dict(self.has_primary_input))
+
+        if not isinstance(self.has_output, list):
+            self.has_output = [self.has_output] if self.has_output is not None else []
+        self.has_output = [v if isinstance(v, MoleculeAssociation) else MoleculeAssociation(**as_dict(v)) for v in self.has_output]
+
+        if self.has_primary_output is not None and not isinstance(self.has_primary_output, MoleculeAssociation):
+            self.has_primary_output = MoleculeAssociation(**as_dict(self.has_primary_output))
 
         if not isinstance(self.causal_associations, list):
             self.causal_associations = [self.causal_associations] if self.causal_associations is not None else []
@@ -1176,11 +1186,17 @@ slots.activity__occurs_in = Slot(uri=GOCAM.occurs_in, name="activity__occurs_in"
 slots.activity__part_of = Slot(uri=GOCAM.part_of, name="activity__part_of", curie=GOCAM.curie('part_of'),
                    model_uri=GOCAM.activity__part_of, domain=None, range=Optional[Union[dict, BiologicalProcessAssociation]])
 
-slots.activity__has_direct_input = Slot(uri=GOCAM.has_direct_input, name="activity__has_direct_input", curie=GOCAM.curie('has_direct_input'),
-                   model_uri=GOCAM.activity__has_direct_input, domain=None, range=Optional[Union[dict, MoleculeAssociation]])
+slots.activity__has_input = Slot(uri=GOCAM.has_input, name="activity__has_input", curie=GOCAM.curie('has_input'),
+                   model_uri=GOCAM.activity__has_input, domain=None, range=Optional[Union[Union[dict, MoleculeAssociation], List[Union[dict, MoleculeAssociation]]]])
 
-slots.activity__has_direct_output = Slot(uri=GOCAM.has_direct_output, name="activity__has_direct_output", curie=GOCAM.curie('has_direct_output'),
-                   model_uri=GOCAM.activity__has_direct_output, domain=None, range=Optional[Union[dict, MoleculeAssociation]])
+slots.activity__has_primary_input = Slot(uri=GOCAM.has_primary_input, name="activity__has_primary_input", curie=GOCAM.curie('has_primary_input'),
+                   model_uri=GOCAM.activity__has_primary_input, domain=None, range=Optional[Union[dict, MoleculeAssociation]])
+
+slots.activity__has_output = Slot(uri=GOCAM.has_output, name="activity__has_output", curie=GOCAM.curie('has_output'),
+                   model_uri=GOCAM.activity__has_output, domain=None, range=Optional[Union[Union[dict, MoleculeAssociation], List[Union[dict, MoleculeAssociation]]]])
+
+slots.activity__has_primary_output = Slot(uri=GOCAM.has_primary_output, name="activity__has_primary_output", curie=GOCAM.curie('has_primary_output'),
+                   model_uri=GOCAM.activity__has_primary_output, domain=None, range=Optional[Union[dict, MoleculeAssociation]])
 
 slots.activity__causal_associations = Slot(uri=GOCAM.causal_associations, name="activity__causal_associations", curie=GOCAM.curie('causal_associations'),
                    model_uri=GOCAM.activity__causal_associations, domain=None, range=Optional[Union[Union[dict, CausalAssociation], List[Union[dict, CausalAssociation]]]])

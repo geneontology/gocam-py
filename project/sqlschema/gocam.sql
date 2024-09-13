@@ -10,8 +10,8 @@
 --     * Slot: molecular_function_id Description: The molecular function that is carried out by the gene product or complex
 --     * Slot: occurs_in_id Description: The cellular location in which the activity occurs
 --     * Slot: part_of_id Description: The larger biological process in which the activity is a part
---     * Slot: has_direct_input_id Description: The input molecules that are directly consumed by the activity
---     * Slot: has_direct_output_id Description: The output molecules that are directly produced by the activity
+--     * Slot: has_primary_input_id Description: The primary input molecule that is directly consumed by the activity
+--     * Slot: has_primary_output_id Description: The primary output molecule that is directly produced by the activity
 -- # Class: "EvidenceItem" Description: "An individual piece of evidence that is associated with an assertion in a model"
 --     * Slot: id Description: 
 --     * Slot: term Description: The ECO term representing the type of evidence
@@ -77,6 +77,7 @@
 --     * Slot: id Description: 
 --     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
+--     * Slot: Activity_id Description: Autocreated FK slot
 -- # Class: "Object" Description: "An abstract class for all identified objects in a model"
 --     * Slot: id Description: 
 --     * Slot: label Description: 
@@ -191,10 +192,37 @@
 --     * Slot: EnabledByProteinComplexAssociation_id Description: Autocreated FK slot
 --     * Slot: members_id Description: The gene products that are part of the complex
 
+CREATE TABLE "Activity" (
+	id TEXT NOT NULL, 
+	"Model_id" TEXT, 
+	enabled_by_id INTEGER, 
+	molecular_function_id INTEGER, 
+	occurs_in_id INTEGER, 
+	part_of_id INTEGER, 
+	has_primary_input_id INTEGER, 
+	has_primary_output_id INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY("Model_id") REFERENCES "Model" (id), 
+	FOREIGN KEY(enabled_by_id) REFERENCES "EnabledByAssociation" (id), 
+	FOREIGN KEY(molecular_function_id) REFERENCES "MolecularFunctionAssociation" (id), 
+	FOREIGN KEY(occurs_in_id) REFERENCES "CellularAnatomicalEntityAssociation" (id), 
+	FOREIGN KEY(part_of_id) REFERENCES "BiologicalProcessAssociation" (id), 
+	FOREIGN KEY(has_primary_input_id) REFERENCES "MoleculeAssociation" (id), 
+	FOREIGN KEY(has_primary_output_id) REFERENCES "MoleculeAssociation" (id)
+);
 CREATE TABLE "Association" (
 	id INTEGER NOT NULL, 
 	type TEXT, 
 	PRIMARY KEY (id)
+);
+CREATE TABLE "MoleculeAssociation" (
+	id INTEGER NOT NULL, 
+	term TEXT, 
+	type TEXT, 
+	"Activity_id" TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(term) REFERENCES "MoleculeTermObject" (id), 
+	FOREIGN KEY("Activity_id") REFERENCES "Activity" (id)
 );
 CREATE TABLE "TermObject" (
 	id TEXT NOT NULL, 
@@ -332,6 +360,17 @@ CREATE TABLE "EnabledByProteinComplexAssociation" (
 	PRIMARY KEY (id), 
 	FOREIGN KEY(term) REFERENCES "ProteinComplexTermObject" (id)
 );
+CREATE TABLE "CausalAssociation" (
+	id INTEGER NOT NULL, 
+	predicate TEXT, 
+	downstream_activity TEXT, 
+	type TEXT, 
+	"Activity_id" TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(predicate) REFERENCES "PredicateTermObject" (id), 
+	FOREIGN KEY(downstream_activity) REFERENCES "Activity" (id), 
+	FOREIGN KEY("Activity_id") REFERENCES "Activity" (id)
+);
 CREATE TABLE "TermAssociation" (
 	id INTEGER NOT NULL, 
 	term TEXT, 
@@ -374,64 +413,6 @@ CREATE TABLE "GrossAnatomyAssociation" (
 	PRIMARY KEY (id), 
 	FOREIGN KEY(term) REFERENCES "GrossAnatomicalStructureTermObject" (id)
 );
-CREATE TABLE "MoleculeAssociation" (
-	id INTEGER NOT NULL, 
-	term TEXT, 
-	type TEXT, 
-	PRIMARY KEY (id), 
-	FOREIGN KEY(term) REFERENCES "MoleculeTermObject" (id)
-);
-CREATE TABLE "Activity" (
-	id TEXT NOT NULL, 
-	"Model_id" TEXT, 
-	enabled_by_id INTEGER, 
-	molecular_function_id INTEGER, 
-	occurs_in_id INTEGER, 
-	part_of_id INTEGER, 
-	has_direct_input_id INTEGER, 
-	has_direct_output_id INTEGER, 
-	PRIMARY KEY (id), 
-	FOREIGN KEY("Model_id") REFERENCES "Model" (id), 
-	FOREIGN KEY(enabled_by_id) REFERENCES "EnabledByAssociation" (id), 
-	FOREIGN KEY(molecular_function_id) REFERENCES "MolecularFunctionAssociation" (id), 
-	FOREIGN KEY(occurs_in_id) REFERENCES "CellularAnatomicalEntityAssociation" (id), 
-	FOREIGN KEY(part_of_id) REFERENCES "BiologicalProcessAssociation" (id), 
-	FOREIGN KEY(has_direct_input_id) REFERENCES "MoleculeAssociation" (id), 
-	FOREIGN KEY(has_direct_output_id) REFERENCES "MoleculeAssociation" (id)
-);
-CREATE TABLE "Object" (
-	id TEXT NOT NULL, 
-	label TEXT, 
-	type TEXT, 
-	obsolete BOOLEAN, 
-	"Model_id" TEXT, 
-	PRIMARY KEY (id), 
-	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
-);
-CREATE TABLE "Model_comments" (
-	"Model_id" TEXT, 
-	comments TEXT, 
-	PRIMARY KEY ("Model_id", comments), 
-	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
-);
-CREATE TABLE "EnabledByProteinComplexAssociation_members" (
-	"EnabledByProteinComplexAssociation_id" INTEGER, 
-	members_id TEXT, 
-	PRIMARY KEY ("EnabledByProteinComplexAssociation_id", members_id), 
-	FOREIGN KEY("EnabledByProteinComplexAssociation_id") REFERENCES "EnabledByProteinComplexAssociation" (id), 
-	FOREIGN KEY(members_id) REFERENCES "GeneProductTermObject" (id)
-);
-CREATE TABLE "CausalAssociation" (
-	id INTEGER NOT NULL, 
-	predicate TEXT, 
-	downstream_activity TEXT, 
-	type TEXT, 
-	"Activity_id" TEXT, 
-	PRIMARY KEY (id), 
-	FOREIGN KEY(predicate) REFERENCES "PredicateTermObject" (id), 
-	FOREIGN KEY(downstream_activity) REFERENCES "Activity" (id), 
-	FOREIGN KEY("Activity_id") REFERENCES "Activity" (id)
-);
 CREATE TABLE "EvidenceItem" (
 	id INTEGER NOT NULL, 
 	term TEXT, 
@@ -463,6 +444,28 @@ CREATE TABLE "EvidenceItem" (
 	FOREIGN KEY("CellTypeAssociation_id") REFERENCES "CellTypeAssociation" (id), 
 	FOREIGN KEY("GrossAnatomyAssociation_id") REFERENCES "GrossAnatomyAssociation" (id), 
 	FOREIGN KEY("MoleculeAssociation_id") REFERENCES "MoleculeAssociation" (id)
+);
+CREATE TABLE "Object" (
+	id TEXT NOT NULL, 
+	label TEXT, 
+	type TEXT, 
+	obsolete BOOLEAN, 
+	"Model_id" TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
+);
+CREATE TABLE "Model_comments" (
+	"Model_id" TEXT, 
+	comments TEXT, 
+	PRIMARY KEY ("Model_id", comments), 
+	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
+);
+CREATE TABLE "EnabledByProteinComplexAssociation_members" (
+	"EnabledByProteinComplexAssociation_id" INTEGER, 
+	members_id TEXT, 
+	PRIMARY KEY ("EnabledByProteinComplexAssociation_id", members_id), 
+	FOREIGN KEY("EnabledByProteinComplexAssociation_id") REFERENCES "EnabledByProteinComplexAssociation" (id), 
+	FOREIGN KEY(members_id) REFERENCES "GeneProductTermObject" (id)
 );
 CREATE TABLE "ProvenanceInfo" (
 	id INTEGER NOT NULL, 
