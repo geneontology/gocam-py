@@ -228,12 +228,39 @@
     click EnabledByAssociation href "../EnabledByAssociation"
 
 
-      Activity : has_direct_input
+      Activity : has_input
 
 
 
 
-    Activity --&gt; "0..1" MoleculeAssociation : has_direct_input
+    Activity --&gt; "*" MoleculeAssociation : has_input
+    click MoleculeAssociation href "../MoleculeAssociation"
+
+
+      Activity : has_output
+
+
+
+
+    Activity --&gt; "*" MoleculeAssociation : has_output
+    click MoleculeAssociation href "../MoleculeAssociation"
+
+
+      Activity : has_primary_input
+
+
+
+
+    Activity --&gt; "0..1" MoleculeAssociation : has_primary_input
+    click MoleculeAssociation href "../MoleculeAssociation"
+
+
+      Activity : has_primary_output
+
+
+
+
+    Activity --&gt; "0..1" MoleculeAssociation : has_primary_output
     click MoleculeAssociation href "../MoleculeAssociation"
 
 
@@ -320,9 +347,27 @@
 <td>direct</td>
 </tr>
 <tr>
-<td><a href="../has_direct_input/">has_direct_input</a></td>
-<td>0..1 <br/> <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td><a href="../has_input/">has_input</a></td>
+<td>* <br/> <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
 <td>The input molecules that are directly consumed by the activity</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../has_primary_input/">has_primary_input</a></td>
+<td>0..1 <br/> <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td>The primary input molecule that is directly consumed by the activity</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../has_output/">has_output</a></td>
+<td>* <br/> <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td>The output molecules that are directly produced by the activity</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../has_primary_output/">has_primary_output</a></td>
+<td>0..1 <br/> <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td>The primary output molecule that is directly produced by the activity</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -457,9 +502,40 @@ attributes:
     - Activity
     range: BiologicalProcessAssociation
     inlined: true
-  has_direct_input:
-    name: has_direct_input
+  has_input:
+    name: has_input
     description: The input molecules that are directly consumed by the activity
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    multivalued: true
+    domain_of:
+    - Activity
+    range: MoleculeAssociation
+    inlined: true
+    inlined_as_list: true
+  has_primary_input:
+    name: has_primary_input
+    description: The primary input molecule that is directly consumed by the activity
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - Activity
+    range: MoleculeAssociation
+    inlined: true
+  has_output:
+    name: has_output
+    description: The output molecules that are directly produced by the activity
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    multivalued: true
+    domain_of:
+    - Activity
+    range: MoleculeAssociation
+    inlined: true
+    inlined_as_list: true
+  has_primary_output:
+    name: has_primary_output
+    description: The primary output molecule that is directly produced by the activity
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -566,12 +642,49 @@ attributes:
     - Activity
     range: BiologicalProcessAssociation
     inlined: true
-  has_direct_input:
-    name: has_direct_input
+  has_input:
+    name: has_input
     description: The input molecules that are directly consumed by the activity
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: has_direct_input
+    multivalued: true
+    alias: has_input
+    owner: Activity
+    domain_of:
+    - Activity
+    range: MoleculeAssociation
+    inlined: true
+    inlined_as_list: true
+  has_primary_input:
+    name: has_primary_input
+    description: The primary input molecule that is directly consumed by the activity
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: has_primary_input
+    owner: Activity
+    domain_of:
+    - Activity
+    range: MoleculeAssociation
+    inlined: true
+  has_output:
+    name: has_output
+    description: The output molecules that are directly produced by the activity
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    multivalued: true
+    alias: has_output
+    owner: Activity
+    domain_of:
+    - Activity
+    range: MoleculeAssociation
+    inlined: true
+    inlined_as_list: true
+  has_primary_output:
+    name: has_primary_output
+    description: The primary output molecule that is directly produced by the activity
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: has_primary_output
     owner: Activity
     domain_of:
     - Activity

@@ -2,437 +2,452 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://geneontology.github.io/gocam-by/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Activity/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Association/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/BiologicalProcessAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/BiologicalProcessTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Boolean/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/CausalAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/CausalPredicateEnum/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/CellTypeAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/CellTypeTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/CellularAnatomicalEntityAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/CellularAnatomicalEntityTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Curie/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Date/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/DateOrDatetime/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Datetime/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Decimal/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Double/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/EnabledByAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/EnabledByGeneProductAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/EnabledByProteinComplexAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/EvidenceItem/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/EvidenceTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Float/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/GeneProductTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/GrossAnatomicalStructureTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/GrossAnatomyAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/InformationBiomacromoleculeCategory/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/InformationBiomacromoleculeTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Integer/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Jsonpath/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Jsonpointer/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Model/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/ModelStateEnum/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/MolecularFunctionAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/MolecularFunctionTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/MoleculeAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/MoleculeTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Ncname/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Nodeidentifier/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Object/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Objectidentifier/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/PhaseTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/PredicateTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/ProteinComplexTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/ProvenanceInfo/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/PublicationObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Sparqlpath/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/String/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/TaxonTermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/TermAssociation/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/TermObject/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Time/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Uri/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/Uriorcurie/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/about/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/abstract_text/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/activities/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/causal_associations/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/comments/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/contributor/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/created/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/date/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/downstream_activity/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/enabled_by/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/evidence/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/full_text/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/gocam/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://geneontology.github.io/gocam-by/has_direct_input/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <loc>https://geneontology.github.io/gocam-by/has_input/</loc>
+         <lastmod>2024-09-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://geneontology.github.io/gocam-by/has_output/</loc>
+         <lastmod>2024-09-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://geneontology.github.io/gocam-by/has_primary_input/</loc>
+         <lastmod>2024-09-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://geneontology.github.io/gocam-by/has_primary_output/</loc>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/id/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/label/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/members/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/molecular_function/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/objects/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/obsolete/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/occurs_in/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/part_of/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/predicate/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/provenances/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/provided_by/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/reference/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/status/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/taxon/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/term/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/title/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/type/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-by/with_objects/</loc>
-         <lastmod>2024-08-29</lastmod>
+         <lastmod>2024-09-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
