@@ -6,7 +6,10 @@ type Activity
     molecularFunction: MolecularFunctionAssociation
     occursIn: CellularAnatomicalEntityAssociation
     partOf: BiologicalProcessAssociation
-    hasDirectInput: MoleculeAssociation
+    hasInput: [MoleculeAssociation]
+    hasPrimaryInput: MoleculeAssociation
+    hasOutput: [MoleculeAssociation]
+    hasPrimaryOutput: MoleculeAssociation
     causalAssociations: [CausalAssociation]
     provenances: [ProvenanceInfo]
   }

@@ -97,7 +97,10 @@ class Activity(ConfiguredBaseModel):
     molecular_function: Optional[MolecularFunctionAssociation] = Field(None, description="""The molecular function that is carried out by the gene product or complex""")
     occurs_in: Optional[CellularAnatomicalEntityAssociation] = Field(None, description="""The cellular location in which the activity occurs""")
     part_of: Optional[BiologicalProcessAssociation] = Field(None, description="""The larger biological process in which the activity is a part""")
-    has_direct_input: Optional[MoleculeAssociation] = Field(None, description="""The input molecules that are directly consumed by the activity""")
+    has_input: Optional[List[MoleculeAssociation]] = Field(default_factory=list, description="""The input molecules that are directly consumed by the activity""")
+    has_primary_input: Optional[MoleculeAssociation] = Field(None, description="""The primary input molecule that is directly consumed by the activity""")
+    has_output: Optional[List[MoleculeAssociation]] = Field(default_factory=list, description="""The output molecules that are directly produced by the activity""")
+    has_primary_output: Optional[MoleculeAssociation] = Field(None, description="""The primary output molecule that is directly produced by the activity""")
     causal_associations: Optional[List[CausalAssociation]] = Field(default_factory=list, description="""The causal associations that connect this activity to other activities""")
     provenances: Optional[List[ProvenanceInfo]] = Field(default_factory=list, description="""Provenance information for the activity""")
 

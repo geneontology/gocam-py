@@ -9,7 +9,10 @@ message Activity
   molecularFunctionAssociation molecularFunction = 0
   cellularAnatomicalEntityAssociation occursIn = 0
   biologicalProcessAssociation partOf = 0
-  moleculeAssociation hasDirectInput = 0
+ repeated  moleculeAssociation hasInput = 0
+  moleculeAssociation hasPrimaryInput = 0
+ repeated  moleculeAssociation hasOutput = 0
+  moleculeAssociation hasPrimaryOutput = 0
  repeated  causalAssociation causalAssociations = 0
  repeated  provenanceInfo provenances = 0
  }

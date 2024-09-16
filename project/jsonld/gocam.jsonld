@@ -690,11 +690,57 @@
       "@type": "SlotDefinition"
     },
     {
-      "name": "activity__has_direct_input",
+      "name": "activity__has_input",
       "description": "The input molecules that are directly consumed by the activity",
       "from_schema": "https://w3id.org/gocam",
-      "slot_uri": "https://w3id.org/gocam/has_direct_input",
-      "alias": "has_direct_input",
+      "slot_uri": "https://w3id.org/gocam/has_input",
+      "multivalued": true,
+      "alias": "has_input",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "MoleculeAssociation",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__has_primary_input",
+      "description": "The primary input molecule that is directly consumed by the activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/has_primary_input",
+      "alias": "has_primary_input",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "MoleculeAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__has_output",
+      "description": "The output molecules that are directly produced by the activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/has_output",
+      "multivalued": true,
+      "alias": "has_output",
+      "owner": "Activity",
+      "domain_of": [
+        "Activity"
+      ],
+      "range": "MoleculeAssociation",
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "activity__has_primary_output",
+      "description": "The primary output molecule that is directly produced by the activity",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/has_primary_output",
+      "alias": "has_primary_output",
       "owner": "Activity",
       "domain_of": [
         "Activity"
@@ -1373,7 +1419,10 @@
         "activity__molecular_function",
         "activity__occurs_in",
         "activity__part_of",
-        "activity__has_direct_input",
+        "activity__has_input",
+        "activity__has_primary_input",
+        "activity__has_output",
+        "activity__has_primary_output",
         "activity__causal_associations",
         "activity__provenances"
       ],
@@ -1421,8 +1470,31 @@
           "@type": "SlotDefinition"
         },
         {
-          "name": "has_direct_input",
+          "name": "has_input",
           "description": "The input molecules that are directly consumed by the activity",
+          "multivalued": true,
+          "range": "MoleculeAssociation",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "has_primary_input",
+          "description": "The primary input molecule that is directly consumed by the activity",
+          "range": "MoleculeAssociation",
+          "inlined": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "has_output",
+          "description": "The output molecules that are directly produced by the activity",
+          "multivalued": true,
+          "range": "MoleculeAssociation",
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "has_primary_output",
+          "description": "The primary output molecule that is directly produced by the activity",
           "range": "MoleculeAssociation",
           "inlined": true,
           "@type": "SlotDefinition"
@@ -2138,9 +2210,9 @@
   ],
   "metamodel_version": "1.7.0",
   "source_file": "gocam.yaml",
-  "source_file_date": "2024-08-28T16:22:21",
-  "source_file_size": 13188,
-  "generation_date": "2024-08-28T17:21:26",
+  "source_file_date": "2024-09-13T14:36:24",
+  "source_file_size": 13755,
+  "generation_date": "2024-09-13T15:30:51",
   "@type": "SchemaDefinition",
   "@context": [
     "project/jsonld/gocam.context.jsonld",
