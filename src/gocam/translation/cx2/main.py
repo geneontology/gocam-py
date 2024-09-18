@@ -1,6 +1,6 @@
 from ndex2.cx2 import CX2Network
 
-from gocam.datamodel import Model
+from gocam.datamodel import EnabledByProteinComplexAssociation, Model
 from gocam.translation.cx2.style import (
     RELATIONS,
     VISUAL_EDITOR_PROPERTIES,
@@ -27,9 +27,15 @@ def model_to_cx2(gocam: Model) -> list:
         if activity.enabled_by is None:
             continue
 
+        if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
+            node_type = "complex"
+        else:
+            node_type = "gene"
+
         node_attributes = {
             "name": _get_object_label(activity.enabled_by.term),
             "represents": activity.enabled_by.term,
+            "type": node_type,
         }
 
         if activity.molecular_function:
