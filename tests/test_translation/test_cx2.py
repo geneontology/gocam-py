@@ -65,14 +65,31 @@ def test_load_cx2_to_ndex(example_model):
 
 def test_node_type_attribute(input_model):
     """Test that the `type` attribute is correctly set for nodes."""
-    model = input_model("Model-5ce58dde00001215")
+    model = input_model("Model-6606056e00002011")
     cx2 = model_to_cx2(model)
 
     node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
     assert node_aspect is not None
     for node in node_aspect["nodes"]:
         node_attrs = node["v"]
-        if node_attrs["name"] == "transcription regulator complex":
+        if node_attrs["name"] == "B cell receptor complex":
             assert node_attrs["type"] == "complex"
         else:
             assert node_attrs["type"] == "gene"
+
+
+def test_node_name_and_member_attributes(input_model):
+    model = input_model("Model-6606056e00002011")
+    cx2 = model_to_cx2(model)
+
+    node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
+    assert node_aspect is not None
+    for node in node_aspect["nodes"]:
+        node_attrs = node["v"]
+        if node_attrs["name"] == "B cell receptor complex":
+            assert "member" in node_attrs
+            assert len(node_attrs["member"]) == 2
+            assert all("Hsap" not in member for member in node_attrs["member"])
+        else:
+            assert "member" not in node_attrs
+            assert "Hsap" not in node_attrs["name"]

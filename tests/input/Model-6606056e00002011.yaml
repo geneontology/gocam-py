@@ -1,0 +1,210 @@
+---
+id: gomodel:6606056e00002011
+title: CD72 and BCR co-stimulation by sn/RNP self antigen (Human)
+taxon: NCBITaxon:9606
+status: production
+activities:
+- id: gomodel:6606056e00002011/662af8fa00002857
+  enabled_by:
+    term: GO:0019815
+    members:
+    - UniProtKB:P40259
+    - UniProtKB:P11912
+  molecular_function:
+    evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - MGI:96892
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+    term: GO:0004888
+  occurs_in:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:36426942
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+    term: GO:0005886
+  part_of:
+    evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - MGI:96892
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+    term: GO:0050853
+  has_input:
+  - evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - MGI:96892
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+    term: UniProtKB:P07948
+  causal_associations:
+  - evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - MGI:96892
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+    predicate: RO:0002629
+    downstream_activity: gomodel:6606056e00002011/6606056e00002040
+- id: gomodel:6606056e00002011/6606056e00002049
+  enabled_by:
+    term: UniProtKB:P29350
+  molecular_function:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:17562706
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0004725
+  occurs_in:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:10940933
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0005737
+  part_of:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:35941532
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0050859
+- id: gomodel:6606056e00002011/6606056e00002040
+  enabled_by:
+    term: UniProtKB:P07948
+  molecular_function:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:11823534
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0004713
+  occurs_in:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:15173188
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0005886
+  part_of:
+    evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - UniProtKB:P25911
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0001782
+  has_input:
+  - evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - MGI:96892
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+    term: UniProtKB:P21854
+  causal_associations:
+  - evidence:
+    - term: ECO:0000314
+      reference: PMID:11823534
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    predicate: RO:0002629
+    downstream_activity: gomodel:6606056e00002011/6606056e00002014
+- id: gomodel:6606056e00002011/6606056e00002014
+  enabled_by:
+    term: UniProtKB:P21854
+  molecular_function:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:27810925
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0004888
+  occurs_in:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:1711157
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0005886
+  part_of:
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:1711157
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    term: GO:0050859
+  causal_associations:
+  - evidence:
+    - term: ECO:0000314
+      reference: PMID:27810925
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7646-0052
+        date: '2024-04-09'
+    predicate: RO:0002629
+    downstream_activity: gomodel:6606056e00002011/6606056e00002049
+objects:
+- id: GO:0005615
+  label: extracellular space
+- id: GO:0004888
+  label: transmembrane signaling receptor activity
+- id: UniProtKB:P21854
+  label: CD72 Hsap
+- id: GO:0050859
+  label: negative regulation of B cell receptor signaling pathway
+- id: GO:0005886
+  label: plasma membrane
+- id: ECO:0000314
+  label: direct assay evidence used in manual assertion
+- id: GO:0004713
+  label: protein tyrosine kinase activity
+- id: UniProtKB:P07948
+  label: LYN Hsap
+- id: GO:0001782
+  label: B cell homeostasis
+- id: ECO:0000250
+  label: sequence similarity evidence used in manual assertion
+- id: GO:0004725
+  label: protein tyrosine phosphatase activity
+- id: UniProtKB:P29350
+  label: PTPN6 Hsap
+- id: GO:0005737
+  label: cytoplasm
+- id: GO:0019815
+  label: B cell receptor complex
+- id: UniProtKB:P11912
+  label: CD79A Hsap
+- id: UniProtKB:P40259
+  label: CD79B Hsap
+- id: GO:0050853
+  label: B cell receptor signaling pathway
+- id: CHEBI:166824
+  label: peptide antigen
+

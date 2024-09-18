@@ -1,5 +1,6 @@
 import logging
 import re
+from enum import Enum
 
 from ndex2.cx2 import CX2Network
 
@@ -12,9 +13,10 @@ from gocam.translation.cx2.style import (
 
 logger = logging.getLogger(__name__)
 
-# Derived from https://github.com/geneontology/wc-gocam-viz/blob/6ef1fcaddfef97ece94d04b7c23ac09c33ace168/src/globals/%40noctua.form/data/taxon-dataset.json
-# TODO: Can this not be hardcoded? Consider just splitting the label on space and keeping the first
-#       part? Could also go into the MinervaWrapper class.
+# Derived from
+# https://github.com/geneontology/wc-gocam-viz/blob/6ef1fcaddfef97ece94d04b7c23ac09c33ace168/src/globals/%40noctua.form/data/taxon-dataset.json
+# If maintaining this list becomes onerous, consider splitting the label on a space and taking only
+# the first part
 SPECIES_CODES = [
     "Atal",
     "Btau",
@@ -48,6 +50,11 @@ def _remove_species_code_suffix(label: str) -> str:
 IQUERY_GENE_SYMBOL_PATTERN = re.compile("(^[A-Z][A-Z0-9-]*$)|(^C[0-9]+orf[0-9]+$)")
 
 
+class NODE_TYPE(str, Enum):
+    GENE = "gene"
+    COMPLEX = "complex"
+
+
 def model_to_cx2(gocam: Model) -> list:
 
     def _get_object_label(object_id: str) -> str:
@@ -68,14 +75,17 @@ def model_to_cx2(gocam: Model) -> list:
             continue
 
         if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-            node_type = "complex"
+            node_type = NODE_TYPE.COMPLEX
         else:
-            node_type = "gene"
+            node_type = NODE_TYPE.GENE
 
         node_name = _remove_species_code_suffix(
             _get_object_label(activity.enabled_by.term)
         )
-        if node_type == "gene" and IQUERY_GENE_SYMBOL_PATTERN.match(node_name) is None:
+        if (
+            node_type == NODE_TYPE.GENE
+            and IQUERY_GENE_SYMBOL_PATTERN.match(node_name) is None
+        ):
             logger.warning(
                 f"Name for gene node does not match expected pattern: {node_name}"
             )
@@ -83,8 +93,18 @@ def model_to_cx2(gocam: Model) -> list:
         node_attributes = {
             "name": node_name,
             "represents": activity.enabled_by.term,
-            "type": node_type,
+            "type": node_type.value,
         }
+
+        if node_type == NODE_TYPE.COMPLEX:
+            node_attributes["member"] = []
+            for member in activity.enabled_by.members:
+                member_name = _remove_species_code_suffix(_get_object_label(member))
+                if IQUERY_GENE_SYMBOL_PATTERN.match(member_name) is None:
+                    logger.warning(
+                        f"Name for complex member does not match expected pattern: {member_name}"
+                    )
+                node_attributes["member"].append(member_name)
 
         if activity.molecular_function:
             node_attributes["molecular_function_id"] = activity.molecular_function.term
