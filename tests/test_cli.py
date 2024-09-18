@@ -11,7 +11,7 @@ from tests import EXAMPLES_DIR, INPUT_DIR
 
 @pytest.fixture
 def runner():
-    return CliRunner()
+    return CliRunner(mix_stderr=False)
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def test_fetch_yaml(runner, api_mock):
     result = runner.invoke(cli, ["fetch", "--format", "yaml", "5b91dbd100002057"])
     assert result.exit_code == 0
 
-    parsed_output = yaml.safe_load(result.output)
+    parsed_output = yaml.safe_load(result.stdout)
     assert parsed_output["id"] == "gomodel:5b91dbd100002057"
 
 
@@ -36,14 +36,14 @@ def test_fetch_json(runner, api_mock):
     result = runner.invoke(cli, ["fetch", "--format", "json", "5b91dbd100002057"])
     assert result.exit_code == 0
 
-    parsed_output = json.loads(result.output)
+    parsed_output = json.loads(result.stdout)
     assert parsed_output["id"] == "gomodel:5b91dbd100002057"
 
 
 def test_version(runner):
     result = runner.invoke(cli, ["--version"])
     assert result.exit_code == 0
-    assert __version__ in result.output
+    assert __version__ in result.stdout
 
 
 @pytest.mark.parametrize("format", ["json", "yaml"])
@@ -58,7 +58,7 @@ def test_convert_to_cx2_from_file(runner, format):
         ],
     )
     assert result.exit_code == 0
-    cx2 = json.loads(result.output)
+    cx2 = json.loads(result.stdout)
     assert isinstance(cx2, list)
 
 
@@ -69,7 +69,7 @@ def test_convert_to_cx2_from_stdin(runner, format):
             cli, ["convert", "-O", "cx2", "-I", format], input=f.read()
         )
     assert result.exit_code == 0
-    cx2 = json.loads(result.output)
+    cx2 = json.loads(result.stdout)
     assert isinstance(cx2, list)
 
 

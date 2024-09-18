@@ -1,3 +1,6 @@
+import logging
+import re
+
 from ndex2.cx2 import CX2Network
 
 from gocam.datamodel import EnabledByProteinComplexAssociation, Model
@@ -6,6 +9,43 @@ from gocam.translation.cx2.style import (
     VISUAL_EDITOR_PROPERTIES,
     VISUAL_PROPERTIES,
 )
+
+logger = logging.getLogger(__name__)
+
+# Derived from https://github.com/geneontology/wc-gocam-viz/blob/6ef1fcaddfef97ece94d04b7c23ac09c33ace168/src/globals/%40noctua.form/data/taxon-dataset.json
+# TODO: Can this not be hardcoded? Consider just splitting the label on space and keeping the first
+#       part? Could also go into the MinervaWrapper class.
+SPECIES_CODES = [
+    "Atal",
+    "Btau",
+    "Cele",
+    "Cfam",
+    "Ddis",
+    "Dmel",
+    "Drer",
+    "Ggal",
+    "Hsap",
+    "Mmus",
+    "Pseudomonas",
+    "Rnor",
+    "Scer",
+    "Sjap",
+    "Solanaceae",
+    "Spom",
+    "Sscr",
+    "Xenopus",
+]
+
+
+def _remove_species_code_suffix(label: str) -> str:
+    for code in SPECIES_CODES:
+        label = label.removesuffix(code).strip()
+    return label
+
+
+# Regex from
+# https://github.com/ndexbio/ndex-enrichment-rest/wiki/Enrichment-network-structure#via-node-attributes-preferred-method
+IQUERY_GENE_SYMBOL_PATTERN = re.compile("(^[A-Z][A-Z0-9-]*$)|(^C[0-9]+orf[0-9]+$)")
 
 
 def model_to_cx2(gocam: Model) -> list:
@@ -32,8 +72,16 @@ def model_to_cx2(gocam: Model) -> list:
         else:
             node_type = "gene"
 
+        node_name = _remove_species_code_suffix(
+            _get_object_label(activity.enabled_by.term)
+        )
+        if node_type == "gene" and IQUERY_GENE_SYMBOL_PATTERN.match(node_name) is None:
+            logger.warning(
+                f"Name for gene node does not match expected pattern: {node_name}"
+            )
+
         node_attributes = {
-            "name": _get_object_label(activity.enabled_by.term),
+            "name": node_name,
             "represents": activity.enabled_by.term,
             "type": node_type,
         }
