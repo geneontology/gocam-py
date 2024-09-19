@@ -7,170 +7,239 @@ status: production
 activities:
 - id: gomodel:63f809ec00000701/63f809ec00000742
   enabled_by:
+    type: EnabledByGeneProductAssociation
+    evidence: []
+    provenances: []
     term: UniProtKB:Q96Q11
   molecular_function:
+    type: MolecularFunctionAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:0004810
   part_of:
+    type: BiologicalProcessAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:0001680
+  has_input: []
+  has_output: []
+  causal_associations: []
+  provenances: []
 - id: gomodel:63f809ec00000701/63f809ec00000726
   enabled_by:
+    type: EnabledByGeneProductAssociation
+    evidence: []
+    provenances: []
     term: UniProtKB:Q9H8Y5
   molecular_function:
+    type: MolecularFunctionAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:31011209
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:0004521
   part_of:
+    type: BiologicalProcessAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:31011209
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:0072344
+  has_input: []
   has_output:
-  - evidence:
+  - type: MoleculeAssociation
+    evidence:
     - term: ECO:0000314
       reference: PMID:31011209
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: CHEBI:10668
   causal_associations:
-  - evidence:
+  - type: CausalAssociation
+    evidence:
     - term: ECO:0000314
       reference: PMID:31011209
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     predicate: RO:0002629
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000735
+  provenances: []
 - id: gomodel:63f809ec00000701/63f809ec00000735
   enabled_by:
+    type: EnabledByGeneProductAssociation
+    evidence: []
+    provenances: []
     term: UniProtKB:Q9H777
   molecular_function:
+    type: MolecularFunctionAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:0004549
   part_of:
+    type: BiologicalProcessAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:0042780
   has_input:
-  - evidence:
+  - type: MoleculeAssociation
+    evidence:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: CHEBI:10668
+  has_output: []
   causal_associations:
-  - evidence:
+  - type: CausalAssociation
+    evidence:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     predicate: RO:0002629
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000742
+  provenances: []
 - id: gomodel:63f809ec00000701/63f809ec00000706
   enabled_by:
+    type: EnabledByGeneProductAssociation
+    evidence: []
+    provenances: []
     term: UniProtKB:O60524
   molecular_function:
+    type: MolecularFunctionAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:1904678
   occurs_in:
+    type: CellularAnatomicalEntityAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:0022626
   part_of:
+    type: BiologicalProcessAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: GO:0140708
   has_input:
-  - evidence:
+  - type: MoleculeAssociation
+    evidence:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+    provenances: []
     term: CHEBI:17732
+  has_output: []
   causal_associations:
-  - evidence:
+  - type: CausalAssociation
+    evidence:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-02'
+    provenances: []
     predicate: RO:0002304
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000726
+  provenances: []
 objects:
 - id: GO:1904678
   label: alpha-aminoacyl-tRNA binding
+  type: gocam:Object
 - id: UniProtKB:O60524
   label: NEMF Hsap
+  type: gocam:Object
 - id: GO:0140708
   label: CAT tailing
+  type: gocam:Object
 - id: GO:0022626
   label: cytosolic ribosome
+  type: gocam:Object
 - id: CHEBI:17732
   label: Ala-tRNA(Ala)
+  type: gocam:Object
 - id: GO:0004521
   label: RNA endonuclease activity
+  type: gocam:Object
 - id: UniProtKB:Q9H8Y5
   label: ANKZF1 Hsap
+  type: gocam:Object
 - id: GO:0072344
   label: rescue of stalled ribosome
+  type: gocam:Object
 - id: ECO:0000314
   label: direct assay evidence used in manual assertion
+  type: gocam:Object
 - id: CHEBI:10668
   label: tRNA precursor
+  type: gocam:Object
 - id: GO:0004549
   label: tRNA-specific ribonuclease activity
+  type: gocam:Object
 - id: UniProtKB:Q9H777
   label: ELAC1 Hsap
+  type: gocam:Object
 - id: GO:0042780
   label: tRNA 3'-end processing
+  type: gocam:Object
 - id: GO:0004810
   label: CCA tRNA nucleotidyltransferase activity
+  type: gocam:Object
 - id: UniProtKB:Q96Q11
   label: TRNT1 Hsap
+  type: gocam:Object
 - id: GO:0001680
   label: tRNA 3'-terminal CCA addition
+  type: gocam:Object
+provenances: []
 
