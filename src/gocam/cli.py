@@ -69,7 +69,7 @@ def fetch(model_ids, format):
 
     for model_id in model_ids:
         model = wrapper.fetch_model(model_id)
-        model_dict = model.model_dump(exclude_none=True, exclude_defaults=True)
+        model_dict = model.model_dump(exclude_none=True)
 
         if format == "json":
             click.echo(json.dumps(model_dict, indent=2))
