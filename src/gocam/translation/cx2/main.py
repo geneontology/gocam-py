@@ -135,7 +135,7 @@ def model_to_cx2(gocam: Model) -> list:
             "type": node_type.value,
         }
 
-        if node_type == NODE_TYPE.COMPLEX:
+        if node_type == NODE_TYPE.COMPLEX and activity.enabled_by.members:
             node_attributes["member"] = []
             for member in activity.enabled_by.members:
                 member_name = _get_object_label(member)
