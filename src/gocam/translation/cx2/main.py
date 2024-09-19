@@ -1,10 +1,15 @@
 import logging
 import re
 from enum import Enum
+from typing import Dict, List, Optional, Union
 
 from ndex2.cx2 import CX2Network
 
-from gocam.datamodel import EnabledByProteinComplexAssociation, Model
+from gocam.datamodel import (
+    EnabledByProteinComplexAssociation,
+    Model,
+    MoleculeAssociation,
+)
 from gocam.translation.cx2.style import (
     RELATIONS,
     VISUAL_EDITOR_PROPERTIES,
@@ -57,10 +62,46 @@ class NODE_TYPE(str, Enum):
 
 def model_to_cx2(gocam: Model) -> list:
 
+    # Internal state
+    input_output_nodes: Dict[str, int] = {}
+    activity_nodes: Dict[str, int] = {}
+
+    # Internal helper functions that access internal state
     def _get_object_label(object_id: str) -> str:
         object = next((obj for obj in gocam.objects if obj.id == object_id), None)
-        return object.label if object is not None else ""
+        return _remove_species_code_suffix(object.label) if object is not None else ""
 
+    def _add_input_output_nodes(
+        associations: Optional[Union[MoleculeAssociation, List[MoleculeAssociation]]],
+        edge_attributes: dict,
+    ) -> None:
+        if associations is None:
+            return
+        if not isinstance(associations, list):
+            associations = [associations]
+        for association in associations:
+            if association.term not in input_output_nodes:
+                node_attributes = {
+                    "name": _get_object_label(association.term),
+                    "represents": association.term,
+                }
+
+                if association.provenances:
+                    node_attributes["provenance"] = [
+                        p.contributor for p in association.provenances
+                    ]
+
+                input_output_nodes[association.term] = cx2_network.add_node(
+                    attributes=node_attributes
+                )
+
+            cx2_network.add_edge(
+                source=input_output_nodes[association.term],
+                target=activity_nodes[activity.id],
+                attributes=edge_attributes,
+            )
+
+    # Create the CX2 network and set network-level attributes
     cx2_network = CX2Network()
     cx2_network.set_network_attributes(
         {
@@ -69,7 +110,7 @@ def model_to_cx2(gocam: Model) -> list:
         }
     )
 
-    activity_nodes = {}
+    # Add nodes for activities, labeled by the activity's enabled_by object
     for activity in gocam.activities:
         if activity.enabled_by is None:
             continue
@@ -79,9 +120,7 @@ def model_to_cx2(gocam: Model) -> list:
         else:
             node_type = NODE_TYPE.GENE
 
-        node_name = _remove_species_code_suffix(
-            _get_object_label(activity.enabled_by.term)
-        )
+        node_name = _get_object_label(activity.enabled_by.term)
         if (
             node_type == NODE_TYPE.GENE
             and IQUERY_GENE_SYMBOL_PATTERN.match(node_name) is None
@@ -99,7 +138,7 @@ def model_to_cx2(gocam: Model) -> list:
         if node_type == NODE_TYPE.COMPLEX:
             node_attributes["member"] = []
             for member in activity.enabled_by.members:
-                member_name = _remove_species_code_suffix(_get_object_label(member))
+                member_name = _get_object_label(member)
                 if IQUERY_GENE_SYMBOL_PATTERN.match(member_name) is None:
                     logger.warning(
                         f"Name for complex member does not match expected pattern: {member_name}"
@@ -129,6 +168,24 @@ def model_to_cx2(gocam: Model) -> list:
 
         activity_nodes[activity.id] = cx2_network.add_node(attributes=node_attributes)
 
+    # Add nodes for input/output molecules and create edges to activity nodes
+    for activity in gocam.activities:
+        _add_input_output_nodes(
+            activity.has_input, {"name": "has input", "represents": "RO:0002233"}
+        )
+        _add_input_output_nodes(
+            activity.has_output, {"name": "has output", "represents": "RO:0002234"}
+        )
+        _add_input_output_nodes(
+            activity.has_primary_input,
+            {"name": "has primary input", "represents": "RO:0004009"},
+        )
+        _add_input_output_nodes(
+            activity.has_primary_output,
+            {"name": "has primary output", "represents": "RO:0004008"},
+        )
+
+    # Add edges for causal associations between activity nodes
     for activity in gocam.activities:
         for association in activity.causal_associations:
             if association.downstream_activity in activity_nodes:
@@ -157,6 +214,7 @@ def model_to_cx2(gocam: Model) -> list:
                     attributes=edge_attributes,
                 )
 
+    # Set visual properties for the network
     cx2_network.set_visual_properties(VISUAL_PROPERTIES)
     cx2_network.set_opaque_aspect("visualEditorProperties", [VISUAL_EDITOR_PROPERTIES])
 
