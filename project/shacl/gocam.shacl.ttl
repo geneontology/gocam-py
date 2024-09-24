@@ -12,15 +12,15 @@ gocam:Association a sh:NodeShape ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 2 ;
             sh:path gocam:provenances ],
-        [ sh:class gocam:EvidenceItem ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 1 ;
-            sh:path gocam:evidence ],
         [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 0 ;
-            sh:path gocam:type ] ;
+            sh:path gocam:type ],
+        [ sh:class gocam:EvidenceItem ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path gocam:evidence ] ;
     sh:targetClass gocam:Association .
 
 gocam:CellTypeAssociation a sh:NodeShape ;
@@ -52,13 +52,7 @@ gocam:EnabledByGeneProductAssociation a sh:NodeShape ;
     sh:closed true ;
     sh:description "An association between an activity and a gene product" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:GeneProductTermObject ;
-            sh:description "The gene product or complex that carries out the activity" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 0 ;
-            sh:path gocam:term ],
-        [ sh:datatype xsd:string ;
+    sh:property [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
@@ -67,6 +61,12 @@ gocam:EnabledByGeneProductAssociation a sh:NodeShape ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 3 ;
             sh:path gocam:provenances ],
+        [ sh:class gocam:GeneProductTermObject ;
+            sh:description "The gene product or complex that carries out the activity" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 0 ;
+            sh:path gocam:term ],
         [ sh:class gocam:EvidenceItem ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 2 ;
@@ -82,61 +82,87 @@ gocam:EnabledByProteinComplexAssociation a sh:NodeShape ;
             sh:nodeKind sh:IRI ;
             sh:order 0 ;
             sh:path gocam:members ],
-        [ sh:class gocam:ProteinComplexTermObject ;
-            sh:description "The gene product or complex that carries out the activity" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 1 ;
-            sh:path gocam:term ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 4 ;
-            sh:path gocam:provenances ],
         [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 2 ;
             sh:path gocam:type ],
+        [ sh:class gocam:ProvenanceInfo ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 4 ;
+            sh:path gocam:provenances ],
         [ sh:class gocam:EvidenceItem ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 3 ;
-            sh:path gocam:evidence ] ;
+            sh:path gocam:evidence ],
+        [ sh:class gocam:ProteinComplexTermObject ;
+            sh:description "The gene product or complex that carries out the activity" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 1 ;
+            sh:path gocam:term ] ;
     sh:targetClass gocam:EnabledByProteinComplexAssociation .
 
 gocam:GrossAnatomyAssociation a sh:NodeShape ;
     sh:closed true ;
     sh:description "An association between an activity and a gross anatomical structure term" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:ProvenanceInfo ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:provenances ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path gocam:type ],
-        [ sh:class gocam:EvidenceItem ;
+    sh:property [ sh:class gocam:EvidenceItem ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 2 ;
             sh:path gocam:evidence ],
+        [ sh:class gocam:ProvenanceInfo ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path gocam:provenances ],
         [ sh:class gocam:GrossAnatomicalStructureTermObject ;
             sh:description "The ontology term that describes the nature of the association" ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 0 ;
-            sh:path gocam:term ] ;
+            sh:path gocam:term ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path gocam:type ] ;
     sh:targetClass gocam:GrossAnatomyAssociation .
 
 gocam:Model a sh:NodeShape ;
     sh:closed true ;
     sh:description "A model of a biological program consisting of a set of causally connected activities" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:Activity ;
+    sh:property [ sh:class gocam:Object ;
+            sh:description "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside." ;
+            sh:nodeKind sh:IRI ;
+            sh:order 6 ;
+            sh:path gocam:objects ],
+        [ sh:datatype xsd:anyURI ;
+            sh:description "The identifier of the model. Should be in gocam namespace." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path gocam:id ],
+        [ sh:description "The status of the model" ;
+            sh:in ( "production" "development" ) ;
+            sh:maxCount 1 ;
+            sh:order 3 ;
+            sh:path pav:status ],
+        [ sh:class gocam:Activity ;
             sh:description "All of the activities that are part of the model" ;
             sh:nodeKind sh:IRI ;
             sh:order 5 ;
             sh:path gocam:activities ],
+        [ sh:datatype xsd:string ;
+            sh:description "Comments about the model" ;
+            sh:nodeKind sh:Literal ;
+            sh:order 4 ;
+            sh:path <rdfs:comment> ],
+        [ sh:class gocam:ProvenanceInfo ;
+            sh:description "Model-level provenance information" ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 7 ;
+            sh:path gocam:provenances ],
         [ sh:class gocam:TaxonTermObject ;
             sh:description "The primary taxon that the model is about" ;
             sh:maxCount 1 ;
@@ -148,40 +174,25 @@ gocam:Model a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
-            sh:path <dct:title> ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:description "Model-level provenance information" ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 7 ;
-            sh:path gocam:provenances ],
-        [ sh:description "The status of the model" ;
-            sh:in ( "production" "development" ) ;
-            sh:maxCount 1 ;
-            sh:order 3 ;
-            sh:path pav:status ],
-        [ sh:class gocam:Object ;
-            sh:description "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside." ;
-            sh:nodeKind sh:IRI ;
-            sh:order 6 ;
-            sh:path gocam:objects ],
-        [ sh:datatype xsd:anyURI ;
-            sh:description "The identifier of the model. Should be in gocam namespace." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path gocam:id ],
-        [ sh:datatype xsd:string ;
-            sh:description "Comments about the model" ;
-            sh:nodeKind sh:Literal ;
-            sh:order 4 ;
-            sh:path <rdfs:comment> ] ;
+            sh:path <dct:title> ] ;
     sh:targetClass gocam:Model .
 
 gocam:PhaseTermObject a sh:NodeShape ;
     sh:closed true ;
     sh:description "A term object that represents a phase term from GO or UBERON" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:string ;
+    sh:property [ sh:datatype xsd:boolean ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
+            sh:path gocam:obsolete ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path gocam:id ],
+        [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
@@ -190,18 +201,7 @@ gocam:PhaseTermObject a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 2 ;
-            sh:path gocam:type ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path gocam:id ],
-        [ sh:datatype xsd:boolean ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path gocam:obsolete ] ;
+            sh:path gocam:type ] ;
     sh:targetClass gocam:PhaseTermObject .
 
 gocam:TermAssociation a sh:NodeShape ;
@@ -213,45 +213,45 @@ gocam:TermAssociation a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path gocam:type ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:provenances ],
-        [ sh:class gocam:EvidenceItem ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 2 ;
-            sh:path gocam:evidence ],
         [ sh:class gocam:TermObject ;
             sh:description "The ontology term that describes the nature of the association" ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 0 ;
-            sh:path gocam:term ] ;
+            sh:path gocam:term ],
+        [ sh:class gocam:EvidenceItem ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path gocam:evidence ],
+        [ sh:class gocam:ProvenanceInfo ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path gocam:provenances ] ;
     sh:targetClass gocam:TermAssociation .
 
 gocam:BiologicalProcessAssociation a sh:NodeShape ;
     sh:closed true ;
     sh:description "An association between an activity and a biological process term" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:EvidenceItem ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 2 ;
-            sh:path gocam:evidence ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path gocam:type ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:provenances ],
-        [ sh:class gocam:BiologicalProcessTermObject ;
+    sh:property [ sh:class gocam:BiologicalProcessTermObject ;
             sh:description "The ontology term that describes the nature of the association" ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 0 ;
-            sh:path gocam:term ] ;
+            sh:path gocam:term ],
+        [ sh:class gocam:EvidenceItem ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path gocam:evidence ],
+        [ sh:class gocam:ProvenanceInfo ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path gocam:provenances ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path gocam:type ] ;
     sh:targetClass gocam:BiologicalProcessAssociation .
 
 gocam:BiologicalProcessTermObject a sh:NodeShape ;
@@ -285,7 +285,15 @@ gocam:CausalAssociation a sh:NodeShape ;
     sh:closed true ;
     sh:description "A causal association between two activities" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:Activity ;
+    sh:property [ sh:class gocam:ProvenanceInfo ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 4 ;
+            sh:path gocam:provenances ],
+        [ sh:class gocam:EvidenceItem ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path gocam:evidence ],
+        [ sh:class gocam:Activity ;
             sh:description "The activity unit that is downstream of this one" ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
@@ -296,14 +304,6 @@ gocam:CausalAssociation a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 2 ;
             sh:path gocam:type ],
-        [ sh:class gocam:EvidenceItem ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:evidence ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 4 ;
-            sh:path gocam:provenances ],
         [ sh:class gocam:PredicateTermObject ;
             sh:description "The RO relation that represents the type of relationship" ;
             sh:maxCount 1 ;
@@ -316,69 +316,11 @@ gocam:CellTypeTermObject a sh:NodeShape ;
     sh:closed true ;
     sh:description "A term object that represents a cell type term from CL" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:boolean ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path gocam:obsolete ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path gocam:type ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path <rdfs:label> ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path gocam:id ] ;
-    sh:targetClass gocam:CellTypeTermObject .
-
-gocam:CellularAnatomicalEntityAssociation a sh:NodeShape ;
-    sh:closed true ;
-    sh:description "An association between an activity and a cellular anatomical entity term" ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:EvidenceItem ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 2 ;
-            sh:path gocam:evidence ],
-        [ sh:class gocam:CellularAnatomicalEntityTermObject ;
-            sh:description "The ontology term that describes the nature of the association" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 0 ;
-            sh:path gocam:term ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path gocam:type ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:provenances ] ;
-    sh:targetClass gocam:CellularAnatomicalEntityAssociation .
-
-gocam:CellularAnatomicalEntityTermObject a sh:NodeShape ;
-    sh:closed true ;
-    sh:description "A term object that represents a cellular anatomical entity term from GO" ;
-    sh:ignoredProperties ( rdf:type ) ;
     sh:property [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path <rdfs:label> ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path gocam:id ],
         [ sh:datatype xsd:boolean ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
@@ -386,16 +328,32 @@ gocam:CellularAnatomicalEntityTermObject a sh:NodeShape ;
             sh:path gocam:obsolete ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path gocam:id ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 2 ;
             sh:path gocam:type ] ;
-    sh:targetClass gocam:CellularAnatomicalEntityTermObject .
+    sh:targetClass gocam:CellTypeTermObject .
 
-gocam:EnabledByAssociation a sh:NodeShape ;
-    sh:closed false ;
-    sh:description "An association between an activity and the gene product or complex that carries it out" ;
+gocam:CellularAnatomicalEntityAssociation a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "An association between an activity and a cellular anatomical entity term" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:string ;
+    sh:property [ sh:class gocam:CellularAnatomicalEntityTermObject ;
+            sh:description "The ontology term that describes the nature of the association" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 0 ;
+            sh:path gocam:term ],
+        [ sh:class gocam:ProvenanceInfo ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path gocam:provenances ],
+        [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
@@ -403,24 +361,77 @@ gocam:EnabledByAssociation a sh:NodeShape ;
         [ sh:class gocam:EvidenceItem ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 2 ;
-            sh:path gocam:evidence ],
-        [ sh:class gocam:InformationBiomacromoleculeTermObject ;
+            sh:path gocam:evidence ] ;
+    sh:targetClass gocam:CellularAnatomicalEntityAssociation .
+
+gocam:CellularAnatomicalEntityTermObject a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "A term object that represents a cellular anatomical entity term from GO" ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path gocam:type ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path <rdfs:label> ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path gocam:id ],
+        [ sh:datatype xsd:boolean ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
+            sh:path gocam:obsolete ] ;
+    sh:targetClass gocam:CellularAnatomicalEntityTermObject .
+
+gocam:EnabledByAssociation a sh:NodeShape ;
+    sh:closed false ;
+    sh:description "An association between an activity and the gene product or complex that carries it out" ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class gocam:InformationBiomacromoleculeTermObject ;
             sh:description "The gene product or complex that carries out the activity" ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 0 ;
             sh:path gocam:term ],
+        [ sh:class gocam:EvidenceItem ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path gocam:evidence ],
         [ sh:class gocam:ProvenanceInfo ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 3 ;
-            sh:path gocam:provenances ] ;
+            sh:path gocam:provenances ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path gocam:type ] ;
     sh:targetClass gocam:EnabledByAssociation .
 
 gocam:EvidenceTermObject a sh:NodeShape ;
     sh:closed true ;
     sh:description "A term object that represents an evidence term from ECO" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:anyURI ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path <rdfs:label> ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path gocam:id ],
+        [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 2 ;
@@ -429,45 +440,34 @@ gocam:EvidenceTermObject a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
-            sh:path gocam:obsolete ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path <rdfs:label> ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path gocam:id ] ;
+            sh:path gocam:obsolete ] ;
     sh:targetClass gocam:EvidenceTermObject .
 
 gocam:GrossAnatomicalStructureTermObject a sh:NodeShape ;
     sh:closed true ;
     sh:description "A term object that represents a gross anatomical structure term from UBERON" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:boolean ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path <rdfs:label> ],
+        [ sh:datatype xsd:boolean ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
             sh:path gocam:obsolete ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path gocam:type ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 0 ;
-            sh:path gocam:id ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path <rdfs:label> ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path gocam:type ] ;
+            sh:path gocam:id ] ;
     sh:targetClass gocam:GrossAnatomicalStructureTermObject .
 
 gocam:InformationBiomacromoleculeTermObject a sh:NodeShape ;
@@ -485,48 +485,7 @@ gocam:InformationBiomacromoleculeTermObject a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 0 ;
             sh:path gocam:id ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path <rdfs:label> ],
         [ sh:datatype xsd:boolean ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path gocam:obsolete ] ;
-    sh:targetClass gocam:InformationBiomacromoleculeTermObject .
-
-gocam:MolecularFunctionAssociation a sh:NodeShape ;
-    sh:closed true ;
-    sh:description "An association between an activity and a molecular function term" ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path gocam:type ],
-        [ sh:class gocam:EvidenceItem ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 2 ;
-            sh:path gocam:evidence ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:provenances ],
-        [ sh:class gocam:MolecularFunctionTermObject ;
-            sh:description "The ontology term that describes the nature of the association" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:IRI ;
-            sh:order 0 ;
-            sh:path gocam:term ] ;
-    sh:targetClass gocam:MolecularFunctionAssociation .
-
-gocam:MolecularFunctionTermObject a sh:NodeShape ;
-    sh:closed true ;
-    sh:description "A term object that represents a molecular function term from GO" ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:boolean ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
@@ -535,18 +494,59 @@ gocam:MolecularFunctionTermObject a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
+            sh:path <rdfs:label> ] ;
+    sh:targetClass gocam:InformationBiomacromoleculeTermObject .
+
+gocam:MolecularFunctionAssociation a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "An association between an activity and a molecular function term" ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:class gocam:EvidenceItem ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path gocam:evidence ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path gocam:type ],
+        [ sh:class gocam:MolecularFunctionTermObject ;
+            sh:description "The ontology term that describes the nature of the association" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:IRI ;
+            sh:order 0 ;
+            sh:path gocam:term ],
+        [ sh:class gocam:ProvenanceInfo ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path gocam:provenances ] ;
+    sh:targetClass gocam:MolecularFunctionAssociation .
+
+gocam:MolecularFunctionTermObject a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "A term object that represents a molecular function term from GO" ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
             sh:path <rdfs:label> ],
+        [ sh:datatype xsd:boolean ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
+            sh:path gocam:obsolete ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path gocam:type ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 0 ;
-            sh:path gocam:id ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path gocam:type ] ;
+            sh:path gocam:id ] ;
     sh:targetClass gocam:MolecularFunctionTermObject .
 
 gocam:MoleculeTermObject a sh:NodeShape ;
@@ -563,55 +563,34 @@ gocam:MoleculeTermObject a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 2 ;
             sh:path gocam:type ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path <rdfs:label> ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 0 ;
-            sh:path gocam:id ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path <rdfs:label> ] ;
+            sh:path gocam:id ] ;
     sh:targetClass gocam:MoleculeTermObject .
 
 gocam:PredicateTermObject a sh:NodeShape ;
     sh:closed true ;
     sh:description "A term object that represents a taxon term from NCBITaxon" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path gocam:id ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path <rdfs:label> ],
-        [ sh:datatype xsd:boolean ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path gocam:obsolete ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path gocam:type ] ;
-    sh:targetClass gocam:PredicateTermObject .
-
-gocam:ProteinComplexTermObject a sh:NodeShape ;
-    sh:closed true ;
-    sh:description "A term object that represents a protein complex term from GO" ;
-    sh:ignoredProperties ( rdf:type ) ;
     sh:property [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path <rdfs:label> ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path gocam:id ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
@@ -621,13 +600,34 @@ gocam:ProteinComplexTermObject a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
-            sh:path gocam:obsolete ],
+            sh:path gocam:obsolete ] ;
+    sh:targetClass gocam:PredicateTermObject .
+
+gocam:ProteinComplexTermObject a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "A term object that represents a protein complex term from GO" ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path gocam:type ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 0 ;
-            sh:path gocam:id ] ;
+            sh:path gocam:id ],
+        [ sh:datatype xsd:boolean ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
+            sh:path gocam:obsolete ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path <rdfs:label> ] ;
     sh:targetClass gocam:ProteinComplexTermObject .
 
 gocam:PublicationObject a sh:NodeShape ;
@@ -639,6 +639,16 @@ gocam:PublicationObject a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path gocam:full_text ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
+            sh:path <rdfs:label> ],
+        [ sh:datatype xsd:boolean ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 5 ;
+            sh:path gocam:obsolete ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
@@ -653,44 +663,34 @@ gocam:PublicationObject a sh:NodeShape ;
         [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path <rdfs:label> ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
             sh:order 0 ;
-            sh:path gocam:abstract_text ],
-        [ sh:datatype xsd:boolean ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 5 ;
-            sh:path gocam:obsolete ] ;
+            sh:path gocam:abstract_text ] ;
     sh:targetClass gocam:PublicationObject .
 
 gocam:TaxonTermObject a sh:NodeShape ;
     sh:closed true ;
     sh:description "A term object that represents a taxon term from NCBITaxon" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:string ;
+    sh:property [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path gocam:type ],
+        [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path <rdfs:label> ],
-        [ sh:datatype xsd:boolean ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path gocam:obsolete ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 0 ;
             sh:path gocam:id ],
-        [ sh:datatype xsd:anyURI ;
+        [ sh:datatype xsd:boolean ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path gocam:type ] ;
+            sh:order 3 ;
+            sh:path gocam:obsolete ] ;
     sh:targetClass gocam:TaxonTermObject .
 
 gocam:TermObject a sh:NodeShape ;
@@ -698,16 +698,6 @@ gocam:TermObject a sh:NodeShape ;
     sh:description "An abstract class for all ontology term objects" ;
     sh:ignoredProperties ( rdf:type ) ;
     sh:property [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path gocam:type ],
-        [ sh:datatype xsd:boolean ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path gocam:obsolete ],
-        [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
             sh:nodeKind sh:Literal ;
@@ -717,23 +707,74 @@ gocam:TermObject a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
-            sh:path <rdfs:label> ] ;
+            sh:path <rdfs:label> ],
+        [ sh:datatype xsd:boolean ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
+            sh:path gocam:obsolete ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path gocam:type ] ;
     sh:targetClass gocam:TermObject .
 
 gocam:Activity a sh:NodeShape ;
     sh:closed true ;
     sh:description "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:ProvenanceInfo ;
+    sh:property [ sh:class gocam:CellularAnatomicalEntityAssociation ;
+            sh:description "The cellular location in which the activity occurs" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path gocam:occurs_in ],
+        [ sh:class gocam:MoleculeAssociation ;
+            sh:description "The input molecules that are directly consumed by the activity" ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 5 ;
+            sh:path gocam:has_input ],
+        [ sh:class gocam:ProvenanceInfo ;
             sh:description "Provenance information for the activity" ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 10 ;
             sh:path gocam:provenances ],
+        [ sh:datatype xsd:anyURI ;
+            sh:description "Identifier of the activity unit. Should be in gocam namespace." ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path gocam:id ],
+        [ sh:class gocam:EnabledByAssociation ;
+            sh:description "The gene product or complex that carries out the activity" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 1 ;
+            sh:path gocam:enabled_by ],
+        [ sh:class gocam:MoleculeAssociation ;
+            sh:description "The primary input molecule that is directly consumed by the activity" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 6 ;
+            sh:path gocam:has_primary_input ],
         [ sh:class gocam:CausalAssociation ;
             sh:description "The causal associations that connect this activity to other activities" ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 9 ;
             sh:path gocam:causal_associations ],
+        [ sh:class gocam:MoleculeAssociation ;
+            sh:description "The primary output molecule that is directly produced by the activity" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 8 ;
+            sh:path gocam:has_primary_output ],
+        [ sh:class gocam:MolecularFunctionAssociation ;
+            sh:description "The molecular function that is carried out by the gene product or complex" ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path gocam:molecular_function ],
         [ sh:class gocam:BiologicalProcessAssociation ;
             sh:description "The larger biological process in which the activity is a part" ;
             sh:maxCount 1 ;
@@ -744,64 +785,50 @@ gocam:Activity a sh:NodeShape ;
             sh:description "The output molecules that are directly produced by the activity" ;
             sh:nodeKind sh:BlankNodeOrIRI ;
             sh:order 7 ;
-            sh:path gocam:has_output ],
-        [ sh:class gocam:MoleculeAssociation ;
-            sh:description "The input molecules that are directly consumed by the activity" ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 5 ;
-            sh:path gocam:has_input ],
-        [ sh:class gocam:MoleculeAssociation ;
-            sh:description "The primary output molecule that is directly produced by the activity" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 8 ;
-            sh:path gocam:has_primary_output ],
-        [ sh:class gocam:CellularAnatomicalEntityAssociation ;
-            sh:description "The cellular location in which the activity occurs" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:occurs_in ],
-        [ sh:class gocam:EnabledByAssociation ;
-            sh:description "The gene product or complex that carries out the activity" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 1 ;
-            sh:path gocam:enabled_by ],
-        [ sh:class gocam:MolecularFunctionAssociation ;
-            sh:description "The molecular function that is carried out by the gene product or complex" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 2 ;
-            sh:path gocam:molecular_function ],
-        [ sh:datatype xsd:anyURI ;
-            sh:description "Identifier of the activity unit. Should be in gocam namespace." ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path gocam:id ],
-        [ sh:class gocam:MoleculeAssociation ;
-            sh:description "The primary input molecule that is directly consumed by the activity" ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 6 ;
-            sh:path gocam:has_primary_input ] ;
+            sh:path gocam:has_output ] ;
     sh:targetClass gocam:Activity .
 
 gocam:GeneProductTermObject a sh:NodeShape ;
     sh:closed true ;
     sh:description "A term object that represents a gene product term from GO or UniProtKB" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:anyURI ;
+    sh:property [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 1 ;
+            sh:path <rdfs:label> ],
+        [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 2 ;
             sh:path gocam:type ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path gocam:id ],
         [ sh:datatype xsd:boolean ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 3 ;
+            sh:path gocam:obsolete ] ;
+    sh:targetClass gocam:GeneProductTermObject .
+
+gocam:Object a sh:NodeShape ;
+    sh:closed true ;
+    sh:description "An abstract class for all identified objects in a model" ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:datatype xsd:boolean ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 3 ;
             sh:path gocam:obsolete ],
+        [ sh:datatype xsd:anyURI ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path gocam:type ],
         [ sh:datatype xsd:anyURI ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
@@ -813,65 +840,48 @@ gocam:GeneProductTermObject a sh:NodeShape ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path <rdfs:label> ] ;
-    sh:targetClass gocam:GeneProductTermObject .
-
-gocam:Object a sh:NodeShape ;
-    sh:closed true ;
-    sh:description "An abstract class for all identified objects in a model" ;
-    sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path gocam:type ],
-        [ sh:datatype xsd:boolean ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 3 ;
-            sh:path gocam:obsolete ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 1 ;
-            sh:path <rdfs:label> ],
-        [ sh:datatype xsd:anyURI ;
-            sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path gocam:id ] ;
     sh:targetClass gocam:Object .
 
 gocam:MoleculeAssociation a sh:NodeShape ;
     sh:closed true ;
     sh:description "An association between an activity and a molecule term" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:EvidenceItem ;
+    sh:property [ sh:class gocam:ProvenanceInfo ;
             sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 2 ;
-            sh:path gocam:evidence ],
+            sh:order 3 ;
+            sh:path gocam:provenances ],
         [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
             sh:order 1 ;
             sh:path gocam:type ],
+        [ sh:class gocam:EvidenceItem ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 2 ;
+            sh:path gocam:evidence ],
         [ sh:class gocam:MoleculeTermObject ;
             sh:description "The ontology term that describes the nature of the association" ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 0 ;
-            sh:path gocam:term ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:provenances ] ;
+            sh:path gocam:term ] ;
     sh:targetClass gocam:MoleculeAssociation .
 
 gocam:EvidenceItem a sh:NodeShape ;
     sh:closed true ;
     sh:description "An individual piece of evidence that is associated with an assertion in a model" ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:property [ sh:class gocam:EvidenceTermObject ;
+    sh:property [ sh:class gocam:Object ;
+            sh:description "Supporting database entities or terms" ;
+            sh:nodeKind sh:IRI ;
+            sh:order 2 ;
+            sh:path gocam:with_objects ],
+        [ sh:class gocam:ProvenanceInfo ;
+            sh:description "Provenance about the assertion, e.g. who made it" ;
+            sh:nodeKind sh:BlankNodeOrIRI ;
+            sh:order 3 ;
+            sh:path gocam:provenances ],
+        [ sh:class gocam:EvidenceTermObject ;
             sh:description "The ECO term representing the type of evidence" ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
@@ -882,17 +892,7 @@ gocam:EvidenceItem a sh:NodeShape ;
             sh:maxCount 1 ;
             sh:nodeKind sh:IRI ;
             sh:order 1 ;
-            sh:path gocam:reference ],
-        [ sh:class gocam:ProvenanceInfo ;
-            sh:description "Provenance about the assertion, e.g. who made it" ;
-            sh:nodeKind sh:BlankNodeOrIRI ;
-            sh:order 3 ;
-            sh:path gocam:provenances ],
-        [ sh:class gocam:Object ;
-            sh:description "Supporting database entities or terms" ;
-            sh:nodeKind sh:IRI ;
-            sh:order 2 ;
-            sh:path gocam:with_objects ] ;
+            sh:path gocam:reference ] ;
     sh:targetClass gocam:EvidenceItem .
 
 gocam:ProvenanceInfo a sh:NodeShape ;
@@ -902,22 +902,22 @@ gocam:ProvenanceInfo a sh:NodeShape ;
     sh:property [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
-            sh:order 2 ;
-            sh:path <dct:date> ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
-            sh:order 0 ;
-            sh:path <dct:contributor> ],
-        [ sh:datatype xsd:string ;
-            sh:maxCount 1 ;
-            sh:nodeKind sh:Literal ;
             sh:order 3 ;
             sh:path pav:providedBy ],
         [ sh:datatype xsd:string ;
             sh:maxCount 1 ;
             sh:nodeKind sh:Literal ;
+            sh:order 2 ;
+            sh:path <dct:date> ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
             sh:order 1 ;
-            sh:path <dct:created> ] ;
+            sh:path <dct:created> ],
+        [ sh:datatype xsd:string ;
+            sh:maxCount 1 ;
+            sh:nodeKind sh:Literal ;
+            sh:order 0 ;
+            sh:path <dct:contributor> ] ;
     sh:targetClass gocam:ProvenanceInfo .
 

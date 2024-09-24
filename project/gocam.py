@@ -1,5 +1,5 @@
 # Auto generated from gocam.yaml by pythongen.py version: 0.0.1
-# Generation date: 2024-09-13T15:30:52
+# Generation date: 2024-09-24T11:27:55
 # Schema: gocam
 #
 # id: https://w3id.org/gocam
