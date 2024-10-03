@@ -206,6 +206,34 @@ RELATIONS = {
         color=Color.LIGHT_BLUE,
         width=Width.SMALL,
     ),
+    "RO:0002407": RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.TRIANGLE,
+        label="indirectly positively regulates",
+        color=Color.GREEN,
+        width=Width.INDIRECT,
+    ),
+    "RO:0002409": RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.TEE,
+        label="indirectly negatively regulates",
+        color=Color.RED,
+        width=Width.INDIRECT,
+    ),
+    "RO:0012009": RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.CIRCLE,
+        label="constitutively upstream of",
+        color=Color.DARK_SLATE_BLUE,
+        width=Width.INDIRECT,
+    ),
+    "RO:0012010": RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.CIRCLE,
+        label="removes input for",
+        color=Color.DARK_SLATE_BLUE,
+        width=Width.INDIRECT,
+    ),
 }
 
 VISUAL_PROPERTIES = {

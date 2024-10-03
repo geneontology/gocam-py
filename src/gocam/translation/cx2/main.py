@@ -192,6 +192,10 @@ def model_to_cx2(gocam: Model) -> list:
         for association in activity.causal_associations:
             if association.downstream_activity in activity_nodes:
                 relation_style = RELATIONS.get(association.predicate, None)
+                if relation_style is None:
+                    logger.warning(
+                        f"Unknown relation style for {association.predicate}"
+                    )
                 name = (
                     relation_style.label
                     if relation_style is not None
