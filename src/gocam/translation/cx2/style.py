@@ -14,6 +14,9 @@ class Color(str, Enum):
     DARK_GOLDENROD = "#B8860B"
     DARK_SLATE_BLUE = "#483D8B"
     SNOW = "#FFFAFA"
+    PALE_LAVENDER = "#ebe3f9"
+    LIGHT_GRAY = "#dddddd"
+    PALE_AQUA = "#e0f2f1"
 
 
 class Width(int, Enum):
@@ -33,6 +36,12 @@ class ArrowShape(str, Enum):
 class LineStyle(str, Enum):
     DASHED = "dashed"
     SOLID = "solid"
+
+
+class NodeType(str, Enum):
+    GENE = "gene"
+    COMPLEX = "complex"
+    MOLECULE = "molecule"
 
 
 @dataclass
@@ -206,6 +215,34 @@ RELATIONS = {
         color=Color.LIGHT_BLUE,
         width=Width.SMALL,
     ),
+    "RO:0002407": RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.TRIANGLE,
+        label="indirectly positively regulates",
+        color=Color.GREEN,
+        width=Width.INDIRECT,
+    ),
+    "RO:0002409": RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.TEE,
+        label="indirectly negatively regulates",
+        color=Color.RED,
+        width=Width.INDIRECT,
+    ),
+    "RO:0012009": RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.CIRCLE,
+        label="constitutively upstream of",
+        color=Color.DARK_SLATE_BLUE,
+        width=Width.INDIRECT,
+    ),
+    "RO:0012010": RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.CIRCLE,
+        label="removes input for",
+        color=Color.DARK_SLATE_BLUE,
+        width=Width.INDIRECT,
+    ),
 }
 
 VISUAL_PROPERTIES = {
@@ -299,10 +336,6 @@ VISUAL_PROPERTIES = {
         },
     },
     "edgeMapping": {
-        "EDGE_LABEL": {
-            "type": "PASSTHROUGH",
-            "definition": {"attribute": "name", "type": "string"},
-        },
         "EDGE_LINE_COLOR": {
             "type": "DISCRETE",
             "definition": {
@@ -360,10 +393,26 @@ VISUAL_PROPERTIES = {
         "NODE_LABEL": {
             "type": "PASSTHROUGH",
             "definition": {"attribute": "name", "type": "string"},
-        }
+        },
+        "NODE_BACKGROUND_COLOR": {
+            "type": "DISCRETE",
+            "definition": {
+                "attribute": "type",
+                "map": [
+                    {"v": NodeType.GENE, "vp": Color.PALE_LAVENDER},
+                    {"v": NodeType.COMPLEX, "vp": Color.LIGHT_GRAY},
+                    {"v": NodeType.MOLECULE, "vp": Color.PALE_AQUA},
+                ],
+                "type": "string",
+            },
+        },
     },
 }
 
 VISUAL_EDITOR_PROPERTIES = {
-    "arrowColorMatchesEdge": True,
+    "properties": {
+        "nodeSizeLocked": False,
+        "arrowColorMatchesEdge": False,
+        "nodeCustomGraphicsSizeSync": True,
+    }
 }
