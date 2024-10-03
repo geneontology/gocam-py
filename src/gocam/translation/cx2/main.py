@@ -98,8 +98,8 @@ def model_to_cx2(gocam: Model) -> list:
                 )
 
             cx2_network.add_edge(
-                source=input_output_nodes[association.term],
-                target=activity_nodes[activity.id],
+                source=activity_nodes[activity.id],
+                target=input_output_nodes[association.term],
                 attributes=edge_attributes,
             )
 
