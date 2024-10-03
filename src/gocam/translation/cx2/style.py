@@ -327,10 +327,6 @@ VISUAL_PROPERTIES = {
         },
     },
     "edgeMapping": {
-        "EDGE_LABEL": {
-            "type": "PASSTHROUGH",
-            "definition": {"attribute": "name", "type": "string"},
-        },
         "EDGE_LINE_COLOR": {
             "type": "DISCRETE",
             "definition": {
