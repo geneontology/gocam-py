@@ -55,9 +55,10 @@ def _remove_species_code_suffix(label: str) -> str:
 IQUERY_GENE_SYMBOL_PATTERN = re.compile("(^[A-Z][A-Z0-9-]*$)|(^C[0-9]+orf[0-9]+$)")
 
 
-class NODE_TYPE(str, Enum):
+class NodeType(str, Enum):
     GENE = "gene"
     COMPLEX = "complex"
+    MOLECULE = "molecule"
 
 
 def model_to_cx2(gocam: Model) -> list:
@@ -84,6 +85,7 @@ def model_to_cx2(gocam: Model) -> list:
                 node_attributes = {
                     "name": _get_object_label(association.term),
                     "represents": association.term,
+                    "type": NodeType.MOLECULE.value,
                 }
 
                 if association.provenances:
@@ -116,13 +118,13 @@ def model_to_cx2(gocam: Model) -> list:
             continue
 
         if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-            node_type = NODE_TYPE.COMPLEX
+            node_type = NodeType.COMPLEX
         else:
-            node_type = NODE_TYPE.GENE
+            node_type = NodeType.GENE
 
         node_name = _get_object_label(activity.enabled_by.term)
         if (
-            node_type == NODE_TYPE.GENE
+            node_type == NodeType.GENE
             and IQUERY_GENE_SYMBOL_PATTERN.match(node_name) is None
         ):
             logger.warning(
@@ -135,7 +137,7 @@ def model_to_cx2(gocam: Model) -> list:
             "type": node_type.value,
         }
 
-        if node_type == NODE_TYPE.COMPLEX and activity.enabled_by.members:
+        if node_type == NodeType.COMPLEX and activity.enabled_by.members:
             node_attributes["member"] = []
             for member in activity.enabled_by.members:
                 member_name = _get_object_label(member)
