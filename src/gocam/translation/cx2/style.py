@@ -405,7 +405,7 @@ VISUAL_PROPERTIES = {
                 ],
                 "type": "string",
             },
-        }
+        },
     },
 }
 

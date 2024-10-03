@@ -10,10 +10,10 @@ from gocam.datamodel import (
     MoleculeAssociation,
 )
 from gocam.translation.cx2.style import (
-    NodeType,
     RELATIONS,
     VISUAL_EDITOR_PROPERTIES,
     VISUAL_PROPERTIES,
+    NodeType,
 )
 
 logger = logging.getLogger(__name__)

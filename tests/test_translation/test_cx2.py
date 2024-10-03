@@ -75,10 +75,9 @@ def test_node_type_attribute(input_model):
         # If this is the expected complex node, check that the type is set to "complex"
         if node_attrs["name"] == "B cell receptor complex":
             assert node_attrs["type"] == "complex"
-        # Otherwise, if the node has a type attribute (nodes created by input/output
-        # associations won't have that attribute), check that it is set to "gene"
+        # Otherwise, check that it is set to "gene" or "molecule"
         elif "type" in node_attrs:
-            assert node_attrs["type"] == "gene"
+            assert node_attrs["type"] == "gene" or node_attrs["type"] == "molecule"
 
 
 def test_node_name_and_member_attributes(input_model):
@@ -122,7 +121,7 @@ def test_activity_input_output_notes(input_model):
     input_edge = next(
         edge
         for edge in edge_aspect["edges"]
-        if edge["s"] == io_node["id"] and edge["v"]["name"] == "has input"
+        if edge["t"] == io_node["id"] and edge["v"]["name"] == "has input"
     )
     assert input_edge is not None
 
@@ -130,6 +129,6 @@ def test_activity_input_output_notes(input_model):
     output_edge = next(
         edge
         for edge in edge_aspect["edges"]
-        if edge["s"] == io_node["id"] and edge["v"]["name"] == "has output"
+        if edge["t"] == io_node["id"] and edge["v"]["name"] == "has output"
     )
     assert output_edge is not None
