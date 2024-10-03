@@ -14,6 +14,9 @@ class Color(str, Enum):
     DARK_GOLDENROD = "#B8860B"
     DARK_SLATE_BLUE = "#483D8B"
     SNOW = "#FFFAFA"
+    PALE_LAVENDER = "#ebe3f9"
+    LIGHT_GRAY = "#dddddd"
+    PALE_AQUA = "#e0f2f1"
 
 
 class Width(int, Enum):
@@ -33,6 +36,12 @@ class ArrowShape(str, Enum):
 class LineStyle(str, Enum):
     DASHED = "dashed"
     SOLID = "solid"
+
+
+class NodeType(str, Enum):
+    GENE = "gene"
+    COMPLEX = "complex"
+    MOLECULE = "molecule"
 
 
 @dataclass
@@ -384,6 +393,18 @@ VISUAL_PROPERTIES = {
         "NODE_LABEL": {
             "type": "PASSTHROUGH",
             "definition": {"attribute": "name", "type": "string"},
+        },
+        "NODE_BACKGROUND_COLOR": {
+            "type": "DISCRETE",
+            "definition": {
+                "attribute": "type",
+                "map": [
+                    {"v": NodeType.GENE, "vp": Color.PALE_LAVENDER},
+                    {"v": NodeType.COMPLEX, "vp": Color.LIGHT_GRAY},
+                    {"v": NodeType.MOLECULE, "vp": Color.PALE_AQUA},
+                ],
+                "type": "string",
+            },
         }
     },
 }
