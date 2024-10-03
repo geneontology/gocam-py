@@ -410,5 +410,9 @@ VISUAL_PROPERTIES = {
 }
 
 VISUAL_EDITOR_PROPERTIES = {
-    "arrowColorMatchesEdge": True,
+    "properties": {
+        "nodeSizeLocked": False,
+        "arrowColorMatchesEdge": False,
+        "nodeCustomGraphicsSizeSync": True,
+    }
 }
