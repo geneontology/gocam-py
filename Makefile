@@ -52,7 +52,7 @@ endif
 
 
 # basename of a YAML file in model/
-.PHONY: all clean setup gen-project gen-examples gendoc git-init-add git-init git-add git-commit git-status
+.PHONY: all clean setup gen-project gen-examples gendoc git-init-add git-init git-add git-commit git-status lint lint-python lint-fix-python
 
 # note: "help" MUST be the first target in the file,
 # when the user types "make" they should get help info
@@ -147,6 +147,14 @@ test-python:
 
 lint:
 	$(RUN) linkml-lint $(SOURCE_SCHEMA_PATH)
+
+lint-python:
+	$(RUN) ruff format --check
+	$(RUN) ruff check
+
+lint-fix-python:
+	$(RUN) ruff check --fix
+	$(RUN) ruff format
 
 check-config:
 ifndef LINKML_SCHEMA_NAME
