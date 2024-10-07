@@ -1,1 +1,1 @@
-from gocam.translation.minerva_wrapper import MinervaWrapper
+from gocam.translation.minerva_wrapper import MinervaWrapper as MinervaWrapper

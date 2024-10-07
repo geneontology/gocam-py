@@ -135,7 +135,9 @@ def convert(model, input_format, output_format, output, ndex_upload):
             # Make the network searchable
             client.set_network_system_properties(network_id, {"index_level": "META"})
 
-            click.echo(f"View network at: 'https://www.ndexbio.org/viewer/networks/{network_id}")
+            click.echo(
+                f"View network at: 'https://www.ndexbio.org/viewer/networks/{network_id}"
+            )
         else:
             click.echo(json.dumps(cx2), file=output)
 

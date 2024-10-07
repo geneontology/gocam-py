@@ -64,7 +64,6 @@ IQUERY_GENE_SYMBOL_PATTERN = re.compile("(^[A-Z][A-Z0-9-]*$)|(^C[0-9]+orf[0-9]+$
 
 
 def model_to_cx2(gocam: Model) -> list:
-
     # Internal state
     input_output_nodes: Dict[str, int] = {}
     activity_nodes: Dict[str, int] = {}
