@@ -1,7 +1,10 @@
+import json
 import logging
 import re
+from functools import cache
 from typing import Dict, List, Optional, Union
 
+import prefixmaps
 from ndex2.cx2 import CX2Network
 
 from gocam.datamodel import (
@@ -48,6 +51,11 @@ def _remove_species_code_suffix(label: str) -> str:
     for code in SPECIES_CODES:
         label = label.removesuffix(code).strip()
     return label
+
+
+@cache
+def _get_context():
+    return prefixmaps.load_context("go").as_dict()
 
 
 # Regex from
@@ -101,6 +109,7 @@ def model_to_cx2(gocam: Model) -> list:
     cx2_network = CX2Network()
     cx2_network.set_network_attributes(
         {
+            "@context": json.dumps(_get_context()),
             "name": gocam.title if gocam.title is not None else gocam.id,
             "represents": gocam.id,
         }
