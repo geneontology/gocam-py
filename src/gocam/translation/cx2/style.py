@@ -3,7 +3,7 @@ from enum import Enum
 
 
 class Color(str, Enum):
-    LIGHT_BLUE = "#add8e6"
+    LIGHT_BLUE = "#ADD8E6"
     CORNFLOWER_BLUE = "#6495ED"
     MEDIUM_AQUAMARINE = "#66CDAA"
     DARK_SLATE_GRAY = "#2F4F4F"
@@ -13,10 +13,10 @@ class Color(str, Enum):
     DARK_SALMON = "#E9967A"
     DARK_GOLDENROD = "#B8860B"
     DARK_SLATE_BLUE = "#483D8B"
-    SNOW = "#FFFAFA"
-    PALE_LAVENDER = "#ebe3f9"
-    LIGHT_GRAY = "#dddddd"
-    PALE_AQUA = "#e0f2f1"
+    LIGHT_GOLD = "#FFCC66"
+    PALE_LAVENDER = "#EBE3F9"
+    LIGHT_GRAY = "#DDDDDD"
+    PALE_AQUA = "#E0F2F1"
 
 
 class Width(int, Enum):
@@ -205,7 +205,7 @@ RELATIONS = {
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.CIRCLE,
         label="activity",
-        color=Color.SNOW,
+        color=Color.LIGHT_GOLD,
         width=Width.DEFAULT,
     ),
     "RO:0002413": RelationStyle(
@@ -301,10 +301,82 @@ VISUAL_PROPERTIES = {
             "NODE_BORDER_OPACITY": 1,
             "NODE_BORDER_STYLE": "solid",
             "NODE_BORDER_WIDTH": 1,
+            "NODE_CUSTOMGRAPHICS_POSITION_1": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_POSITION_2": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_POSITION_3": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_POSITION_4": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_POSITION_5": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_POSITION_6": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_POSITION_7": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_POSITION_8": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_POSITION_9": {
+                "ENTITY_ANCHOR": "C",
+                "GRAPHICS_ANCHOR": "C",
+                "JUSTIFICATION": "center",
+                "MARGIN_X": 0,
+                "MARGIN_Y": 0,
+            },
+            "NODE_CUSTOMGRAPHICS_SIZE_1": 50,
+            "NODE_CUSTOMGRAPHICS_SIZE_2": 50,
+            "NODE_CUSTOMGRAPHICS_SIZE_3": 50,
+            "NODE_CUSTOMGRAPHICS_SIZE_4": 50,
+            "NODE_CUSTOMGRAPHICS_SIZE_5": 50,
+            "NODE_CUSTOMGRAPHICS_SIZE_6": 50,
+            "NODE_CUSTOMGRAPHICS_SIZE_7": 50,
+            "NODE_CUSTOMGRAPHICS_SIZE_8": 50,
+            "NODE_CUSTOMGRAPHICS_SIZE_9": 50,
             "NODE_HEIGHT": 35,
             "NODE_LABEL_BACKGROUND_COLOR": "#B6B6B6",
             "NODE_LABEL_BACKGROUND_OPACITY": 1,
-            "NODE_LABEL_BACKGROUND_SHAPE": "NONE",
+            "NODE_LABEL_BACKGROUND_SHAPE": "none",
             "NODE_LABEL_COLOR": "#000000",
             "NODE_LABEL_FONT_FACE": {
                 "FONT_FAMILY": "sans-serif",
@@ -390,10 +462,6 @@ VISUAL_PROPERTIES = {
         },
     },
     "nodeMapping": {
-        "NODE_LABEL": {
-            "type": "PASSTHROUGH",
-            "definition": {"attribute": "name", "type": "string"},
-        },
         "NODE_BACKGROUND_COLOR": {
             "type": "DISCRETE",
             "definition": {
@@ -404,6 +472,67 @@ VISUAL_PROPERTIES = {
                     {"v": NodeType.MOLECULE, "vp": Color.PALE_AQUA},
                 ],
                 "type": "string",
+            },
+        },
+        "NODE_HEIGHT": {
+            "type": "DISCRETE",
+            "definition": {
+                "attribute": "type",
+                "map": [
+                    {"v": NodeType.GENE, "vp": 40},
+                    {"v": NodeType.COMPLEX, "vp": 70},
+                ],
+                "type": "string",
+            },
+        },
+        "NODE_LABEL": {
+            "type": "PASSTHROUGH",
+            "definition": {"attribute": "name", "type": "string"},
+        },
+        "NODE_LABEL_FONT_SIZE": {
+            "type": "DISCRETE",
+            "definition": {
+                "attribute": "type",
+                "map": [
+                    {"v": NodeType.COMPLEX, "vp": 15},
+                    {"v": NodeType.MOLECULE, "vp": 10},
+                ],
+                "type": "integer",
+            },
+        },
+        "NODE_LABEL_MAX_WIDTH": {
+            "type": "DISCRETE",
+            "definition": {
+                "attribute": "type",
+                "map": [
+                    {"v": NodeType.GENE, "vp": 80},
+                    {"v": NodeType.COMPLEX, "vp": 100},
+                    {"v": NodeType.MOLECULE, "vp": 70},
+                ],
+                "type": "integer",
+            },
+        },
+        "NODE_SHAPE": {
+            "type": "DISCRETE",
+            "definition": {
+                "attribute": "type",
+                "map": [
+                    {"v": NodeType.GENE, "vp": "ellipse"},
+                    {"v": NodeType.COMPLEX, "vp": "octagon"},
+                ],
+                "type": "string",
+            },
+        },
+        "NODE_WIDTH": {
+            "type": "DISCRETE",
+            "definition": {
+                "attribute": "type",
+                "map": [
+                    {"v": NodeType.GENE, "vp": 85},
+                    {"v": NodeType.COMPLEX, "vp": 110},
+                    {"v": NodeType.MOLECULE, "vp": 70},
+                ],
+                "type": "integer",
             },
         },
     },
