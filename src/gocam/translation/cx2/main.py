@@ -55,7 +55,7 @@ def _remove_species_code_suffix(label: str) -> str:
 
 @cache
 def _get_context():
-    return prefixmaps.load_context("go").as_dict()
+    return prefixmaps.load_context("go")
 
 
 # Regex from
@@ -105,14 +105,18 @@ def model_to_cx2(gocam: Model) -> list:
             )
 
     # Create the CX2 network and set network-level attributes
+    go_context = _get_context()
+    go_converter = go_context.as_converter()
     cx2_network = CX2Network()
     cx2_network.set_network_attributes(
         {
-            "@context": json.dumps(_get_context()),
+            "@context": json.dumps(go_context.as_dict()),
             "name": gocam.title if gocam.title is not None else gocam.id,
-            "represents": gocam.id,
+            "prov:wasDerivedFrom": go_converter.expand(gocam.id),
         }
     )
+    # This gets added separately so we can declare the datatype
+    cx2_network.add_network_attribute("labels", [gocam.id], "list_of_string")
 
     # Add nodes for activities, labeled by the activity's enabled_by object
     for activity in gocam.activities:
