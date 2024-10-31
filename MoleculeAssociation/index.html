@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="https://geneontology.github.io/gocam-by/MoleculeAssociation/" rel="canonical"/>
 <link href="../assets/images/favicon.png" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-8.5.10" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-8.5.10" name="generator"/>
 <title>Class: MoleculeAssociation - gocam</title>
 <link href="../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
@@ -363,10 +363,6 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
-    domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
     range: MoleculeTermObject
 
 </code></pre>
@@ -380,10 +376,6 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
-    domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
     range: MoleculeTermObject
 attributes:
   term:
@@ -412,17 +404,16 @@ attributes:
     name: evidence
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: evidence
     owner: MoleculeAssociation
     domain_of:
     - Association
     range: EvidenceItem
+    multivalued: true
     inlined: true
   provenances:
     name: provenances
     from_schema: https://w3id.org/gocam
-    multivalued: true
     alias: provenances
     owner: MoleculeAssociation
     domain_of:
@@ -431,6 +422,7 @@ attributes:
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 

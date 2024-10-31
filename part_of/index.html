@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://geneontology.github.io/gocam-by/part_of/">
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-8.5.10">
     
     
       
@@ -274,18 +274,12 @@
     Identifier and Mapping Information
   </a>
   
-    <nav class="md-nav" aria-label="Identifier and Mapping Information">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#schema-source" class="md-nav__link">
-    Schema Source
-  </a>
-  
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#mappings" class="md-nav__link">
+    Mappings
+  </a>
   
 </li>
       
@@ -317,7 +311,6 @@
 
 
 <h1 id="slot-part_of">Slot: part_of</h1>
-<p><em>The larger biological process in which the activity is a part</em></p>
 <p>URI: <a href="https://w3id.org/gocam/part_of">gocam:part_of</a></p>
 <!-- no inheritance hierarchy -->
 
@@ -332,34 +325,68 @@
 </thead>
 <tbody>
 <tr>
+<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
+<td>An association between an activity and a cell type term</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../Activity/">Activity</a></td>
 <td>An individual activity in a causal model, representing the individual molecul...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
+<td>An association between an activity and a cellular anatomical entity term</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../GrossAnatomyAssociation/">GrossAnatomyAssociation</a></td>
+<td>An association between an activity and a gross anatomical structure term</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
+<td>An association between an activity and a biological process term</td>
 <td>no</td>
 </tr>
 </tbody>
 </table>
 <h2 id="properties">Properties</h2>
 <ul>
-<li>Range: <a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></li>
+<li>Range: <a href="../String/">String</a></li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
+<h2 id="mappings">Mappings</h2>
+<table>
+<thead>
+<tr>
+<th>Mapping Type</th>
+<th>Mapped Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>self</td>
+<td>gocam:part_of</td>
+</tr>
+<tr>
+<td>native</td>
+<td>gocam:part_of</td>
+</tr>
+</tbody>
+</table>
 <h2 id="linkml-source">LinkML Source</h2>
 <details>
 
 <pre><code class="language-yaml">name: part_of
-description: The larger biological process in which the activity is a part
-from_schema: https://w3id.org/gocam
-rank: 1000
 alias: part_of
-owner: Activity
 domain_of:
 - Activity
-range: BiologicalProcessAssociation
-inlined: true
+- BiologicalProcessAssociation
+- CellularAnatomicalEntityAssociation
+- CellTypeAssociation
+- GrossAnatomyAssociation
+range: string
 
 </code></pre>
 

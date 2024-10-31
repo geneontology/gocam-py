@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="https://geneontology.github.io/gocam-by/BiologicalProcessAssociation/" rel="canonical"/>
 <link href="../assets/images/favicon.png" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-8.5.10" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-8.5.10" name="generator"/>
 <title>Class: BiologicalProcessAssociation - gocam</title>
 <link href="../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
@@ -222,6 +222,24 @@
     click EvidenceItem href "../EvidenceItem"
 
 
+      BiologicalProcessAssociation : happens_during
+
+
+
+
+    BiologicalProcessAssociation --&gt; "0..1" PhaseTermObject : happens_during
+    click PhaseTermObject href "../PhaseTermObject"
+
+
+      BiologicalProcessAssociation : part_of
+
+
+
+
+    BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessTermObject : part_of
+    click BiologicalProcessTermObject href "../BiologicalProcessTermObject"
+
+
       BiologicalProcessAssociation : provenances
 
 
@@ -265,6 +283,18 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../happens_during/">happens_during</a></td>
+<td>0..1 <br/> <a href="../PhaseTermObject/">PhaseTermObject</a></td>
+<td>Optional extension describing where the BP takes place</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../part_of/">part_of</a></td>
+<td>0..1 <br/> <a href="../BiologicalProcessTermObject/">BiologicalProcessTermObject</a></td>
+<td>Optional extension allowing hierarchical nesting of BPs</td>
+<td>direct</td>
+</tr>
 <tr>
 <td><a href="../term/">term</a></td>
 <td>0..1 <br/> <a href="../BiologicalProcessTermObject/">BiologicalProcessTermObject</a></td>
@@ -345,18 +375,26 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
-    domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
     range: BiologicalProcessTermObject
+attributes:
   happens_during:
     name: happens_during
     description: Optional extension describing where the BP takes place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - BiologicalProcessAssociation
     range: PhaseTermObject
   part_of:
     name: part_of
     description: Optional extension allowing hierarchical nesting of BPs
+    from_schema: https://w3id.org/gocam
+    domain_of:
+    - Activity
+    - BiologicalProcessAssociation
+    - CellularAnatomicalEntityAssociation
+    - CellTypeAssociation
+    - GrossAnatomyAssociation
     range: BiologicalProcessTermObject
 
 </code></pre>
@@ -370,20 +408,31 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
-    domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
     range: BiologicalProcessTermObject
+attributes:
   happens_during:
     name: happens_during
     description: Optional extension describing where the BP takes place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: happens_during
+    owner: BiologicalProcessAssociation
+    domain_of:
+    - BiologicalProcessAssociation
     range: PhaseTermObject
   part_of:
     name: part_of
     description: Optional extension allowing hierarchical nesting of BPs
+    from_schema: https://w3id.org/gocam
+    alias: part_of
+    owner: BiologicalProcessAssociation
+    domain_of:
+    - Activity
+    - BiologicalProcessAssociation
+    - CellularAnatomicalEntityAssociation
+    - CellTypeAssociation
+    - GrossAnatomyAssociation
     range: BiologicalProcessTermObject
-attributes:
   term:
     name: term
     description: The ontology term that describes the nature of the association
@@ -410,17 +459,16 @@ attributes:
     name: evidence
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: evidence
     owner: BiologicalProcessAssociation
     domain_of:
     - Association
     range: EvidenceItem
+    multivalued: true
     inlined: true
   provenances:
     name: provenances
     from_schema: https://w3id.org/gocam
-    multivalued: true
     alias: provenances
     owner: BiologicalProcessAssociation
     domain_of:
@@ -429,6 +477,7 @@ attributes:
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 

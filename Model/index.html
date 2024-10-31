@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="https://geneontology.github.io/gocam-by/Model/" rel="canonical"/>
 <link href="../assets/images/favicon.png" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-8.5.10" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-8.5.10" name="generator"/>
 <title>Class: Model - gocam</title>
 <link href="../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
@@ -393,18 +393,18 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: rdfs:comment
-    multivalued: true
     domain_of:
     - Model
+    multivalued: true
   activities:
     name: activities
     description: All of the activities that are part of the model
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     domain_of:
     - Model
     range: Activity
+    multivalued: true
     inlined: true
     inlined_as_list: true
   objects:
@@ -415,10 +415,10 @@ attributes:
       refreshed from outside.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     domain_of:
     - Model
     range: Object
+    multivalued: true
     inlined: true
     inlined_as_list: true
   provenances:
@@ -426,13 +426,13 @@ attributes:
     description: Model-level provenance information
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     domain_of:
     - Model
     - Activity
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 
@@ -498,23 +498,23 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: rdfs:comment
-    multivalued: true
     alias: comments
     owner: Model
     domain_of:
     - Model
     range: string
+    multivalued: true
   activities:
     name: activities
     description: All of the activities that are part of the model
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: activities
     owner: Model
     domain_of:
     - Model
     range: Activity
+    multivalued: true
     inlined_as_list: true
   objects:
     name: objects
@@ -524,19 +524,18 @@ attributes:
       refreshed from outside.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: objects
     owner: Model
     domain_of:
     - Model
     range: Object
+    multivalued: true
     inlined_as_list: true
   provenances:
     name: provenances
     description: Model-level provenance information
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: provenances
     owner: Model
     domain_of:
@@ -545,6 +544,7 @@ attributes:
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined_as_list: true
 
 </code></pre>

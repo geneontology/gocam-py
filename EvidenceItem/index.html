@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="https://geneontology.github.io/gocam-by/EvidenceItem/" rel="canonical"/>
 <link href="../assets/images/favicon.png" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-8.5.10" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-8.5.10" name="generator"/>
 <title>Class: EvidenceItem - gocam</title>
 <link href="../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
@@ -425,21 +425,21 @@ attributes:
     - with
     - with/from
     rank: 1000
-    multivalued: true
     domain_of:
     - EvidenceItem
     range: Object
+    multivalued: true
   provenances:
     name: provenances
     description: Provenance about the assertion, e.g. who made it
     from_schema: https://w3id.org/gocam
-    multivalued: true
     domain_of:
     - Model
     - Activity
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 
@@ -482,17 +482,16 @@ attributes:
     - with
     - with/from
     rank: 1000
-    multivalued: true
     alias: with_objects
     owner: EvidenceItem
     domain_of:
     - EvidenceItem
     range: Object
+    multivalued: true
   provenances:
     name: provenances
     description: Provenance about the assertion, e.g. who made it
     from_schema: https://w3id.org/gocam
-    multivalued: true
     alias: provenances
     owner: EvidenceItem
     domain_of:
@@ -501,6 +500,7 @@ attributes:
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 

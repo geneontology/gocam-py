@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="https://geneontology.github.io/gocam-by/EnabledByProteinComplexAssociation/" rel="canonical"/>
 <link href="../assets/images/favicon.png" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-8.5.10" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-8.5.10" name="generator"/>
 <title>Class: EnabledByProteinComplexAssociation - gocam</title>
 <link href="../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
@@ -336,10 +336,6 @@ is_a: EnabledByAssociation
 slot_usage:
   term:
     name: term
-    domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
     range: ProteinComplexTermObject
 attributes:
   members:
@@ -347,10 +343,10 @@ attributes:
     description: The gene products that are part of the complex
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     domain_of:
     - EnabledByProteinComplexAssociation
     range: GeneProductTermObject
+    multivalued: true
 
 </code></pre>
 </details>
@@ -363,10 +359,6 @@ is_a: EnabledByAssociation
 slot_usage:
   term:
     name: term
-    domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
     range: ProteinComplexTermObject
 attributes:
   members:
@@ -374,12 +366,12 @@ attributes:
     description: The gene products that are part of the complex
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: members
     owner: EnabledByProteinComplexAssociation
     domain_of:
     - EnabledByProteinComplexAssociation
     range: GeneProductTermObject
+    multivalued: true
   term:
     name: term
     description: The gene product or complex that carries out the activity
@@ -406,17 +398,16 @@ attributes:
     name: evidence
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: evidence
     owner: EnabledByProteinComplexAssociation
     domain_of:
     - Association
     range: EvidenceItem
+    multivalued: true
     inlined: true
   provenances:
     name: provenances
     from_schema: https://w3id.org/gocam
-    multivalued: true
     alias: provenances
     owner: EnabledByProteinComplexAssociation
     domain_of:
@@ -425,6 +416,7 @@ attributes:
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 

@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="https://geneontology.github.io/gocam-by/CellularAnatomicalEntityAssociation/" rel="canonical"/>
 <link href="../assets/images/favicon.png" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-8.5.10" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-8.5.10" name="generator"/>
 <title>Class: CellularAnatomicalEntityAssociation - gocam</title>
 <link href="../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
@@ -222,6 +222,15 @@
     click EvidenceItem href "../EvidenceItem"
 
 
+      CellularAnatomicalEntityAssociation : part_of
+
+
+
+
+    CellularAnatomicalEntityAssociation --&gt; "0..1" CellTypeAssociation : part_of
+    click CellTypeAssociation href "../CellTypeAssociation"
+
+
       CellularAnatomicalEntityAssociation : provenances
 
 
@@ -265,6 +274,12 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../part_of/">part_of</a></td>
+<td>0..1 <br/> <a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
+<td></td>
+<td>direct</td>
+</tr>
 <tr>
 <td><a href="../term/">term</a></td>
 <td>0..1 <br/> <a href="../CellularAnatomicalEntityTermObject/">CellularAnatomicalEntityTermObject</a></td>
@@ -345,13 +360,17 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
-    domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
     range: CellularAnatomicalEntityTermObject
+attributes:
   part_of:
     name: part_of
+    from_schema: https://w3id.org/gocam
+    domain_of:
+    - Activity
+    - BiologicalProcessAssociation
+    - CellularAnatomicalEntityAssociation
+    - CellTypeAssociation
+    - GrossAnatomyAssociation
     range: CellTypeAssociation
 
 </code></pre>
@@ -365,15 +384,20 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
-    domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
     range: CellularAnatomicalEntityTermObject
+attributes:
   part_of:
     name: part_of
+    from_schema: https://w3id.org/gocam
+    alias: part_of
+    owner: CellularAnatomicalEntityAssociation
+    domain_of:
+    - Activity
+    - BiologicalProcessAssociation
+    - CellularAnatomicalEntityAssociation
+    - CellTypeAssociation
+    - GrossAnatomyAssociation
     range: CellTypeAssociation
-attributes:
   term:
     name: term
     description: The ontology term that describes the nature of the association
@@ -400,17 +424,16 @@ attributes:
     name: evidence
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: evidence
     owner: CellularAnatomicalEntityAssociation
     domain_of:
     - Association
     range: EvidenceItem
+    multivalued: true
     inlined: true
   provenances:
     name: provenances
     from_schema: https://w3id.org/gocam
-    multivalued: true
     alias: provenances
     owner: CellularAnatomicalEntityAssociation
     domain_of:
@@ -419,6 +442,7 @@ attributes:
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 

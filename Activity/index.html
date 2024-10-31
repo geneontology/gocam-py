@@ -7,7 +7,7 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <link href="https://geneontology.github.io/gocam-by/Activity/" rel="canonical"/>
 <link href="../assets/images/favicon.png" rel="icon"/>
-<meta content="mkdocs-1.6.0, mkdocs-material-8.5.10" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-8.5.10" name="generator"/>
 <title>Class: Activity - gocam</title>
 <link href="../assets/stylesheets/main.975780f9.min.css" rel="stylesheet"/>
 <link href="../assets/stylesheets/palette.2505c338.min.css" rel="stylesheet"/>
@@ -500,6 +500,10 @@ attributes:
     rank: 1000
     domain_of:
     - Activity
+    - BiologicalProcessAssociation
+    - CellularAnatomicalEntityAssociation
+    - CellTypeAssociation
+    - GrossAnatomyAssociation
     range: BiologicalProcessAssociation
     inlined: true
   has_input:
@@ -507,10 +511,10 @@ attributes:
     description: The input molecules that are directly consumed by the activity
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     domain_of:
     - Activity
     range: MoleculeAssociation
+    multivalued: true
     inlined: true
     inlined_as_list: true
   has_primary_input:
@@ -527,10 +531,10 @@ attributes:
     description: The output molecules that are directly produced by the activity
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     domain_of:
     - Activity
     range: MoleculeAssociation
+    multivalued: true
     inlined: true
     inlined_as_list: true
   has_primary_output:
@@ -547,23 +551,23 @@ attributes:
     description: The causal associations that connect this activity to other activities
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     domain_of:
     - Activity
     range: CausalAssociation
+    multivalued: true
     inlined: true
     inlined_as_list: true
   provenances:
     name: provenances
     description: Provenance information for the activity
     from_schema: https://w3id.org/gocam
-    multivalued: true
     domain_of:
     - Model
     - Activity
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 
@@ -640,6 +644,10 @@ attributes:
     owner: Activity
     domain_of:
     - Activity
+    - BiologicalProcessAssociation
+    - CellularAnatomicalEntityAssociation
+    - CellTypeAssociation
+    - GrossAnatomyAssociation
     range: BiologicalProcessAssociation
     inlined: true
   has_input:
@@ -647,12 +655,12 @@ attributes:
     description: The input molecules that are directly consumed by the activity
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: has_input
     owner: Activity
     domain_of:
     - Activity
     range: MoleculeAssociation
+    multivalued: true
     inlined: true
     inlined_as_list: true
   has_primary_input:
@@ -671,12 +679,12 @@ attributes:
     description: The output molecules that are directly produced by the activity
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: has_output
     owner: Activity
     domain_of:
     - Activity
     range: MoleculeAssociation
+    multivalued: true
     inlined: true
     inlined_as_list: true
   has_primary_output:
@@ -695,19 +703,18 @@ attributes:
     description: The causal associations that connect this activity to other activities
     from_schema: https://w3id.org/gocam
     rank: 1000
-    multivalued: true
     alias: causal_associations
     owner: Activity
     domain_of:
     - Activity
     range: CausalAssociation
+    multivalued: true
     inlined: true
     inlined_as_list: true
   provenances:
     name: provenances
     description: Provenance information for the activity
     from_schema: https://w3id.org/gocam
-    multivalued: true
     alias: provenances
     owner: Activity
     domain_of:
@@ -716,6 +723,7 @@ attributes:
     - EvidenceItem
     - Association
     range: ProvenanceInfo
+    multivalued: true
     inlined: true
     inlined_as_list: true
 
