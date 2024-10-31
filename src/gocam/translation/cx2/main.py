@@ -201,6 +201,9 @@ def model_to_cx2(gocam: Model) -> list:
 
     # Add edges for causal associations between activity nodes
     for activity in gocam.activities:
+        if activity.causal_associations is None:
+            continue
+
         for association in activity.causal_associations:
             if association.downstream_activity in activity_nodes_by_activity_id:
                 relation_style = RELATIONS.get(association.predicate, None)
