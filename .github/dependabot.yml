@@ -1,0 +1,37 @@
+version: 2
+updates:
+  # `pip` is the ecosystem for Poetry projects
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      # Allow both direct and indirect updates for all packages
+      - dependency-type: "all"
+    assignees:
+      - "pkalita-lbl"
+    groups:
+      # Group all dependency updates together so that we have fewer PRs to manage
+      all-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"
+    labels:
+      - "poetry"
+      - "dependencies"
+    # Don't change the version specifiers in `pyproject.toml`, just update the lock file
+    versioning-strategy: lockfile-only
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "pkalita-lbl"
+    groups:
+      all-dependencies:
+        applies-to: version-updates
+        patterns:
+          - "*"
+    labels:
+      - "gh-actions"
+      - "dependencies"
