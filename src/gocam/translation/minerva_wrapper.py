@@ -322,6 +322,8 @@ class MinervaWrapper:
         for activity, term, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
+            if activity.has_input is None:
+                activity.has_input = []
             activity.has_input.append(MoleculeAssociation(term=term, evidence=evs))
 
         for activity, term, evs in _iter_activities_by_fact_subject(
@@ -333,6 +335,8 @@ class MinervaWrapper:
         for activity, term, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
+            if activity.has_output is None:
+                activity.has_output = []
             activity.has_output.append(MoleculeAssociation(term=term, evidence=evs))
 
         for activity, term, evs in _iter_activities_by_fact_subject(
@@ -366,6 +370,8 @@ class MinervaWrapper:
                     downstream_activity=object_activity.id,
                     evidence=evs,
                 )
+                if subject_activity.causal_associations is None:
+                    subject_activity.causal_associations = []
                 subject_activity.causal_associations.append(rel)
 
         annotations = _annotations(obj)

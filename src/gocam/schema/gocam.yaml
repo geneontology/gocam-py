@@ -238,42 +238,46 @@ classes:
   BiologicalProcessAssociation:
     description: An association between an activity and a biological process term
     is_a: TermAssociation
-    slot_usage:
-      term:
-        range: BiologicalProcessTermObject
+    attributes:
       happens_during:
         description: Optional extension describing where the BP takes place
         range: PhaseTermObject
       part_of:
         description: Optional extension allowing hierarchical nesting of BPs
         range: BiologicalProcessTermObject
+    slot_usage:
+      term:
+        range: BiologicalProcessTermObject
 
   CellularAnatomicalEntityAssociation:
     description: An association between an activity and a cellular anatomical entity term
     is_a: TermAssociation
+    attributes:
+      part_of:
+        range: CellTypeAssociation
     slot_usage:
       term:
         range: CellularAnatomicalEntityTermObject
-      part_of:
-        range: CellTypeAssociation
 
   CellTypeAssociation:
     description: An association between an activity and a cell type term
     is_a: TermAssociation
+    attributes:
+      part_of:
+        range: GrossAnatomyAssociation
     slot_usage:
       term:
         range: CellTypeTermObject
-      part_of:
-        range: GrossAnatomyAssociation
 
   GrossAnatomyAssociation:
     description: An association between an activity and a gross anatomical structure term
     is_a: TermAssociation
+    attributes:
+      part_of:
+        range: GrossAnatomyAssociation
     slot_usage:
       term:
         range: GrossAnatomicalStructureTermObject
-      part_of:
-        range: GrossAnatomyAssociation
 
   MoleculeAssociation:
     description: An association between an activity and a molecule term
