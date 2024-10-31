@@ -193,7 +193,7 @@ $(PYMODEL):
 	mkdir -p $@
 
 $(PYDANTIC): $(SOURCE_SCHEMA_PATH)
-	$(RUN) gen-pydantic --pydantic-version 2 $< > $@.tmp && mv $@.tmp $@
+	$(RUN) linkml generate pydantic $< > $@.tmp && mv $@.tmp $@
 
 $(DOCDIR):
 	mkdir -p $@
