@@ -9,8 +9,10 @@ from ndex2.cx2 import CX2Network
 
 from gocam.datamodel import (
     EnabledByProteinComplexAssociation,
+    EvidenceItem,
     Model,
     MoleculeAssociation,
+    TermAssociation,
 )
 from gocam.translation.cx2.style import (
     RELATIONS,
@@ -58,6 +60,10 @@ def _get_context():
     return prefixmaps.load_context("go")
 
 
+def _format_link(url: str, label: str) -> str:
+    return f'<a href="{url}" target="_blank" rel="noopener noreferrer">{label}</a>'
+
+
 # Regex from
 # https://github.com/ndexbio/ndex-enrichment-rest/wiki/Enrichment-network-structure#via-node-attributes-preferred-method
 IQUERY_GENE_SYMBOL_PATTERN = re.compile("(^[A-Z][A-Z0-9-]*$)|(^C[0-9]+orf[0-9]+$)")
@@ -69,10 +75,47 @@ def model_to_cx2(gocam: Model) -> list:
     activity_nodes_by_activity_id: Dict[str, int] = {}
     activity_nodes_by_enabled_by_id: Dict[str, int] = {}
 
+    go_context = _get_context()
+    go_converter = go_context.as_converter()
+
     # Internal helper functions that access internal state
+    @cache
     def _get_object_label(object_id: str) -> str:
         object = next((obj for obj in gocam.objects if obj.id == object_id), None)
         return _remove_species_code_suffix(object.label) if object is not None else ""
+
+    def _format_evidence_list(evidence_list: List[EvidenceItem]) -> str:
+        """Format a list of evidence items as an HTML unordered list."""
+        evidence_list_items = []
+        for e in evidence_list:
+            reference_link = _format_link(go_converter.expand(e.reference), e.reference)
+            term_link = _format_link(
+                go_converter.expand(e.term), _get_object_label(e.term)
+            )
+            evidence_item = f"{reference_link} ({term_link})"
+            if e.with_objects:
+                with_objects = ", ".join(
+                    _format_link(go_converter.expand(o), o) for o in e.with_objects
+                )
+                evidence_item += f" with/from {with_objects}"
+            evidence_list_items.append(f"<li>{evidence_item}</li>")
+        return f'<ul style="padding-inline-start: 1rem">{"".join(evidence_list_items)}</ul>'
+
+    def _format_term_association(term_association: TermAssociation) -> str:
+        """Format a term association as an HTML link to the term with evidence list."""
+        term_id = term_association.term
+        term_label = _get_object_label(term_id)
+        term_url = go_converter.expand(term_id)
+        term_link = _format_link(term_url, f"{term_label} [{term_id}]")
+        evidence_list = _format_evidence_list(term_association.evidence)
+
+        return f"""
+{term_link}<br>
+<div style="font-size: smaller; display: block; margin-inline-start: 1rem">
+  Evidence:
+  {evidence_list}
+</div>
+        """
 
     def _add_input_output_nodes(
         associations: Optional[Union[MoleculeAssociation, List[MoleculeAssociation]]],
@@ -94,13 +137,10 @@ def model_to_cx2(gocam: Model) -> list:
                     "type": NodeType.MOLECULE.value,
                 }
 
-                if association.provenances:
-                    node_attributes["provenance"] = [
-                        p.contributor for p in association.provenances
-                    ]
-
                 target = cx2_network.add_node(attributes=node_attributes)
                 input_output_nodes[association.term] = target
+
+            edge_attributes["Evidence"] = _format_evidence_list(association.evidence)
 
             cx2_network.add_edge(
                 source=activity_nodes_by_activity_id[activity.id],
@@ -109,8 +149,6 @@ def model_to_cx2(gocam: Model) -> list:
             )
 
     # Create the CX2 network and set network-level attributes
-    go_context = _get_context()
-    go_converter = go_context.as_converter()
     cx2_network = CX2Network()
     cx2_network.set_network_attributes(
         {
@@ -158,25 +196,15 @@ def model_to_cx2(gocam: Model) -> list:
                 node_attributes["member"].append(member_name)
 
         if activity.molecular_function:
-            node_attributes["molecular_function_id"] = activity.molecular_function.term
-            node_attributes["molecular_function_label"] = _get_object_label(
-                activity.molecular_function.term
+            node_attributes["Molecular Function"] = _format_term_association(
+                activity.molecular_function
             )
 
         if activity.occurs_in:
-            node_attributes["occurs_in_id"] = activity.occurs_in.term
-            node_attributes["occurs_in_label"] = _get_object_label(
-                activity.occurs_in.term
-            )
+            node_attributes["Occurs In"] = _format_term_association(activity.occurs_in)
 
         if activity.part_of:
-            node_attributes["part_of_id"] = activity.part_of.term
-            node_attributes["part_of_label"] = _get_object_label(activity.part_of.term)
-
-        if activity.provenances:
-            node_attributes["provenance"] = [
-                p.contributor for p in activity.provenances
-            ]
+            node_attributes["Part Of"] = _format_term_association(activity.part_of)
 
         node = cx2_network.add_node(attributes=node_attributes)
         activity_nodes_by_activity_id[activity.id] = node
@@ -222,12 +250,9 @@ def model_to_cx2(gocam: Model) -> list:
                 }
 
                 if association.evidence:
-                    edge_attributes["evidence"] = [e.term for e in association.evidence]
-
-                if association.provenances:
-                    edge_attributes["provenance"] = [
-                        p.contributor for p in association.provenances
-                    ]
+                    edge_attributes["Evidence"] = _format_evidence_list(
+                        association.evidence
+                    )
 
                 cx2_network.add_edge(
                     source=activity_nodes_by_activity_id[activity.id],
