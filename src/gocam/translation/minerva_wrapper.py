@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import DefaultDict, Dict, Iterator, List, Optional, Set, Tuple
+from typing import DefaultDict, Dict, Iterator, List, Optional, Tuple
 
 import requests
 import yaml
@@ -74,19 +74,14 @@ def _setattr_with_warning(obj, attr, value):
     setattr(obj, attr, value)
 
 
-MAIN_TYPES = [
-    "molecular_function",
-    "biological_process",
-    "cellular_component",
-    "information biomacromolecule",
-    "evidence",
-    "chemical entity",
-    "anatomical entity",
-]
-
-COMPLEX_TYPES = [
-    "protein-containing complex",
-]
+MOLECULAR_FUNCTION = "GO:0003674"
+BIOLOGICAL_PROCESS = "GO:0008150"
+CELLULAR_COMPONENT = "GO:0005575"
+INFORMATION_BIOMACROMOLECULE = "CHEBI:33695"
+PROTEIN_CONTAINING_COMPLEX = "GO:0032991"
+EVIDENCE = "ECO:0000000"
+CHEMICAL_ENTITY = "CHEBI:24431"
+ANATOMICAL_ENTITY = "UBERON:0001062"
 
 
 @dataclass
@@ -176,25 +171,13 @@ class MinervaWrapper:
         # Bookkeeping variables
 
         # individual ID to "root" type / category, e.g Evidence, BP
-        individual_to_type: Dict[str, Optional[str]] = {}
+        individual_to_root_types: Dict[str, List[str]] = {}
         individual_to_term: Dict[str, str] = {}
         individual_to_annotations: Dict[str, Dict] = {}
-        complex_individuals: Set[str] = set()
-        id2obj: Dict[str, Dict] = {}
+        objects_by_id: Dict[str, Dict] = {}
         activities: List[Activity] = []
         activities_by_mf_id: DefaultDict[str, List[Activity]] = defaultdict(list)
         facts_by_property: DefaultDict[str, List[Dict]] = defaultdict(list)
-
-        def _cls(obj: Dict) -> Optional[str]:
-            if obj.get("type", None) == "complement":
-                logger.warning(f"Ignoring Complement: {obj}")
-                # class expression representing NOT
-                return None
-            if "id" not in obj:
-                raise ValueError(f"No ID for {obj}")
-            id = obj["id"]
-            id2obj[id] = obj
-            return id
 
         def _evidence_from_fact(fact: Dict) -> List[EvidenceItem]:
             anns_mv = _annotations_multivalued(fact)
@@ -227,41 +210,40 @@ class MinervaWrapper:
             fact_property: str,
         ) -> Iterator[Tuple[Activity, str, List[EvidenceItem]]]:
             for fact in facts_by_property.get(fact_property, []):
-                s, o = fact["subject"], fact["object"]
-                if o not in individual_to_term:
-                    logger.warning(f"Missing {o} in {individual_to_term}")
+                subject, object_ = fact["subject"], fact["object"]
+                if object_ not in individual_to_term:
+                    logger.warning(f"Missing {object_} in {individual_to_term}")
                     continue
-                for activity in activities_by_mf_id.get(s, []):
+                for activity in activities_by_mf_id.get(subject, []):
                     evs = _evidence_from_fact(fact)
-                    yield activity, individual_to_term[o], evs
+                    yield activity, object_, evs
+
+        def _has_molecule_root_type(individual_id: str) -> bool:
+            root_types = individual_to_root_types.get(individual_id, [])
+            return (
+                CHEMICAL_ENTITY in root_types
+                and INFORMATION_BIOMACROMOLECULE not in root_types
+            )
 
         for individual in obj["individuals"]:
-            typs = [x["label"] for x in individual.get("root-type", []) if x]
-            typ: Optional[str] = None
-            for t in typs:
-                if t in MAIN_TYPES:
-                    typ = t
-                    break
-            if not typ:
-                logger.warning(f"Could not find type for {individual}")
-                continue
-            individual_to_type[individual["id"]] = typ
+            root_types = [x["id"] for x in individual.get("root-type", []) if x]
+            individual_to_root_types[individual["id"]] = root_types
 
-            # Check to see if one of the types is a complex type
-            for t in typs:
-                if t in COMPLEX_TYPES:
-                    complex_individuals.add(individual["id"])
-                    break
+            term_id: Optional[str] = None
+            for type_ in individual.get("type", []):
+                if type_.get("type") == "complement":
+                    # class expression representing NOT
+                    continue
+                type_id = type_.get("id")
+                if type_id is None:
+                    continue
+                objects_by_id[type_id] = type_
+                term_id = type_id
 
-            terms = list(filter(None, (_cls(x) for x in individual.get("type", []))))
-            if len(terms) > 1:
-                logger.warning(f"Multiple terms for {individual}: {terms}")
-            if not terms:
-                logger.warning(f"No terms for {individual}")
-                continue
-            individual_to_term[individual["id"]] = terms[0]
-            anns = _annotations(individual)
-            individual_to_annotations[individual["id"]] = anns
+            individual_to_term[individual["id"]] = term_id
+            if "annotations" in individual:
+                anns = _annotations(individual)
+                individual_to_annotations[individual["id"]] = anns
 
         for fact in obj["facts"]:
             facts_by_property[fact["property"]].append(fact)
@@ -270,22 +252,23 @@ class MinervaWrapper:
         if not enabled_by_facts:
             raise ValueError(f"Missing {ENABLED_BY} in {facts_by_property}")
         for fact in enabled_by_facts:
-            s, o = fact["subject"], fact["object"]
-            if s not in individual_to_term:
-                logger.warning(f"Missing {s} in {individual_to_term}")
+            subject, object_ = fact["subject"], fact["object"]
+            if subject not in individual_to_term:
+                logger.warning(f"Missing {subject} in {individual_to_term}")
                 continue
-            if o not in individual_to_term:
-                logger.warning(f"Missing {o} in {individual_to_term}")
+            if object_ not in individual_to_term:
+                logger.warning(f"Missing {object_} in {individual_to_term}")
                 continue
-            gene_id = individual_to_term[o]
+            gene_id = individual_to_term[object_]
+            root_types = individual_to_root_types.get(object_, [])
 
             evs = _evidence_from_fact(fact)
             enabled_by_association: EnabledByAssociation
-            if o in complex_individuals:
+            if PROTEIN_CONTAINING_COMPLEX in root_types:
                 has_part_facts = [
                     fact
                     for fact in facts_by_property.get(HAS_PART, [])
-                    if fact["subject"] == o
+                    if fact["subject"] == object_
                 ]
                 members = [
                     individual_to_term[fact["object"]]
@@ -295,72 +278,95 @@ class MinervaWrapper:
                 enabled_by_association = EnabledByProteinComplexAssociation(
                     term=gene_id, members=members
                 )
-            else:
+            elif INFORMATION_BIOMACROMOLECULE in root_types:
                 enabled_by_association = EnabledByGeneProductAssociation(term=gene_id)
+            else:
+                continue
+
             activity = Activity(
-                id=s,
+                id=subject,
                 enabled_by=enabled_by_association,
                 molecular_function=MolecularFunctionAssociation(
-                    term=individual_to_term[s], evidence=evs
+                    term=individual_to_term[subject], evidence=evs
                 ),
             )
             activities.append(activity)
-            activities_by_mf_id[s].append(activity)
+            activities_by_mf_id[subject].append(activity)
 
-        for activity, term, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=PART_OF
         ):
-            association = BiologicalProcessAssociation(term=term, evidence=evs)
+            association = BiologicalProcessAssociation(
+                term=individual_to_term[individual], evidence=evs
+            )
             _setattr_with_warning(activity, "part_of", association)
 
-        for activity, term, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=OCCURS_IN
         ):
-            association = CellularAnatomicalEntityAssociation(term=term, evidence=evs)
+            association = CellularAnatomicalEntityAssociation(
+                term=individual_to_term[individual], evidence=evs
+            )
             _setattr_with_warning(activity, "occurs_in", association)
 
-        for activity, term, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
+            if not _has_molecule_root_type(individual):
+                continue
             if activity.has_input is None:
                 activity.has_input = []
-            activity.has_input.append(MoleculeAssociation(term=term, evidence=evs))
+            activity.has_input.append(
+                MoleculeAssociation(term=individual_to_term[individual], evidence=evs)
+            )
 
-        for activity, term, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_INPUT
         ):
-            association = MoleculeAssociation(term=term, evidence=evs)
+            if not _has_molecule_root_type(individual):
+                continue
+            association = MoleculeAssociation(
+                term=individual_to_term[individual], evidence=evs
+            )
             _setattr_with_warning(activity, "has_primary_input", association)
 
-        for activity, term, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
+            if not _has_molecule_root_type(individual):
+                continue
             if activity.has_output is None:
                 activity.has_output = []
-            activity.has_output.append(MoleculeAssociation(term=term, evidence=evs))
+            activity.has_output.append(
+                MoleculeAssociation(term=individual_to_term[individual], evidence=evs)
+            )
 
-        for activity, term, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_OUTPUT
         ):
-            association = MoleculeAssociation(term=term, evidence=evs)
+            if not _has_molecule_root_type(individual):
+                continue
+            association = MoleculeAssociation(
+                term=individual_to_term[individual], evidence=evs
+            )
             _setattr_with_warning(activity, "has_primary_output", association)
 
         for fact_property, facts in facts_by_property.items():
             for fact in facts:
-                s, o = fact["subject"], fact["object"]
-                subject_activities = activities_by_mf_id.get(s, [])
-                object_activities = activities_by_mf_id.get(o, [])
+                subject, object_ = fact["subject"], fact["object"]
+                subject_activities = activities_by_mf_id.get(subject, [])
+                object_activities = activities_by_mf_id.get(object_, [])
 
                 if not subject_activities or not object_activities:
                     continue
-                if individual_to_type.get(s, None) != "molecular_function":
+                if MOLECULAR_FUNCTION not in individual_to_root_types.get(subject, []):
                     continue
-                if individual_to_type.get(o, None) != "molecular_function":
+                if MOLECULAR_FUNCTION not in individual_to_root_types.get(object_, []):
                     continue
                 if len(subject_activities) > 1:
-                    logger.warning(f"Multiple activities for subject: {s}")
+                    logger.warning(f"Multiple activities for subject: {subject}")
                 if len(object_activities) > 1:
-                    logger.warning(f"Multiple activities for object: {o}")
+                    logger.warning(f"Multiple activities for object: {object_}")
 
                 subject_activity = subject_activities[0]
                 object_activity = object_activities[0]
@@ -376,7 +382,14 @@ class MinervaWrapper:
 
         annotations = _annotations(obj)
         annotations_mv = _annotations_multivalued(obj)
-        objs = [Object(id=obj["id"], label=obj["label"]) for obj in id2obj.values()]
+
+        objects: List[Object] = []
+        for obj in objects_by_id.values():
+            object_ = Object(id=obj["id"])
+            if "label" in obj:
+                object_.label = obj["label"]
+            objects.append(object_)
+
         cam = Model(
             id=id,
             title=annotations["title"],
@@ -384,6 +397,6 @@ class MinervaWrapper:
             comments=annotations_mv.get("comment", None),
             taxon=annotations.get("in_taxon", None),
             activities=activities,
-            objects=objs,
+            objects=objects,
         )
         return cam
