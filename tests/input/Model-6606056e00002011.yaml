@@ -7,8 +7,6 @@ activities:
 - id: gomodel:6606056e00002011/662af8fa00002857
   enabled_by:
     type: EnabledByProteinComplexAssociation
-    evidence: []
-    provenances: []
     term: GO:0019815
     members:
     - UniProtKB:P40259
@@ -23,7 +21,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-05-07'
-    provenances: []
     term: GO:0004888
   occurs_in:
     type: CellularAnatomicalEntityAssociation
@@ -33,7 +30,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-05-07'
-    provenances: []
     term: GO:0005886
   part_of:
     type: BiologicalProcessAssociation
@@ -45,21 +41,7 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-05-07'
-    provenances: []
     term: GO:0050853
-  has_input:
-  - type: MoleculeAssociation
-    evidence:
-    - term: ECO:0000250
-      reference: GO_REF:0000024
-      with_objects:
-      - MGI:96892
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
-        date: '2024-05-07'
-    provenances: []
-    term: UniProtKB:P07948
-  has_output: []
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -70,15 +52,11 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-05-07'
-    provenances: []
     predicate: RO:0002629
     downstream_activity: gomodel:6606056e00002011/6606056e00002040
-  provenances: []
 - id: gomodel:6606056e00002011/6606056e00002049
   enabled_by:
     type: EnabledByGeneProductAssociation
-    evidence: []
-    provenances: []
     term: UniProtKB:P29350
   molecular_function:
     type: MolecularFunctionAssociation
@@ -88,7 +66,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0004725
   occurs_in:
     type: CellularAnatomicalEntityAssociation
@@ -98,7 +75,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0005737
   part_of:
     type: BiologicalProcessAssociation
@@ -108,17 +84,10 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0050859
-  has_input: []
-  has_output: []
-  causal_associations: []
-  provenances: []
 - id: gomodel:6606056e00002011/6606056e00002040
   enabled_by:
     type: EnabledByGeneProductAssociation
-    evidence: []
-    provenances: []
     term: UniProtKB:P07948
   molecular_function:
     type: MolecularFunctionAssociation
@@ -128,7 +97,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0004713
   occurs_in:
     type: CellularAnatomicalEntityAssociation
@@ -138,7 +106,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0005886
   part_of:
     type: BiologicalProcessAssociation
@@ -150,21 +117,7 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0001782
-  has_input:
-  - type: MoleculeAssociation
-    evidence:
-    - term: ECO:0000250
-      reference: GO_REF:0000024
-      with_objects:
-      - MGI:96892
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
-        date: '2024-05-07'
-    provenances: []
-    term: UniProtKB:P21854
-  has_output: []
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -173,15 +126,11 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     predicate: RO:0002629
     downstream_activity: gomodel:6606056e00002011/6606056e00002014
-  provenances: []
 - id: gomodel:6606056e00002011/6606056e00002014
   enabled_by:
     type: EnabledByGeneProductAssociation
-    evidence: []
-    provenances: []
     term: UniProtKB:P21854
   molecular_function:
     type: MolecularFunctionAssociation
@@ -191,7 +140,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0004888
   occurs_in:
     type: CellularAnatomicalEntityAssociation
@@ -201,7 +149,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0005886
   part_of:
     type: BiologicalProcessAssociation
@@ -211,10 +158,7 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     term: GO:0050859
-  has_input: []
-  has_output: []
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -223,10 +167,8 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
-    provenances: []
     predicate: RO:0002629
     downstream_activity: gomodel:6606056e00002011/6606056e00002049
-  provenances: []
 objects:
 - id: GO:0005615
   label: extracellular space
@@ -282,5 +224,4 @@ objects:
 - id: CHEBI:166824
   label: peptide antigen
   type: gocam:Object
-provenances: []
 

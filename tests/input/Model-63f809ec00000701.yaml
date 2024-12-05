@@ -5,41 +5,9 @@ title: tRNA repair and recycling by ANKZF1, ELAC1 and TRNT1 following activity o
 taxon: NCBITaxon:9606
 status: production
 activities:
-- id: gomodel:63f809ec00000701/63f809ec00000742
-  enabled_by:
-    type: EnabledByGeneProductAssociation
-    evidence: []
-    provenances: []
-    term: UniProtKB:Q96Q11
-  molecular_function:
-    type: MolecularFunctionAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:32075755
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-    provenances: []
-    term: GO:0004810
-  part_of:
-    type: BiologicalProcessAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:32075755
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-    provenances: []
-    term: GO:0001680
-  has_input: []
-  has_output: []
-  causal_associations: []
-  provenances: []
 - id: gomodel:63f809ec00000701/63f809ec00000726
   enabled_by:
     type: EnabledByGeneProductAssociation
-    evidence: []
-    provenances: []
     term: UniProtKB:Q9H8Y5
   molecular_function:
     type: MolecularFunctionAssociation
@@ -49,7 +17,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: GO:0004521
   part_of:
     type: BiologicalProcessAssociation
@@ -59,9 +26,7 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: GO:0072344
-  has_input: []
   has_output:
   - type: MoleculeAssociation
     evidence:
@@ -70,7 +35,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: CHEBI:10668
   causal_associations:
   - type: CausalAssociation
@@ -80,15 +44,33 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     predicate: RO:0002629
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000735
-  provenances: []
+- id: gomodel:63f809ec00000701/63f809ec00000742
+  enabled_by:
+    type: EnabledByGeneProductAssociation
+    term: UniProtKB:Q96Q11
+  molecular_function:
+    type: MolecularFunctionAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:32075755
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+    term: GO:0004810
+  part_of:
+    type: BiologicalProcessAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:32075755
+      provenances:
+      - contributor: https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+    term: GO:0001680
 - id: gomodel:63f809ec00000701/63f809ec00000735
   enabled_by:
     type: EnabledByGeneProductAssociation
-    evidence: []
-    provenances: []
     term: UniProtKB:Q9H777
   molecular_function:
     type: MolecularFunctionAssociation
@@ -98,7 +80,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: GO:0004549
   part_of:
     type: BiologicalProcessAssociation
@@ -108,7 +89,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: GO:0042780
   has_input:
   - type: MoleculeAssociation
@@ -118,9 +98,7 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: CHEBI:10668
-  has_output: []
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -129,15 +107,11 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     predicate: RO:0002629
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000742
-  provenances: []
 - id: gomodel:63f809ec00000701/63f809ec00000706
   enabled_by:
     type: EnabledByGeneProductAssociation
-    evidence: []
-    provenances: []
     term: UniProtKB:O60524
   molecular_function:
     type: MolecularFunctionAssociation
@@ -147,7 +121,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: GO:1904678
   occurs_in:
     type: CellularAnatomicalEntityAssociation
@@ -157,7 +130,6 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: GO:0022626
   part_of:
     type: BiologicalProcessAssociation
@@ -167,19 +139,7 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
-    provenances: []
     term: GO:0140708
-  has_input:
-  - type: MoleculeAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:33909987
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-    provenances: []
-    term: CHEBI:17732
-  has_output: []
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -188,10 +148,8 @@ activities:
       provenances:
       - contributor: https://orcid.org/0000-0001-7299-6685
         date: '2023-03-02'
-    provenances: []
     predicate: RO:0002304
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000726
-  provenances: []
 objects:
 - id: GO:1904678
   label: alpha-aminoacyl-tRNA binding
@@ -241,5 +199,4 @@ objects:
 - id: GO:0001680
   label: tRNA 3'-terminal CCA addition
   type: gocam:Object
-provenances: []
 
