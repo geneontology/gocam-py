@@ -95,10 +95,7 @@ def model_to_cx2(gocam: Model, *, validate_iquery_gene_symbol_pattern=True) -> l
         evidence_list_items = []
         for e in evidence_list:
             reference_link = _format_link(go_converter.expand(e.reference), e.reference)
-            term_link = _format_link(
-                go_converter.expand(e.term), _get_object_label(e.term)
-            )
-            evidence_item = f"{reference_link} ({term_link})"
+            evidence_item = f"{reference_link} ({_get_object_label(e.term)})"
             if e.with_objects:
                 with_objects = ", ".join(
                     _format_link(go_converter.expand(o), o) for o in e.with_objects
