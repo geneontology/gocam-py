@@ -44,6 +44,12 @@ class NodeType(str, Enum):
     MOLECULE = "molecule"
 
 
+class NodeShape(str, Enum):
+    ELLIPSE = "ellipse"
+    OCTAGON = "octagon"
+    ROUND_RECTANGLE = "round-rectangle"
+
+
 @dataclass
 class RelationStyle:
     line_style: LineStyle
@@ -51,6 +57,16 @@ class RelationStyle:
     label: str
     color: Color
     width: Width
+
+
+@dataclass
+class NodeStyle:
+    color: Color
+    height: int
+    label_font_size: int
+    label_max_width: int
+    shape: NodeShape
+    width: int
 
 
 RELATIONS = {
@@ -242,6 +258,33 @@ RELATIONS = {
         label="removes input for",
         color=Color.DARK_SLATE_BLUE,
         width=Width.INDIRECT,
+    ),
+}
+
+NODE_STYLES = {
+    NodeType.GENE: NodeStyle(
+        color=Color.PALE_LAVENDER,
+        height=40,
+        label_font_size=12,
+        label_max_width=80,
+        shape=NodeShape.ELLIPSE,
+        width=85,
+    ),
+    NodeType.COMPLEX: NodeStyle(
+        color=Color.LIGHT_GRAY,
+        height=70,
+        label_font_size=15,
+        label_max_width=100,
+        shape=NodeShape.OCTAGON,
+        width=110,
+    ),
+    NodeType.MOLECULE: NodeStyle(
+        color=Color.PALE_AQUA,
+        height=40,
+        label_font_size=10,
+        label_max_width=70,
+        shape=NodeShape.ROUND_RECTANGLE,
+        width=70,
     ),
 }
 
@@ -467,9 +510,7 @@ VISUAL_PROPERTIES = {
             "definition": {
                 "attribute": "type",
                 "map": [
-                    {"v": NodeType.GENE, "vp": Color.PALE_LAVENDER},
-                    {"v": NodeType.COMPLEX, "vp": Color.LIGHT_GRAY},
-                    {"v": NodeType.MOLECULE, "vp": Color.PALE_AQUA},
+                    {"v": key, "vp": value.color} for key, value in NODE_STYLES.items()
                 ],
                 "type": "string",
             },
@@ -479,8 +520,7 @@ VISUAL_PROPERTIES = {
             "definition": {
                 "attribute": "type",
                 "map": [
-                    {"v": NodeType.GENE, "vp": 40},
-                    {"v": NodeType.COMPLEX, "vp": 70},
+                    {"v": key, "vp": value.height} for key, value in NODE_STYLES.items()
                 ],
                 "type": "string",
             },
@@ -494,8 +534,7 @@ VISUAL_PROPERTIES = {
             "definition": {
                 "attribute": "type",
                 "map": [
-                    {"v": NodeType.COMPLEX, "vp": 15},
-                    {"v": NodeType.MOLECULE, "vp": 10},
+                    {"v": key, "vp": value.label_font_size} for key, value in NODE_STYLES.items()
                 ],
                 "type": "integer",
             },
@@ -505,9 +544,7 @@ VISUAL_PROPERTIES = {
             "definition": {
                 "attribute": "type",
                 "map": [
-                    {"v": NodeType.GENE, "vp": 80},
-                    {"v": NodeType.COMPLEX, "vp": 100},
-                    {"v": NodeType.MOLECULE, "vp": 70},
+                    {"v": key, "vp": value.label_max_width} for key, value in NODE_STYLES.items()
                 ],
                 "type": "integer",
             },
@@ -517,8 +554,7 @@ VISUAL_PROPERTIES = {
             "definition": {
                 "attribute": "type",
                 "map": [
-                    {"v": NodeType.GENE, "vp": "ellipse"},
-                    {"v": NodeType.COMPLEX, "vp": "octagon"},
+                    {"v": key, "vp": value.shape} for key, value in NODE_STYLES.items()
                 ],
                 "type": "string",
             },
@@ -528,9 +564,7 @@ VISUAL_PROPERTIES = {
             "definition": {
                 "attribute": "type",
                 "map": [
-                    {"v": NodeType.GENE, "vp": 85},
-                    {"v": NodeType.COMPLEX, "vp": 110},
-                    {"v": NodeType.MOLECULE, "vp": 70},
+                    {"v": key, "vp": value.width} for key, value in NODE_STYLES.items()
                 ],
                 "type": "integer",
             },
