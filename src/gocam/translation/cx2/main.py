@@ -75,7 +75,7 @@ def _format_link(url: str, label: str) -> str:
 IQUERY_GENE_SYMBOL_PATTERN = re.compile("(^[A-Z][A-Z0-9-]*$)|(^C[0-9]+orf[0-9]+$)")
 
 
-def model_to_cx2(gocam: Model) -> list:
+def model_to_cx2(gocam: Model, *, validate_iquery_gene_symbol_pattern=True) -> list:
     # Internal state
     input_output_nodes: Dict[str, int] = {}
     activity_nodes_by_activity_id: Dict[str, int] = {}
@@ -95,10 +95,7 @@ def model_to_cx2(gocam: Model) -> list:
         evidence_list_items = []
         for e in evidence_list:
             reference_link = _format_link(go_converter.expand(e.reference), e.reference)
-            term_link = _format_link(
-                go_converter.expand(e.term), _get_object_label(e.term)
-            )
-            evidence_item = f"{reference_link} ({term_link})"
+            evidence_item = f"{reference_link} ({_get_object_label(e.term)})"
             if e.with_objects:
                 with_objects = ", ".join(
                     _format_link(go_converter.expand(o), o) for o in e.with_objects
@@ -179,7 +176,8 @@ def model_to_cx2(gocam: Model) -> list:
 
         node_name = _get_object_label(activity.enabled_by.term)
         if (
-            node_type == NodeType.GENE
+            validate_iquery_gene_symbol_pattern
+            and node_type == NodeType.GENE
             and IQUERY_GENE_SYMBOL_PATTERN.match(node_name) is None
         ):
             logger.warning(
@@ -196,7 +194,10 @@ def model_to_cx2(gocam: Model) -> list:
             node_attributes["member"] = []
             for member in activity.enabled_by.members:
                 member_name = _get_object_label(member)
-                if IQUERY_GENE_SYMBOL_PATTERN.match(member_name) is None:
+                if (
+                    validate_iquery_gene_symbol_pattern
+                    and IQUERY_GENE_SYMBOL_PATTERN.match(member_name) is None
+                ):
                     logger.warning(
                         f"Name for complex member does not match expected pattern: {member_name}"
                     )
