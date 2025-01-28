@@ -555,13 +555,13 @@
         "http://example.org/UNKNOWN/rdfs/comment"
       ],
       "slot_uri": "http://example.org/UNKNOWN/rdfs/comment",
-      "multivalued": true,
       "alias": "comments",
       "owner": "Model",
       "domain_of": [
         "Model"
       ],
       "range": "string",
+      "multivalued": true,
       "@type": "SlotDefinition"
     },
     {
@@ -569,13 +569,13 @@
       "description": "All of the activities that are part of the model",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/activities",
-      "multivalued": true,
       "alias": "activities",
       "owner": "Model",
       "domain_of": [
         "Model"
       ],
       "range": "Activity",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -585,13 +585,13 @@
       "description": "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/objects",
-      "multivalued": true,
       "alias": "objects",
       "owner": "Model",
       "domain_of": [
         "Model"
       ],
       "range": "Object",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -601,13 +601,13 @@
       "description": "Model-level provenance information",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/provenances",
-      "multivalued": true,
       "alias": "provenances",
       "owner": "Model",
       "domain_of": [
         "Model"
       ],
       "range": "ProvenanceInfo",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -694,13 +694,13 @@
       "description": "The input molecules that are directly consumed by the activity",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/has_input",
-      "multivalued": true,
       "alias": "has_input",
       "owner": "Activity",
       "domain_of": [
         "Activity"
       ],
       "range": "MoleculeAssociation",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -724,13 +724,13 @@
       "description": "The output molecules that are directly produced by the activity",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/has_output",
-      "multivalued": true,
       "alias": "has_output",
       "owner": "Activity",
       "domain_of": [
         "Activity"
       ],
       "range": "MoleculeAssociation",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -754,13 +754,13 @@
       "description": "The causal associations that connect this activity to other activities",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/causal_associations",
-      "multivalued": true,
       "alias": "causal_associations",
       "owner": "Activity",
       "domain_of": [
         "Activity"
       ],
       "range": "CausalAssociation",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -770,13 +770,13 @@
       "description": "Provenance information for the activity",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/provenances",
-      "multivalued": true,
       "alias": "provenances",
       "owner": "Activity",
       "domain_of": [
         "Activity"
       ],
       "range": "ProvenanceInfo",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -816,13 +816,13 @@
         "with/from"
       ],
       "slot_uri": "https://w3id.org/gocam/with_objects",
-      "multivalued": true,
       "alias": "with_objects",
       "owner": "EvidenceItem",
       "domain_of": [
         "EvidenceItem"
       ],
       "range": "Object",
+      "multivalued": true,
       "@type": "SlotDefinition"
     },
     {
@@ -830,13 +830,13 @@
       "description": "Provenance about the assertion, e.g. who made it",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/provenances",
-      "multivalued": true,
       "alias": "provenances",
       "owner": "EvidenceItem",
       "domain_of": [
         "EvidenceItem"
       ],
       "range": "ProvenanceInfo",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -858,13 +858,13 @@
       "name": "association__evidence",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/evidence",
-      "multivalued": true,
       "alias": "evidence",
       "owner": "Association",
       "domain_of": [
         "Association"
       ],
       "range": "EvidenceItem",
+      "multivalued": true,
       "inlined": true,
       "@type": "SlotDefinition"
     },
@@ -872,13 +872,13 @@
       "name": "association__provenances",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/provenances",
-      "multivalued": true,
       "alias": "provenances",
       "owner": "Association",
       "domain_of": [
         "Association"
       ],
       "range": "ProvenanceInfo",
+      "multivalued": true,
       "inlined": true,
       "inlined_as_list": true,
       "@type": "SlotDefinition"
@@ -901,13 +901,13 @@
       "description": "The gene products that are part of the complex",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/members",
-      "multivalued": true,
       "alias": "members",
       "owner": "EnabledByProteinComplexAssociation",
       "domain_of": [
         "EnabledByProteinComplexAssociation"
       ],
       "range": "GeneProductTermObject",
+      "multivalued": true,
       "@type": "SlotDefinition"
     },
     {
@@ -950,6 +950,71 @@
         "TermAssociation"
       ],
       "range": "TermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "biologicalProcessAssociation__happens_during",
+      "description": "Optional extension describing where the BP takes place",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/happens_during",
+      "alias": "happens_during",
+      "owner": "BiologicalProcessAssociation",
+      "domain_of": [
+        "BiologicalProcessAssociation"
+      ],
+      "range": "PhaseTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "biologicalProcessAssociation__part_of",
+      "description": "Optional extension allowing hierarchical nesting of BPs",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "BiologicalProcessAssociation",
+      "domain_of": [
+        "BiologicalProcessAssociation"
+      ],
+      "range": "BiologicalProcessTermObject",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "cellularAnatomicalEntityAssociation__part_of",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "CellularAnatomicalEntityAssociation",
+      "domain_of": [
+        "CellularAnatomicalEntityAssociation"
+      ],
+      "range": "CellTypeAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "cellTypeAssociation__part_of",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "CellTypeAssociation",
+      "domain_of": [
+        "CellTypeAssociation"
+      ],
+      "range": "GrossAnatomyAssociation",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "grossAnatomyAssociation__part_of",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/part_of",
+      "alias": "part_of",
+      "owner": "GrossAnatomyAssociation",
+      "domain_of": [
+        "GrossAnatomyAssociation"
+      ],
+      "range": "GrossAnatomyAssociation",
+      "inlined": true,
       "@type": "SlotDefinition"
     },
     {
@@ -1091,22 +1156,6 @@
       "@type": "SlotDefinition"
     },
     {
-      "name": "happens_during",
-      "description": "Optional extension describing where the BP takes place",
-      "from_schema": "https://w3id.org/gocam",
-      "slot_uri": "https://w3id.org/gocam/happens_during",
-      "range": "PhaseTermObject",
-      "@type": "SlotDefinition"
-    },
-    {
-      "name": "part_of",
-      "description": "Optional extension allowing hierarchical nesting of BPs",
-      "from_schema": "https://w3id.org/gocam",
-      "slot_uri": "https://w3id.org/gocam/part_of",
-      "range": "BiologicalProcessTermObject",
-      "@type": "SlotDefinition"
-    },
-    {
       "name": "EnabledByGeneProductAssociation_term",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "enabledByAssociation__term",
@@ -1171,40 +1220,6 @@
       "@type": "SlotDefinition"
     },
     {
-      "name": "BiologicalProcessAssociation_happens_during",
-      "description": "Optional extension describing where the BP takes place",
-      "from_schema": "https://w3id.org/gocam",
-      "is_a": "happens_during",
-      "domain": "BiologicalProcessAssociation",
-      "slot_uri": "https://w3id.org/gocam/happens_during",
-      "alias": "happens_during",
-      "owner": "BiologicalProcessAssociation",
-      "domain_of": [
-        "BiologicalProcessAssociation"
-      ],
-      "is_usage_slot": true,
-      "usage_slot_name": "happens_during",
-      "range": "PhaseTermObject",
-      "@type": "SlotDefinition"
-    },
-    {
-      "name": "BiologicalProcessAssociation_part_of",
-      "description": "Optional extension allowing hierarchical nesting of BPs",
-      "from_schema": "https://w3id.org/gocam",
-      "is_a": "part_of",
-      "domain": "BiologicalProcessAssociation",
-      "slot_uri": "https://w3id.org/gocam/part_of",
-      "alias": "part_of",
-      "owner": "BiologicalProcessAssociation",
-      "domain_of": [
-        "BiologicalProcessAssociation"
-      ],
-      "is_usage_slot": true,
-      "usage_slot_name": "part_of",
-      "range": "BiologicalProcessTermObject",
-      "@type": "SlotDefinition"
-    },
-    {
       "name": "CellularAnatomicalEntityAssociation_term",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "termAssociation__term",
@@ -1218,24 +1233,6 @@
       "is_usage_slot": true,
       "usage_slot_name": "term",
       "range": "CellularAnatomicalEntityTermObject",
-      "@type": "SlotDefinition"
-    },
-    {
-      "name": "CellularAnatomicalEntityAssociation_part_of",
-      "description": "Optional extension allowing hierarchical nesting of BPs",
-      "from_schema": "https://w3id.org/gocam",
-      "is_a": "part_of",
-      "domain": "CellularAnatomicalEntityAssociation",
-      "slot_uri": "https://w3id.org/gocam/part_of",
-      "alias": "part_of",
-      "owner": "CellularAnatomicalEntityAssociation",
-      "domain_of": [
-        "CellularAnatomicalEntityAssociation"
-      ],
-      "is_usage_slot": true,
-      "usage_slot_name": "part_of",
-      "range": "CellTypeAssociation",
-      "inlined": true,
       "@type": "SlotDefinition"
     },
     {
@@ -1255,24 +1252,6 @@
       "@type": "SlotDefinition"
     },
     {
-      "name": "CellTypeAssociation_part_of",
-      "description": "Optional extension allowing hierarchical nesting of BPs",
-      "from_schema": "https://w3id.org/gocam",
-      "is_a": "part_of",
-      "domain": "CellTypeAssociation",
-      "slot_uri": "https://w3id.org/gocam/part_of",
-      "alias": "part_of",
-      "owner": "CellTypeAssociation",
-      "domain_of": [
-        "CellTypeAssociation"
-      ],
-      "is_usage_slot": true,
-      "usage_slot_name": "part_of",
-      "range": "GrossAnatomyAssociation",
-      "inlined": true,
-      "@type": "SlotDefinition"
-    },
-    {
       "name": "GrossAnatomyAssociation_term",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "termAssociation__term",
@@ -1286,24 +1265,6 @@
       "is_usage_slot": true,
       "usage_slot_name": "term",
       "range": "GrossAnatomicalStructureTermObject",
-      "@type": "SlotDefinition"
-    },
-    {
-      "name": "GrossAnatomyAssociation_part_of",
-      "description": "Optional extension allowing hierarchical nesting of BPs",
-      "from_schema": "https://w3id.org/gocam",
-      "is_a": "part_of",
-      "domain": "GrossAnatomyAssociation",
-      "slot_uri": "https://w3id.org/gocam/part_of",
-      "alias": "part_of",
-      "owner": "GrossAnatomyAssociation",
-      "domain_of": [
-        "GrossAnatomyAssociation"
-      ],
-      "is_usage_slot": true,
-      "usage_slot_name": "part_of",
-      "range": "GrossAnatomyAssociation",
-      "inlined": true,
       "@type": "SlotDefinition"
     },
     {
@@ -1380,24 +1341,24 @@
         {
           "name": "activities",
           "description": "All of the activities that are part of the model",
-          "multivalued": true,
           "range": "Activity",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "objects",
           "description": "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.",
-          "multivalued": true,
           "range": "Object",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "provenances",
           "description": "Model-level provenance information",
-          "multivalued": true,
           "range": "ProvenanceInfo",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         }
@@ -1472,8 +1433,8 @@
         {
           "name": "has_input",
           "description": "The input molecules that are directly consumed by the activity",
-          "multivalued": true,
           "range": "MoleculeAssociation",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         },
@@ -1487,8 +1448,8 @@
         {
           "name": "has_output",
           "description": "The output molecules that are directly produced by the activity",
-          "multivalued": true,
           "range": "MoleculeAssociation",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         },
@@ -1502,16 +1463,16 @@
         {
           "name": "causal_associations",
           "description": "The causal associations that connect this activity to other activities",
-          "multivalued": true,
           "range": "CausalAssociation",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "provenances",
           "description": "Provenance information for the activity",
-          "multivalued": true,
           "range": "ProvenanceInfo",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         }
@@ -1551,15 +1512,15 @@
             "with",
             "with/from"
           ],
-          "multivalued": true,
           "range": "Object",
+          "multivalued": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "provenances",
           "description": "Provenance about the assertion, e.g. who made it",
-          "multivalued": true,
           "range": "ProvenanceInfo",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         }
@@ -1587,15 +1548,15 @@
         },
         {
           "name": "evidence",
-          "multivalued": true,
           "range": "EvidenceItem",
+          "multivalued": true,
           "inlined": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "provenances",
-          "multivalued": true,
           "range": "ProvenanceInfo",
+          "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
         }
@@ -1662,8 +1623,8 @@
         {
           "name": "members",
           "description": "The gene products that are part of the complex",
-          "multivalued": true,
           "range": "GeneProductTermObject",
+          "multivalued": true,
           "@type": "SlotDefinition"
         }
       ],
@@ -1758,11 +1719,25 @@
         "association__type",
         "association__evidence",
         "association__provenances",
-        "BiologicalProcessAssociation_term",
-        "BiologicalProcessAssociation_happens_during",
-        "BiologicalProcessAssociation_part_of"
+        "biologicalProcessAssociation__happens_during",
+        "biologicalProcessAssociation__part_of",
+        "BiologicalProcessAssociation_term"
       ],
       "slot_usage": {},
+      "attributes": [
+        {
+          "name": "happens_during",
+          "description": "Optional extension describing where the BP takes place",
+          "range": "PhaseTermObject",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "part_of",
+          "description": "Optional extension allowing hierarchical nesting of BPs",
+          "range": "BiologicalProcessTermObject",
+          "@type": "SlotDefinition"
+        }
+      ],
       "class_uri": "https://w3id.org/gocam/BiologicalProcessAssociation",
       "@type": "ClassDefinition"
     },
@@ -1776,10 +1751,17 @@
         "association__type",
         "association__evidence",
         "association__provenances",
-        "CellularAnatomicalEntityAssociation_term",
-        "CellularAnatomicalEntityAssociation_part_of"
+        "cellularAnatomicalEntityAssociation__part_of",
+        "CellularAnatomicalEntityAssociation_term"
       ],
       "slot_usage": {},
+      "attributes": [
+        {
+          "name": "part_of",
+          "range": "CellTypeAssociation",
+          "@type": "SlotDefinition"
+        }
+      ],
       "class_uri": "https://w3id.org/gocam/CellularAnatomicalEntityAssociation",
       "@type": "ClassDefinition"
     },
@@ -1793,10 +1775,17 @@
         "association__type",
         "association__evidence",
         "association__provenances",
-        "CellTypeAssociation_term",
-        "CellTypeAssociation_part_of"
+        "cellTypeAssociation__part_of",
+        "CellTypeAssociation_term"
       ],
       "slot_usage": {},
+      "attributes": [
+        {
+          "name": "part_of",
+          "range": "GrossAnatomyAssociation",
+          "@type": "SlotDefinition"
+        }
+      ],
       "class_uri": "https://w3id.org/gocam/CellTypeAssociation",
       "@type": "ClassDefinition"
     },
@@ -1810,10 +1799,17 @@
         "association__type",
         "association__evidence",
         "association__provenances",
-        "GrossAnatomyAssociation_term",
-        "GrossAnatomyAssociation_part_of"
+        "grossAnatomyAssociation__part_of",
+        "GrossAnatomyAssociation_term"
       ],
       "slot_usage": {},
+      "attributes": [
+        {
+          "name": "part_of",
+          "range": "GrossAnatomyAssociation",
+          "@type": "SlotDefinition"
+        }
+      ],
       "class_uri": "https://w3id.org/gocam/GrossAnatomyAssociation",
       "@type": "ClassDefinition"
     },
@@ -2210,9 +2206,9 @@
   ],
   "metamodel_version": "1.7.0",
   "source_file": "gocam.yaml",
-  "source_file_date": "2024-09-18T11:26:12",
-  "source_file_size": 13755,
-  "generation_date": "2024-09-24T11:27:55",
+  "source_file_date": "2025-01-27T20:23:30",
+  "source_file_size": 13819,
+  "generation_date": "2025-01-27T20:25:17",
   "@type": "SchemaDefinition",
   "@context": [
     "project/jsonld/gocam.context.jsonld",

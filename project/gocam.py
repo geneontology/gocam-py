@@ -1,5 +1,5 @@
 # Auto generated from gocam.yaml by pythongen.py version: 0.0.1
-# Generation date: 2024-09-24T11:27:55
+# Generation date: 2025-01-27T20:25:18
 # Schema: gocam
 #
 # id: https://w3id.org/gocam
@@ -11,20 +11,55 @@
 
 import dataclasses
 import re
-from jsonasobj2 import JsonObj, as_dict
-from typing import Optional, List, Union, Dict, ClassVar, Any
 from dataclasses import dataclass
-from datetime import date, datetime
-from linkml_runtime.linkml_model.meta import EnumDefinition, PermissibleValue, PvFormulaOptions
+from datetime import (
+    date,
+    datetime,
+    time
+)
+from typing import (
+    Any,
+    ClassVar,
+    Dict,
+    List,
+    Optional,
+    Union
+)
 
-from linkml_runtime.utils.slot import Slot
-from linkml_runtime.utils.metamodelcore import empty_list, empty_dict, bnode
-from linkml_runtime.utils.yamlutils import YAMLRoot, extended_str, extended_float, extended_int
-from linkml_runtime.utils.dataclass_extensions_376 import dataclasses_init_fn_with_kwargs
-from linkml_runtime.utils.formatutils import camelcase, underscore, sfx
-from linkml_runtime.utils.enumerations import EnumDefinitionImpl
-from rdflib import Namespace, URIRef
+from jsonasobj2 import (
+    JsonObj,
+    as_dict
+)
+from linkml_runtime.linkml_model.meta import (
+    EnumDefinition,
+    PermissibleValue,
+    PvFormulaOptions
+)
 from linkml_runtime.utils.curienamespace import CurieNamespace
+from linkml_runtime.utils.dataclass_extensions_376 import dataclasses_init_fn_with_kwargs
+from linkml_runtime.utils.enumerations import EnumDefinitionImpl
+from linkml_runtime.utils.formatutils import (
+    camelcase,
+    sfx,
+    underscore
+)
+from linkml_runtime.utils.metamodelcore import (
+    bnode,
+    empty_dict,
+    empty_list
+)
+from linkml_runtime.utils.slot import Slot
+from linkml_runtime.utils.yamlutils import (
+    YAMLRoot,
+    extended_float,
+    extended_int,
+    extended_str
+)
+from rdflib import (
+    Namespace,
+    URIRef
+)
+
 from linkml_runtime.linkml_model.types import Boolean, String, Uriorcurie
 from linkml_runtime.utils.metamodelcore import Bool, URIorCURIE
 
@@ -142,7 +177,7 @@ class PredicateTermObjectId(TermObjectId):
     pass
 
 
-@dataclass
+@dataclass(repr=False)
 class Model(YAMLRoot):
     """
     A model of a biological program consisting of a set of causally connected activities
@@ -193,7 +228,7 @@ class Model(YAMLRoot):
         super().__post_init__(**kwargs)
 
 
-@dataclass
+@dataclass(repr=False)
 class Activity(YAMLRoot):
     """
     An individual activity in a causal model, representing the individual molecular activity of a single gene product
@@ -261,7 +296,7 @@ class Activity(YAMLRoot):
         super().__post_init__(**kwargs)
 
 
-@dataclass
+@dataclass(repr=False)
 class EvidenceItem(YAMLRoot):
     """
     An individual piece of evidence that is associated with an assertion in a model
@@ -296,7 +331,7 @@ class EvidenceItem(YAMLRoot):
         super().__post_init__(**kwargs)
 
 
-@dataclass
+@dataclass(repr=False)
 class Association(YAMLRoot):
     """
     An abstract grouping for different kinds of evidence-associated provenance
@@ -344,7 +379,7 @@ class Association(YAMLRoot):
 
 
 
-@dataclass
+@dataclass(repr=False)
 class EnabledByAssociation(Association):
     """
     An association between an activity and the gene product or complex that carries it out
@@ -366,7 +401,7 @@ class EnabledByAssociation(Association):
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class EnabledByGeneProductAssociation(EnabledByAssociation):
     """
     An association between an activity and a gene product
@@ -388,7 +423,7 @@ class EnabledByGeneProductAssociation(EnabledByAssociation):
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class EnabledByProteinComplexAssociation(EnabledByAssociation):
     """
     An association between an activity and a protein complex
@@ -415,7 +450,7 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class CausalAssociation(Association):
     """
     A causal association between two activities
@@ -441,7 +476,7 @@ class CausalAssociation(Association):
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class TermAssociation(Association):
     """
     An association between an activity and a term, potentially with extensions
@@ -463,7 +498,7 @@ class TermAssociation(Association):
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class MolecularFunctionAssociation(TermAssociation):
     """
     An association between an activity and a molecular function term
@@ -485,7 +520,7 @@ class MolecularFunctionAssociation(TermAssociation):
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class BiologicalProcessAssociation(TermAssociation):
     """
     An association between an activity and a biological process term
@@ -497,25 +532,25 @@ class BiologicalProcessAssociation(TermAssociation):
     class_name: ClassVar[str] = "BiologicalProcessAssociation"
     class_model_uri: ClassVar[URIRef] = GOCAM.BiologicalProcessAssociation
 
-    term: Optional[Union[str, BiologicalProcessTermObjectId]] = None
     happens_during: Optional[Union[str, PhaseTermObjectId]] = None
     part_of: Optional[Union[str, BiologicalProcessTermObjectId]] = None
+    term: Optional[Union[str, BiologicalProcessTermObjectId]] = None
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
-        if self.term is not None and not isinstance(self.term, BiologicalProcessTermObjectId):
-            self.term = BiologicalProcessTermObjectId(self.term)
-
         if self.happens_during is not None and not isinstance(self.happens_during, PhaseTermObjectId):
             self.happens_during = PhaseTermObjectId(self.happens_during)
 
         if self.part_of is not None and not isinstance(self.part_of, BiologicalProcessTermObjectId):
             self.part_of = BiologicalProcessTermObjectId(self.part_of)
 
+        if self.term is not None and not isinstance(self.term, BiologicalProcessTermObjectId):
+            self.term = BiologicalProcessTermObjectId(self.term)
+
         super().__post_init__(**kwargs)
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class CellularAnatomicalEntityAssociation(TermAssociation):
     """
     An association between an activity and a cellular anatomical entity term
@@ -527,21 +562,21 @@ class CellularAnatomicalEntityAssociation(TermAssociation):
     class_name: ClassVar[str] = "CellularAnatomicalEntityAssociation"
     class_model_uri: ClassVar[URIRef] = GOCAM.CellularAnatomicalEntityAssociation
 
-    term: Optional[Union[str, CellularAnatomicalEntityTermObjectId]] = None
     part_of: Optional[Union[dict, "CellTypeAssociation"]] = None
+    term: Optional[Union[str, CellularAnatomicalEntityTermObjectId]] = None
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
-        if self.term is not None and not isinstance(self.term, CellularAnatomicalEntityTermObjectId):
-            self.term = CellularAnatomicalEntityTermObjectId(self.term)
-
         if self.part_of is not None and not isinstance(self.part_of, CellTypeAssociation):
             self.part_of = CellTypeAssociation(**as_dict(self.part_of))
+
+        if self.term is not None and not isinstance(self.term, CellularAnatomicalEntityTermObjectId):
+            self.term = CellularAnatomicalEntityTermObjectId(self.term)
 
         super().__post_init__(**kwargs)
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class CellTypeAssociation(TermAssociation):
     """
     An association between an activity and a cell type term
@@ -553,21 +588,21 @@ class CellTypeAssociation(TermAssociation):
     class_name: ClassVar[str] = "CellTypeAssociation"
     class_model_uri: ClassVar[URIRef] = GOCAM.CellTypeAssociation
 
-    term: Optional[Union[str, CellTypeTermObjectId]] = None
     part_of: Optional[Union[dict, "GrossAnatomyAssociation"]] = None
+    term: Optional[Union[str, CellTypeTermObjectId]] = None
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
-        if self.term is not None and not isinstance(self.term, CellTypeTermObjectId):
-            self.term = CellTypeTermObjectId(self.term)
-
         if self.part_of is not None and not isinstance(self.part_of, GrossAnatomyAssociation):
             self.part_of = GrossAnatomyAssociation(**as_dict(self.part_of))
+
+        if self.term is not None and not isinstance(self.term, CellTypeTermObjectId):
+            self.term = CellTypeTermObjectId(self.term)
 
         super().__post_init__(**kwargs)
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class GrossAnatomyAssociation(TermAssociation):
     """
     An association between an activity and a gross anatomical structure term
@@ -579,21 +614,21 @@ class GrossAnatomyAssociation(TermAssociation):
     class_name: ClassVar[str] = "GrossAnatomyAssociation"
     class_model_uri: ClassVar[URIRef] = GOCAM.GrossAnatomyAssociation
 
-    term: Optional[Union[str, GrossAnatomicalStructureTermObjectId]] = None
     part_of: Optional[Union[dict, "GrossAnatomyAssociation"]] = None
+    term: Optional[Union[str, GrossAnatomicalStructureTermObjectId]] = None
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
-        if self.term is not None and not isinstance(self.term, GrossAnatomicalStructureTermObjectId):
-            self.term = GrossAnatomicalStructureTermObjectId(self.term)
-
         if self.part_of is not None and not isinstance(self.part_of, GrossAnatomyAssociation):
             self.part_of = GrossAnatomyAssociation(**as_dict(self.part_of))
+
+        if self.term is not None and not isinstance(self.term, GrossAnatomicalStructureTermObjectId):
+            self.term = GrossAnatomicalStructureTermObjectId(self.term)
 
         super().__post_init__(**kwargs)
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class MoleculeAssociation(TermAssociation):
     """
     An association between an activity and a molecule term
@@ -615,7 +650,7 @@ class MoleculeAssociation(TermAssociation):
         self.unknown_type = str(self.class_name)
 
 
-@dataclass
+@dataclass(repr=False)
 class Object(YAMLRoot):
     """
     An abstract class for all identified objects in a model
@@ -675,7 +710,7 @@ class Object(YAMLRoot):
 
 
 
-@dataclass
+@dataclass(repr=False)
 class TermObject(Object):
     """
     An abstract class for all ontology term objects
@@ -695,7 +730,7 @@ class TermObject(Object):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class PublicationObject(Object):
     """
     An object that represents a publication or other kind of reference
@@ -727,7 +762,7 @@ class PublicationObject(Object):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class EvidenceTermObject(TermObject):
     """
     A term object that represents an evidence term from ECO
@@ -751,7 +786,7 @@ class EvidenceTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class MolecularFunctionTermObject(TermObject):
     """
     A term object that represents a molecular function term from GO
@@ -775,7 +810,7 @@ class MolecularFunctionTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class BiologicalProcessTermObject(TermObject):
     """
     A term object that represents a biological process term from GO
@@ -799,7 +834,7 @@ class BiologicalProcessTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class CellularAnatomicalEntityTermObject(TermObject):
     """
     A term object that represents a cellular anatomical entity term from GO
@@ -823,7 +858,7 @@ class CellularAnatomicalEntityTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class MoleculeTermObject(TermObject):
     """
     A term object that represents a molecule term from CHEBI or UniProtKB
@@ -847,7 +882,7 @@ class MoleculeTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class CellTypeTermObject(TermObject):
     """
     A term object that represents a cell type term from CL
@@ -871,7 +906,7 @@ class CellTypeTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class GrossAnatomicalStructureTermObject(TermObject):
     """
     A term object that represents a gross anatomical structure term from UBERON
@@ -895,7 +930,7 @@ class GrossAnatomicalStructureTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class PhaseTermObject(TermObject):
     """
     A term object that represents a phase term from GO or UBERON
@@ -919,7 +954,7 @@ class PhaseTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class InformationBiomacromoleculeTermObject(TermObject):
     """
     An abstract class for all information biomacromolecule term objects
@@ -939,7 +974,7 @@ class InformationBiomacromoleculeTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class GeneProductTermObject(InformationBiomacromoleculeTermObject):
     """
     A term object that represents a gene product term from GO or UniProtKB
@@ -963,7 +998,7 @@ class GeneProductTermObject(InformationBiomacromoleculeTermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class ProteinComplexTermObject(InformationBiomacromoleculeTermObject):
     """
     A term object that represents a protein complex term from GO
@@ -987,7 +1022,7 @@ class ProteinComplexTermObject(InformationBiomacromoleculeTermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class TaxonTermObject(TermObject):
     """
     A term object that represents a taxon term from NCBITaxon
@@ -1011,7 +1046,7 @@ class TaxonTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class PredicateTermObject(TermObject):
     """
     A term object that represents a taxon term from NCBITaxon
@@ -1035,7 +1070,7 @@ class PredicateTermObject(TermObject):
         self.unknown_type = str(self.class_class_curie)
 
 
-@dataclass
+@dataclass(repr=False)
 class ProvenanceInfo(YAMLRoot):
     """
     Provenance information for an object
@@ -1240,6 +1275,21 @@ slots.causalAssociation__downstream_activity = Slot(uri=GOCAM.downstream_activit
 slots.termAssociation__term = Slot(uri=GOCAM.term, name="termAssociation__term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.termAssociation__term, domain=None, range=Optional[Union[str, TermObjectId]])
 
+slots.biologicalProcessAssociation__happens_during = Slot(uri=GOCAM.happens_during, name="biologicalProcessAssociation__happens_during", curie=GOCAM.curie('happens_during'),
+                   model_uri=GOCAM.biologicalProcessAssociation__happens_during, domain=None, range=Optional[Union[str, PhaseTermObjectId]])
+
+slots.biologicalProcessAssociation__part_of = Slot(uri=GOCAM.part_of, name="biologicalProcessAssociation__part_of", curie=GOCAM.curie('part_of'),
+                   model_uri=GOCAM.biologicalProcessAssociation__part_of, domain=None, range=Optional[Union[str, BiologicalProcessTermObjectId]])
+
+slots.cellularAnatomicalEntityAssociation__part_of = Slot(uri=GOCAM.part_of, name="cellularAnatomicalEntityAssociation__part_of", curie=GOCAM.curie('part_of'),
+                   model_uri=GOCAM.cellularAnatomicalEntityAssociation__part_of, domain=None, range=Optional[Union[dict, CellTypeAssociation]])
+
+slots.cellTypeAssociation__part_of = Slot(uri=GOCAM.part_of, name="cellTypeAssociation__part_of", curie=GOCAM.curie('part_of'),
+                   model_uri=GOCAM.cellTypeAssociation__part_of, domain=None, range=Optional[Union[dict, GrossAnatomyAssociation]])
+
+slots.grossAnatomyAssociation__part_of = Slot(uri=GOCAM.part_of, name="grossAnatomyAssociation__part_of", curie=GOCAM.curie('part_of'),
+                   model_uri=GOCAM.grossAnatomyAssociation__part_of, domain=None, range=Optional[Union[dict, GrossAnatomyAssociation]])
+
 slots.object__id = Slot(uri=GOCAM.id, name="object__id", curie=GOCAM.curie('id'),
                    model_uri=GOCAM.object__id, domain=None, range=URIRef)
 
@@ -1270,12 +1320,6 @@ slots.provenanceInfo__date = Slot(uri=DCT.date, name="provenanceInfo__date", cur
 slots.provenanceInfo__provided_by = Slot(uri=PAV.providedBy, name="provenanceInfo__provided_by", curie=PAV.curie('providedBy'),
                    model_uri=GOCAM.provenanceInfo__provided_by, domain=None, range=Optional[str])
 
-slots.happens_during = Slot(uri=GOCAM.happens_during, name="happens_during", curie=GOCAM.curie('happens_during'),
-                   model_uri=GOCAM.happens_during, domain=None, range=Optional[Union[str, PhaseTermObjectId]])
-
-slots.part_of = Slot(uri=GOCAM.part_of, name="part_of", curie=GOCAM.curie('part_of'),
-                   model_uri=GOCAM.part_of, domain=None, range=Optional[Union[str, BiologicalProcessTermObjectId]])
-
 slots.EnabledByGeneProductAssociation_term = Slot(uri=GOCAM.term, name="EnabledByGeneProductAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.EnabledByGeneProductAssociation_term, domain=EnabledByGeneProductAssociation, range=Optional[Union[str, GeneProductTermObjectId]])
 
@@ -1288,29 +1332,14 @@ slots.MolecularFunctionAssociation_term = Slot(uri=GOCAM.term, name="MolecularFu
 slots.BiologicalProcessAssociation_term = Slot(uri=GOCAM.term, name="BiologicalProcessAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.BiologicalProcessAssociation_term, domain=BiologicalProcessAssociation, range=Optional[Union[str, BiologicalProcessTermObjectId]])
 
-slots.BiologicalProcessAssociation_happens_during = Slot(uri=GOCAM.happens_during, name="BiologicalProcessAssociation_happens_during", curie=GOCAM.curie('happens_during'),
-                   model_uri=GOCAM.BiologicalProcessAssociation_happens_during, domain=BiologicalProcessAssociation, range=Optional[Union[str, PhaseTermObjectId]])
-
-slots.BiologicalProcessAssociation_part_of = Slot(uri=GOCAM.part_of, name="BiologicalProcessAssociation_part_of", curie=GOCAM.curie('part_of'),
-                   model_uri=GOCAM.BiologicalProcessAssociation_part_of, domain=BiologicalProcessAssociation, range=Optional[Union[str, BiologicalProcessTermObjectId]])
-
 slots.CellularAnatomicalEntityAssociation_term = Slot(uri=GOCAM.term, name="CellularAnatomicalEntityAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.CellularAnatomicalEntityAssociation_term, domain=CellularAnatomicalEntityAssociation, range=Optional[Union[str, CellularAnatomicalEntityTermObjectId]])
-
-slots.CellularAnatomicalEntityAssociation_part_of = Slot(uri=GOCAM.part_of, name="CellularAnatomicalEntityAssociation_part_of", curie=GOCAM.curie('part_of'),
-                   model_uri=GOCAM.CellularAnatomicalEntityAssociation_part_of, domain=CellularAnatomicalEntityAssociation, range=Optional[Union[dict, "CellTypeAssociation"]])
 
 slots.CellTypeAssociation_term = Slot(uri=GOCAM.term, name="CellTypeAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.CellTypeAssociation_term, domain=CellTypeAssociation, range=Optional[Union[str, CellTypeTermObjectId]])
 
-slots.CellTypeAssociation_part_of = Slot(uri=GOCAM.part_of, name="CellTypeAssociation_part_of", curie=GOCAM.curie('part_of'),
-                   model_uri=GOCAM.CellTypeAssociation_part_of, domain=CellTypeAssociation, range=Optional[Union[dict, "GrossAnatomyAssociation"]])
-
 slots.GrossAnatomyAssociation_term = Slot(uri=GOCAM.term, name="GrossAnatomyAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.GrossAnatomyAssociation_term, domain=GrossAnatomyAssociation, range=Optional[Union[str, GrossAnatomicalStructureTermObjectId]])
-
-slots.GrossAnatomyAssociation_part_of = Slot(uri=GOCAM.part_of, name="GrossAnatomyAssociation_part_of", curie=GOCAM.curie('part_of'),
-                   model_uri=GOCAM.GrossAnatomyAssociation_part_of, domain=GrossAnatomyAssociation, range=Optional[Union[dict, "GrossAnatomyAssociation"]])
 
 slots.MoleculeAssociation_term = Slot(uri=GOCAM.term, name="MoleculeAssociation_term", curie=GOCAM.curie('term'),
                    model_uri=GOCAM.MoleculeAssociation_term, domain=MoleculeAssociation, range=Optional[Union[str, MoleculeTermObjectId]])

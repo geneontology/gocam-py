@@ -78,9 +78,9 @@ linkml:Sparqlpath xsd:string
 <BiologicalProcessAssociation> CLOSED {
     (  $<BiologicalProcessAssociation_tes> (  &<TermAssociation_tes> ;
           rdf:type [ <TermAssociation> ] ? ;
-          <term> @<BiologicalProcessTermObject> ? ;
           <happens_during> @<PhaseTermObject> ? ;
-          <part_of> @<BiologicalProcessTermObject> ?
+          <part_of> @<BiologicalProcessTermObject> ? ;
+          <term> @<BiologicalProcessTermObject> ?
        ) ;
        rdf:type [ <BiologicalProcessAssociation> ] ?
     )
@@ -107,8 +107,8 @@ linkml:Sparqlpath xsd:string
 <CellTypeAssociation> CLOSED {
     (  $<CellTypeAssociation_tes> (  &<TermAssociation_tes> ;
           rdf:type [ <TermAssociation> ] ? ;
-          <term> @<CellTypeTermObject> ? ;
-          <part_of> @<GrossAnatomyAssociation> ?
+          <part_of> @<GrossAnatomyAssociation> ? ;
+          <term> @<CellTypeTermObject> ?
        ) ;
        rdf:type [ <CellTypeAssociation> ] ?
     )
@@ -125,8 +125,8 @@ linkml:Sparqlpath xsd:string
 <CellularAnatomicalEntityAssociation> CLOSED {
     (  $<CellularAnatomicalEntityAssociation_tes> (  &<TermAssociation_tes> ;
           rdf:type [ <TermAssociation> ] ? ;
-          <term> @<CellularAnatomicalEntityTermObject> ? ;
-          <part_of> @<CellTypeAssociation> ?
+          <part_of> @<CellTypeAssociation> ? ;
+          <term> @<CellularAnatomicalEntityTermObject> ?
        ) ;
        rdf:type [ <CellularAnatomicalEntityAssociation> ] ?
     )
@@ -209,8 +209,8 @@ linkml:Sparqlpath xsd:string
 <GrossAnatomyAssociation> CLOSED {
     (  $<GrossAnatomyAssociation_tes> (  &<TermAssociation_tes> ;
           rdf:type [ <TermAssociation> ] ? ;
-          <term> @<GrossAnatomicalStructureTermObject> ? ;
-          <part_of> @<GrossAnatomyAssociation> ?
+          <part_of> @<GrossAnatomyAssociation> ? ;
+          <term> @<GrossAnatomicalStructureTermObject> ?
        ) ;
        rdf:type [ <GrossAnatomyAssociation> ] ?
     )

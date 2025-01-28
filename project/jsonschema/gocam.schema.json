@@ -9,7 +9,10 @@
                     "items": {
                         "$ref": "#/$defs/CausalAssociation"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "enabled_by": {
                     "anyOf": [
@@ -18,6 +21,9 @@
                         },
                         {
                             "$ref": "#/$defs/EnabledByProteinComplexAssociation"
+                        },
+                        {
+                            "type": "null"
                         }
                     ],
                     "description": "The gene product or complex that carries out the activity"
@@ -27,37 +33,81 @@
                     "items": {
                         "$ref": "#/$defs/MoleculeAssociation"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "has_output": {
                     "description": "The output molecules that are directly produced by the activity",
                     "items": {
                         "$ref": "#/$defs/MoleculeAssociation"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "has_primary_input": {
-                    "$ref": "#/$defs/MoleculeAssociation",
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/MoleculeAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
                     "description": "The primary input molecule that is directly consumed by the activity"
                 },
                 "has_primary_output": {
-                    "$ref": "#/$defs/MoleculeAssociation",
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/MoleculeAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
                     "description": "The primary output molecule that is directly produced by the activity"
                 },
                 "id": {
                     "description": "Identifier of the activity unit. Should be in gocam namespace.",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "molecular_function": {
-                    "$ref": "#/$defs/MolecularFunctionAssociation",
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/MolecularFunctionAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
                     "description": "The molecular function that is carried out by the gene product or complex"
                 },
                 "occurs_in": {
-                    "$ref": "#/$defs/CellularAnatomicalEntityAssociation",
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/CellularAnatomicalEntityAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
                     "description": "The cellular location in which the activity occurs"
                 },
                 "part_of": {
-                    "$ref": "#/$defs/BiologicalProcessAssociation",
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/BiologicalProcessAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
                     "description": "The larger biological process in which the activity is a part"
                 },
                 "provenances": {
@@ -65,7 +115,10 @@
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -82,23 +135,49 @@
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "happens_during": {
+                    "description": "Optional extension describing where the BP takes place",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "part_of": {
+                    "description": "Optional extension allowing hierarchical nesting of BPs",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The ontology term that describes the nature of the association",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "BiologicalProcessAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "BiologicalProcessAssociation",
@@ -112,16 +191,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:BiologicalProcessTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -136,29 +224,44 @@
             "properties": {
                 "downstream_activity": {
                     "description": "The activity unit that is downstream of this one",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "evidence": {
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "predicate": {
                     "description": "The RO relation that represents the type of relationship",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "CausalAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "CausalAssociation",
@@ -189,23 +292,45 @@
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "part_of": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/GrossAnatomyAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The ontology term that describes the nature of the association",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "CellTypeAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "CellTypeAssociation",
@@ -219,16 +344,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:CellTypeTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -245,23 +379,45 @@
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "part_of": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/CellTypeAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The ontology term that describes the nature of the association",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "CellularAnatomicalEntityAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "CellularAnatomicalEntityAssociation",
@@ -275,16 +431,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:CellularAnatomicalEntityTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -301,23 +466,35 @@
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The gene product or complex that carries out the activity",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "EnabledByGeneProductAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "EnabledByGeneProductAssociation",
@@ -331,30 +508,45 @@
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "members": {
                     "description": "The gene products that are part of the complex",
                     "items": {
                         "type": "string"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The gene product or complex that carries out the activity",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "EnabledByProteinComplexAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "EnabledByProteinComplexAssociation",
@@ -369,22 +561,34 @@
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "reference": {
                     "description": "The publication of reference that describes the evidence",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The ECO term representing the type of evidence",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "with_objects": {
                     "description": "Supporting database entities or terms",
                     "items": {
                         "type": "string"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 }
             },
             "title": "EvidenceItem",
@@ -398,16 +602,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:EvidenceTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -424,16 +637,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:GeneProductTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -450,16 +672,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:GrossAnatomicalStructureTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -476,23 +707,45 @@
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "part_of": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/GrossAnatomyAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The ontology term that describes the nature of the association",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "GrossAnatomyAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "GrossAnatomyAssociation",
@@ -518,18 +771,27 @@
                     "items": {
                         "$ref": "#/$defs/Activity"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "comments": {
                     "description": "Comments about the model",
                     "items": {
                         "type": "string"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "id": {
                     "description": "The identifier of the model. Should be in gocam namespace.",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "objects": {
                     "description": "All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.",
@@ -579,14 +841,20 @@
                             }
                         ]
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "provenances": {
                     "description": "Model-level provenance information",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "status": {
                     "$ref": "#/$defs/ModelStateEnum",
@@ -594,11 +862,17 @@
                 },
                 "taxon": {
                     "description": "The primary taxon that the model is about",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "title": {
                     "description": "The human-readable descriptive title of the model",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -624,23 +898,35 @@
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The ontology term that describes the nature of the association",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "MolecularFunctionAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "MolecularFunctionAssociation",
@@ -654,16 +940,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:MolecularFunctionTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -680,23 +975,35 @@
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "provenances": {
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
-                    "type": "array"
+                    "type": [
+                        "array",
+                        "null"
+                    ]
                 },
                 "term": {
                     "description": "The ontology term that describes the nature of the association",
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "MoleculeAssociation"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "MoleculeAssociation",
@@ -710,16 +1017,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:MoleculeTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -736,16 +1052,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:Object"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -762,16 +1087,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:PhaseTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -788,16 +1122,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:PredicateTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -814,16 +1157,25 @@
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:ProteinComplexTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -837,16 +1189,28 @@
             "description": "Provenance information for an object",
             "properties": {
                 "contributor": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "created": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "date": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "provided_by": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "title": "ProvenanceInfo",
@@ -857,25 +1221,40 @@
             "description": "An object that represents a publication or other kind of reference",
             "properties": {
                 "abstract_text": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "full_text": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "id": {
                     "type": "string"
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:PublicationObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [
@@ -889,19 +1268,31 @@
             "description": "A term object that represents a taxon term from NCBITaxon",
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "label": {
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "obsolete": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
                 },
                 "type": {
                     "enum": [
                         "gocam:TaxonTermObject"
                     ],
-                    "type": "string"
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 }
             },
             "required": [

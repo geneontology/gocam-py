@@ -22,9 +22,9 @@ message BiologicalProcessAssociation
   string type = 0
  repeated  evidenceItem evidence = 0
  repeated  provenanceInfo provenances = 0
-  biologicalProcessTermObject term = 0
   phaseTermObject happensDuring = 0
   biologicalProcessTermObject partOf = 0
+  biologicalProcessTermObject term = 0
  }
 // A term object that represents a biological process term from GO
 message BiologicalProcessTermObject
@@ -49,8 +49,8 @@ message CellTypeAssociation
   string type = 0
  repeated  evidenceItem evidence = 0
  repeated  provenanceInfo provenances = 0
-  cellTypeTermObject term = 0
   grossAnatomyAssociation partOf = 0
+  cellTypeTermObject term = 0
  }
 // A term object that represents a cell type term from CL
 message CellTypeTermObject
@@ -66,8 +66,8 @@ message CellularAnatomicalEntityAssociation
   string type = 0
  repeated  evidenceItem evidence = 0
  repeated  provenanceInfo provenances = 0
-  cellularAnatomicalEntityTermObject term = 0
   cellTypeAssociation partOf = 0
+  cellularAnatomicalEntityTermObject term = 0
  }
 // A term object that represents a cellular anatomical entity term from GO
 message CellularAnatomicalEntityTermObject
@@ -132,8 +132,8 @@ message GrossAnatomyAssociation
   string type = 0
  repeated  evidenceItem evidence = 0
  repeated  provenanceInfo provenances = 0
-  grossAnatomicalStructureTermObject term = 0
   grossAnatomyAssociation partOf = 0
+  grossAnatomicalStructureTermObject term = 0
  }
 // A model of a biological program consisting of a set of causally connected activities
 message Model

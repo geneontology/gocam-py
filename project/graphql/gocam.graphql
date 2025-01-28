@@ -1,4 +1,32 @@
 # metamodel_version: 1.7.0
+enum CausalPredicateEnum
+  {
+    causally_upstream_of__COMMA___positive_effect
+    causally_upstream_of__COMMA___negative_effect
+    causally_upstream_of
+    immediately_causally_upstream_of
+    causally_upstream_of_or_within
+    causally_upstream_of_or_within__COMMA___negative_effect
+    causally_upstream_of_or_within__COMMA___positive_effect
+    regulates
+    negatively_regulates
+    positively_regulates
+  }
+
+enum InformationBiomacromoleculeCategory
+  {
+    GeneOrReferenceProtein
+    ProteinIsoform
+    MacromolecularComplex
+    Unknown
+  }
+
+enum ModelStateEnum
+  {
+    production
+    development
+  }
+
 type Activity
   {
     id: Uriorcurie!
@@ -26,9 +54,9 @@ type BiologicalProcessAssociation
     type: String
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
-    term: BiologicalProcessTermObject
     happensDuring: PhaseTermObject
     partOf: BiologicalProcessTermObject
+    term: BiologicalProcessTermObject
   }
 
 type BiologicalProcessTermObject
@@ -53,8 +81,8 @@ type CellTypeAssociation
     type: String
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
-    term: CellTypeTermObject
     partOf: GrossAnatomyAssociation
+    term: CellTypeTermObject
   }
 
 type CellTypeTermObject
@@ -70,8 +98,8 @@ type CellularAnatomicalEntityAssociation
     type: String
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
-    term: CellularAnatomicalEntityTermObject
     partOf: CellTypeAssociation
+    term: CellularAnatomicalEntityTermObject
   }
 
 type CellularAnatomicalEntityTermObject
@@ -144,8 +172,8 @@ type GrossAnatomyAssociation
     type: String
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
-    term: GrossAnatomicalStructureTermObject
     partOf: GrossAnatomyAssociation
+    term: GrossAnatomicalStructureTermObject
   }
 
 interface InformationBiomacromoleculeTermObject

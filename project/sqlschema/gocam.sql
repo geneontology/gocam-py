@@ -59,20 +59,25 @@
 --     * Slot: type Description: 
 -- # Class: "BiologicalProcessAssociation" Description: "An association between an activity and a biological process term"
 --     * Slot: id Description: 
+--     * Slot: happens_during Description: Optional extension describing where the BP takes place
+--     * Slot: part_of Description: Optional extension allowing hierarchical nesting of BPs
 --     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
 -- # Class: "CellularAnatomicalEntityAssociation" Description: "An association between an activity and a cellular anatomical entity term"
 --     * Slot: id Description: 
 --     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
+--     * Slot: part_of_id Description: 
 -- # Class: "CellTypeAssociation" Description: "An association between an activity and a cell type term"
 --     * Slot: id Description: 
 --     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
+--     * Slot: part_of_id Description: 
 -- # Class: "GrossAnatomyAssociation" Description: "An association between an activity and a gross anatomical structure term"
 --     * Slot: id Description: 
 --     * Slot: term Description: The ontology term that describes the nature of the association
 --     * Slot: type Description: 
+--     * Slot: part_of_id Description: 
 -- # Class: "MoleculeAssociation" Description: "An association between an activity and a molecule term"
 --     * Slot: id Description: 
 --     * Slot: term Description: The ontology term that describes the nature of the association
@@ -387,31 +392,63 @@ CREATE TABLE "MolecularFunctionAssociation" (
 );
 CREATE TABLE "BiologicalProcessAssociation" (
 	id INTEGER NOT NULL, 
+	happens_during TEXT, 
+	part_of TEXT, 
 	term TEXT, 
 	type TEXT, 
 	PRIMARY KEY (id), 
+	FOREIGN KEY(happens_during) REFERENCES "PhaseTermObject" (id), 
+	FOREIGN KEY(part_of) REFERENCES "BiologicalProcessTermObject" (id), 
 	FOREIGN KEY(term) REFERENCES "BiologicalProcessTermObject" (id)
-);
-CREATE TABLE "CellularAnatomicalEntityAssociation" (
-	id INTEGER NOT NULL, 
-	term TEXT, 
-	type TEXT, 
-	PRIMARY KEY (id), 
-	FOREIGN KEY(term) REFERENCES "CellularAnatomicalEntityTermObject" (id)
-);
-CREATE TABLE "CellTypeAssociation" (
-	id INTEGER NOT NULL, 
-	term TEXT, 
-	type TEXT, 
-	PRIMARY KEY (id), 
-	FOREIGN KEY(term) REFERENCES "CellTypeTermObject" (id)
 );
 CREATE TABLE "GrossAnatomyAssociation" (
 	id INTEGER NOT NULL, 
 	term TEXT, 
 	type TEXT, 
+	part_of_id INTEGER, 
 	PRIMARY KEY (id), 
-	FOREIGN KEY(term) REFERENCES "GrossAnatomicalStructureTermObject" (id)
+	FOREIGN KEY(term) REFERENCES "GrossAnatomicalStructureTermObject" (id), 
+	FOREIGN KEY(part_of_id) REFERENCES "GrossAnatomyAssociation" (id)
+);
+CREATE TABLE "CellTypeAssociation" (
+	id INTEGER NOT NULL, 
+	term TEXT, 
+	type TEXT, 
+	part_of_id INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(term) REFERENCES "CellTypeTermObject" (id), 
+	FOREIGN KEY(part_of_id) REFERENCES "GrossAnatomyAssociation" (id)
+);
+CREATE TABLE "Object" (
+	id TEXT NOT NULL, 
+	label TEXT, 
+	type TEXT, 
+	obsolete BOOLEAN, 
+	"Model_id" TEXT, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
+);
+CREATE TABLE "Model_comments" (
+	"Model_id" TEXT, 
+	comments TEXT, 
+	PRIMARY KEY ("Model_id", comments), 
+	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
+);
+CREATE TABLE "EnabledByProteinComplexAssociation_members" (
+	"EnabledByProteinComplexAssociation_id" INTEGER, 
+	members_id TEXT, 
+	PRIMARY KEY ("EnabledByProteinComplexAssociation_id", members_id), 
+	FOREIGN KEY("EnabledByProteinComplexAssociation_id") REFERENCES "EnabledByProteinComplexAssociation" (id), 
+	FOREIGN KEY(members_id) REFERENCES "GeneProductTermObject" (id)
+);
+CREATE TABLE "CellularAnatomicalEntityAssociation" (
+	id INTEGER NOT NULL, 
+	term TEXT, 
+	type TEXT, 
+	part_of_id INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(term) REFERENCES "CellularAnatomicalEntityTermObject" (id), 
+	FOREIGN KEY(part_of_id) REFERENCES "CellTypeAssociation" (id)
 );
 CREATE TABLE "EvidenceItem" (
 	id INTEGER NOT NULL, 
@@ -444,28 +481,6 @@ CREATE TABLE "EvidenceItem" (
 	FOREIGN KEY("CellTypeAssociation_id") REFERENCES "CellTypeAssociation" (id), 
 	FOREIGN KEY("GrossAnatomyAssociation_id") REFERENCES "GrossAnatomyAssociation" (id), 
 	FOREIGN KEY("MoleculeAssociation_id") REFERENCES "MoleculeAssociation" (id)
-);
-CREATE TABLE "Object" (
-	id TEXT NOT NULL, 
-	label TEXT, 
-	type TEXT, 
-	obsolete BOOLEAN, 
-	"Model_id" TEXT, 
-	PRIMARY KEY (id), 
-	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
-);
-CREATE TABLE "Model_comments" (
-	"Model_id" TEXT, 
-	comments TEXT, 
-	PRIMARY KEY ("Model_id", comments), 
-	FOREIGN KEY("Model_id") REFERENCES "Model" (id)
-);
-CREATE TABLE "EnabledByProteinComplexAssociation_members" (
-	"EnabledByProteinComplexAssociation_id" INTEGER, 
-	members_id TEXT, 
-	PRIMARY KEY ("EnabledByProteinComplexAssociation_id", members_id), 
-	FOREIGN KEY("EnabledByProteinComplexAssociation_id") REFERENCES "EnabledByProteinComplexAssociation" (id), 
-	FOREIGN KEY(members_id) REFERENCES "GeneProductTermObject" (id)
 );
 CREATE TABLE "ProvenanceInfo" (
 	id INTEGER NOT NULL, 
