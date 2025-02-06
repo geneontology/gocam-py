@@ -27,7 +27,6 @@ class Width(int, Enum):
 
 class ArrowShape(str, Enum):
     CIRCLE = "circle"
-    CIRCLE_TRIANGLE = "circle-triangle"
     DIAMOND = "diamond"
     SQUARE = "square"
     TEE = "tee"
@@ -43,8 +42,8 @@ class NodeType(str, Enum):
     GENE = "gene"
     COMPLEX = "complex"
     MOLECULE = "molecule"
-    
-    
+
+
 class RelationType(str, Enum):
     CAUSALLY_UPSTREAM_OF_POSITIVE_EFFECT = "RO:0002304"
     CAUSALLY_UPSTREAM_OF_NEGATIVE_EFFECT = "RO:0002305"
@@ -93,107 +92,110 @@ RELATIONS = {
     RelationType.CAUSALLY_UPSTREAM_OF_POSITIVE_EFFECT: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TRIANGLE,
-        label='causally upstream of, positive effect',
+        label="causally upstream of, positive effect",
         color=Color.LIGHT_GREEN,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.CAUSALLY_UPSTREAM_OF_NEGATIVE_EFFECT: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TEE,
-        label='causally upstream of, negative effect',
+        label="causally upstream of, negative effect",
         color=Color.LIGHT_RED,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.CONSTITUTIVELY_UPSTREAM_OF: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.CIRCLE,
-        label='constitutively upstream of',
+        label="constitutively upstream of",
         color=Color.LIGHT_GREEN,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.DIRECTLY_NEGATIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TEE,
-        label='directly negatively regulates',
+        label="directly negatively regulates",
         color=Color.RED,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.DIRECTLY_POSITIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TRIANGLE,
-        label='directly positively regulates',
+        label="directly positively regulates",
         color=Color.GREEN,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.HAS_INPUT: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.CIRCLE,
-        label='has input',
+        label="has input",
         color=Color.BLUE,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.HAS_OUTPUT: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.CIRCLE,
-        label='has output',
+        label="has output",
         color=Color.PINK,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.INDIRECTLY_NEGATIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TEE,
-        label='indirectly negatively regulates',
+        label="indirectly negatively regulates",
         color=Color.RED,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.INDIRECTLY_POSITIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TRIANGLE,
-        label='indirectly positively regulates',
+        label="indirectly positively regulates",
         color=Color.GREEN,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.IS_SMALL_MOLECULE_INHIBITOR_OF: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TEE,
-        label='is small molecule inhibitor of',
+        label="is small molecule inhibitor of",
         color=Color.RED,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.IS_SMALL_MOLECULE_ACTIVATOR_OF: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TRIANGLE,
-        label='is small molecule activator of',
+        label="is small molecule activator of",
         color=Color.GREEN,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.NEGATIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TEE,
-        label='negatively regulates',
+        label="negatively regulates",
         color=Color.RED,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.POSITIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TRIANGLE,
-        label='positively regulates',
+        label="positively regulates",
         color=Color.GREEN,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.PROVIDES_INPUT_FOR: RelationStyle(
         line_style=LineStyle.SOLID,
-        arrow_shape=ArrowShape.CIRCLE_TRIANGLE,
-        label='provides input for',
+        # The widget uses `circle-triangle` in this case, but that shape is not part of the CX2
+        # spec. So we need to intentionally deviate and use a supported shape here.
+        # See: https://cytoscape.org/cx/cx2/cx2-visual-styles/#2361-edge-source-arrow-shape
+        arrow_shape=ArrowShape.CIRCLE,
+        label="provides input for",
         color=Color.PURPLE,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
     RelationType.REMOVES_INPUT_FOR: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.SQUARE,
-        label='removes input for',
+        label="removes input for",
         color=Color.LIGHT_RED,
-        width=Width.DEFAULT
+        width=Width.DEFAULT,
     ),
 }
 
@@ -470,7 +472,8 @@ VISUAL_PROPERTIES = {
             "definition": {
                 "attribute": "type",
                 "map": [
-                    {"v": key, "vp": value.label_font_size} for key, value in NODE_STYLES.items()
+                    {"v": key, "vp": value.label_font_size}
+                    for key, value in NODE_STYLES.items()
                 ],
                 "type": "integer",
             },
@@ -480,7 +483,8 @@ VISUAL_PROPERTIES = {
             "definition": {
                 "attribute": "type",
                 "map": [
-                    {"v": key, "vp": value.label_max_width} for key, value in NODE_STYLES.items()
+                    {"v": key, "vp": value.label_max_width}
+                    for key, value in NODE_STYLES.items()
                 ],
                 "type": "integer",
             },
