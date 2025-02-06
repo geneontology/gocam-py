@@ -509,3 +509,30 @@ objects:
 
 ```
 
+## CX2 Conversion
+
+Additional dependencies are required for CX2 conversion. Install them with the `cx2` extras:
+
+```bash
+pip install gocam-py[cx2]
+```
+
+> [!IMPORTANT]
+> This will attempt to install the `pygraphviz` package, which requires [Graphviz](https://www.graphviz.org/) (version 2.46 or later) to be installed. If you are on MacOS and you installed Graphviz with Homebrew, you may need to set the following environment variables first so that `pygraphviz` can find the Graphviz installation:
+> ```shell
+> export GRAPHVIZ_PREFIX=$(brew --prefix graphviz)
+> export CFLAGS="-I${GRAPHVIZ_PREFIX}/include"
+> export LDFLAGS="-L${GRAPHVIZ_PREFIX}/lib"
+> ```
+
+Then you can convert a GO-CAM model to CX2 with the `convert` subcommand:
+
+```bash
+gocam convert -O cx2 model.yaml
+```
+
+See the CLI help for more information and options:
+
+```bash
+gocam convert --help
+```

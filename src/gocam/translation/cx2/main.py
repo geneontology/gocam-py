@@ -4,8 +4,9 @@ import re
 from functools import cache
 from typing import Dict, List, Optional, Union
 
+import networkx as nx
 import prefixmaps
-from ndex2.cx2 import CX2Network
+from ndex2.cx2 import CX2Network, CX2NetworkXFactory
 
 from gocam.datamodel import (
     EnabledByProteinComplexAssociation,
@@ -74,7 +75,9 @@ def _format_link(url: str, label: str) -> str:
 IQUERY_GENE_SYMBOL_PATTERN = re.compile("(^[A-Z][A-Z0-9-]*$)|(^C[0-9]+orf[0-9]+$)")
 
 
-def model_to_cx2(gocam: Model, *, validate_iquery_gene_symbol_pattern=True) -> list:
+def model_to_cx2(
+    gocam: Model, *, validate_iquery_gene_symbol_pattern=True, apply_dot_layout=False
+) -> list:
     # Internal state
     input_output_nodes: Dict[str, int] = {}
     activity_nodes_by_activity_id: Dict[str, int] = {}
@@ -157,7 +160,7 @@ def model_to_cx2(gocam: Model, *, validate_iquery_gene_symbol_pattern=True) -> l
             "@context": json.dumps(go_context.as_dict()),
             "name": gocam.title if gocam.title is not None else gocam.id,
             "prov:wasDerivedFrom": go_converter.expand(gocam.id),
-            "description": f"<p><img src=\"{LEGEND_GRAPHIC_SRC}\" style=\"width: 100%;\"/></p>"
+            "description": f'<p><img src="{LEGEND_GRAPHIC_SRC}" style="width: 100%;"/></p>',
         }
     )
     # This gets added separately so we can declare the datatype
@@ -272,5 +275,34 @@ def model_to_cx2(gocam: Model, *, validate_iquery_gene_symbol_pattern=True) -> l
     # Set visual properties for the network
     cx2_network.set_visual_properties(VISUAL_PROPERTIES)
     cx2_network.set_opaque_aspect("visualEditorProperties", [VISUAL_EDITOR_PROPERTIES])
+
+    if apply_dot_layout:
+        # Convert the CX2 network to a networkx graph
+        networkx_graph = CX2NetworkXFactory().get_graph(cx2_network)
+
+        # Our node and edge attributes confuse the pydot conversion, but we don't need them just
+        # for layout
+        for node_id in networkx_graph.nodes:
+            networkx_graph.nodes[node_id].clear()
+        for edge_id in networkx_graph.edges:
+            networkx_graph.edges[edge_id].clear()
+
+        # Run graphviz layout on the networkx graph
+        layout = nx.nx_pydot.pydot_layout(networkx_graph, prog="dot")
+
+        # These scaling factors are totally heuristic
+        x_scale = 2.0
+        y_scale = 1.5
+
+        # Get the max x and y values so that we can flip the layout around so its goes top-to-bottom
+        # Flipping it left-to-right makes it more similar to the cytoscape-dagre layout used by the
+        # pathway widget
+        max_x = max([v[0] for v in layout.values()])
+        max_y = max([v[1] for v in layout.values()])
+
+        # Stick the computed layout positions back into the CX2 network
+        for node_id, position in layout.items():
+            cx2_network.get_node(node_id)["x"] = (max_x - position[0]) * x_scale
+            cx2_network.get_node(node_id)["y"] = (max_y - position[1]) * y_scale
 
     return cx2_network.to_cx2()
