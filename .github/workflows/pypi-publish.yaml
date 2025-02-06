@@ -30,7 +30,7 @@ jobs:
           cache: 'poetry'
 
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --all-extras
 
       - name: Generate project files
         run: make clean all

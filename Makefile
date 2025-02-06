@@ -78,7 +78,7 @@ setup: check-config git-init install gen-project gen-examples gendoc git-add git
 
 # install any dependencies required for building
 install:
-	poetry install
+	poetry install --all-extras
 .PHONY: install
 
 # ---
