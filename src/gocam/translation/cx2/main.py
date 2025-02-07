@@ -49,10 +49,10 @@ SPECIES_CODES = [
     "Xenopus",
 ]
 
-# This image gets referenced in the network description. The NDEx folks were fairly insistent that
-# we include a legend graphic in the network description. The process of generating this graphic is
-# not fully automated, but it is described here: https://github.com/pkalita-lbl/ndex-gocam-legend
-LEGEND_GRAPHIC_SRC = "https://geneontology.org/assets/ndex-gocam-legend-v1.png"
+# This image gets referenced in the network description. as recommended by NDEx. The process of
+# generating this graphic is not fully automated, but it is described here:
+# https://github.com/pkalita-lbl/ndex-gocam-legend
+LEGEND_GRAPHIC_SRC = "https://geneontology.org/assets/ndex-gocam-legend-v2.png"
 
 
 def _remove_species_code_suffix(label: str) -> str:
