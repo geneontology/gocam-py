@@ -218,13 +218,6 @@ class MinervaWrapper:
                     evs = _evidence_from_fact(fact)
                     yield activity, object_, evs
 
-        def _has_molecule_root_type(individual_id: str) -> bool:
-            root_types = individual_to_root_types.get(individual_id, [])
-            return (
-                CHEMICAL_ENTITY in root_types
-                and INFORMATION_BIOMACROMOLECULE not in root_types
-            )
-
         for individual in obj["individuals"]:
             root_types = [x["id"] for x in individual.get("root-type", []) if x]
             individual_to_root_types[individual["id"]] = root_types
@@ -312,8 +305,6 @@ class MinervaWrapper:
         for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
-            if not _has_molecule_root_type(individual):
-                continue
             if activity.has_input is None:
                 activity.has_input = []
             activity.has_input.append(
@@ -323,8 +314,6 @@ class MinervaWrapper:
         for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_INPUT
         ):
-            if not _has_molecule_root_type(individual):
-                continue
             association = MoleculeAssociation(
                 term=individual_to_term[individual], evidence=evs
             )
@@ -333,8 +322,6 @@ class MinervaWrapper:
         for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
-            if not _has_molecule_root_type(individual):
-                continue
             if activity.has_output is None:
                 activity.has_output = []
             activity.has_output.append(
@@ -344,8 +331,6 @@ class MinervaWrapper:
         for activity, individual, evs in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_OUTPUT
         ):
-            if not _has_molecule_root_type(individual):
-                continue
             association = MoleculeAssociation(
                 term=individual_to_term[individual], evidence=evs
             )
