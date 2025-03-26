@@ -192,8 +192,10 @@ class MinervaWrapper:
                     with_objs = with_obj.split(" | ")
                 else:
                     with_objs = None
+                # TODO: Handle multiple contributor annotations
+                contributor_annotations = evidence_inst_annotations.get("contributor", None)
                 prov = ProvenanceInfo(
-                    contributor=evidence_inst_annotations.get("contributor", None),
+                    contributor=[contributor_annotations] if contributor_annotations else None,
                     date=evidence_inst_annotations.get("date", None),
                 )
                 ev = EvidenceItem(

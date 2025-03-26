@@ -5,47 +5,6 @@ title: tRNA repair and recycling by ANKZF1, ELAC1 and TRNT1 following activity o
 taxon: NCBITaxon:9606
 status: production
 activities:
-- id: gomodel:63f809ec00000701/63f809ec00000726
-  enabled_by:
-    type: EnabledByGeneProductAssociation
-    term: UniProtKB:Q9H8Y5
-  molecular_function:
-    type: MolecularFunctionAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:31011209
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-    term: GO:0004521
-  part_of:
-    type: BiologicalProcessAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:31011209
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-    term: GO:0072344
-  has_output:
-  - type: MoleculeAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:31011209
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-    term: CHEBI:10668
-  causal_associations:
-  - type: CausalAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:31011209
-      provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-    predicate: RO:0002629
-    downstream_activity: gomodel:63f809ec00000701/63f809ec00000735
 - id: gomodel:63f809ec00000701/63f809ec00000742
   enabled_by:
     type: EnabledByGeneProductAssociation
@@ -56,7 +15,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     term: GO:0004810
   part_of:
@@ -65,9 +25,55 @@ activities:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     term: GO:0001680
+- id: gomodel:63f809ec00000701/63f809ec00000726
+  enabled_by:
+    type: EnabledByGeneProductAssociation
+    term: UniProtKB:Q9H8Y5
+  molecular_function:
+    type: MolecularFunctionAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:31011209
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+    term: GO:0004521
+  part_of:
+    type: BiologicalProcessAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:31011209
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+    term: GO:0072344
+  has_output:
+  - type: MoleculeAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:31011209
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+    term: CHEBI:10668
+  causal_associations:
+  - type: CausalAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:31011209
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+    predicate: RO:0002629
+    downstream_activity: gomodel:63f809ec00000701/63f809ec00000735
 - id: gomodel:63f809ec00000701/63f809ec00000735
   enabled_by:
     type: EnabledByGeneProductAssociation
@@ -78,7 +84,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     term: GO:0004549
   part_of:
@@ -87,7 +94,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     term: GO:0042780
   has_input:
@@ -96,7 +104,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     term: CHEBI:10668
   causal_associations:
@@ -105,7 +114,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:32075755
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     predicate: RO:0002629
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000742
@@ -119,7 +129,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     term: GO:1904678
   occurs_in:
@@ -128,7 +139,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     term: GO:0022626
   part_of:
@@ -137,16 +149,28 @@ activities:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
     term: GO:0140708
+  has_input:
+  - type: MoleculeAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:33909987
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+    term: CHEBI:17732
   causal_associations:
   - type: CausalAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:33909987
       provenances:
-      - contributor: https://orcid.org/0000-0001-7299-6685
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-02'
     predicate: RO:0002304
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000726

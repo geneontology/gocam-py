@@ -19,7 +19,8 @@ activities:
       with_objects:
       - MGI:96892
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-05-07'
     term: GO:0004888
   occurs_in:
@@ -28,7 +29,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:36426942
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-05-07'
     term: GO:0005886
   part_of:
@@ -39,9 +41,22 @@ activities:
       with_objects:
       - MGI:96892
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-05-07'
     term: GO:0050853
+  has_input:
+  - type: MoleculeAssociation
+    evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - MGI:96892
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+    term: UniProtKB:P07948
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -50,7 +65,8 @@ activities:
       with_objects:
       - MGI:96892
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-05-07'
     predicate: RO:0002629
     downstream_activity: gomodel:6606056e00002011/6606056e00002040
@@ -64,7 +80,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:17562706
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0004725
   occurs_in:
@@ -73,7 +90,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:10940933
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0005737
   part_of:
@@ -82,7 +100,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:35941532
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0050859
 - id: gomodel:6606056e00002011/6606056e00002040
@@ -95,7 +114,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:11823534
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0004713
   occurs_in:
@@ -104,7 +124,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:15173188
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0005886
   part_of:
@@ -115,16 +136,30 @@ activities:
       with_objects:
       - UniProtKB:P25911
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0001782
+  has_input:
+  - type: MoleculeAssociation
+    evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - MGI:96892
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+    term: UniProtKB:P21854
   causal_associations:
   - type: CausalAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:11823534
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     predicate: RO:0002629
     downstream_activity: gomodel:6606056e00002011/6606056e00002014
@@ -138,7 +173,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:27810925
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0004888
   occurs_in:
@@ -147,7 +183,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:1711157
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0005886
   part_of:
@@ -156,7 +193,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:1711157
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     term: GO:0050859
   causal_associations:
@@ -165,7 +203,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:27810925
       provenances:
-      - contributor: https://orcid.org/0000-0001-7646-0052
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
         date: '2024-04-09'
     predicate: RO:0002629
     downstream_activity: gomodel:6606056e00002011/6606056e00002049

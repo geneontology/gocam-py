@@ -43,11 +43,11 @@ def test_model_to_cx2(example_model):
 
     node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
     assert node_aspect is not None
-    assert len(node_aspect["nodes"]) == 10, "Incorrect number of nodes in CX2"
+    assert len(node_aspect["nodes"]) == 13, "Incorrect number of nodes in CX2"
 
     edge_aspect = next((aspect for aspect in cx2 if "edges" in aspect), None)
     assert edge_aspect is not None
-    assert len(edge_aspect["edges"]) == 14, "Incorrect number of edges in CX2"
+    assert len(edge_aspect["edges"]) == 21, "Incorrect number of edges in CX2"
 
 
 def test_load_cx2_to_ndex(example_model):
@@ -59,8 +59,8 @@ def test_load_cx2_to_ndex(example_model):
     cx2_network = factory.get_cx2network(cx2)
 
     assert isinstance(cx2_network, CX2Network)
-    assert len(cx2_network.get_nodes()) == 10, "Incorrect number of nodes in CX2"
-    assert len(cx2_network.get_edges()) == 14, "Incorrect number of edges in CX2"
+    assert len(cx2_network.get_nodes()) == 13, "Incorrect number of nodes in CX2"
+    assert len(cx2_network.get_edges()) == 21, "Incorrect number of edges in CX2"
 
 
 def test_node_type_attribute(input_model):
