@@ -51,7 +51,9 @@ def _annotations(obj: Dict) -> Dict[str, str]:
 
     Annotations are lists of objects with keys "key" and "value".
     """
-    return {_normalize_property(a["key"]): a["value"] for a in obj["annotations"]}
+    return {
+        _normalize_property(a["key"]): a["value"] for a in obj.get("annotations", [])
+    }
 
 
 def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
@@ -61,8 +63,8 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
     Annotations are lists of objects with keys "key" and "value".
     """
     anns = defaultdict(list)
-    for a in obj["annotations"]:
-        anns[a["key"]].append(a["value"])
+    for a in obj.get("annotations", []):
+        anns[_normalize_property(a["key"])].append(a["value"])
     return anns
 
 
@@ -173,7 +175,8 @@ class MinervaWrapper:
         # individual ID to "root" type / category, e.g Evidence, BP
         individual_to_root_types: Dict[str, List[str]] = {}
         individual_to_term: Dict[str, str] = {}
-        individual_to_annotations: Dict[str, Dict] = {}
+        individual_to_annotations: Dict[str, Dict[str, str]] = {}
+        individual_to_annotations_multivalued: Dict[str, Dict[str, List[str]]] = {}
         objects_by_id: Dict[str, Dict] = {}
         activities: List[Activity] = []
         activities_by_mf_id: DefaultDict[str, List[Activity]] = defaultdict(list)
@@ -187,16 +190,20 @@ class MinervaWrapper:
                 evidence_inst_annotations = individual_to_annotations.get(
                     evidence_inst_id, {}
                 )
+                evidence_inst_annotations_multivalued = (
+                    individual_to_annotations_multivalued.get(evidence_inst_id, {})
+                )
                 with_obj: Optional[str] = evidence_inst_annotations.get("with", None)
                 if with_obj:
-                    with_objs = with_obj.split(" | ")
+                    with_objs = [s.strip() for s in with_obj.split("|")]
                 else:
                     with_objs = None
-                # TODO: Handle multiple contributor annotations
-                contributor_annotations = evidence_inst_annotations.get("contributor", None)
                 prov = ProvenanceInfo(
-                    contributor=[contributor_annotations] if contributor_annotations else None,
+                    contributor=evidence_inst_annotations_multivalued.get(
+                        "contributor"
+                    ),
                     date=evidence_inst_annotations.get("date", None),
+                    provided_by=evidence_inst_annotations_multivalued.get("providedBy"),
                 )
                 ev = EvidenceItem(
                     term=individual_to_term.get(evidence_inst_id, None),
@@ -221,8 +228,9 @@ class MinervaWrapper:
                     yield activity, object_, evs
 
         for individual in obj["individuals"]:
+            individual_id = individual["id"]
             root_types = [x["id"] for x in individual.get("root-type", []) if x]
-            individual_to_root_types[individual["id"]] = root_types
+            individual_to_root_types[individual_id] = root_types
 
             term_id: Optional[str] = None
             for type_ in individual.get("type", []):
@@ -235,10 +243,11 @@ class MinervaWrapper:
                 objects_by_id[type_id] = type_
                 term_id = type_id
 
-            individual_to_term[individual["id"]] = term_id
-            if "annotations" in individual:
-                anns = _annotations(individual)
-                individual_to_annotations[individual["id"]] = anns
+            individual_to_term[individual_id] = term_id
+            individual_to_annotations[individual_id] = _annotations(individual)
+            individual_to_annotations_multivalued[individual_id] = (
+                _annotations_multivalued(individual)
+            )
 
         for fact in obj["facts"]:
             facts_by_property[fact["property"]].append(fact)

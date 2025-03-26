@@ -1,4 +1,5 @@
 import json
+import re
 
 import pytest
 
@@ -125,3 +126,47 @@ def test_multivalued_input_and_output():
     )
     assert len(cs_activity.has_input) == 3
     assert len(cs_activity.has_output) == 2
+
+
+def test_complete_provenance_on_evidence():
+    """Test that all contributor and providedBy annotations are included on the ProvenanceInfo
+    instance attached to evidence."""
+    mw = MinervaWrapper()
+    with open(INPUT_DIR / "minerva-633b013300000306.json", "r") as f:
+        minerva_object = json.load(f)
+
+    # ensure that all evidence has more than one contributor and providedBy annotation
+    for individual in minerva_object["individuals"]:
+        if any(rt["id"] == "ECO:0000000" for rt in individual["root-type"]):
+            individual["annotations"].append(
+                {"key": "providedBy", "value": "https://www.example.org"}
+            )
+            individual["annotations"].append(
+                {"key": "contributor", "value": "https://orcid.org/0000-0000-0000-0000"}
+            )
+
+    model = mw.minerva_object_to_model(minerva_object)
+
+    # assert that provenances of evidence has more than one contributor and provided_by
+    for activity in model.activities:
+        for association in activity.causal_associations:
+            for evidence in association.evidence:
+                for provenance in evidence.provenances:
+                    assert len(provenance.contributor) > 1
+                    assert len(provenance.provided_by) > 1
+
+
+def test_evidence_with_objects():
+    """Test that evidence with_objects are correctly translated."""
+    mw = MinervaWrapper()
+    with open(INPUT_DIR / "minerva-5f46c3b700001031.json", "r") as f:
+        minerva_object = json.load(f)
+    model = mw.minerva_object_to_model(minerva_object)
+
+    kinase_activity = next((a for a in model.activities if a.molecular_function.term == "GO:0004674"), None)
+    assert kinase_activity is not None
+    assert len(kinase_activity.molecular_function.evidence) == 1
+
+    evidence = kinase_activity.molecular_function.evidence[0]
+    assert len(evidence.with_objects) == 2
+    assert all(re.match(r"^[A-Z]+:[A-Z0-9]+$", obj) for obj in evidence.with_objects)
