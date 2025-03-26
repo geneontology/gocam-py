@@ -8,9 +8,6 @@ activities:
 - id: gomodel:63f809ec00000701/63f809ec00000742
   enabled_by:
     type: EnabledByGeneProductAssociation
-    term: UniProtKB:Q96Q11
-  molecular_function:
-    type: MolecularFunctionAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:32075755
@@ -18,6 +15,17 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
+    term: UniProtKB:Q96Q11
+  molecular_function:
+    type: MolecularFunctionAssociation
     term: GO:0004810
   part_of:
     type: BiologicalProcessAssociation
@@ -28,13 +36,18 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     term: GO:0001680
 - id: gomodel:63f809ec00000701/63f809ec00000726
   enabled_by:
     type: EnabledByGeneProductAssociation
-    term: UniProtKB:Q9H8Y5
-  molecular_function:
-    type: MolecularFunctionAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:31011209
@@ -42,6 +55,17 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
+    term: UniProtKB:Q9H8Y5
+  molecular_function:
+    type: MolecularFunctionAssociation
     term: GO:0004521
   part_of:
     type: BiologicalProcessAssociation
@@ -52,6 +76,14 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     term: GO:0072344
   has_output:
   - type: MoleculeAssociation
@@ -62,6 +94,14 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     term: CHEBI:10668
   causal_associations:
   - type: CausalAssociation
@@ -72,14 +112,19 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     predicate: RO:0002629
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000735
 - id: gomodel:63f809ec00000701/63f809ec00000735
   enabled_by:
     type: EnabledByGeneProductAssociation
-    term: UniProtKB:Q9H777
-  molecular_function:
-    type: MolecularFunctionAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:32075755
@@ -87,6 +132,17 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
+    term: UniProtKB:Q9H777
+  molecular_function:
+    type: MolecularFunctionAssociation
     term: GO:0004549
   part_of:
     type: BiologicalProcessAssociation
@@ -97,6 +153,14 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     term: GO:0042780
   has_input:
   - type: MoleculeAssociation
@@ -107,6 +171,14 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     term: CHEBI:10668
   causal_associations:
   - type: CausalAssociation
@@ -117,14 +189,19 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     predicate: RO:0002629
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000742
 - id: gomodel:63f809ec00000701/63f809ec00000706
   enabled_by:
     type: EnabledByGeneProductAssociation
-    term: UniProtKB:O60524
-  molecular_function:
-    type: MolecularFunctionAssociation
     evidence:
     - term: ECO:0000314
       reference: PMID:33909987
@@ -132,6 +209,17 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
+    term: UniProtKB:O60524
+  molecular_function:
+    type: MolecularFunctionAssociation
     term: GO:1904678
   occurs_in:
     type: CellularAnatomicalEntityAssociation
@@ -142,6 +230,14 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     term: GO:0022626
   part_of:
     type: BiologicalProcessAssociation
@@ -152,6 +248,14 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     term: GO:0140708
   has_input:
   - type: MoleculeAssociation
@@ -162,6 +266,14 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
     term: CHEBI:17732
   causal_associations:
   - type: CausalAssociation
@@ -172,6 +284,14 @@ activities:
       - contributor:
         - https://orcid.org/0000-0001-7299-6685
         date: '2023-03-02'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-02'
+      provided_by:
+      - https://www.uniprot.org
     predicate: RO:0002304
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000726
 objects:
@@ -223,4 +343,10 @@ objects:
 - id: GO:0001680
   label: tRNA 3'-terminal CCA addition
   type: gocam:Object
+provenances:
+- contributor:
+  - https://orcid.org/0000-0001-7299-6685
+  date: '2023-06-08'
+  provided_by:
+  - https://www.uniprot.org
 

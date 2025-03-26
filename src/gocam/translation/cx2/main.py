@@ -222,7 +222,9 @@ def model_to_cx2(
                     )
                 node_attributes["member"].append(member_name)
 
-        node_attributes["Evidence"] = _format_evidence_list(activity.enabled_by.evidence)
+        node_attributes["Evidence"] = _format_evidence_list(
+            activity.enabled_by.evidence
+        )
 
         if activity.molecular_function:
             node_attributes["Molecular Function"] = _format_term_association(
