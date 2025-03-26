@@ -386,6 +386,12 @@ class MinervaWrapper:
                 object_.label = obj["label"]
             objects.append(object_)
 
+        provenance = ProvenanceInfo(
+            contributor=annotations_mv.get("contributor"),
+            date=annotations.get("date", None),
+            provided_by=annotations_mv.get("providedBy"),
+        )
+
         cam = Model(
             id=id,
             title=annotations["title"],
@@ -394,5 +400,6 @@ class MinervaWrapper:
             taxon=annotations.get("in_taxon", None),
             activities=activities,
             objects=objects,
+            provenances=[provenance],
         )
         return cam
