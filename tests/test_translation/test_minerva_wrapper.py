@@ -177,6 +177,50 @@ def test_provenance_on_model():
     assert provenance.date == "2023-11-02"
 
 
+def test_provenance_on_associations():
+    """Test that fact annotations are included on the ProvenanceInfo instance attached to various
+    Association subclasses."""
+    minerva_object = load_minerva_object("663d668500002178")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    for activity in model.activities:
+        if activity.causal_associations is not None:
+            for causal_assoc in activity.causal_associations:
+                assert causal_assoc.provenances is not None
+                assert len(causal_assoc.provenances) > 0
+
+        if activity.has_input is not None:
+            for input_assoc in activity.has_input:
+                assert input_assoc.provenances is not None
+                assert len(input_assoc.provenances) > 0
+
+        if activity.has_output is not None:
+            for output_assoc in activity.has_output:
+                assert output_assoc.provenances is not None
+                assert len(output_assoc.provenances) > 0
+
+        if activity.has_primary_input is not None:
+            assert activity.has_primary_input.provenances is not None
+            assert len(activity.has_primary_input.provenances) > 0
+
+        if activity.has_primary_output is not None:
+            assert activity.has_primary_output.provenances is not None
+            assert len(activity.has_primary_output.provenances) > 0
+
+        if activity.occurs_in is not None:
+            assert activity.occurs_in.provenances is not None
+            assert len(activity.occurs_in.provenances) > 0
+
+        if activity.part_of is not None:
+            assert activity.part_of.provenances is not None
+            assert len(activity.part_of.provenances) > 0
+
+        if activity.enabled_by is not None:
+            assert activity.enabled_by.provenances is not None
+            assert len(activity.enabled_by.provenances) > 0
+
+
 def test_evidence_with_objects():
     """Test that evidence with_objects are correctly translated."""
     minerva_object = load_minerva_object("5f46c3b700001031")
@@ -187,8 +231,8 @@ def test_evidence_with_objects():
         (a for a in model.activities if a.molecular_function.term == "GO:0004674"), None
     )
     assert kinase_activity is not None
-    assert len(kinase_activity.molecular_function.evidence) == 1
+    assert len(kinase_activity.enabled_by.evidence) == 1
 
-    evidence = kinase_activity.molecular_function.evidence[0]
+    evidence = kinase_activity.enabled_by.evidence[0]
     assert len(evidence.with_objects) == 2
     assert all(re.match(r"^[A-Z]+:[A-Z0-9]+$", obj) for obj in evidence.with_objects)

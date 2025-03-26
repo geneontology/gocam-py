@@ -68,6 +68,17 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
     return anns
 
 
+def _provenance_from_fact(fact: Dict) -> ProvenanceInfo:
+    """Produce a ProvenanceInfo object from a fact object."""
+    annotations = _annotations(fact)
+    annotations_mv = _annotations_multivalued(fact)
+    return ProvenanceInfo(
+        contributor=annotations_mv.get("contributor"),
+        date=annotations.get("date", None),
+        provided_by=annotations_mv.get("providedBy"),
+    )
+
+
 def _setattr_with_warning(obj, attr, value):
     if getattr(obj, attr, None) is not None:
         logger.warning(
@@ -217,7 +228,7 @@ class MinervaWrapper:
         def _iter_activities_by_fact_subject(
             *,
             fact_property: str,
-        ) -> Iterator[Tuple[Activity, str, List[EvidenceItem]]]:
+        ) -> Iterator[Tuple[Activity, str, List[EvidenceItem], ProvenanceInfo]]:
             for fact in facts_by_property.get(fact_property, []):
                 subject, object_ = fact["subject"], fact["object"]
                 if object_ not in individual_to_term:
@@ -225,7 +236,8 @@ class MinervaWrapper:
                     continue
                 for activity in activities_by_mf_id.get(subject, []):
                     evs = _evidence_from_fact(fact)
-                    yield activity, object_, evs
+                    provenance = _provenance_from_fact(fact)
+                    yield activity, object_, evs, provenance
 
         for individual in obj["individuals"]:
             individual_id = individual["id"]
@@ -267,6 +279,7 @@ class MinervaWrapper:
             root_types = individual_to_root_types.get(object_, [])
 
             evs = _evidence_from_fact(fact)
+            prov = _provenance_from_fact(fact)
             enabled_by_association: EnabledByAssociation
             if PROTEIN_CONTAINING_COMPLEX in root_types:
                 has_part_facts = [
@@ -280,70 +293,81 @@ class MinervaWrapper:
                     if fact["object"] in individual_to_term
                 ]
                 enabled_by_association = EnabledByProteinComplexAssociation(
-                    term=gene_id, members=members
+                    term=gene_id, members=members, evidence=evs, provenances=[prov]
                 )
             elif INFORMATION_BIOMACROMOLECULE in root_types:
-                enabled_by_association = EnabledByGeneProductAssociation(term=gene_id)
+                enabled_by_association = EnabledByGeneProductAssociation(
+                    term=gene_id, evidence=evs, provenances=[prov]
+                )
             else:
+                logger.warning("Unknown enabled_by type")
                 continue
 
             activity = Activity(
                 id=subject,
                 enabled_by=enabled_by_association,
                 molecular_function=MolecularFunctionAssociation(
-                    term=individual_to_term[subject], evidence=evs
+                    term=individual_to_term[subject]
                 ),
             )
             activities.append(activity)
             activities_by_mf_id[subject].append(activity)
 
-        for activity, individual, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
             fact_property=PART_OF
         ):
             association = BiologicalProcessAssociation(
-                term=individual_to_term[individual], evidence=evs
+                term=individual_to_term[individual], evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "part_of", association)
 
-        for activity, individual, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
             fact_property=OCCURS_IN
         ):
             association = CellularAnatomicalEntityAssociation(
-                term=individual_to_term[individual], evidence=evs
+                term=individual_to_term[individual], evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "occurs_in", association)
 
-        for activity, individual, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
             if activity.has_input is None:
                 activity.has_input = []
             activity.has_input.append(
-                MoleculeAssociation(term=individual_to_term[individual], evidence=evs)
+                MoleculeAssociation(
+                    term=individual_to_term[individual],
+                    evidence=evs,
+                    provenances=[prov],
+                )
             )
 
-        for activity, individual, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_INPUT
         ):
             association = MoleculeAssociation(
-                term=individual_to_term[individual], evidence=evs
+                term=individual_to_term[individual], evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_input", association)
 
-        for activity, individual, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
             if activity.has_output is None:
                 activity.has_output = []
             activity.has_output.append(
-                MoleculeAssociation(term=individual_to_term[individual], evidence=evs)
+                MoleculeAssociation(
+                    term=individual_to_term[individual],
+                    evidence=evs,
+                    provenances=[prov],
+                )
             )
 
-        for activity, individual, evs in _iter_activities_by_fact_subject(
+        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_OUTPUT
         ):
             association = MoleculeAssociation(
-                term=individual_to_term[individual], evidence=evs
+                term=individual_to_term[individual], evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_output", association)
 
@@ -367,10 +391,12 @@ class MinervaWrapper:
                 subject_activity = subject_activities[0]
                 object_activity = object_activities[0]
                 evs = _evidence_from_fact(fact)
+                provenance = _provenance_from_fact(fact)
                 rel = CausalAssociation(
                     predicate=fact_property,
                     downstream_activity=object_activity.id,
                     evidence=evs,
+                    provenances=[provenance],
                 )
                 if subject_activity.causal_associations is None:
                     subject_activity.causal_associations = []
