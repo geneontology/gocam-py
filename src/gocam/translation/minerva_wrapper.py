@@ -300,7 +300,7 @@ class MinervaWrapper:
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
             else:
-                logger.warning("Unknown enabled_by type")
+                logger.warning(f"Unknown enabled_by type for {object_}")
                 continue
 
             activity = Activity(
