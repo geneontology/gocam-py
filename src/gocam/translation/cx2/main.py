@@ -131,6 +131,16 @@ def model_to_cx2(
         if not isinstance(associations, list):
             associations = [associations]
         for association in associations:
+            # Filter proteins at CX2 level (per issue #65)
+            # Skip if the term is an INFORMATION_BIOMACROMOLECULE
+            # We check if it's already in activity_nodes_by_enabled_by_id as a simple
+            # proxy for identifying proteins/gene products
+            if (
+                association.term in activity_nodes_by_enabled_by_id
+                and "has input" in edge_attributes["name"]
+            ):
+                continue
+
             if association.term in activity_nodes_by_enabled_by_id:
                 target = activity_nodes_by_enabled_by_id[association.term]
             elif association.term in input_output_nodes:

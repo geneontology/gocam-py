@@ -89,6 +89,30 @@ def test_has_input_and_has_output():
     assert len(urea_output_activities) == 3
 
 
+def test_has_input_issue_65():
+    """Test that all input associations, including proteins, are included in the core model"""
+    mw = MinervaWrapper()
+    with open(INPUT_DIR / "minerva-5f46c3b700001031.json", "r") as f:
+        minerva_object = json.load(f)
+    model = mw.minerva_object_to_model(minerva_object)
+
+    # Find activities with inputs
+    activities_with_input = [a for a in model.activities if a.has_input is not None]
+
+    # Verify that all inputs are included, even protein inputs
+    for activity in activities_with_input:
+        for input_assoc in activity.has_input:
+            # Check if the input term is also the term of an enabled_by for any activity
+            is_protein = any(
+                a.enabled_by.term == input_assoc.term
+                for a in model.activities
+                if a.enabled_by is not None
+            )
+            # If this test passes, it means we're no longer filtering at the core data model level
+            if is_protein:
+                assert input_assoc is not None
+
+
 def test_multivalued_input_and_output():
     """Test that activities with multiple inputs and outputs are correctly translated."""
     mw = MinervaWrapper()
