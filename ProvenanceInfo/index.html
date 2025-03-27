@@ -229,7 +229,7 @@
 <tbody>
 <tr>
 <td><a href="../contributor/">contributor</a></td>
-<td>0..1 <br/> <a href="../String/">String</a></td>
+<td>* <br/> <a href="../String/">String</a></td>
 <td></td>
 <td>direct</td>
 </tr>
@@ -247,7 +247,7 @@
 </tr>
 <tr>
 <td><a href="../provided_by/">provided_by</a></td>
-<td>0..1 <br/> <a href="../String/">String</a></td>
+<td>* <br/> <a href="../String/">String</a></td>
 <td></td>
 <td>direct</td>
 </tr>
@@ -395,6 +395,7 @@ attributes:
     slot_uri: dct:contributor
     domain_of:
     - ProvenanceInfo
+    multivalued: true
   created:
     name: created
     from_schema: https://w3id.org/gocam
@@ -416,6 +417,7 @@ attributes:
     slot_uri: pav:providedBy
     domain_of:
     - ProvenanceInfo
+    multivalued: true
 
 </code></pre>
 </details>
@@ -435,6 +437,7 @@ attributes:
     domain_of:
     - ProvenanceInfo
     range: string
+    multivalued: true
   created:
     name: created
     from_schema: https://w3id.org/gocam
@@ -465,6 +468,7 @@ attributes:
     domain_of:
     - ProvenanceInfo
     range: string
+    multivalued: true
 
 </code></pre>
 </details>
