@@ -301,8 +301,9 @@ def model_to_cx2(
         # Convert the CX2 network to a networkx graph
         networkx_graph = CX2NetworkXFactory().get_graph(cx2_network)
 
-        # Our node and edge attributes confuse the pydot conversion, but we don't need them just
-        # for layout
+        # Our graph, node, and edge attributes confuse the pydot conversion, but we don't need them
+        # just for layout
+        networkx_graph.graph.clear()
         for node_id in networkx_graph.nodes:
             networkx_graph.nodes[node_id].clear()
         for edge_id in networkx_graph.edges:
