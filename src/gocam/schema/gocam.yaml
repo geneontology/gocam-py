@@ -402,12 +402,14 @@ classes:
     description: Provenance information for an object
     attributes:
       contributor:
+        multivalued: true
         slot_uri: dct:contributor
       created:
         slot_uri: dct:created
       date:
         slot_uri: dct:date
       provided_by:
+        multivalued: true
         slot_uri: pav:providedBy
 
 enums:

@@ -90,7 +90,11 @@ def model_to_cx2(
     @cache
     def _get_object_label(object_id: str) -> str:
         object = next((obj for obj in gocam.objects if obj.id == object_id), None)
-        return _remove_species_code_suffix(object.label) if object is not None else ""
+        if object is None:
+            return ""
+        if object.label is None:
+            return object_id
+        return _remove_species_code_suffix(object.label)
 
     def _format_evidence_list(evidence_list: List[EvidenceItem]) -> str:
         """Format a list of evidence items as an HTML unordered list."""
@@ -112,15 +116,18 @@ def model_to_cx2(
         term_label = _get_object_label(term_id)
         term_url = go_converter.expand(term_id)
         term_link = _format_link(term_url, f"{term_label} [{term_id}]")
-        evidence_list = _format_evidence_list(term_association.evidence)
+        formatted = f"{term_link}"
 
-        return f"""
-{term_link}<br>
+        if term_association.evidence:
+            evidence_list = _format_evidence_list(term_association.evidence)
+            formatted += f"""
+<br>
 <div style="font-size: smaller; display: block; margin-inline-start: 1rem">
   Evidence:
   {evidence_list}
 </div>
-        """
+"""
+        return formatted
 
     def _add_input_output_nodes(
         associations: Optional[Union[MoleculeAssociation, List[MoleculeAssociation]]],
@@ -214,6 +221,10 @@ def model_to_cx2(
                         f"Name for complex member does not match expected pattern: {member_name}"
                     )
                 node_attributes["member"].append(member_name)
+
+        node_attributes["Evidence"] = _format_evidence_list(
+            activity.enabled_by.evidence
+        )
 
         if activity.molecular_function:
             node_attributes["Molecular Function"] = _format_term_association(
