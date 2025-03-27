@@ -96,17 +96,31 @@ def model_to_cx2(
             return object_id
         return _remove_species_code_suffix(object.label)
 
+    def _format_curie_link(curie: str) -> str:
+        try:
+            url = go_converter.expand(curie)
+            return _format_link(url, curie)
+        except ValueError:
+            return curie
+
     def _format_evidence_list(evidence_list: List[EvidenceItem]) -> str:
         """Format a list of evidence items as an HTML unordered list."""
         evidence_list_items = []
         for e in evidence_list:
-            reference_link = _format_link(go_converter.expand(e.reference), e.reference)
-            evidence_item = f"{reference_link} ({_get_object_label(e.term)})"
+            evidence_item = ""
+            if e.reference:
+                evidence_item += _format_curie_link(e.reference)
+            if e.term:
+                term_label = _get_object_label(e.term)
+                if evidence_item:
+                    evidence_item += f" ({term_label})"
+                else:
+                    evidence_item += term_label
             if e.with_objects:
-                with_objects = ", ".join(
-                    _format_link(go_converter.expand(o), o) for o in e.with_objects
-                )
-                evidence_item += f" with/from {with_objects}"
+                with_objects = ", ".join(_format_curie_link(o) for o in e.with_objects)
+                if evidence_item:
+                    evidence_item += " "
+                evidence_item += f"with/from {with_objects}"
             evidence_list_items.append(f"<li>{evidence_item}</li>")
         return f'<ul style="padding-inline-start: 1rem">{"".join(evidence_list_items)}</ul>'
 
@@ -301,8 +315,9 @@ def model_to_cx2(
         # Convert the CX2 network to a networkx graph
         networkx_graph = CX2NetworkXFactory().get_graph(cx2_network)
 
-        # Our node and edge attributes confuse the pydot conversion, but we don't need them just
-        # for layout
+        # Our graph, node, and edge attributes confuse the pydot conversion, but we don't need them
+        # just for layout
+        networkx_graph.graph.clear()
         for node_id in networkx_graph.nodes:
             networkx_graph.nodes[node_id].clear()
         for edge_id in networkx_graph.edges:
