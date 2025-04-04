@@ -4,13 +4,11 @@ import os
 import sys
 
 import click
-import ndex2
 import yaml
 
 from gocam import __version__
 from gocam.datamodel import Model
 from gocam.translation import MinervaWrapper
-from gocam.translation.cx2 import model_to_cx2
 
 
 @click.group()
@@ -59,8 +57,14 @@ def cli(verbose: int, quiet: bool, stacktrace: bool):
     show_default=True,
     help="Input format",
 )
+@click.option(
+    "--as-minerva/--no-as-minerva",
+    default=False,
+    show_default=True,
+    help="Export as minerva json/yaml",
+)
 @click.argument("model_ids", nargs=-1)
-def fetch(model_ids, format):
+def fetch(model_ids, as_minerva, format):
     """Fetch GO-CAM models."""
     wrapper = MinervaWrapper()
 
@@ -68,8 +72,11 @@ def fetch(model_ids, format):
         model_ids = wrapper.models_ids()
 
     for model_id in model_ids:
-        model = wrapper.fetch_model(model_id)
-        model_dict = model.model_dump(exclude_none=True)
+        if as_minerva:
+            model_dict = wrapper.fetch_minerva_object(model_id)
+        else:
+            model = wrapper.fetch_model(model_id)
+            model_dict = model.model_dump(exclude_none=True)
 
         if format == "json":
             click.echo(json.dumps(model_dict, indent=2))
@@ -118,9 +125,13 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
         raise click.UsageError(f"Could not load model: {e}")
 
     if output_format == "cx2":
+        from gocam.translation.cx2 import model_to_cx2
+
         cx2 = model_to_cx2(model, apply_dot_layout=dot_layout)
 
         if ndex_upload:
+            import ndex2
+
             # This is very basic proof-of-concept usage of the NDEx client. Once we have a better
             # idea of how we want to use it, we can refactor this to allow more CLI options for
             # connection details, visibility, adding the new network to a group, etc. At that point
