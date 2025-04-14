@@ -43,11 +43,11 @@ def test_model_to_cx2(example_model):
 
     node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
     assert node_aspect is not None
-    assert len(node_aspect["nodes"]) == 10, "Incorrect number of nodes in CX2"
+    assert len(node_aspect["nodes"]) == 13, "Incorrect number of nodes in CX2"
 
     edge_aspect = next((aspect for aspect in cx2 if "edges" in aspect), None)
     assert edge_aspect is not None
-    assert len(edge_aspect["edges"]) == 14, "Incorrect number of edges in CX2"
+    assert len(edge_aspect["edges"]) == 21, "Incorrect number of edges in CX2"
 
 
 def test_load_cx2_to_ndex(example_model):
@@ -59,8 +59,8 @@ def test_load_cx2_to_ndex(example_model):
     cx2_network = factory.get_cx2network(cx2)
 
     assert isinstance(cx2_network, CX2Network)
-    assert len(cx2_network.get_nodes()) == 10, "Incorrect number of nodes in CX2"
-    assert len(cx2_network.get_edges()) == 14, "Incorrect number of edges in CX2"
+    assert len(cx2_network.get_nodes()) == 13, "Incorrect number of nodes in CX2"
+    assert len(cx2_network.get_edges()) == 21, "Incorrect number of edges in CX2"
 
 
 def test_node_type_attribute(input_model):
@@ -132,3 +132,71 @@ def test_activity_input_output_notes(input_model):
         if edge["t"] == io_node["id"] and edge["v"]["name"] == "has output"
     )
     assert output_edge is not None
+
+
+def test_issue_65_protein_inputs_filtered(input_model):
+    """Test that protein inputs are filtered at the CX level (issue #65)"""
+    from gocam.datamodel import MoleculeAssociation
+
+    model = input_model("Model-63f809ec00000701")
+
+    # Find activities with protein inputs
+    activities_with_protein_inputs = []
+
+    # Add a protein input to an activity to test filtering
+    for activity in model.activities:
+        if activity.enabled_by is None:
+            continue
+
+        # Find another activity to use as input
+        for other_activity in model.activities:
+            if other_activity.enabled_by is None or other_activity == activity:
+                continue
+
+            # Add the other activity's enabled_by as an input to this activity
+            if activity.has_input is None:
+                activity.has_input = []
+
+            activity.has_input.append(
+                MoleculeAssociation(term=other_activity.enabled_by.term, evidence=[])
+            )
+            activities_with_protein_inputs.append(activity)
+            break
+
+        if activities_with_protein_inputs:
+            break
+
+    # Ensure we have at least one activity with a protein input for the test
+    assert len(activities_with_protein_inputs) > 0
+
+    # Convert to CX2
+    cx2 = model_to_cx2(model)
+
+    # Get edges
+    edge_aspect = next((aspect for aspect in cx2 if "edges" in aspect), None)
+    assert edge_aspect is not None
+
+    # Create a list of protein terms
+    protein_terms = [
+        activity.enabled_by.term
+        for activity in model.activities
+        if activity.enabled_by is not None
+    ]
+
+    # Find all "has input" edges
+    has_input_edges = [
+        edge for edge in edge_aspect["edges"] if edge["v"].get("name") == "has input"
+    ]
+
+    # Get nodes
+    node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
+    assert node_aspect is not None
+
+    # Check if any has_input edges point to protein nodes
+    for edge in has_input_edges:
+        target_node = next(
+            node for node in node_aspect["nodes"] if node["id"] == edge["t"]
+        )
+
+        # Verify that the target node doesn't represent a protein term
+        assert target_node["v"]["represents"] not in protein_terms

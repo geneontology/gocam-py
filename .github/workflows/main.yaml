@@ -16,6 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v2
+
       - name: Install Poetry
         run: pipx install poetry
 
@@ -25,7 +28,7 @@ jobs:
           cache: 'poetry'
 
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --all-extras
 
       - name: Run test suite
         run: make test

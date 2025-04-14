@@ -89,9 +89,10 @@ def fetch(model_ids, format):
 )
 @click.option("--output-format", "-O", type=click.Choice(["cx2"]), required=True)
 @click.option("--output", "-o", type=click.File("w"), default="-")
-@click.option("--ndex-upload", is_flag=True, help="Upload to NDEx")
+@click.option("--dot-layout", is_flag=True, help="Apply dot layout (requires Graphviz)")
+@click.option("--ndex-upload", is_flag=True, help="Upload to NDEx (only for CX2)")
 @click.argument("model", type=click.File("r"), default="-")
-def convert(model, input_format, output_format, output, ndex_upload):
+def convert(model, input_format, output_format, output, dot_layout, ndex_upload):
     """Convert GO-CAM models."""
     if ndex_upload and output_format != "cx2":
         raise click.UsageError("NDEx upload requires output format to be CX2")
@@ -117,7 +118,7 @@ def convert(model, input_format, output_format, output, ndex_upload):
         raise click.UsageError(f"Could not load model: {e}")
 
     if output_format == "cx2":
-        cx2 = model_to_cx2(model)
+        cx2 = model_to_cx2(model, apply_dot_layout=dot_layout)
 
         if ndex_upload:
             # This is very basic proof-of-concept usage of the NDEx client. Once we have a better

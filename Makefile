@@ -78,7 +78,7 @@ setup: check-config git-init install gen-project gen-examples gendoc git-add git
 
 # install any dependencies required for building
 install:
-	poetry install
+	poetry install --all-extras
 .PHONY: install
 
 # ---
@@ -112,9 +112,14 @@ deploy: all mkd-gh-deploy
 compile-sheets:
 	$(RUN) sheets2linkml --gsheet-id $(SHEET_ID) $(SHEET_TABS) > $(SHEET_MODULE_PATH).tmp && mv $(SHEET_MODULE_PATH).tmp $(SHEET_MODULE_PATH)
 
-# In future this will be done by conversion
 gen-examples:
-	cp src/data/examples/* $(EXAMPLEDIR)
+	$(RUN) gocam fetch --format yaml 663d668500002178 > src/data/examples/Model-663d668500002178.yaml
+	$(RUN) gocam fetch --format json 663d668500002178 > src/data/examples/Model-663d668500002178.json
+
+.PHONY: gen-test-inputs
+gen-test-inputs:
+	$(RUN) gocam fetch --format yaml 63f809ec00000701 > tests/input/Model-63f809ec00000701.yaml
+	$(RUN) gocam fetch --format yaml 6606056e00002011 > tests/input/Model-6606056e00002011.yaml
 
 # generates all project files
 
