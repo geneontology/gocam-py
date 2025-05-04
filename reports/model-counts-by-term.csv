@@ -1,0 +1,101 @@
+facet,value,count
+objects,"{'id': 'ECO:0000314', 'label': 'direct assay evidence used in manual assertion', 'type': 'gocam:Object'}",1002
+objects,"{'id': 'ECO:0000315', 'label': 'mutant phenotype evidence used in manual assertion', 'type': 'gocam:Object'}",374
+objects,"{'id': 'GO:0005886', 'label': 'plasma membrane', 'type': 'gocam:Object'}",352
+objects,"{'id': 'GO:0005829', 'label': 'cytosol', 'type': 'gocam:Object'}",296
+objects,"{'id': 'GO:0005737', 'label': 'cytoplasm', 'type': 'gocam:Object'}",272
+objects,"{'id': 'ECO:0000250', 'label': 'sequence similarity evidence used in manual assertion', 'type': 'gocam:Object'}",221
+objects,"{'id': 'GO:0005615', 'label': 'extracellular space', 'type': 'gocam:Object'}",216
+objects,"{'id': 'GO:0004674', 'label': 'protein serine/threonine kinase activity', 'type': 'gocam:Object'}",200
+objects,"{'id': 'GO:0005634', 'label': 'nucleus', 'type': 'gocam:Object'}",185
+objects,"{'id': 'GO:0061630', 'label': 'ubiquitin protein ligase activity', 'type': 'gocam:Object'}",178
+objects,"{'id': 'ECO:0000266', 'label': 'sequence orthology evidence used in manual assertion', 'type': 'gocam:Object'}",178
+objects,"{'id': 'ECO:0000305', 'label': 'curator inference used in manual assertion', 'type': 'gocam:Object'}",167
+objects,"{'id': 'ECO:0000304', 'label': 'author statement supported by traceable reference used in manual assertion', 'type': 'gocam:Object'}",138
+objects,"{'id': 'ECO:0000318', 'label': 'biological aspect of ancestor evidence used in manual assertion', 'type': 'gocam:Object'}",119
+objects,"{'id': 'ECO:0000316', 'label': 'genetic interaction evidence used in manual assertion', 'type': 'gocam:Object'}",109
+objects,"{'id': 'GO:0048018', 'label': 'receptor ligand activity', 'type': 'gocam:Object'}",107
+objects,"{'id': 'GO:0030674', 'label': 'protein-macromolecule adaptor activity', 'type': 'gocam:Object'}",105
+objects,"{'id': 'GO:0003700', 'label': 'DNA-binding transcription factor activity', 'type': 'gocam:Object'}",90
+objects,"{'id': 'GO:0003925', 'label': 'G protein activity', 'type': 'gocam:Object'}",84
+objects,"{'id': 'GO:0035591', 'label': 'signaling adaptor activity', 'type': 'gocam:Object'}",81
+objects,"{'id': 'GO:0004713', 'label': 'protein tyrosine kinase activity', 'type': 'gocam:Object'}",77
+objects,"{'id': 'GO:0005125', 'label': 'cytokine activity', 'type': 'gocam:Object'}",74
+objects,"{'id': 'GO:0060090', 'label': 'molecular adaptor activity', 'type': 'gocam:Object'}",73
+objects,"{'id': 'ECO:0000303', 'label': 'author statement without traceable support used in manual assertion', 'type': 'gocam:Object'}",71
+objects,"{'id': 'GO:1990756', 'label': 'ubiquitin-like ligase-substrate adaptor activity', 'type': 'gocam:Object'}",71
+objects,"{'id': 'GO:0005789', 'label': 'endoplasmic reticulum membrane', 'type': 'gocam:Object'}",66
+objects,"{'id': 'GO:0140311', 'label': 'protein sequestering activity', 'type': 'gocam:Object'}",62
+objects,"{'id': 'GO:0004016', 'label': 'adenylate cyclase activity', 'type': 'gocam:Object'}",53
+objects,"{'id': 'GO:0000785', 'label': 'chromatin', 'type': 'gocam:Object'}",52
+objects,"{'id': 'GO:0004197', 'label': 'cysteine-type endopeptidase activity', 'type': 'gocam:Object'}",50
+objects,"{'id': 'GO:0051604', 'label': 'protein maturation', 'type': 'gocam:Object'}",49
+objects,"{'id': 'GO:0005765', 'label': 'lysosomal membrane', 'type': 'gocam:Object'}",49
+objects,"{'id': 'GO:0043161', 'label': 'proteasome-mediated ubiquitin-dependent protein catabolic process', 'type': 'gocam:Object'}",49
+objects,"{'id': 'GO:0043539', 'label': 'protein serine/threonine kinase activator activity', 'type': 'gocam:Object'}",47
+objects,"{'id': 'CHEBI:17489', 'label': ""3',5'-cyclic AMP"", 'type': 'gocam:Object'}",45
+objects,"{'id': 'GO:0003674', 'label': 'molecular_function', 'type': 'gocam:Object'}",45
+objects,"{'id': 'GO:0038023', 'label': 'signaling receptor activity', 'type': 'gocam:Object'}",44
+objects,"{'id': 'GO:0005759', 'label': 'mitochondrial matrix', 'type': 'gocam:Object'}",42
+objects,"{'id': 'GO:0140693', 'label': 'molecular condensate scaffold activity', 'type': 'gocam:Object'}",42
+objects,"{'id': 'UniProtKB:P42345', 'label': 'MTOR Hsap', 'type': 'gocam:Object'}",42
+objects,"{'id': 'GO:0031669', 'label': 'cellular response to nutrient levels', 'type': 'gocam:Object'}",41
+objects,"{'id': 'GO:0000981', 'label': 'DNA-binding transcription factor activity, RNA polymerase II-specific', 'type': 'gocam:Object'}",41
+objects,"{'id': 'GO:0005179', 'label': 'hormone activity', 'type': 'gocam:Object'}",39
+objects,"{'id': 'UniProtKB:O43306', 'label': 'ADCY6 Hsap', 'type': 'gocam:Object'}",39
+objects,"{'id': 'GO:1904263', 'label': 'positive regulation of TORC1 signaling', 'type': 'gocam:Object'}",39
+objects,"{'id': 'ECO:0000353', 'label': 'physical interaction evidence used in manual assertion', 'type': 'gocam:Object'}",38
+objects,"{'id': 'GO:0005739', 'label': 'mitochondrion', 'type': 'gocam:Object'}",38
+objects,"{'id': 'ECO:0000269', 'label': 'experimental evidence used in manual assertion', 'type': 'gocam:Object'}",36
+objects,"{'id': 'GO:0022829', 'label': 'wide pore channel activity', 'type': 'gocam:Object'}",36
+objects,"{'id': 'GO:1904262', 'label': 'negative regulation of TORC1 signaling', 'type': 'gocam:Object'}",36
+objects,"{'id': 'UniProtKB:P62877', 'label': 'RBX1 Hsap', 'type': 'gocam:Object'}",35
+objects,"{'id': 'GO:0038202', 'label': 'TORC1 signaling', 'type': 'gocam:Object'}",35
+objects,"{'id': 'GO:0001228', 'label': 'DNA-binding transcription activator activity, RNA polymerase II-specific', 'type': 'gocam:Object'}",34
+objects,"{'id': 'GO:0007189', 'label': 'adenylate cyclase-activating G protein-coupled receptor signaling pathway', 'type': 'gocam:Object'}",34
+objects,"{'id': 'UniProtKB:Q9UHD2', 'label': 'TBK1 Hsap', 'type': 'gocam:Object'}",34
+objects,"{'id': 'GO:0004888', 'label': 'transmembrane signaling receptor activity', 'type': 'gocam:Object'}",33
+objects,"{'id': 'GO:0015026', 'label': 'coreceptor activity', 'type': 'gocam:Object'}",33
+objects,"{'id': 'GO:0022626', 'label': 'cytosolic ribosome', 'type': 'gocam:Object'}",33
+objects,"{'id': 'GO:0005515', 'label': 'protein binding', 'type': 'gocam:Object'}",32
+objects,"{'id': 'ECO:0007005', 'label': 'high throughput direct assay evidence used in manual assertion', 'type': 'gocam:Object'}",32
+objects,"{'id': 'GO:0030430', 'label': 'host cell cytoplasm', 'type': 'gocam:Object'}",31
+objects,"{'id': 'GO:0160072', 'label': 'ubiquitin ligase complex scaffold activity', 'type': 'gocam:Object'}",31
+objects,"{'id': 'GO:0035861', 'label': 'site of double-strand break', 'type': 'gocam:Object'}",30
+objects,"{'id': 'ECO:0000501', 'label': 'evidence used in automatic assertion', 'type': 'gocam:Object'}",30
+objects,"{'id': 'GO:0005743', 'label': 'mitochondrial inner membrane', 'type': 'gocam:Object'}",30
+objects,"{'id': 'GO:0005085', 'label': 'guanyl-nucleotide exchange factor activity', 'type': 'gocam:Object'}",29
+objects,"{'id': 'GO:0043495', 'label': 'protein-membrane adaptor activity', 'type': 'gocam:Object'}",29
+objects,"{'id': 'UniProtKB:Q5JWF2', 'label': 'GNAS Hsap', 'type': 'gocam:Object'}",29
+objects,"{'id': 'GO:0070534', 'label': 'protein K63-linked ubiquitination', 'type': 'gocam:Object'}",29
+objects,"{'id': 'CHEBI:15377', 'label': 'water', 'type': 'gocam:Object'}",29
+objects,"{'id': 'CHEBI:15378', 'label': 'hydron', 'type': 'gocam:Object'}",28
+objects,"{'id': 'GO:0140463', 'label': 'chromatin-protein adaptor activity', 'type': 'gocam:Object'}",28
+objects,"{'id': 'UniProtKB:Q14653', 'label': 'IRF3 Hsap', 'type': 'gocam:Object'}",27
+objects,"{'id': 'GO:0038187', 'label': 'pattern recognition receptor activity', 'type': 'gocam:Object'}",27
+objects,"{'id': 'GO:0070936', 'label': 'protein K48-linked ubiquitination', 'type': 'gocam:Object'}",26
+objects,"{'id': 'GO:0006974', 'label': 'DNA damage response', 'type': 'gocam:Object'}",26
+objects,"{'id': 'GO:0005783', 'label': 'endoplasmic reticulum', 'type': 'gocam:Object'}",25
+objects,"{'id': 'GO:0005576', 'label': 'extracellular region', 'type': 'gocam:Object'}",25
+objects,"{'id': 'GO:0045824', 'label': 'negative regulation of innate immune response', 'type': 'gocam:Object'}",24
+objects,"{'id': 'GO:0003924', 'label': 'GTPase activity', 'type': 'gocam:Object'}",24
+objects,"{'id': 'GO:0140896', 'label': 'cGAS/STING signaling pathway', 'type': 'gocam:Object'}",23
+objects,"{'id': 'GO:0004707', 'label': 'MAP kinase activity', 'type': 'gocam:Object'}",23
+objects,"{'id': 'CHEBI:30616', 'label': 'ATP(4-)', 'type': 'gocam:Object'}",23
+objects,"{'id': 'GO:0004930', 'label': 'G protein-coupled receptor activity', 'type': 'gocam:Object'}",23
+objects,"{'id': 'GO:0003735', 'label': 'structural constituent of ribosome', 'type': 'gocam:Object'}",23
+objects,"{'id': 'GO:0005546', 'label': 'phosphatidylinositol-4,5-bisphosphate binding', 'type': 'gocam:Object'}",23
+objects,"{'id': 'UniProtKB:P31749', 'label': 'AKT1 Hsap', 'type': 'gocam:Object'}",22
+objects,"{'id': 'GO:0007249', 'label': 'canonical NF-kappaB signal transduction', 'type': 'gocam:Object'}",21
+objects,"{'id': 'GO:0140767', 'label': 'enzyme-substrate adaptor activity', 'type': 'gocam:Object'}",21
+objects,"{'id': 'GO:0000139', 'label': 'Golgi membrane', 'type': 'gocam:Object'}",21
+objects,"{'id': 'GO:0005096', 'label': 'GTPase activator activity', 'type': 'gocam:Object'}",21
+objects,"{'id': 'GO:0005741', 'label': 'mitochondrial outer membrane', 'type': 'gocam:Object'}",20
+objects,"{'id': 'GO:0002181', 'label': 'cytoplasmic translation', 'type': 'gocam:Object'}",20
+objects,"{'id': 'UniProtKB:Q86WV6', 'label': 'STING1 Hsap', 'type': 'gocam:Object'}",20
+objects,"{'id': 'UniProtKB:Q8N884', 'label': 'CGAS Hsap', 'type': 'gocam:Object'}",20
+objects,"{'id': 'GO:0004843', 'label': 'cysteine-type deubiquitinase activity', 'type': 'gocam:Object'}",20
+objects,"{'id': 'UniProtKB:O43318', 'label': 'MAP3K7 Hsap', 'type': 'gocam:Object'}",20
+objects,"{'id': 'GO:0140374', 'label': 'antiviral innate immune response', 'type': 'gocam:Object'}",20
+objects,"{'id': 'UniProtKB:P57764', 'label': 'GSDMD Hsap', 'type': 'gocam:Object'}",20
+objects,"{'id': 'GO:0061501', 'label': ""2',3'-cyclic GMP-AMP synthase activity"", 'type': 'gocam:Object'}",19
