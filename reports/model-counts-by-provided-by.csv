@@ -1,0 +1,14 @@
+facet,value,count
+provenances.provided_by,https://www.uniprot.org,748
+provenances.provided_by,http://informatics.jax.org,195
+provenances.provided_by,http://www.pombase.org,39
+provenances.provided_by,http://flybase.org,21
+provenances.provided_by,http://www.yeastgenome.org,18
+provenances.provided_by,http://zfin.org,14
+provenances.provided_by,http://www.wormbase.org,12
+provenances.provided_by,http://geneontology.org,7
+provenances.provided_by,http://www.xenbase.org,2
+provenances.provided_by,http://purl.obolibrary.org/go/groups/GO_Central,2
+provenances.provided_by,http://purl.obolibrary.org/go/groups/FlyBase,1
+provenances.provided_by,http://purl.obolibrary.org/go/groups/ZFIN,1
+provenances.provided_by,http://purl.obolibrary.org/go/groups/MGI,1
