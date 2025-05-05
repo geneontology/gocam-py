@@ -66,3 +66,6 @@ reports/model-pmid.csv:
 
 reports/describe.txt:
 	$(Q) describe -o $@
+
+reports/model-counts-by-annoton.csv:
+	$(QI) fq -S query_index.annoton_terms.label -O csv -o $@
