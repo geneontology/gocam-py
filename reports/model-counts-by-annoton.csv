@@ -1,0 +1,101 @@
+facet,value,count
+query_index.annoton_terms.label,MGI:MGI:109482; molecular_function,68
+query_index.annoton_terms.label,UniProtKB:O43306; adenylate cyclase activity; adenylate cyclase-activating G protein-coupled receptor signaling pathway,24
+query_index.annoton_terms.label,UniProtKB:Q5JWF2; G protein activity; adenylate cyclase-activating G protein-coupled receptor signaling pathway; cytosol,23
+query_index.annoton_terms.label,UniProtKB:Q15382; protein serine/threonine kinase activator activity; positive regulation of TORC1 signaling; lysosomal membrane; UniProtKB:P42345,18
+query_index.annoton_terms.label,UniProtKB:P62753; structural constituent of ribosome; cytoplasmic translation; cytosolic ribosome,16
+query_index.annoton_terms.label,UniProtKB:P23443; protein serine/threonine kinase activity; positive regulation of translational initiation; UniProtKB:P62753,15
+query_index.annoton_terms.label,UniProtKB:Q9UBS0; protein serine/threonine kinase activity; positive regulation of translational initiation; UniProtKB:P62753,15
+query_index.annoton_terms.label,UniProtKB:Q13541; translation repressor activity; negative regulation of translational initiation; UniProtKB:P06730,14
+query_index.annoton_terms.label,UniProtKB:P42345; protein serine/threonine kinase activity; positive regulation of translational initiation; lysosomal membrane; UniProtKB:Q13541,14
+query_index.annoton_terms.label,MGI:MGI:3647519; 2-oxo-4-hydroxy-4-carboxy-5-ureidoimidazoline decarboxylase activity; peroxisome,13
+query_index.annoton_terms.label,UniProtKB:Q9HB90; GDP binding; positive regulation of TORC1 signaling; lysosomal membrane,12
+query_index.annoton_terms.label,UniProtKB:Q7L523; protein-membrane adaptor activity; protein localization to lysosome; lysosomal membrane; TORC1 complex,11
+query_index.annoton_terms.label,UniProtKB:Q7L523; GTP binding; positive regulation of TORC1 signaling; lysosomal membrane,11
+query_index.annoton_terms.label,"UniProtKB:P57764; phosphatidylinositol-4,5-bisphosphate binding; pyroptotic inflammatory response; plasma membrane",10
+query_index.annoton_terms.label,"UniProtKB:Q86WV6; 2',3'-cyclic GMP-AMP binding; cGAS/STING signaling pathway; endoplasmic reticulum membrane",10
+query_index.annoton_terms.label,UniProtKB:P05198; translation initiation factor activity; translational initiation; cytosol,10
+query_index.annoton_terms.label,UniProtKB:O60934; chromatin-protein adaptor activity; protein localization to site of double-strand break; site of double-strand break; Mre11 complex,9
+query_index.annoton_terms.label,UniProtKB:Q9HB90; protein-membrane adaptor activity; protein localization to lysosome; lysosomal membrane; TORC1 complex,9
+query_index.annoton_terms.label,UniProtKB:P29466; cysteine-type endopeptidase activity; protein maturation; cytosol; UniProtKB:P57764,8
+query_index.annoton_terms.label,UniProtKB:Q04206; DNA-binding transcription factor activity; canonical NF-kappaB signal transduction; chromatin,8
+query_index.annoton_terms.label,UniProtKB:P42345; protein serine/threonine kinase activity; TORC1 signaling; lysosomal membrane; UniProtKB:P23443; UniProtKB:Q9UBS0,8
+query_index.annoton_terms.label,"UniProtKB:Q8N884; 2',3'-cyclic GMP-AMP synthase activity; cGAS/STING signaling pathway; cytosol",7
+query_index.annoton_terms.label,UniProtKB:P19838; DNA-binding transcription factor activity; canonical NF-kappaB signal transduction; chromatin,7
+query_index.annoton_terms.label,UniProtKB:P63096; G protein activity; adenylate cyclase-inhibiting G protein-coupled receptor signaling pathway; cytosol,7
+query_index.annoton_terms.label,UniProtKB:P42345; protein serine/threonine kinase activity; TORC1 signaling; lysosomal membrane; UniProtKB:O75385,7
+query_index.annoton_terms.label,UniProtKB:P42345; protein serine/threonine kinase activity; TORC1 signaling; lysosomal membrane; UniProtKB:Q9UBS0; UniProtKB:P23443,7
+query_index.annoton_terms.label,UniProtKB:O43306; adenylate cyclase activity; adenylate cyclase-inhibiting serotonin receptor signaling pathway,7
+query_index.annoton_terms.label,UniProtKB:O43914; protein-macromolecule adaptor activity; cellular response to amyloid-beta; plasma membrane; UniProtKB:P43405,7
+query_index.annoton_terms.label,UniProtKB:P43405; protein tyrosine kinase activity; cellular response to amyloid-beta; cytoplasm,7
+query_index.annoton_terms.label,UniProtKB:P42345; protein serine/threonine kinase activity; TORC1 signaling; lysosomal membrane,7
+query_index.annoton_terms.label,UniProtKB:Q9NZC2; transmembrane signaling receptor activity; cellular response to lipoprotein particle stimulus; plasma membrane; UniProtKB:O43914,6
+query_index.annoton_terms.label,UniProtKB:Q13315; protein serine/threonine kinase activity; DNA double-strand break processing; site of double-strand break; UniProtKB:P49959,6
+query_index.annoton_terms.label,UniProtKB:Q93034; ubiquitin ligase complex scaffold activity; proteasome-mediated ubiquitin-dependent protein catabolic process,6
+query_index.annoton_terms.label,UniProtKB:Q8WTW4; GTPase activator activity; negative regulation of TORC1 signaling; lysosomal membrane; UniProtKB:Q7L523,6
+query_index.annoton_terms.label,UniProtKB:P61221; ribonucleoside triphosphate phosphatase activity; ribosome disassembly; cytosolic ribosome,6
+query_index.annoton_terms.label,UniProtKB:Q8N884; molecular condensate scaffold activity; cGAS/STING signaling pathway,6
+query_index.annoton_terms.label,UniProtKB:Q9GZV5; transcription coregulator activity; hippo signaling; nucleus,6
+query_index.annoton_terms.label,UniProtKB:Q96S15; ubiquitin protein ligase activity; protein K6-linked ubiquitination; lysosomal membrane; UniProtKB:Q8WTW4,6
+query_index.annoton_terms.label,UniProtKB:P49959; 3'-5'-DNA exonuclease activity; double-strand break repair via homologous recombination; site of double-strand break,6
+query_index.annoton_terms.label,UniProtKB:P49815; GTPase activator activity; negative regulation of TORC1 signaling; lysosomal membrane; UniProtKB:Q15382,6
+query_index.annoton_terms.label,UniProtKB:Q8N884; double-stranded DNA binding; cGAS/STING signaling pathway; cytosol,6
+query_index.annoton_terms.label,"UniProtKB:Q8N884; 2',3'-cyclic GMP-AMP synthase activity; cGAS/STING signaling pathway",6
+query_index.annoton_terms.label,UniProtKB:Q9UHD2; protein serine/threonine kinase activity; positive regulation of type I interferon production; cytoplasm; UniProtKB:Q14653,5
+query_index.annoton_terms.label,UniProtKB:Q8TB45; protein serine/threonine kinase inhibitor activity; positive regulation of autophagy; lysosomal membrane; UniProtKB:P42345,5
+query_index.annoton_terms.label,UniProtKB:O15530; protein serine/threonine kinase activity; positive regulation of phosphatidylinositol 3-kinase/protein kinase B signal transduction; UniProtKB:P31749,5
+query_index.annoton_terms.label,MGI:MGI:95294; transmembrane receptor protein tyrosine kinase activity; epidermal growth factor receptor signaling pathway; plasma membrane,5
+query_index.annoton_terms.label,UniProtKB:P31749; protein serine/threonine kinase activity; phosphatidylinositol 3-kinase/protein kinase B signal transduction,5
+query_index.annoton_terms.label,"UniProtKB:P57764; phosphatidylinositol-4,5-bisphosphate binding; pyroptotic cell death; plasma membrane",5
+query_index.annoton_terms.label,UniProtKB:O14920; IkappaB kinase activity; positive regulation of canonical NF-kappaB signal transduction; cytoplasm; UniProtKB:P25963,5
+query_index.annoton_terms.label,MGI:MGI:1924809; 4-alpha-glucanotransferase activity; glycogen catabolic process; cytosol,5
+query_index.annoton_terms.label,UniProtKB:Q13501; molecular condensate scaffold activity; membraneless organelle assembly; intracellular membraneless organelle,5
+query_index.annoton_terms.label,UniProtKB:Q8N884; molecular condensate scaffold activity; cGAS/STING signaling pathway; cytosol,5
+query_index.annoton_terms.label,UniProtKB:P42345; protein serine/threonine kinase activity; TORC2 signaling; plasma membrane; UniProtKB:P31749,5
+query_index.annoton_terms.label,UniProtKB:O43306; adenylate cyclase activity; adenylate cyclase-inhibiting G protein-coupled receptor signaling pathway,5
+query_index.annoton_terms.label,MGI:MGI:97565; phosphoglucomutase activity; glycogen catabolic process; cytosol,5
+query_index.annoton_terms.label,UniProtKB:Q9UHD2; protein serine/threonine kinase activity; cytoplasmic pattern recognition receptor signaling pathway; cytoplasm; UniProtKB:Q14653,5
+query_index.annoton_terms.label,UniProtKB:Q8N122; enzyme-substrate adaptor activity; TORC1 signaling; lysosomal membrane,5
+query_index.annoton_terms.label,MGI:MGI:97564; phosphoglucomutase activity; glycogen catabolic process; cytosol,5
+query_index.annoton_terms.label,UniProtKB:P63096; G protein activity; adenylate cyclase-inhibiting serotonin receptor signaling pathway; cytosol,5
+query_index.annoton_terms.label,Mre11 complex; protein serine/threonine kinase activator activity; DNA double-strand break processing; site of double-strand break; UniProtKB:Q13315,5
+query_index.annoton_terms.label,"MGI:MGI:1924809; amylo-alpha-1,6-glucosidase activity; glycogen catabolic process; cytosol",5
+query_index.annoton_terms.label,UniProtKB:Q8NE86; calcium channel activity; calcium import into the mitochondrion; mitochondrial inner membrane; calcium(2+),5
+query_index.annoton_terms.label,UniProtKB:P05198; translation initiation factor activity; translational initiation; cytosol; UniProtKB:P18848,5
+query_index.annoton_terms.label,UniProtKB:Q9UHD2; protein serine/threonine kinase activity; positive regulation of type I interferon production; cytosol; UniProtKB:Q14653,5
+query_index.annoton_terms.label,UniProtKB:P38405; G protein activity; adenylate cyclase-activating G protein-coupled receptor signaling pathway; plasma membrane,4
+query_index.annoton_terms.label,Ragulator complex; guanyl-nucleotide exchange factor activity; positive regulation of TORC1 signaling; lysosomal membrane; UniProtKB:Q7L523,4
+query_index.annoton_terms.label,UniProtKB:P57764; wide pore channel activity; pyroptotic cell death; plasma membrane,4
+query_index.annoton_terms.label,UniProtKB:P57764; wide pore channel activity; pyroptotic inflammatory response; plasma membrane,4
+query_index.annoton_terms.label,UniProtKB:Q6IAA8; protein-membrane adaptor activity; positive regulation of protein localization to lysosome; lysosomal membrane; Ragulator complex,4
+query_index.annoton_terms.label,UniProtKB:Q86WV6; signaling adaptor activity; cGAS/STING signaling pathway; endoplasmic reticulum-Golgi intermediate compartment membrane; UniProtKB:Q9UHD2; UniProtKB:Q14653,4
+query_index.annoton_terms.label,UniProtKB:Q7Z434; signaling adaptor activity; cytoplasmic pattern recognition receptor signaling pathway; mitochondrial membrane,4
+query_index.annoton_terms.label,UniProtKB:Q9Y6Q9; transcription coactivator activity; retinoic acid receptor signaling pathway; chromatin,4
+query_index.annoton_terms.label,UniProtKB:O95835; protein serine/threonine kinase activity; hippo signaling; cytoplasm; UniProtKB:Q9GZV5; UniProtKB:P46937,4
+query_index.annoton_terms.label,MGI:MGI:2143535; beta-ureidopropionase activity; cytosol,4
+query_index.annoton_terms.label,KICSTOR complex; protein-membrane adaptor activity; protein localization to lysosome; lysosomal membrane; GATOR1 complex,4
+query_index.annoton_terms.label,UniProtKB:Q9NZJ5; eukaryotic translation initiation factor 2alpha kinase activity; PERK-mediated unfolded protein response; endoplasmic reticulum membrane; UniProtKB:P05198,4
+query_index.annoton_terms.label,UniProtKB:Q9GZQ8; phosphatidylethanolamine binding; autophagosome assembly; autophagosome membrane,4
+query_index.annoton_terms.label,UniProtKB:Q9NRM7; protein serine/threonine kinase activity; hippo signaling; cytoplasm; UniProtKB:Q9GZV5; UniProtKB:P46937,4
+query_index.annoton_terms.label,UniProtKB:P30988; amylin receptor activity; adenylate cyclase-activating G protein-coupled receptor signaling pathway; plasma membrane; UniProtKB:Q5JWF2,4
+query_index.annoton_terms.label,UniProtKB:Q16539; MAP kinase activity; p38MAPK cascade; cytosol,4
+query_index.annoton_terms.label,MGI:MGI:96433; protein tyrosine kinase activity; insulin-like growth factor receptor signaling pathway,4
+query_index.annoton_terms.label,UniProtKB:O14920; IkappaB kinase activity; canonical NF-kappaB signal transduction; cytoplasm; UniProtKB:P25963,4
+query_index.annoton_terms.label,UniProtKB:O75140; small GTPase binding; negative regulation of TORC1 signaling; lysosomal membrane; UniProtKB:Q7L523; UniProtKB:Q9HB90,4
+query_index.annoton_terms.label,UniProtKB:O60266; adenylate cyclase activity; adenylate cyclase-activating G protein-coupled receptor signaling pathway; plasma membrane,4
+query_index.annoton_terms.label,UniProtKB:Q9BQI3; eukaryotic translation initiation factor 2alpha kinase activity; HRI-mediated signaling; cytosol; UniProtKB:P05198,4
+query_index.annoton_terms.label,UniProtKB:O95786; pattern recognition receptor activity; cytoplasmic pattern recognition receptor signaling pathway; cytoplasm,4
+query_index.annoton_terms.label,UniProtKB:P07949; transmembrane receptor protein tyrosine kinase activity; glial cell-derived neurotrophic factor receptor signaling pathway; plasma membrane,4
+query_index.annoton_terms.label,MGI:MGI:105992; transketolase activity; pentose-phosphate shunt; cytosol,4
+query_index.annoton_terms.label,"CLOCK-BMAL transcription complex; DNA-binding transcription activator activity, RNA polymerase II-specific",4
+query_index.annoton_terms.label,MGI:MGI:1341110; adenylate cyclase activity; adenylate cyclase-activating G protein-coupled receptor signaling pathway; cytosol,4
+query_index.annoton_terms.label,UniProtKB:P49662; cysteine-type endopeptidase activity; protein maturation; cytosol; UniProtKB:P49662,4
+query_index.annoton_terms.label,UniProtKB:Q13501; protein-macromolecule adaptor activity; protein targeting to vacuole involved in autophagy; autophagosome; UniProtKB:Q9H492,4
+query_index.annoton_terms.label,UniProtKB:P18848; DNA-binding transcription factor activity; PERK-mediated unfolded protein response; nucleus,4
+query_index.annoton_terms.label,MGI:MGI:97828; glycogen phosphorylase activity; glycogen catabolic process; cytosol,4
+query_index.annoton_terms.label,UniProtKB:P00734; serine-type endopeptidase activity; negative regulation of blood coagulation; extracellular space; UniProtKB:P04070,4
+query_index.annoton_terms.label,UniProtKB:Q9BPX6; calcium ion sensor activity; cellular response to calcium ion; mitochondrial inner membrane; calcium(2+),4
+query_index.annoton_terms.label,MGI:MGI:95410; protein tyrosine kinase activity; ERBB2-EGFR signaling pathway; plasma membrane,4
+query_index.annoton_terms.label,UniProtKB:Q15759; MAP kinase activity; p38MAPK cascade; cytosol,4
+query_index.annoton_terms.label,UniProtKB:Q96P20; signaling adaptor activity; NLRP3 inflammasome complex assembly; microtubule organizing center; UniProtKB:Q96P20,4
+query_index.annoton_terms.label,MGI:MGI:97829; glycogen phosphorylase activity; glycogen catabolic process; cytosol,4
