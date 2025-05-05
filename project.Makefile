@@ -2,6 +2,10 @@
 
 RUN = poetry run
 Q = linkml-store  -d gocams::main
+QI = linkml-store  -d gocams::indexed
+
+HM = linkml-store plot heatmap
+HMCY = $(HM) --cluster y --cluster-method ward --cluster-metric cosine
 
 data/gocam.yaml:
 	$(RUN) gocam fetch -f yaml > $@.tmp && mv $@.tmp $@
@@ -34,6 +38,28 @@ reports/model-counts-by-provided-by.csv:
 
 reports/model-counts-by-causal-edge-predicate.csv:
 	$(Q) fq -S activities.causal_associations.predicate -O csv -o $@
+
+reports/activity-counts-by-provided-by.csv:
+	$(QI) fq -S provenances.provided_by+query_index.number_of_activities -O csv -o $@
+
+reports/rows.csv:
+	$(QI) query -s "[taxon,query_index.number_of_activities,query_index.number_of_enabled_by_terms,query_index.number_of_causal_associations,query_index.number_of_strongly_connected_components,query_index.length_of_longest_causal_association_path]" -O csv -o $@
+.PRECIOUS: reports/rows.csv
+
+reports/heatmap-taxon-by-activities.png: reports/rows.csv
+	$(HM) -f csv -x query_index.number_of_activities -y taxon $< -o $@
+
+reports/clustered-heatmap-taxon-by-activities.png: reports/rows.csv
+	$(HMCY) -f csv -x query_index.number_of_activities -y taxon $< -o $@
+
+reports/clustered-heatmap-taxon-by-enablers.png: reports/rows.csv
+	$(HMCY) -f csv -x query_index.number_of_enabled_by_terms -y taxon $< -o $@
+
+reports/clustered-heatmap-taxon-by-sccs.png: reports/rows.csv
+	$(HMCY) -f csv -x query_index.number_of_strongly_connected_components -y taxon $< -o $@
+
+reports/clustered-heatmap-taxon-by-longest-path.png: reports/rows.csv
+	$(HMCY) -f csv -x query_index.length_of_longest_causal_association_path -y taxon $< -o $@
 
 reports/model-pmid.csv:
 	$(Q) query |  jq -r '.[] | .id as $$id | [.. | objects | .reference? | select(. != null and startswith("PMID:"))] | .[] | [$$id, .] | @tsv' > $@

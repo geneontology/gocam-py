@@ -78,6 +78,8 @@ classes:
         range: ProvenanceInfo
         inlined_as_list: true
         multivalued: true
+      query_index:
+        range: QueryIndex
 
   Activity:
     description: An individual activity in a causal model, representing the individual molecular 
@@ -411,6 +413,56 @@ classes:
       provided_by:
         multivalued: true
         slot_uri: pav:providedBy
+
+  QueryIndex:
+    attributes:
+      number_of_activities:
+        range: integer
+      number_of_enabled_by_terms:
+        range: integer
+      number_of_causal_associations:
+        range: integer
+      length_of_longest_causal_association_path:
+        range: integer
+      number_of_strongly_connected_components:
+        range: integer
+      flattened_references:
+        range: PublicationObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_molecular_function_terms:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_molecular_function_closure:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_occurs_in_terms:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_occurs_in_closure:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_part_of_terms:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_part_of_closure:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_has_input_terms:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_has_input_closure:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+
 
 enums:
 

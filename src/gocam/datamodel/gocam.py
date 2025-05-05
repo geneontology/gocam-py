@@ -12,8 +12,6 @@ from enum import Enum
 from typing import (
     Any,
     ClassVar,
-    Dict,
-    List,
     Literal,
     Optional,
     Union
@@ -47,7 +45,7 @@ class ConfiguredBaseModel(BaseModel):
 
 
 class LinkMLMeta(RootModel):
-    root: Dict[str, Any] = {}
+    root: dict[str, Any] = {}
     model_config = ConfigDict(frozen=True)
 
     def __getattr__(self, key:str):
@@ -157,11 +155,12 @@ class Model(ConfiguredBaseModel):
          'aliases': ['model state'],
          'domain_of': ['Model'],
          'slot_uri': 'pav:status'} })
-    comments: Optional[List[str]] = Field(default=None, description="""Comments about the model""", json_schema_extra = { "linkml_meta": {'alias': 'comments', 'domain_of': ['Model'], 'slot_uri': 'rdfs:comment'} })
-    activities: Optional[List[Activity]] = Field(default=None, description="""All of the activities that are part of the model""", json_schema_extra = { "linkml_meta": {'alias': 'activities', 'domain_of': ['Model']} })
-    objects: Optional[List[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.""", json_schema_extra = { "linkml_meta": {'alias': 'objects', 'domain_of': ['Model']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, description="""Model-level provenance information""", json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    comments: Optional[list[str]] = Field(default=None, description="""Comments about the model""", json_schema_extra = { "linkml_meta": {'alias': 'comments', 'domain_of': ['Model'], 'slot_uri': 'rdfs:comment'} })
+    activities: Optional[list[Activity]] = Field(default=None, description="""All of the activities that are part of the model""", json_schema_extra = { "linkml_meta": {'alias': 'activities', 'domain_of': ['Model']} })
+    objects: Optional[list[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.""", json_schema_extra = { "linkml_meta": {'alias': 'objects', 'domain_of': ['Model']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""Model-level provenance information""", json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    query_index: Optional[QueryIndex] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'query_index', 'domain_of': ['Model']} })
 
 
 class Activity(ConfiguredBaseModel):
@@ -186,12 +185,12 @@ class Activity(ConfiguredBaseModel):
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation']} })
-    has_input: Optional[List[MoleculeAssociation]] = Field(default=None, description="""The input molecules that are directly consumed by the activity""", json_schema_extra = { "linkml_meta": {'alias': 'has_input', 'domain_of': ['Activity']} })
+    has_input: Optional[list[MoleculeAssociation]] = Field(default=None, description="""The input molecules that are directly consumed by the activity""", json_schema_extra = { "linkml_meta": {'alias': 'has_input', 'domain_of': ['Activity']} })
     has_primary_input: Optional[MoleculeAssociation] = Field(default=None, description="""The primary input molecule that is directly consumed by the activity""", json_schema_extra = { "linkml_meta": {'alias': 'has_primary_input', 'domain_of': ['Activity']} })
-    has_output: Optional[List[MoleculeAssociation]] = Field(default=None, description="""The output molecules that are directly produced by the activity""", json_schema_extra = { "linkml_meta": {'alias': 'has_output', 'domain_of': ['Activity']} })
+    has_output: Optional[list[MoleculeAssociation]] = Field(default=None, description="""The output molecules that are directly produced by the activity""", json_schema_extra = { "linkml_meta": {'alias': 'has_output', 'domain_of': ['Activity']} })
     has_primary_output: Optional[MoleculeAssociation] = Field(default=None, description="""The primary output molecule that is directly produced by the activity""", json_schema_extra = { "linkml_meta": {'alias': 'has_primary_output', 'domain_of': ['Activity']} })
-    causal_associations: Optional[List[CausalAssociation]] = Field(default=None, description="""The causal associations that connect this activity to other activities""", json_schema_extra = { "linkml_meta": {'alias': 'causal_associations', 'domain_of': ['Activity']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, description="""Provenance information for the activity""", json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    causal_associations: Optional[list[CausalAssociation]] = Field(default=None, description="""The causal associations that connect this activity to other activities""", json_schema_extra = { "linkml_meta": {'alias': 'causal_associations', 'domain_of': ['Activity']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""Provenance information for the activity""", json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -204,10 +203,10 @@ class EvidenceItem(ConfiguredBaseModel):
     term: Optional[str] = Field(default=None, description="""The ECO term representing the type of evidence""", json_schema_extra = { "linkml_meta": {'alias': 'term',
          'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
     reference: Optional[str] = Field(default=None, description="""The publication of reference that describes the evidence""", json_schema_extra = { "linkml_meta": {'alias': 'reference', 'domain_of': ['EvidenceItem']} })
-    with_objects: Optional[List[str]] = Field(default=None, description="""Supporting database entities or terms""", json_schema_extra = { "linkml_meta": {'alias': 'with_objects',
+    with_objects: Optional[list[str]] = Field(default=None, description="""Supporting database entities or terms""", json_schema_extra = { "linkml_meta": {'alias': 'with_objects',
          'aliases': ['with', 'with/from'],
          'domain_of': ['EvidenceItem']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, description="""Provenance about the assertion, e.g. who made it""", json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""Provenance about the assertion, e.g. who made it""", json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -220,8 +219,8 @@ class Association(ConfiguredBaseModel):
     type: Literal["Association"] = Field(default="Association", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -236,8 +235,8 @@ class EnabledByAssociation(Association):
     type: Literal["EnabledByAssociation"] = Field(default="EnabledByAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -253,8 +252,8 @@ class EnabledByGeneProductAssociation(EnabledByAssociation):
     type: Literal["EnabledByGeneProductAssociation"] = Field(default="EnabledByGeneProductAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -265,14 +264,14 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
          'slot_usage': {'term': {'name': 'term', 'range': 'ProteinComplexTermObject'}}})
 
-    members: Optional[List[str]] = Field(default=None, description="""The gene products that are part of the complex""", json_schema_extra = { "linkml_meta": {'alias': 'members', 'domain_of': ['EnabledByProteinComplexAssociation']} })
+    members: Optional[list[str]] = Field(default=None, description="""The gene products that are part of the complex""", json_schema_extra = { "linkml_meta": {'alias': 'members', 'domain_of': ['EnabledByProteinComplexAssociation']} })
     term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'alias': 'term',
          'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
     type: Literal["EnabledByProteinComplexAssociation"] = Field(default="EnabledByProteinComplexAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -289,8 +288,8 @@ class CausalAssociation(Association):
     type: Literal["CausalAssociation"] = Field(default="CausalAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -305,8 +304,8 @@ class TermAssociation(Association):
     type: Literal["TermAssociation"] = Field(default="TermAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -324,8 +323,8 @@ class MolecularFunctionAssociation(TermAssociation):
     type: Literal["MolecularFunctionAssociation"] = Field(default="MolecularFunctionAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -349,8 +348,8 @@ class BiologicalProcessAssociation(TermAssociation):
     type: Literal["BiologicalProcessAssociation"] = Field(default="BiologicalProcessAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -373,8 +372,8 @@ class CellularAnatomicalEntityAssociation(TermAssociation):
     type: Literal["CellularAnatomicalEntityAssociation"] = Field(default="CellularAnatomicalEntityAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -396,8 +395,8 @@ class CellTypeAssociation(TermAssociation):
     type: Literal["CellTypeAssociation"] = Field(default="CellTypeAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -420,8 +419,8 @@ class GrossAnatomyAssociation(TermAssociation):
     type: Literal["GrossAnatomyAssociation"] = Field(default="GrossAnatomyAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -437,8 +436,8 @@ class MoleculeAssociation(TermAssociation):
     type: Literal["MoleculeAssociation"] = Field(default="MoleculeAssociation", json_schema_extra = { "linkml_meta": {'alias': 'type',
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[List[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
-    provenances: Optional[List[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'evidence', 'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provenances',
          'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
@@ -677,14 +676,37 @@ class ProvenanceInfo(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    contributor: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'contributor',
+    contributor: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'contributor',
          'domain_of': ['ProvenanceInfo'],
          'slot_uri': 'dct:contributor'} })
     created: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'created', 'domain_of': ['ProvenanceInfo'], 'slot_uri': 'dct:created'} })
     date: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'date', 'domain_of': ['ProvenanceInfo'], 'slot_uri': 'dct:date'} })
-    provided_by: Optional[List[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provided_by',
+    provided_by: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'provided_by',
          'domain_of': ['ProvenanceInfo'],
          'slot_uri': 'pav:providedBy'} })
+
+
+class QueryIndex(ConfiguredBaseModel):
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
+
+    number_of_activities: Optional[int] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'number_of_activities', 'domain_of': ['QueryIndex']} })
+    number_of_enabled_by_terms: Optional[int] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'number_of_enabled_by_terms', 'domain_of': ['QueryIndex']} })
+    number_of_causal_associations: Optional[int] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'number_of_causal_associations', 'domain_of': ['QueryIndex']} })
+    length_of_longest_causal_association_path: Optional[int] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'length_of_longest_causal_association_path',
+         'domain_of': ['QueryIndex']} })
+    number_of_strongly_connected_components: Optional[int] = Field(default=None, description="""Number of weakly connected components (distinct causal subgraphs)""", json_schema_extra = { "linkml_meta": {'alias': 'number_of_strongly_connected_components',
+         'domain_of': ['QueryIndex']} })
+    flattened_references: Optional[list[PublicationObject]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'flattened_references', 'domain_of': ['QueryIndex']} })
+    model_activity_molecular_function_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'model_activity_molecular_function_terms',
+         'domain_of': ['QueryIndex']} })
+    model_activity_molecular_function_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'model_activity_molecular_function_closure',
+         'domain_of': ['QueryIndex']} })
+    model_activity_occurs_in_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'model_activity_occurs_in_terms', 'domain_of': ['QueryIndex']} })
+    model_activity_occurs_in_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'model_activity_occurs_in_closure', 'domain_of': ['QueryIndex']} })
+    model_activity_part_of_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'model_activity_part_of_terms', 'domain_of': ['QueryIndex']} })
+    model_activity_part_of_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'model_activity_part_of_closure', 'domain_of': ['QueryIndex']} })
+    model_activity_has_input_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'model_activity_has_input_terms', 'domain_of': ['QueryIndex']} })
+    model_activity_has_input_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'model_activity_has_input_closure', 'domain_of': ['QueryIndex']} })
 
 
 # Model rebuild
@@ -721,4 +743,5 @@ ProteinComplexTermObject.model_rebuild()
 TaxonTermObject.model_rebuild()
 PredicateTermObject.model_rebuild()
 ProvenanceInfo.model_rebuild()
+QueryIndex.model_rebuild()
 
