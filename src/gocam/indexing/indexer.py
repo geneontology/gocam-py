@@ -79,6 +79,7 @@ class Indexer:
         """
         if model.query_index and not reindex:
             return
+        go = self.go_adapter()
         if not model.query_index:
             model.query_index = QueryIndex()
         qi = model.query_index
@@ -90,6 +91,7 @@ class Indexer:
         all_parts_ofs = set()
         all_occurs_ins = set()
         all_has_inputs = set()
+        all_annoton_terms = []
 
         def ta_ref(ta: Optional[TermAssociation]) -> List[str]:
             """Extract references from a TermAssociation."""
@@ -99,26 +101,31 @@ class Indexer:
             return refs
 
         for a in model.activities:
+            annoton_term_id_parts = []
             if a.causal_associations:
                 all_causal_associations.extend(a.causal_associations)
+
+            if a.enabled_by:
+                all_refs.update(ta_ref(a.enabled_by))
+                all_enabled_bys.add(a.enabled_by.term)
+                annoton_term_id_parts.append(a.enabled_by.term)
             
             if a.molecular_function:
                 all_refs.update(ta_ref(a.molecular_function))
                 all_mfs.add(a.molecular_function.term)
-                    
-            if a.enabled_by:
-                all_refs.update(ta_ref(a.enabled_by))
-                all_enabled_bys.add(a.enabled_by.term)
-                
+                annoton_term_id_parts.append(a.molecular_function.term)
+
             if a.part_of:
                 # Handle both single and list cases
                 if isinstance(a.part_of, list):
                     for ta in a.part_of:
                         all_refs.update(ta_ref(ta))
                         all_parts_ofs.add(ta.term)
+                        annoton_term_id_parts.append(ta.term)
                 else:
                     all_refs.update(ta_ref(a.part_of))
                     all_parts_ofs.add(a.part_of.term)
+                    annoton_term_id_parts.append(a.part_of.term)
                         
             if a.occurs_in:
                 # Handle both single and list cases
@@ -126,14 +133,31 @@ class Indexer:
                     for ta in a.occurs_in:
                         all_refs.update(ta_ref(ta))
                         all_occurs_ins.add(ta.term)
+                        annoton_term_id_parts.append(ta.term)
                 else:
                     all_refs.update(ta_ref(a.occurs_in))
                     all_occurs_ins.add(a.occurs_in.term)
+                    annoton_term_id_parts.append(a.occurs_in.term)
                 
             if a.has_input:
                 for ta in a.has_input:
                     all_refs.update(ta_ref(ta))
                     all_has_inputs.add(ta.term)
+                    annoton_term_id_parts.append(ta.term)
+
+            if a.enabled_by:
+                def _label(x):
+                    lbl = go.label(x)
+                    if lbl:
+                        return lbl
+                    else:
+                        return x
+                annoton_term_label_parts = [_label(x) for x in annoton_term_id_parts]
+                annoton_term = TermObject(
+                    id="-".join(annoton_term_id_parts),
+                    label="; ".join(annoton_term_label_parts),
+                )
+                all_annoton_terms.append(annoton_term)
 
         qi.number_of_enabled_by_terms = len(all_enabled_bys)
         qi.number_of_causal_associations = len(all_causal_associations)
@@ -159,7 +183,7 @@ class Indexer:
             undirected_graph = graph.to_undirected()
             connected_components = list(nx.connected_components(undirected_graph))
             qi.number_of_strongly_connected_components = len(connected_components)
-        go = self.go_adapter()
+
 
         mf_direct, mf_closure = self._get_closures(all_mfs)
         qi.model_activity_molecular_function_terms = mf_direct
@@ -173,6 +197,7 @@ class Indexer:
         has_inputs_direct, has_inputs_closure = self._get_closures(all_has_inputs)
         qi.model_activity_has_input_terms = has_inputs_direct
         qi.model_activity_has_input_closure = has_inputs_closure
+        qi.annoton_terms = all_annoton_terms
 
 
 

@@ -462,6 +462,14 @@ classes:
         range: TermObject
         multivalued: true
         inlined_as_list: true
+      taxon_closure:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      annoton_terms:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
 
 
 enums:
