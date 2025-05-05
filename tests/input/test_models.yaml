@@ -1,0 +1,20 @@
+---
+id: gomodel:123456
+title: Example model 1
+status: development
+activities:
+  - id: gomodel:123456/act1
+    enabled_by:
+      term: TEST:001
+    molecular_function:
+      term: GO:0016301
+---
+id: gomodel:789012
+title: Example model 2
+status: production
+activities:
+  - id: gomodel:789012/act1
+    enabled_by:
+      term: TEST:002
+    molecular_function:
+      term: GO:0016301
