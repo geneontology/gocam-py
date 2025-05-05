@@ -231,6 +231,15 @@
     click ProvenanceInfo href "../ProvenanceInfo"
 
 
+      Model : query_index
+
+
+
+
+    Model --&gt; "0..1" QueryIndex : query_index
+    click QueryIndex href "../QueryIndex"
+
+
       Model : status
 
 
@@ -311,6 +320,12 @@
 <td><a href="../provenances/">provenances</a></td>
 <td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
 <td>Model-level provenance information</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../query_index/">query_index</a></td>
+<td>0..1 <br/> <a href="../QueryIndex/">QueryIndex</a></td>
+<td></td>
 <td>direct</td>
 </tr>
 </tbody>
@@ -435,6 +450,13 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  query_index:
+    name: query_index
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - Model
+    range: QueryIndex
 
 </code></pre>
 </details>
@@ -546,6 +568,15 @@ attributes:
     range: ProvenanceInfo
     multivalued: true
     inlined_as_list: true
+  query_index:
+    name: query_index
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: query_index
+    owner: Model
+    domain_of:
+    - Model
+    range: QueryIndex
 
 </code></pre>
 </details>
