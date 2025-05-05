@@ -204,6 +204,15 @@
 <div class="mermaid"> classDiagram
     class QueryIndex
     click QueryIndex href "../QueryIndex"
+      QueryIndex : annoton_terms
+
+
+
+
+    QueryIndex --&gt; "*" TermObject : annoton_terms
+    click TermObject href "../TermObject"
+
+
       QueryIndex : flattened_references
 
 
@@ -294,6 +303,15 @@
       QueryIndex : number_of_enabled_by_terms
 
       QueryIndex : number_of_strongly_connected_components
+
+      QueryIndex : taxon_closure
+
+
+
+
+    QueryIndex --&gt; "*" TermObject : taxon_closure
+    click TermObject href "../TermObject"
+
 
 
 </div>
@@ -389,6 +407,18 @@
 </tr>
 <tr>
 <td><a href="../model_activity_has_input_closure/">model_activity_has_input_closure</a></td>
+<td>* <br/> <a href="../TermObject/">TermObject</a></td>
+<td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../taxon_closure/">taxon_closure</a></td>
+<td>* <br/> <a href="../TermObject/">TermObject</a></td>
+<td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../annoton_terms/">annoton_terms</a></td>
 <td>* <br/> <a href="../TermObject/">TermObject</a></td>
 <td></td>
 <td>direct</td>
@@ -570,6 +600,26 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  taxon_closure:
+    name: taxon_closure
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: TermObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  annoton_terms:
+    name: annoton_terms
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: TermObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
 
 </code></pre>
 </details>
@@ -724,6 +774,30 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_has_input_closure
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: TermObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  taxon_closure:
+    name: taxon_closure
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: taxon_closure
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: TermObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  annoton_terms:
+    name: annoton_terms
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: annoton_terms
     owner: QueryIndex
     domain_of:
     - QueryIndex
