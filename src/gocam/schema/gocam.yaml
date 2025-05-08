@@ -26,9 +26,10 @@ prefixes:
   gomodel: http://model.geneontology.org/
   oio: http://www.geneontology.org/formats/oboInOwl#
   orcid: https://orcid.org/
-  UniProtKB: http://identifiers.org/uniprot/
+  UniProtKB: http://purl.uniprot.org/uniprot/
   PMID: http://identifiers.org/pmid/
   dcterms: http://purl.org/dc/terms/
+  RHEA: http://rdf.rhea-db.org/
 
 default_prefix: gocam
 default_range: string
