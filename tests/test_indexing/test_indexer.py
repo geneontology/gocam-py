@@ -113,7 +113,7 @@ def test_get_closures(mock_go_adapter):
 def test_indexer_with_empty_model():
     """Test indexer with an empty model."""
     # Create an empty model
-    model = Model(id="test:empty")
+    model = Model(id="test:empty", title="Test Empty Model")
     model.activities = []
     
     # Create an indexer with a mock GO adapter
