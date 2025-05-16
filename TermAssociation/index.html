@@ -200,7 +200,7 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
 <h1 id="class-termassociation">Class: TermAssociation</h1>
-<p><em>An association between an activity and a term, potentially with extensions</em></p>
+<p><em>An association between an activity and a term, potentially with extensions. This is an abstract class for grouping purposes, it should not be directly instantiated, instead a subclass should be instantiated.</em></p>
 <ul>
 <li><strong>NOTE</strong>: this is an abstract class and should not be instantiated directly</li>
 </ul>
@@ -292,19 +292,19 @@
 <tr>
 <td><a href="../type/">type</a></td>
 <td>0..1 <br/> <a href="../String/">String</a></td>
-<td></td>
+<td>The type of association</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 <tr>
 <td><a href="../evidence/">evidence</a></td>
 <td>* <br/> <a href="../EvidenceItem/">EvidenceItem</a></td>
-<td></td>
+<td>The set of evidence items that support the association</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 <tr>
 <td><a href="../provenances/">provenances</a></td>
 <td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
-<td></td>
+<td>The set of provenance objects that provide metadata about who made the associ...</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 </tbody>
@@ -338,7 +338,9 @@
 <h3 id="direct">Direct</h3>
 <details>
 <pre><code class="language-yaml">name: TermAssociation
-description: An association between an activity and a term, potentially with extensions
+description: An association between an activity and a term, potentially with extensions.
+  This is an abstract class for grouping purposes, it should not be directly instantiated,
+  instead a subclass should be instantiated.
 from_schema: https://w3id.org/gocam
 is_a: Association
 abstract: true
@@ -358,7 +360,9 @@ attributes:
 <h3 id="induced">Induced</h3>
 <details>
 <pre><code class="language-yaml">name: TermAssociation
-description: An association between an activity and a term, potentially with extensions
+description: An association between an activity and a term, potentially with extensions.
+  This is an abstract class for grouping purposes, it should not be directly instantiated,
+  instead a subclass should be instantiated.
 from_schema: https://w3id.org/gocam
 is_a: Association
 abstract: true
@@ -376,6 +380,10 @@ attributes:
     range: TermObject
   type:
     name: type
+    description: The type of association.
+    comments:
+    - when instantiating Association objects in Python and other languages, it isn't
+      necessary to populate this, it is auto-populated from the object class.
     from_schema: https://w3id.org/gocam
     rank: 1000
     designates_type: true
@@ -387,6 +395,7 @@ attributes:
     range: string
   evidence:
     name: evidence
+    description: The set of evidence items that support the association.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: evidence
@@ -398,6 +407,8 @@ attributes:
     inlined: true
   provenances:
     name: provenances
+    description: The set of provenance objects that provide metadata about who made
+      the association.
     from_schema: https://w3id.org/gocam
     alias: provenances
     owner: TermAssociation

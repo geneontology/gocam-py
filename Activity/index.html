@@ -224,7 +224,7 @@
 
 
 
-    Activity --&gt; "0..1" EnabledByAssociation : enabled_by
+    Activity --&gt; "0..1 _recommended_" EnabledByAssociation : enabled_by
     click EnabledByAssociation href "../EnabledByAssociation"
 
 
@@ -271,7 +271,7 @@
 
 
 
-    Activity --&gt; "0..1" MolecularFunctionAssociation : molecular_function
+    Activity --&gt; "0..1 _recommended_" MolecularFunctionAssociation : molecular_function
     click MolecularFunctionAssociation href "../MolecularFunctionAssociation"
 
 
@@ -280,7 +280,7 @@
 
 
 
-    Activity --&gt; "0..1" CellularAnatomicalEntityAssociation : occurs_in
+    Activity --&gt; "0..1 _recommended_" CellularAnatomicalEntityAssociation : occurs_in
     click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation"
 
 
@@ -289,7 +289,7 @@
 
 
 
-    Activity --&gt; "0..1" BiologicalProcessAssociation : part_of
+    Activity --&gt; "0..1 _recommended_" BiologicalProcessAssociation : part_of
     click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
 
 
@@ -324,25 +324,25 @@
 </tr>
 <tr>
 <td><a href="../enabled_by/">enabled_by</a></td>
-<td>0..1 <br/> <a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
+<td>0..1 <em>recommended</em> <br/> <a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
 <td>The gene product or complex that carries out the activity</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../molecular_function/">molecular_function</a></td>
-<td>0..1 <br/> <a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
+<td>0..1 <em>recommended</em> <br/> <a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
 <td>The molecular function that is carried out by the gene product or complex</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../occurs_in/">occurs_in</a></td>
-<td>0..1 <br/> <a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
+<td>0..1 <em>recommended</em> <br/> <a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
 <td>The cellular location in which the activity occurs</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../part_of/">part_of</a></td>
-<td>0..1 <br/> <a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
+<td>0..1 <em>recommended</em> <br/> <a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
 <td>The larger biological process in which the activity is a part</td>
 <td>direct</td>
 </tr>
@@ -373,7 +373,7 @@
 <tr>
 <td><a href="../causal_associations/">causal_associations</a></td>
 <td>* <br/> <a href="../CausalAssociation/">CausalAssociation</a></td>
-<td>The causal associations that connect this activity to other activities</td>
+<td>The causal associations that flow out of this activity</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -404,6 +404,30 @@
 <tr>
 <td><a href="../CausalAssociation/">CausalAssociation</a></td>
 <td><a href="../downstream_activity/">downstream_activity</a></td>
+<td>range</td>
+<td><a href="./">Activity</a></td>
+</tr>
+<tr>
+<td><a href="../QueryIndex/">QueryIndex</a></td>
+<td><a href="../start_activities/">start_activities</a></td>
+<td>range</td>
+<td><a href="./">Activity</a></td>
+</tr>
+<tr>
+<td><a href="../QueryIndex/">QueryIndex</a></td>
+<td><a href="../end_activities/">end_activities</a></td>
+<td>range</td>
+<td><a href="./">Activity</a></td>
+</tr>
+<tr>
+<td><a href="../QueryIndex/">QueryIndex</a></td>
+<td><a href="../intermediate_activities/">intermediate_activities</a></td>
+<td>range</td>
+<td><a href="./">Activity</a></td>
+</tr>
+<tr>
+<td><a href="../QueryIndex/">QueryIndex</a></td>
+<td><a href="../singleton_activities/">singleton_activities</a></td>
 <td>range</td>
 <td><a href="./">Activity</a></td>
 </tr>
@@ -451,10 +475,15 @@ aliases:
 attributes:
   id:
     name: id
+    id_prefixes:
+    - gocam
     description: Identifier of the activity unit. Should be in gocam namespace.
     comments:
     - Typically does not need to be exposed to end-user, this exists to allow activity
       flows
+    examples:
+    - value: gomodel:63f809ec00000701
+      description: A model representing tRNA repair and recycling
     from_schema: https://w3id.org/gocam
     identifier: true
     domain_of:
@@ -471,6 +500,7 @@ attributes:
     domain_of:
     - Activity
     range: EnabledByAssociation
+    recommended: true
     inlined: true
   molecular_function:
     name: molecular_function
@@ -483,6 +513,7 @@ attributes:
     domain_of:
     - Activity
     range: MolecularFunctionAssociation
+    recommended: true
     inlined: true
   occurs_in:
     name: occurs_in
@@ -492,6 +523,7 @@ attributes:
     domain_of:
     - Activity
     range: CellularAnatomicalEntityAssociation
+    recommended: true
     inlined: true
   part_of:
     name: part_of
@@ -505,10 +537,13 @@ attributes:
     - CellTypeAssociation
     - GrossAnatomyAssociation
     range: BiologicalProcessAssociation
+    recommended: true
     inlined: true
   has_input:
     name: has_input
     description: The input molecules that are directly consumed by the activity
+    todos:
+    - resolve has_input vs has_primary_input
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -520,6 +555,8 @@ attributes:
   has_primary_input:
     name: has_primary_input
     description: The primary input molecule that is directly consumed by the activity
+    todos:
+    - resolve has_input vs has_primary_input
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -529,6 +566,8 @@ attributes:
   has_output:
     name: has_output
     description: The output molecules that are directly produced by the activity
+    todos:
+    - resolve has_output vs has_primary_output
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -540,6 +579,8 @@ attributes:
   has_primary_output:
     name: has_primary_output
     description: The primary output molecule that is directly produced by the activity
+    todos:
+    - resolve has_output vs has_primary_output
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -548,7 +589,12 @@ attributes:
     inlined: true
   causal_associations:
     name: causal_associations
-    description: The causal associations that connect this activity to other activities
+    description: The causal associations that flow out of this activity
+    comments:
+    - All activities in a model must be connected to at least one other activity.
+      If a an activity has no outgoing activities (i.e the value of this slot is empty)
+      then it is a terminal activity in the model. If an activity has no incoming
+      activities, it is an initial activity.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -585,10 +631,15 @@ aliases:
 attributes:
   id:
     name: id
+    id_prefixes:
+    - gocam
     description: Identifier of the activity unit. Should be in gocam namespace.
     comments:
     - Typically does not need to be exposed to end-user, this exists to allow activity
       flows
+    examples:
+    - value: gomodel:63f809ec00000701
+      description: A model representing tRNA repair and recycling
     from_schema: https://w3id.org/gocam
     identifier: true
     alias: id
@@ -609,6 +660,7 @@ attributes:
     domain_of:
     - Activity
     range: EnabledByAssociation
+    recommended: true
     inlined: true
   molecular_function:
     name: molecular_function
@@ -623,6 +675,7 @@ attributes:
     domain_of:
     - Activity
     range: MolecularFunctionAssociation
+    recommended: true
     inlined: true
   occurs_in:
     name: occurs_in
@@ -634,6 +687,7 @@ attributes:
     domain_of:
     - Activity
     range: CellularAnatomicalEntityAssociation
+    recommended: true
     inlined: true
   part_of:
     name: part_of
@@ -649,10 +703,13 @@ attributes:
     - CellTypeAssociation
     - GrossAnatomyAssociation
     range: BiologicalProcessAssociation
+    recommended: true
     inlined: true
   has_input:
     name: has_input
     description: The input molecules that are directly consumed by the activity
+    todos:
+    - resolve has_input vs has_primary_input
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: has_input
@@ -666,6 +723,8 @@ attributes:
   has_primary_input:
     name: has_primary_input
     description: The primary input molecule that is directly consumed by the activity
+    todos:
+    - resolve has_input vs has_primary_input
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: has_primary_input
@@ -677,6 +736,8 @@ attributes:
   has_output:
     name: has_output
     description: The output molecules that are directly produced by the activity
+    todos:
+    - resolve has_output vs has_primary_output
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: has_output
@@ -690,6 +751,8 @@ attributes:
   has_primary_output:
     name: has_primary_output
     description: The primary output molecule that is directly produced by the activity
+    todos:
+    - resolve has_output vs has_primary_output
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: has_primary_output
@@ -700,7 +763,12 @@ attributes:
     inlined: true
   causal_associations:
     name: causal_associations
-    description: The causal associations that connect this activity to other activities
+    description: The causal associations that flow out of this activity
+    comments:
+    - All activities in a model must be connected to at least one other activity.
+      If a an activity has no outgoing activities (i.e the value of this slot is empty)
+      then it is a terminal activity in the model. If an activity has no incoming
+      activities, it is an initial activity.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: causal_associations

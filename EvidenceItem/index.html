@@ -401,7 +401,12 @@ from_schema: https://w3id.org/gocam
 attributes:
   term:
     name: term
+    id_prefixes:
+    - ECO
     description: The ECO term representing the type of evidence
+    examples:
+    - value: ECO:0000314
+      description: direct assay evidence used in manual assertion (IDA)
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -409,9 +414,15 @@ attributes:
     - EnabledByAssociation
     - TermAssociation
     range: EvidenceTermObject
+    bindings:
+    - range: EvidenceCodeEnum
+      obligation_level: REQUIRED
+      binds_value_of: id
   reference:
     name: reference
     description: The publication of reference that describes the evidence
+    examples:
+    - value: PMID:32075755
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -454,7 +465,12 @@ from_schema: https://w3id.org/gocam
 attributes:
   term:
     name: term
+    id_prefixes:
+    - ECO
     description: The ECO term representing the type of evidence
+    examples:
+    - value: ECO:0000314
+      description: direct assay evidence used in manual assertion (IDA)
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: term
@@ -464,9 +480,15 @@ attributes:
     - EnabledByAssociation
     - TermAssociation
     range: EvidenceTermObject
+    bindings:
+    - range: EvidenceCodeEnum
+      obligation_level: REQUIRED
+      binds_value_of: id
   reference:
     name: reference
     description: The publication of reference that describes the evidence
+    examples:
+    - value: PMID:32075755
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: reference

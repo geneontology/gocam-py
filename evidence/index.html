@@ -324,6 +324,7 @@
 
 
 <h1 id="slot-evidence">Slot: evidence</h1>
+<p><em>The set of evidence items that support the association.</em></p>
 <p>URI: <a href="https://w3id.org/gocam/evidence">gocam:evidence</a>
 Alias: evidence</p>
 <!-- no inheritance hierarchy -->
@@ -339,23 +340,13 @@ Alias: evidence</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../Association/">Association</a></td>
-<td>An abstract grouping for different kinds of evidence-associated provenance</td>
-<td>no</td>
-</tr>
-<tr>
 <td><a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
 <td>An association between an activity and a molecular function term</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
-<td>An association between an activity and the gene product or complex that carri...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
-<td>An association between an activity and a protein complex</td>
+<td><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
+<td>An association between an activity and a cellular anatomical entity term</td>
 <td>no</td>
 </tr>
 <tr>
@@ -369,8 +360,13 @@ Alias: evidence</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
-<td>An association between an activity and a cellular anatomical entity term</td>
+<td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td>An association between an activity and a molecule term</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
+<td>An association between an activity and a protein complex, where the complex c...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -379,8 +375,13 @@ Alias: evidence</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
-<td>An association between an activity and a cell type term</td>
+<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
+<td>An association between an activity and the gene product or complex or set of ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../Association/">Association</a></td>
+<td>An abstract grouping for different kinds of evidence-associated provenance</td>
 <td>no</td>
 </tr>
 <tr>
@@ -389,13 +390,13 @@ Alias: evidence</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
-<td>An association between an activity and a molecule term</td>
+<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
+<td>An association between an activity and a cell type term</td>
 <td>no</td>
 </tr>
 <tr>
 <td><a href="../EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
-<td>An association between an activity and a gene product</td>
+<td>An association between an activity and an individual gene product</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -437,6 +438,7 @@ Alias: evidence</p>
 <details>
 
 <pre><code class="language-yaml">name: evidence
+description: The set of evidence items that support the association.
 from_schema: https://w3id.org/gocam
 rank: 1000
 alias: evidence

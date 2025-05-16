@@ -200,7 +200,7 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
 <h1 id="class-enabledbygeneproductassociation">Class: EnabledByGeneProductAssociation</h1>
-<p><em>An association between an activity and a gene product</em></p>
+<p><em>An association between an activity and an individual gene product</em></p>
 <p>URI: <a href="https://w3id.org/gocam/EnabledByGeneProductAssociation">gocam:EnabledByGeneProductAssociation</a></p>
 <div class="mermaid"> classDiagram
     class EnabledByGeneProductAssociation
@@ -263,25 +263,25 @@
 <tr>
 <td><a href="../term/">term</a></td>
 <td>0..1 <br/> <a href="../GeneProductTermObject/">GeneProductTermObject</a></td>
-<td>The gene product or complex that carries out the activity</td>
+<td>A "term" that is an entity database object representing an individual gene pr...</td>
 <td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
 </tr>
 <tr>
 <td><a href="../type/">type</a></td>
 <td>0..1 <br/> <a href="../String/">String</a></td>
-<td></td>
+<td>The type of association</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 <tr>
 <td><a href="../evidence/">evidence</a></td>
 <td>* <br/> <a href="../EvidenceItem/">EvidenceItem</a></td>
-<td></td>
+<td>The set of evidence items that support the association</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 <tr>
 <td><a href="../provenances/">provenances</a></td>
 <td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
-<td></td>
+<td>The set of provenance objects that provide metadata about who made the associ...</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 </tbody>
@@ -315,12 +315,28 @@
 <h3 id="direct">Direct</h3>
 <details>
 <pre><code class="language-yaml">name: EnabledByGeneProductAssociation
-description: An association between an activity and a gene product
+description: An association between an activity and an individual gene product
 from_schema: https://w3id.org/gocam
 is_a: EnabledByAssociation
 slot_usage:
   term:
     name: term
+    description: A "term" that is an entity database object representing an individual
+      gene product.
+    comments:
+    - In the context of the GO workflow, the allowed values for this field come from
+      the GPI file from an authoritative source. For example, the authoritative source
+      for human is the EBI GOA group, and the GPI for this group consists of UniProtKB
+      IDs (for proteins) and RNA Central IDs (for RNA gene products)
+    - A gene identifier may be provided as a value here (if the authoritative GPI
+      allows it). Note that the *interpretation* of the gene ID in the context of
+      a GO-CAM model is the (spliceform and proteoform agnostic) *product* of that
+      gene.
+    examples:
+    - value: UniProtKB:Q96Q11
+      description: The protein product of the Homo sapiens TRNT1 gene
+    - value: RNAcentral:URS00026A1FBE_9606
+      description: An RNA product of this RNA central gene
     range: GeneProductTermObject
 
 </code></pre>
@@ -328,17 +344,48 @@ slot_usage:
 <h3 id="induced">Induced</h3>
 <details>
 <pre><code class="language-yaml">name: EnabledByGeneProductAssociation
-description: An association between an activity and a gene product
+description: An association between an activity and an individual gene product
 from_schema: https://w3id.org/gocam
 is_a: EnabledByAssociation
 slot_usage:
   term:
     name: term
+    description: A "term" that is an entity database object representing an individual
+      gene product.
+    comments:
+    - In the context of the GO workflow, the allowed values for this field come from
+      the GPI file from an authoritative source. For example, the authoritative source
+      for human is the EBI GOA group, and the GPI for this group consists of UniProtKB
+      IDs (for proteins) and RNA Central IDs (for RNA gene products)
+    - A gene identifier may be provided as a value here (if the authoritative GPI
+      allows it). Note that the *interpretation* of the gene ID in the context of
+      a GO-CAM model is the (spliceform and proteoform agnostic) *product* of that
+      gene.
+    examples:
+    - value: UniProtKB:Q96Q11
+      description: The protein product of the Homo sapiens TRNT1 gene
+    - value: RNAcentral:URS00026A1FBE_9606
+      description: An RNA product of this RNA central gene
     range: GeneProductTermObject
 attributes:
   term:
     name: term
-    description: The gene product or complex that carries out the activity
+    description: A "term" that is an entity database object representing an individual
+      gene product.
+    comments:
+    - In the context of the GO workflow, the allowed values for this field come from
+      the GPI file from an authoritative source. For example, the authoritative source
+      for human is the EBI GOA group, and the GPI for this group consists of UniProtKB
+      IDs (for proteins) and RNA Central IDs (for RNA gene products)
+    - A gene identifier may be provided as a value here (if the authoritative GPI
+      allows it). Note that the *interpretation* of the gene ID in the context of
+      a GO-CAM model is the (spliceform and proteoform agnostic) *product* of that
+      gene.
+    examples:
+    - value: UniProtKB:Q96Q11
+      description: The protein product of the Homo sapiens TRNT1 gene
+    - value: RNAcentral:URS00026A1FBE_9606
+      description: An RNA product of this RNA central gene
     from_schema: https://w3id.org/gocam
     alias: term
     owner: EnabledByGeneProductAssociation
@@ -349,6 +396,10 @@ attributes:
     range: GeneProductTermObject
   type:
     name: type
+    description: The type of association.
+    comments:
+    - when instantiating Association objects in Python and other languages, it isn't
+      necessary to populate this, it is auto-populated from the object class.
     from_schema: https://w3id.org/gocam
     rank: 1000
     designates_type: true
@@ -360,6 +411,7 @@ attributes:
     range: string
   evidence:
     name: evidence
+    description: The set of evidence items that support the association.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: evidence
@@ -371,6 +423,8 @@ attributes:
     inlined: true
   provenances:
     name: provenances
+    description: The set of provenance objects that provide metadata about who made
+      the association.
     from_schema: https://w3id.org/gocam
     alias: provenances
     owner: EnabledByGeneProductAssociation

@@ -278,6 +278,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#annotations" class="md-nav__link">
+    Annotations
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#schema-source" class="md-nav__link">
     Schema Source
   </a>
@@ -324,6 +331,7 @@
 
 
 <h1 id="slot-model_activity_molecular_function_closure">Slot: model_activity_molecular_function_closure</h1>
+<p><em>The reflexive transitive closure of <code>model_activity_molecular_function_terms</code>, over the is_a relationship</em></p>
 <p>URI: <a href="https://w3id.org/gocam/model_activity_molecular_function_closure">gocam:model_activity_molecular_function_closure</a>
 Alias: model_activity_molecular_function_closure</p>
 <!-- no inheritance hierarchy -->
@@ -340,7 +348,7 @@ Alias: model_activity_molecular_function_closure</p>
 <tbody>
 <tr>
 <td><a href="../QueryIndex/">QueryIndex</a></td>
-<td></td>
+<td>An index that is optionally placed on a model in order to support common quer...</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -355,6 +363,21 @@ Alias: model_activity_molecular_function_closure</p>
 </li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
+<h3 id="annotations">Annotations</h3>
+<table>
+<thead>
+<tr>
+<th>property</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>closure_computed_over</td>
+<td>[rdfs:subClassOf]</td>
+</tr>
+</tbody>
+</table>
 <h3 id="schema-source">Schema Source</h3>
 <ul>
 <li>from schema: https://w3id.org/gocam</li>
@@ -382,6 +405,12 @@ Alias: model_activity_molecular_function_closure</p>
 <details>
 
 <pre><code class="language-yaml">name: model_activity_molecular_function_closure
+annotations:
+  closure_computed_over:
+    tag: closure_computed_over
+    value: '[rdfs:subClassOf]'
+description: The reflexive transitive closure of `model_activity_molecular_function_terms`,
+  over the is_a relationship
 from_schema: https://w3id.org/gocam
 rank: 1000
 alias: model_activity_molecular_function_closure

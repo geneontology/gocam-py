@@ -268,9 +268,13 @@
 
 
 <h1 id="gocam">gocam</h1>
-<p>GO CAM LinkML schema (experimental)</p>
-<p>The central class in this datamodel is a <a href="../Model/">Model</a>. A model consists of a set of
-<a href="../Activity/">Activity</a> objects.</p>
+<p>Gene Ontology Causal Activity Model (GO-CAM) Schema.</p>
+<p>This schema provides a way of representing causal pathway <a href="../Model/">Models</a>. A model consists of a set of
+<a href="../Activity/">Activity</a> objects, where each activity object represents the function of either an <a href="EnabledByGeneProductAssociation">individual
+gene product</a>, a <a href="EnabledByGeneProductAssociation">protein complex of gene products</a>,
+or a set of possible gene products.</p>
+<p>Each <a href="../Model/">Models</a> has associated metadata slots. Some slots such as <a href="../id/">id</a>, <a href="../title/">title</a>,
+and <a href="../status/">status</a> are <em>required</em>.</p>
 <p>URI: https://w3id.org/gocam</p>
 
 

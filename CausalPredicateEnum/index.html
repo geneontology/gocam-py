@@ -310,6 +310,7 @@
 
 
 <h1 id="enum-causalpredicateenum">Enum: CausalPredicateEnum</h1>
+<p><em>A term describing the causal relationship between two activities. All terms are drawn from the "causally upstream or within" (RO:0002418) branch of the Relation Ontology (RO).</em></p>
 <p>URI: <a href="./">CausalPredicateEnum</a></p>
 <h2 id="permissible-values">Permissible Values</h2>
 <table>
@@ -371,6 +372,16 @@
 <td>RO:0002213</td>
 <td></td>
 </tr>
+<tr>
+<td>provides input for</td>
+<td>RO:0002413</td>
+<td></td>
+</tr>
+<tr>
+<td>removes input for</td>
+<td>RO:0012010</td>
+<td></td>
+</tr>
 </tbody>
 </table>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
@@ -382,6 +393,9 @@
 <details>
 
 <pre><code class="language-yaml">name: CausalPredicateEnum
+description: A term describing the causal relationship between two activities. All
+  terms are drawn from the &quot;causally upstream or within&quot; (RO:0002418) branch of the
+  Relation Ontology (RO).
 from_schema: https://w3id.org/gocam
 rank: 1000
 permissible_values:
@@ -415,6 +429,12 @@ permissible_values:
   positively regulates:
     text: positively regulates
     meaning: RO:0002213
+  provides input for:
+    text: provides input for
+    meaning: RO:0002413
+  removes input for:
+    text: removes input for
+    meaning: RO:0012010
 
 </code></pre>
 

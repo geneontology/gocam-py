@@ -317,7 +317,7 @@
 
 
 <h1 id="enum-modelstateenum">Enum: ModelStateEnum</h1>
-<p><em>Status of a model</em></p>
+<p><em>A term describing where the model is in the development life cycle.</em></p>
 <p>URI: <a href="./">ModelStateEnum</a></p>
 <h2 id="permissible-values">Permissible Values</h2>
 <table>
@@ -330,14 +330,14 @@
 </thead>
 <tbody>
 <tr>
-<td>production</td>
-<td>None</td>
-<td></td>
-</tr>
-<tr>
 <td>development</td>
 <td>None</td>
-<td></td>
+<td>Used when the curator is still working on the model</td>
+</tr>
+<tr>
+<td>production</td>
+<td>None</td>
+<td>Used when the curator has declared the model is ready for public consumption</td>
 </tr>
 </tbody>
 </table>
@@ -352,7 +352,7 @@
 <tbody>
 <tr>
 <td><a href="../status/">status</a></td>
-<td>The status of the model</td>
+<td>The status of the model in terms of its progression along the developmental l...</td>
 </tr>
 </tbody>
 </table>
@@ -365,14 +365,24 @@
 <details>
 
 <pre><code class="language-yaml">name: ModelStateEnum
-description: Status of a model
+description: A term describing where the model is in the development life cycle.
 from_schema: https://w3id.org/gocam
 rank: 1000
 permissible_values:
-  production:
-    text: production
   development:
     text: development
+    description: Used when the curator is still working on the model. Edits are still
+      being made, and the information in the model is not yet guaranteed to be accurate
+      or complete. The model should not be displayed in end-user facing websites,
+      unless it is made clear that the model is a work in progress.
+    aliases:
+    - work in progress
+  production:
+    text: production
+    description: Used when the curator has declared the model is ready for public
+      consumption. Edits might still be performed on the model in future, but the
+      information in the model is believed to be both accurate and reasonably complete.
+      The model may be displayed in public websites.
 
 </code></pre>
 

@@ -152,6 +152,11 @@
   </a>
 </li>
 <li class="md-nav__item">
+<a class="md-nav__link" href="#comments">
+    Comments
+  </a>
+</li>
+<li class="md-nav__item">
 <a class="md-nav__link" href="#identifier-and-mapping-information">
     Identifier and Mapping Information
   </a>
@@ -200,7 +205,7 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
 <h1 id="class-enabledbyproteincomplexassociation">Class: EnabledByProteinComplexAssociation</h1>
-<p><em>An association between an activity and a protein complex</em></p>
+<p><em>An association between an activity and a protein complex, where the complex carries out the activity. This should only be used when the activity cannot be attributed to an individual member of the complex, but instead the function is an emergent property of the complex.</em></p>
 <p>URI: <a href="https://w3id.org/gocam/EnabledByProteinComplexAssociation">gocam:EnabledByProteinComplexAssociation</a></p>
 <div class="mermaid"> classDiagram
     class EnabledByProteinComplexAssociation
@@ -284,23 +289,27 @@
 <tr>
 <td><a href="../type/">type</a></td>
 <td>0..1 <br/> <a href="../String/">String</a></td>
-<td></td>
+<td>The type of association</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 <tr>
 <td><a href="../evidence/">evidence</a></td>
 <td>* <br/> <a href="../EvidenceItem/">EvidenceItem</a></td>
-<td></td>
+<td>The set of evidence items that support the association</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 <tr>
 <td><a href="../provenances/">provenances</a></td>
 <td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
-<td></td>
+<td>The set of provenance objects that provide metadata about who made the associ...</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 </tbody>
 </table>
+<h2 id="comments">Comments</h2>
+<ul>
+<li>Protein complexes can be specified either by <em>pre-composition</em> or <em>post-composition</em>. For pre-composition, a species-specific named protein complex (such as an entry in ComplexPortal) can be specified, in which case the value of <code>members</code> is <em>implicit</em>. For post-composition, the placeholder term "GO:0032991" can be used, in which case <code>members</code> must be <em>explicitly</em> specified. An intermediate case is when a named class in GO that is a subclass of "GO:0032991" is used. In this case, <code>members</code> should still be specified, as this may only be partially specified by the GO class.</li>
+</ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
 <h3 id="schema-source">Schema Source</h3>
 <ul>
@@ -330,12 +339,29 @@
 <h3 id="direct">Direct</h3>
 <details>
 <pre><code class="language-yaml">name: EnabledByProteinComplexAssociation
-description: An association between an activity and a protein complex
+description: An association between an activity and a protein complex, where the complex
+  carries out the activity. This should only be used when the activity cannot be attributed
+  to an individual member of the complex, but instead the function is an emergent
+  property of the complex.
+comments:
+- Protein complexes can be specified either by *pre-composition* or *post-composition*.
+  For pre-composition, a species-specific named protein complex (such as an entry
+  in ComplexPortal) can be specified, in which case the value of `members` is *implicit*.
+  For post-composition, the placeholder term "GO:0032991" can be used, in which case
+  `members` must be *explicitly* specified. An intermediate case is when a named class
+  in GO that is a subclass of "GO:0032991" is used. In this case, `members` should
+  still be specified, as this may only be partially specified by the GO class.
 from_schema: https://w3id.org/gocam
 is_a: EnabledByAssociation
 slot_usage:
   term:
     name: term
+    examples:
+    - value: GO:0032991
+      description: The generic GO entry for a protein complex. If this is the value
+        of `term`, then members *must* be specified.
+    - value: ComplexPortal:CPX-969
+      description: The human Caspase-2 complex
     range: ProteinComplexTermObject
 attributes:
   members:
@@ -347,18 +373,47 @@ attributes:
     - EnabledByProteinComplexAssociation
     range: GeneProductTermObject
     multivalued: true
+rules:
+- preconditions:
+    slot_conditions:
+      term:
+        name: term
+        equals_string: GO:0032991
+  postconditions:
+    slot_conditions:
+      members:
+        name: members
+        required: true
+  title: members must be specified when the generic GO complex is specified
 
 </code></pre>
 </details>
 <h3 id="induced">Induced</h3>
 <details>
 <pre><code class="language-yaml">name: EnabledByProteinComplexAssociation
-description: An association between an activity and a protein complex
+description: An association between an activity and a protein complex, where the complex
+  carries out the activity. This should only be used when the activity cannot be attributed
+  to an individual member of the complex, but instead the function is an emergent
+  property of the complex.
+comments:
+- Protein complexes can be specified either by *pre-composition* or *post-composition*.
+  For pre-composition, a species-specific named protein complex (such as an entry
+  in ComplexPortal) can be specified, in which case the value of `members` is *implicit*.
+  For post-composition, the placeholder term "GO:0032991" can be used, in which case
+  `members` must be *explicitly* specified. An intermediate case is when a named class
+  in GO that is a subclass of "GO:0032991" is used. In this case, `members` should
+  still be specified, as this may only be partially specified by the GO class.
 from_schema: https://w3id.org/gocam
 is_a: EnabledByAssociation
 slot_usage:
   term:
     name: term
+    examples:
+    - value: GO:0032991
+      description: The generic GO entry for a protein complex. If this is the value
+        of `term`, then members *must* be specified.
+    - value: ComplexPortal:CPX-969
+      description: The human Caspase-2 complex
     range: ProteinComplexTermObject
 attributes:
   members:
@@ -375,6 +430,12 @@ attributes:
   term:
     name: term
     description: The gene product or complex that carries out the activity
+    examples:
+    - value: GO:0032991
+      description: The generic GO entry for a protein complex. If this is the value
+        of `term`, then members *must* be specified.
+    - value: ComplexPortal:CPX-969
+      description: The human Caspase-2 complex
     from_schema: https://w3id.org/gocam
     alias: term
     owner: EnabledByProteinComplexAssociation
@@ -385,6 +446,10 @@ attributes:
     range: ProteinComplexTermObject
   type:
     name: type
+    description: The type of association.
+    comments:
+    - when instantiating Association objects in Python and other languages, it isn't
+      necessary to populate this, it is auto-populated from the object class.
     from_schema: https://w3id.org/gocam
     rank: 1000
     designates_type: true
@@ -396,6 +461,7 @@ attributes:
     range: string
   evidence:
     name: evidence
+    description: The set of evidence items that support the association.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: evidence
@@ -407,6 +473,8 @@ attributes:
     inlined: true
   provenances:
     name: provenances
+    description: The set of provenance objects that provide metadata about who made
+      the association.
     from_schema: https://w3id.org/gocam
     alias: provenances
     owner: EnabledByProteinComplexAssociation
@@ -419,6 +487,18 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+rules:
+- preconditions:
+    slot_conditions:
+      term:
+        name: term
+        equals_string: GO:0032991
+  postconditions:
+    slot_conditions:
+      members:
+        name: members
+        required: true
+  title: members must be specified when the generic GO complex is specified
 
 </code></pre>
 </details>

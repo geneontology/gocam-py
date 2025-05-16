@@ -200,6 +200,7 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
 <h1 id="class-queryindex">Class: QueryIndex</h1>
+<p><em>An index that is optionally placed on a model in order to support common query or index operations. Note that this index is not typically populated in the working transactional store for a model, it is derived via computation from core primary model information.</em></p>
 <p>URI: <a href="https://w3id.org/gocam/QueryIndex">gocam:QueryIndex</a></p>
 <div class="mermaid"> classDiagram
     class QueryIndex
@@ -213,6 +214,15 @@
     click TermObject href "../TermObject"
 
 
+      QueryIndex : end_activities
+
+
+
+
+    QueryIndex --&gt; "*" Activity : end_activities
+    click Activity href "../Activity"
+
+
       QueryIndex : flattened_references
 
 
@@ -220,6 +230,15 @@
 
     QueryIndex --&gt; "*" PublicationObject : flattened_references
     click PublicationObject href "../PublicationObject"
+
+
+      QueryIndex : intermediate_activities
+
+
+
+
+    QueryIndex --&gt; "*" Activity : intermediate_activities
+    click Activity href "../Activity"
 
 
       QueryIndex : length_of_longest_causal_association_path
@@ -302,7 +321,33 @@
 
       QueryIndex : number_of_enabled_by_terms
 
+      QueryIndex : number_of_end_activities
+
+      QueryIndex : number_of_intermediate_activities
+
+      QueryIndex : number_of_singleton_activities
+
+      QueryIndex : number_of_start_activities
+
       QueryIndex : number_of_strongly_connected_components
+
+      QueryIndex : singleton_activities
+
+
+
+
+    QueryIndex --&gt; "*" Activity : singleton_activities
+    click Activity href "../Activity"
+
+
+      QueryIndex : start_activities
+
+
+
+
+    QueryIndex --&gt; "*" Activity : start_activities
+    click Activity href "../Activity"
+
 
       QueryIndex : taxon_closure
 
@@ -330,49 +375,49 @@
 <tr>
 <td><a href="../number_of_activities/">number_of_activities</a></td>
 <td>0..1 <br/> <a href="../Integer/">Integer</a></td>
-<td></td>
+<td>The number of activities in a model</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../number_of_enabled_by_terms/">number_of_enabled_by_terms</a></td>
 <td>0..1 <br/> <a href="../Integer/">Integer</a></td>
-<td></td>
+<td>The number of molecular entities or sets of entities in a model</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../number_of_causal_associations/">number_of_causal_associations</a></td>
 <td>0..1 <br/> <a href="../Integer/">Integer</a></td>
-<td></td>
+<td>Total number of causal association edges connecting activities in a model</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../length_of_longest_causal_association_path/">length_of_longest_causal_association_path</a></td>
 <td>0..1 <br/> <a href="../Integer/">Integer</a></td>
-<td></td>
+<td>The maximum number of hops along activities along the direction of causal flo...</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../number_of_strongly_connected_components/">number_of_strongly_connected_components</a></td>
 <td>0..1 <br/> <a href="../Integer/">Integer</a></td>
-<td></td>
+<td>The number of distinct components that consist of activities that are connect...</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../flattened_references/">flattened_references</a></td>
 <td>* <br/> <a href="../PublicationObject/">PublicationObject</a></td>
-<td></td>
+<td>All publication objects from the model across different levels combined in on...</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../model_activity_molecular_function_terms/">model_activity_molecular_function_terms</a></td>
 <td>* <br/> <a href="../TermObject/">TermObject</a></td>
-<td></td>
+<td>All MF terms for all activities</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../model_activity_molecular_function_closure/">model_activity_molecular_function_closure</a></td>
 <td>* <br/> <a href="../TermObject/">TermObject</a></td>
-<td></td>
+<td>The reflexive transitive closure of <code>model_activity_molecular_function_terms</code>...</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -421,6 +466,54 @@
 <td><a href="../annoton_terms/">annoton_terms</a></td>
 <td>* <br/> <a href="../TermObject/">TermObject</a></td>
 <td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../start_activities/">start_activities</a></td>
+<td>* <br/> <a href="../Activity/">Activity</a></td>
+<td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../end_activities/">end_activities</a></td>
+<td>* <br/> <a href="../Activity/">Activity</a></td>
+<td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../intermediate_activities/">intermediate_activities</a></td>
+<td>* <br/> <a href="../Activity/">Activity</a></td>
+<td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../singleton_activities/">singleton_activities</a></td>
+<td>* <br/> <a href="../Activity/">Activity</a></td>
+<td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../number_of_start_activities/">number_of_start_activities</a></td>
+<td>0..1 <br/> <a href="../Integer/">Integer</a></td>
+<td>The number of start activities in a model</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../number_of_end_activities/">number_of_end_activities</a></td>
+<td>0..1 <br/> <a href="../Integer/">Integer</a></td>
+<td>The number of end activities in a model</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../number_of_intermediate_activities/">number_of_intermediate_activities</a></td>
+<td>0..1 <br/> <a href="../Integer/">Integer</a></td>
+<td>The number of intermediate activities in a model</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../number_of_singleton_activities/">number_of_singleton_activities</a></td>
+<td>0..1 <br/> <a href="../Integer/">Integer</a></td>
+<td>The number of singleton activities in a model</td>
 <td>direct</td>
 </tr>
 </tbody>
@@ -473,10 +566,17 @@
 <h3 id="direct">Direct</h3>
 <details>
 <pre><code class="language-yaml">name: QueryIndex
+description: An index that is optionally placed on a model in order to support common
+  query or index operations. Note that this index is not typically populated in the
+  working transactional store for a model, it is derived via computation from core
+  primary model information.
 from_schema: https://w3id.org/gocam
 attributes:
   number_of_activities:
     name: number_of_activities
+    description: The number of activities in a model.
+    comments:
+    - this includes all activities, even those without an enabler.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -484,6 +584,7 @@ attributes:
     range: integer
   number_of_enabled_by_terms:
     name: number_of_enabled_by_terms
+    description: The number of molecular entities or sets of entities in a model.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -491,6 +592,10 @@ attributes:
     range: integer
   number_of_causal_associations:
     name: number_of_causal_associations
+    description: Total number of causal association edges connecting activities in
+      a model.
+    todos:
+    - decide what to do about "implicit" causal associations, i.e provides_input_for
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -498,6 +603,8 @@ attributes:
     range: integer
   length_of_longest_causal_association_path:
     name: length_of_longest_causal_association_path
+    description: The maximum number of hops along activities along the direction of
+      causal flow in a model.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -505,6 +612,10 @@ attributes:
     range: integer
   number_of_strongly_connected_components:
     name: number_of_strongly_connected_components
+    description: The number of distinct components that consist of activities that
+      are connected (directly or indirectly) via causal connections. Most models will
+      consist of a single SCC. Some models may consist of two or more "islands" where
+      there is no connection from one island to another.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -512,6 +623,8 @@ attributes:
     range: integer
   flattened_references:
     name: flattened_references
+    description: All publication objects from the model across different levels combined
+      in one place
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -522,6 +635,7 @@ attributes:
     inlined_as_list: true
   model_activity_molecular_function_terms:
     name: model_activity_molecular_function_terms
+    description: All MF terms for all activities
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -532,6 +646,12 @@ attributes:
     inlined_as_list: true
   model_activity_molecular_function_closure:
     name: model_activity_molecular_function_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf]'
+    description: The reflexive transitive closure of `model_activity_molecular_function_terms`,
+      over the is_a relationship
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -552,6 +672,10 @@ attributes:
     inlined_as_list: true
   model_activity_occurs_in_closure:
     name: model_activity_occurs_in_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf, BFO:0000050]'
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -572,6 +696,10 @@ attributes:
     inlined_as_list: true
   model_activity_part_of_closure:
     name: model_activity_part_of_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf, BFO:0000050]'
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -592,6 +720,10 @@ attributes:
     inlined_as_list: true
   model_activity_has_input_closure:
     name: model_activity_has_input_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf]'
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -602,6 +734,10 @@ attributes:
     inlined_as_list: true
   taxon_closure:
     name: taxon_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf]'
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -620,16 +756,91 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  start_activities:
+    name: start_activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: Activity
+    multivalued: true
+    inlined: false
+  end_activities:
+    name: end_activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: Activity
+    multivalued: true
+    inlined: false
+  intermediate_activities:
+    name: intermediate_activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: Activity
+    multivalued: true
+    inlined: false
+  singleton_activities:
+    name: singleton_activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: Activity
+    multivalued: true
+    inlined: false
+  number_of_start_activities:
+    name: number_of_start_activities
+    description: The number of start activities in a model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: integer
+  number_of_end_activities:
+    name: number_of_end_activities
+    description: The number of end activities in a model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: integer
+  number_of_intermediate_activities:
+    name: number_of_intermediate_activities
+    description: The number of intermediate activities in a model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: integer
+  number_of_singleton_activities:
+    name: number_of_singleton_activities
+    description: The number of singleton activities in a model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: integer
 
 </code></pre>
 </details>
 <h3 id="induced">Induced</h3>
 <details>
 <pre><code class="language-yaml">name: QueryIndex
+description: An index that is optionally placed on a model in order to support common
+  query or index operations. Note that this index is not typically populated in the
+  working transactional store for a model, it is derived via computation from core
+  primary model information.
 from_schema: https://w3id.org/gocam
 attributes:
   number_of_activities:
     name: number_of_activities
+    description: The number of activities in a model.
+    comments:
+    - this includes all activities, even those without an enabler.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: number_of_activities
@@ -639,6 +850,7 @@ attributes:
     range: integer
   number_of_enabled_by_terms:
     name: number_of_enabled_by_terms
+    description: The number of molecular entities or sets of entities in a model.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: number_of_enabled_by_terms
@@ -648,6 +860,10 @@ attributes:
     range: integer
   number_of_causal_associations:
     name: number_of_causal_associations
+    description: Total number of causal association edges connecting activities in
+      a model.
+    todos:
+    - decide what to do about "implicit" causal associations, i.e provides_input_for
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: number_of_causal_associations
@@ -657,6 +873,8 @@ attributes:
     range: integer
   length_of_longest_causal_association_path:
     name: length_of_longest_causal_association_path
+    description: The maximum number of hops along activities along the direction of
+      causal flow in a model.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: length_of_longest_causal_association_path
@@ -666,6 +884,10 @@ attributes:
     range: integer
   number_of_strongly_connected_components:
     name: number_of_strongly_connected_components
+    description: The number of distinct components that consist of activities that
+      are connected (directly or indirectly) via causal connections. Most models will
+      consist of a single SCC. Some models may consist of two or more "islands" where
+      there is no connection from one island to another.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: number_of_strongly_connected_components
@@ -675,6 +897,8 @@ attributes:
     range: integer
   flattened_references:
     name: flattened_references
+    description: All publication objects from the model across different levels combined
+      in one place
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: flattened_references
@@ -687,6 +911,7 @@ attributes:
     inlined_as_list: true
   model_activity_molecular_function_terms:
     name: model_activity_molecular_function_terms
+    description: All MF terms for all activities
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_molecular_function_terms
@@ -699,6 +924,12 @@ attributes:
     inlined_as_list: true
   model_activity_molecular_function_closure:
     name: model_activity_molecular_function_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf]'
+    description: The reflexive transitive closure of `model_activity_molecular_function_terms`,
+      over the is_a relationship
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_molecular_function_closure
@@ -723,6 +954,10 @@ attributes:
     inlined_as_list: true
   model_activity_occurs_in_closure:
     name: model_activity_occurs_in_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf, BFO:0000050]'
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_occurs_in_closure
@@ -747,6 +982,10 @@ attributes:
     inlined_as_list: true
   model_activity_part_of_closure:
     name: model_activity_part_of_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf, BFO:0000050]'
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_part_of_closure
@@ -771,6 +1010,10 @@ attributes:
     inlined_as_list: true
   model_activity_has_input_closure:
     name: model_activity_has_input_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf]'
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_has_input_closure
@@ -783,6 +1026,10 @@ attributes:
     inlined_as_list: true
   taxon_closure:
     name: taxon_closure
+    annotations:
+      closure_computed_over:
+        tag: closure_computed_over
+        value: '[rdfs:subClassOf]'
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: taxon_closure
@@ -805,6 +1052,90 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  start_activities:
+    name: start_activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: start_activities
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: Activity
+    multivalued: true
+    inlined: false
+  end_activities:
+    name: end_activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: end_activities
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: Activity
+    multivalued: true
+    inlined: false
+  intermediate_activities:
+    name: intermediate_activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: intermediate_activities
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: Activity
+    multivalued: true
+    inlined: false
+  singleton_activities:
+    name: singleton_activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: singleton_activities
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: Activity
+    multivalued: true
+    inlined: false
+  number_of_start_activities:
+    name: number_of_start_activities
+    description: The number of start activities in a model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: number_of_start_activities
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: integer
+  number_of_end_activities:
+    name: number_of_end_activities
+    description: The number of end activities in a model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: number_of_end_activities
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: integer
+  number_of_intermediate_activities:
+    name: number_of_intermediate_activities
+    description: The number of intermediate activities in a model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: number_of_intermediate_activities
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: integer
+  number_of_singleton_activities:
+    name: number_of_singleton_activities
+    description: The number of singleton activities in a model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: number_of_singleton_activities
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: integer
 
 </code></pre>
 </details>

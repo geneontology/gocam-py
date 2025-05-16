@@ -195,7 +195,7 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"></path></svg>
 </a>
 <h1 id="class-model">Class: Model</h1>
-<p><em>A model of a biological program consisting of a set of causally connected activities</em></p>
+<p><em>A model of a biological program consisting of a set of causally connected activities.</em></p>
 <p>URI: <a href="https://w3id.org/gocam/Model">gocam:Model</a></p>
 <div class="mermaid"> classDiagram
     class Model
@@ -207,6 +207,15 @@
 
     Model --&gt; "*" Activity : activities
     click Activity href "../Activity"
+
+
+      Model : additional_taxa
+
+
+
+
+    Model --&gt; "*" TaxonTermObject : additional_taxa
+    click TaxonTermObject href "../TaxonTermObject"
 
 
       Model : comments
@@ -282,7 +291,7 @@
 </tr>
 <tr>
 <td><a href="../title/">title</a></td>
-<td>0..1 <br/> <a href="../String/">String</a></td>
+<td>1 <br/> <a href="../String/">String</a></td>
 <td>The human-readable descriptive title of the model</td>
 <td>direct</td>
 </tr>
@@ -293,15 +302,21 @@
 <td>direct</td>
 </tr>
 <tr>
+<td><a href="../additional_taxa/">additional_taxa</a></td>
+<td>* <br/> <a href="../TaxonTermObject/">TaxonTermObject</a></td>
+<td>Additional taxa that the model is about</td>
+<td>direct</td>
+</tr>
+<tr>
 <td><a href="../status/">status</a></td>
 <td>0..1 <br/> <a href="../ModelStateEnum/">ModelStateEnum</a></td>
-<td>The status of the model</td>
+<td>The status of the model in terms of its progression along the developmental l...</td>
 <td>direct</td>
 </tr>
 <tr>
 <td><a href="../comments/">comments</a></td>
 <td>* <br/> <a href="../String/">String</a></td>
-<td>Comments about the model</td>
+<td>Curator-provided comments about the model</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -325,7 +340,7 @@
 <tr>
 <td><a href="../query_index/">query_index</a></td>
 <td>0..1 <br/> <a href="../QueryIndex/">QueryIndex</a></td>
-<td></td>
+<td>An optional object that contains the results of indexing a model with various...</td>
 <td>direct</td>
 </tr>
 </tbody>
@@ -360,7 +375,7 @@
 <details>
 <pre><code class="language-yaml">name: Model
 description: A model of a biological program consisting of a set of causally connected
-  activities
+  activities.
 from_schema: https://w3id.org/gocam
 attributes:
   id:
@@ -383,6 +398,7 @@ attributes:
     slot_uri: dct:title
     domain_of:
     - Model
+    required: true
   taxon:
     name: taxon
     description: The primary taxon that the model is about
@@ -391,9 +407,19 @@ attributes:
     domain_of:
     - Model
     range: TaxonTermObject
+  additional_taxa:
+    name: additional_taxa
+    description: Additional taxa that the model is about
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - Model
+    range: TaxonTermObject
+    multivalued: true
   status:
     name: status
-    description: The status of the model
+    description: The status of the model in terms of its progression along the developmental
+      lifecycle
     from_schema: https://w3id.org/gocam
     aliases:
     - model state
@@ -404,7 +430,7 @@ attributes:
     range: ModelStateEnum
   comments:
     name: comments
-    description: Comments about the model
+    description: Curator-provided comments about the model
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: rdfs:comment
@@ -414,6 +440,11 @@ attributes:
   activities:
     name: activities
     description: All of the activities that are part of the model
+    comments:
+    - this slot is conditionally required. It is optional for models in development
+      state (because a curator may need to instantiate a Model before populating it
+      with activities), but is required for production models. See the associated
+      rule.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -452,11 +483,30 @@ attributes:
     inlined_as_list: true
   query_index:
     name: query_index
+    description: An optional object that contains the results of indexing a model
+      with various summary statistics and retrieval indices.
+    comments:
+    - This is typically not populated in the primary transactional store (OLTP processing),
+      because the values will be redundant with the primary edited components of the
+      model. It is intended to be populated in batch *after* editing, and then used
+      for generating reports, or for indexing in web applications.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
     - Model
     range: QueryIndex
+rules:
+- preconditions:
+    slot_conditions:
+      state:
+        name: state
+        equals_string: production
+  postconditions:
+    slot_conditions:
+      activities:
+        name: activities
+        required: true
+  title: Production rules must have at least one activity
 
 </code></pre>
 </details>
@@ -464,7 +514,7 @@ attributes:
 <details>
 <pre><code class="language-yaml">name: Model
 description: A model of a biological program consisting of a set of causally connected
-  activities
+  activities.
 from_schema: https://w3id.org/gocam
 attributes:
   id:
@@ -491,6 +541,7 @@ attributes:
     domain_of:
     - Model
     range: string
+    required: true
   taxon:
     name: taxon
     description: The primary taxon that the model is about
@@ -501,9 +552,21 @@ attributes:
     domain_of:
     - Model
     range: TaxonTermObject
+  additional_taxa:
+    name: additional_taxa
+    description: Additional taxa that the model is about
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: additional_taxa
+    owner: Model
+    domain_of:
+    - Model
+    range: TaxonTermObject
+    multivalued: true
   status:
     name: status
-    description: The status of the model
+    description: The status of the model in terms of its progression along the developmental
+      lifecycle
     from_schema: https://w3id.org/gocam
     aliases:
     - model state
@@ -516,7 +579,7 @@ attributes:
     range: ModelStateEnum
   comments:
     name: comments
-    description: Comments about the model
+    description: Curator-provided comments about the model
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: rdfs:comment
@@ -529,6 +592,11 @@ attributes:
   activities:
     name: activities
     description: All of the activities that are part of the model
+    comments:
+    - this slot is conditionally required. It is optional for models in development
+      state (because a curator may need to instantiate a Model before populating it
+      with activities), but is required for production models. See the associated
+      rule.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: activities
@@ -570,6 +638,13 @@ attributes:
     inlined_as_list: true
   query_index:
     name: query_index
+    description: An optional object that contains the results of indexing a model
+      with various summary statistics and retrieval indices.
+    comments:
+    - This is typically not populated in the primary transactional store (OLTP processing),
+      because the values will be redundant with the primary edited components of the
+      model. It is intended to be populated in batch *after* editing, and then used
+      for generating reports, or for indexing in web applications.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: query_index
@@ -577,6 +652,18 @@ attributes:
     domain_of:
     - Model
     range: QueryIndex
+rules:
+- preconditions:
+    slot_conditions:
+      state:
+        name: state
+        equals_string: production
+  postconditions:
+    slot_conditions:
+      activities:
+        name: activities
+        required: true
+  title: Production rules must have at least one activity
 
 </code></pre>
 </details>

@@ -270,6 +270,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#comments" class="md-nav__link">
+    Comments
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#identifier-and-mapping-information" class="md-nav__link">
     Identifier and Mapping Information
   </a>
@@ -324,6 +331,7 @@
 
 
 <h1 id="slot-number_of_activities">Slot: number_of_activities</h1>
+<p><em>The number of activities in a model.</em></p>
 <p>URI: <a href="https://w3id.org/gocam/number_of_activities">gocam:number_of_activities</a>
 Alias: number_of_activities</p>
 <!-- no inheritance hierarchy -->
@@ -340,7 +348,7 @@ Alias: number_of_activities</p>
 <tbody>
 <tr>
 <td><a href="../QueryIndex/">QueryIndex</a></td>
-<td></td>
+<td>An index that is optionally placed on a model in order to support common quer...</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -348,6 +356,10 @@ Alias: number_of_activities</p>
 <h2 id="properties">Properties</h2>
 <ul>
 <li>Range: <a href="../Integer/">Integer</a></li>
+</ul>
+<h2 id="comments">Comments</h2>
+<ul>
+<li>this includes all activities, even those without an enabler.</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
 <h3 id="schema-source">Schema Source</h3>
@@ -377,6 +389,9 @@ Alias: number_of_activities</p>
 <details>
 
 <pre><code class="language-yaml">name: number_of_activities
+description: The number of activities in a model.
+comments:
+- this includes all activities, even those without an enabler.
 from_schema: https://w3id.org/gocam
 rank: 1000
 alias: number_of_activities

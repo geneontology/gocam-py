@@ -286,19 +286,19 @@
 <tr>
 <td><a href="../type/">type</a></td>
 <td>0..1 <br/> <a href="../String/">String</a></td>
-<td></td>
+<td>The type of association</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 <tr>
 <td><a href="../evidence/">evidence</a></td>
 <td>* <br/> <a href="../EvidenceItem/">EvidenceItem</a></td>
-<td></td>
+<td>The set of evidence items that support the association</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 <tr>
 <td><a href="../provenances/">provenances</a></td>
 <td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
-<td></td>
+<td>The set of provenance objects that provide metadata about who made the associ...</td>
 <td><a href="../Association/">Association</a></td>
 </tr>
 </tbody>
@@ -407,6 +407,10 @@ attributes:
     range: Activity
   type:
     name: type
+    description: The type of association.
+    comments:
+    - when instantiating Association objects in Python and other languages, it isn't
+      necessary to populate this, it is auto-populated from the object class.
     from_schema: https://w3id.org/gocam
     rank: 1000
     designates_type: true
@@ -418,6 +422,7 @@ attributes:
     range: string
   evidence:
     name: evidence
+    description: The set of evidence items that support the association.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: evidence
@@ -429,6 +434,8 @@ attributes:
     inlined: true
   provenances:
     name: provenances
+    description: The set of provenance objects that provide metadata about who made
+      the association.
     from_schema: https://w3id.org/gocam
     alias: provenances
     owner: CausalAssociation

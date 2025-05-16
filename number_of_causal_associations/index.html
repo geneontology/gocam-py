@@ -270,6 +270,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#todos" class="md-nav__link">
+    TODOs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#identifier-and-mapping-information" class="md-nav__link">
     Identifier and Mapping Information
   </a>
@@ -324,6 +331,7 @@
 
 
 <h1 id="slot-number_of_causal_associations">Slot: number_of_causal_associations</h1>
+<p><em>Total number of causal association edges connecting activities in a model.</em></p>
 <p>URI: <a href="https://w3id.org/gocam/number_of_causal_associations">gocam:number_of_causal_associations</a>
 Alias: number_of_causal_associations</p>
 <!-- no inheritance hierarchy -->
@@ -340,7 +348,7 @@ Alias: number_of_causal_associations</p>
 <tbody>
 <tr>
 <td><a href="../QueryIndex/">QueryIndex</a></td>
-<td></td>
+<td>An index that is optionally placed on a model in order to support common quer...</td>
 <td>no</td>
 </tr>
 </tbody>
@@ -348,6 +356,10 @@ Alias: number_of_causal_associations</p>
 <h2 id="properties">Properties</h2>
 <ul>
 <li>Range: <a href="../Integer/">Integer</a></li>
+</ul>
+<h2 id="todos">TODOs</h2>
+<ul>
+<li>decide what to do about "implicit" causal associations, i.e provides_input_for</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
 <h3 id="schema-source">Schema Source</h3>
@@ -377,6 +389,9 @@ Alias: number_of_causal_associations</p>
 <details>
 
 <pre><code class="language-yaml">name: number_of_causal_associations
+description: Total number of causal association edges connecting activities in a model.
+todos:
+- decide what to do about &quot;implicit&quot; causal associations, i.e provides_input_for
 from_schema: https://w3id.org/gocam
 rank: 1000
 alias: number_of_causal_associations

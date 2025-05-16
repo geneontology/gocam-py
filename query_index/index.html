@@ -270,6 +270,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#comments" class="md-nav__link">
+    Comments
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#identifier-and-mapping-information" class="md-nav__link">
     Identifier and Mapping Information
   </a>
@@ -324,6 +331,7 @@
 
 
 <h1 id="slot-query_index">Slot: query_index</h1>
+<p><em>An optional object that contains the results of indexing a model with various summary statistics and retrieval indices.</em></p>
 <p>URI: <a href="https://w3id.org/gocam/query_index">gocam:query_index</a>
 Alias: query_index</p>
 <!-- no inheritance hierarchy -->
@@ -348,6 +356,10 @@ Alias: query_index</p>
 <h2 id="properties">Properties</h2>
 <ul>
 <li>Range: <a href="../QueryIndex/">QueryIndex</a></li>
+</ul>
+<h2 id="comments">Comments</h2>
+<ul>
+<li>This is typically not populated in the primary transactional store (OLTP processing), because the values will be redundant with the primary edited components of the model. It is intended to be populated in batch <em>after</em> editing, and then used for generating reports, or for indexing in web applications.</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
 <h3 id="schema-source">Schema Source</h3>
@@ -377,6 +389,13 @@ Alias: query_index</p>
 <details>
 
 <pre><code class="language-yaml">name: query_index
+description: An optional object that contains the results of indexing a model with
+  various summary statistics and retrieval indices.
+comments:
+- This is typically not populated in the primary transactional store (OLTP processing),
+  because the values will be redundant with the primary edited components of the model.
+  It is intended to be populated in batch *after* editing, and then used for generating
+  reports, or for indexing in web applications.
 from_schema: https://w3id.org/gocam
 rank: 1000
 alias: query_index

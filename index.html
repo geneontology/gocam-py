@@ -380,9 +380,13 @@
 
 
 <h1 id="gocam">gocam</h1>
-<p>GO CAM LinkML schema (experimental)</p>
-<p>The central class in this datamodel is a <a href="Model/">Model</a>. A model consists of a set of
-<a href="Activity/">Activity</a> objects.</p>
+<p>Gene Ontology Causal Activity Model (GO-CAM) Schema.</p>
+<p>This schema provides a way of representing causal pathway <a href="Model/">Models</a>. A model consists of a set of
+<a href="Activity/">Activity</a> objects, where each activity object represents the function of either an <a href="EnabledByGeneProductAssociation">individual
+gene product</a>, a <a href="EnabledByGeneProductAssociation">protein complex of gene products</a>,
+or a set of possible gene products.</p>
+<p>Each <a href="Model/">Models</a> has associated metadata slots. Some slots such as <a href="id/">id</a>, <a href="title/">title</a>,
+and <a href="status/">status</a> are <em>required</em>.</p>
 <p>URI: https://w3id.org/gocam</p>
 <p>Name: gocam</p>
 <h2 id="classes">Classes</h2>
@@ -408,19 +412,23 @@
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="EnabledByAssociation/">EnabledByAssociation</a></td>
-<td>An association between an activity and the gene product or complex that carries it out</td>
+<td>An association between an activity and the gene product or complex or set of potential gene products</td>
+</tr>
+<tr>
+<td>that carry out that activity.</td>
+<td></td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
-<td>An association between an activity and a gene product</td>
+<td>An association between an activity and an individual gene product</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
-<td>An association between an activity and a protein complex</td>
+<td>An association between an activity and a protein complex, where the complex carries out the activity. This should only be used when the activity cannot be attributed to an individual member of the complex, but instead the function is an emergent property of the complex.</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="TermAssociation/">TermAssociation</a></td>
-<td>An association between an activity and a term, potentially with extensions</td>
+<td>An association between an activity and a term, potentially with extensions. This is an abstract class for grouping purposes, it should not be directly instantiated, instead a subclass should be instantiated.</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
@@ -452,7 +460,7 @@
 </tr>
 <tr>
 <td><a href="Model/">Model</a></td>
-<td>A model of a biological program consisting of a set of causally connected activities</td>
+<td>A model of a biological program consisting of a set of causally connected activities.</td>
 </tr>
 <tr>
 <td><a href="Object/">Object</a></td>
@@ -480,7 +488,7 @@
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="EvidenceTermObject/">EvidenceTermObject</a></td>
-<td>A term object that represents an evidence term from ECO</td>
+<td>A term object that represents an evidence term from ECO. Only ECO terms that map up to a GO GAF evidence code should be used.</td>
 </tr>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="GrossAnatomicalStructureTermObject/">GrossAnatomicalStructureTermObject</a></td>
@@ -524,7 +532,7 @@
 </tr>
 <tr>
 <td><a href="QueryIndex/">QueryIndex</a></td>
-<td>None</td>
+<td>An index that is optionally placed on a model in order to support common query or index operations. Note that this index is not typically populated in the working transactional store for a model, it is derived via computation from core primary model information.</td>
 </tr>
 </tbody>
 </table>
@@ -546,16 +554,20 @@
 <td>All of the activities that are part of the model</td>
 </tr>
 <tr>
+<td><a href="additional_taxa/">additional_taxa</a></td>
+<td>Additional taxa that the model is about</td>
+</tr>
+<tr>
 <td><a href="annoton_terms/">annoton_terms</a></td>
 <td></td>
 </tr>
 <tr>
 <td><a href="causal_associations/">causal_associations</a></td>
-<td>The causal associations that connect this activity to other activities</td>
+<td>The causal associations that flow out of this activity</td>
 </tr>
 <tr>
 <td><a href="comments/">comments</a></td>
-<td>Comments about the model</td>
+<td>Curator-provided comments about the model</td>
 </tr>
 <tr>
 <td><a href="contributor/">contributor</a></td>
@@ -578,12 +590,16 @@
 <td>The gene product or complex that carries out the activity</td>
 </tr>
 <tr>
-<td><a href="evidence/">evidence</a></td>
+<td><a href="end_activities/">end_activities</a></td>
 <td></td>
 </tr>
 <tr>
+<td><a href="evidence/">evidence</a></td>
+<td>The set of evidence items that support the association</td>
+</tr>
+<tr>
 <td><a href="flattened_references/">flattened_references</a></td>
-<td></td>
+<td>All publication objects from the model across different levels combined in on...</td>
 </tr>
 <tr>
 <td><a href="full_text/">full_text</a></td>
@@ -614,12 +630,16 @@
 <td>The identifier of the model</td>
 </tr>
 <tr>
+<td><a href="intermediate_activities/">intermediate_activities</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="label/">label</a></td>
 <td></td>
 </tr>
 <tr>
 <td><a href="length_of_longest_causal_association_path/">length_of_longest_causal_association_path</a></td>
-<td></td>
+<td>The maximum number of hops along activities along the direction of causal flo...</td>
 </tr>
 <tr>
 <td><a href="members/">members</a></td>
@@ -635,11 +655,11 @@
 </tr>
 <tr>
 <td><a href="model_activity_molecular_function_closure/">model_activity_molecular_function_closure</a></td>
-<td></td>
+<td>The reflexive transitive closure of <code>model_activity_molecular_function_terms</code>...</td>
 </tr>
 <tr>
 <td><a href="model_activity_molecular_function_terms/">model_activity_molecular_function_terms</a></td>
-<td></td>
+<td>All MF terms for all activities</td>
 </tr>
 <tr>
 <td><a href="model_activity_occurs_in_closure/">model_activity_occurs_in_closure</a></td>
@@ -663,19 +683,35 @@
 </tr>
 <tr>
 <td><a href="number_of_activities/">number_of_activities</a></td>
-<td></td>
+<td>The number of activities in a model</td>
 </tr>
 <tr>
 <td><a href="number_of_causal_associations/">number_of_causal_associations</a></td>
-<td></td>
+<td>Total number of causal association edges connecting activities in a model</td>
 </tr>
 <tr>
 <td><a href="number_of_enabled_by_terms/">number_of_enabled_by_terms</a></td>
-<td></td>
+<td>The number of molecular entities or sets of entities in a model</td>
+</tr>
+<tr>
+<td><a href="number_of_end_activities/">number_of_end_activities</a></td>
+<td>The number of end activities in a model</td>
+</tr>
+<tr>
+<td><a href="number_of_intermediate_activities/">number_of_intermediate_activities</a></td>
+<td>The number of intermediate activities in a model</td>
+</tr>
+<tr>
+<td><a href="number_of_singleton_activities/">number_of_singleton_activities</a></td>
+<td>The number of singleton activities in a model</td>
+</tr>
+<tr>
+<td><a href="number_of_start_activities/">number_of_start_activities</a></td>
+<td>The number of start activities in a model</td>
 </tr>
 <tr>
 <td><a href="number_of_strongly_connected_components/">number_of_strongly_connected_components</a></td>
-<td></td>
+<td>The number of distinct components that consist of activities that are connect...</td>
 </tr>
 <tr>
 <td><a href="objects/">objects</a></td>
@@ -707,15 +743,23 @@
 </tr>
 <tr>
 <td><a href="query_index/">query_index</a></td>
-<td></td>
+<td>An optional object that contains the results of indexing a model with various...</td>
 </tr>
 <tr>
 <td><a href="reference/">reference</a></td>
 <td>The publication of reference that describes the evidence</td>
 </tr>
 <tr>
+<td><a href="singleton_activities/">singleton_activities</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="start_activities/">start_activities</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="status/">status</a></td>
-<td>The status of the model</td>
+<td>The status of the model in terms of its progression along the developmental l...</td>
 </tr>
 <tr>
 <td><a href="taxon/">taxon</a></td>
@@ -735,7 +779,7 @@
 </tr>
 <tr>
 <td><a href="type/">type</a></td>
-<td></td>
+<td>The type of association</td>
 </tr>
 <tr>
 <td><a href="with_objects/">with_objects</a></td>
@@ -754,15 +798,27 @@
 <tbody>
 <tr>
 <td><a href="CausalPredicateEnum/">CausalPredicateEnum</a></td>
-<td></td>
+<td>A term describing the causal relationship between two activities</td>
+</tr>
+<tr>
+<td><a href="CellularAnatomicalEntityEnum/">CellularAnatomicalEntityEnum</a></td>
+<td>A term from the subset of the cellular anatomical entity branch of GO CC</td>
+</tr>
+<tr>
+<td><a href="EvidenceCodeEnum/">EvidenceCodeEnum</a></td>
+<td>A term from the subset of ECO that maps up to a GAF evidence code</td>
 </tr>
 <tr>
 <td><a href="InformationBiomacromoleculeCategory/">InformationBiomacromoleculeCategory</a></td>
-<td></td>
+<td>A term describing the type of the enabler of an activity</td>
 </tr>
 <tr>
 <td><a href="ModelStateEnum/">ModelStateEnum</a></td>
-<td>Status of a model</td>
+<td>A term describing where the model is in the development life cycle</td>
+</tr>
+<tr>
+<td><a href="PhaseEnum/">PhaseEnum</a></td>
+<td>A term from either the phase branch of GO or the phase branch of an anatomy o...</td>
 </tr>
 </tbody>
 </table>
