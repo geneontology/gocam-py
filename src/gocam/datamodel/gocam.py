@@ -90,11 +90,13 @@ linkml_meta = LinkMLMeta({'default_prefix': 'gocam',
                   'OBAN': {'prefix_prefix': 'OBAN',
                            'prefix_reference': 'http://purl.org/oban/'},
                   'PMID': {'prefix_prefix': 'PMID',
-                           'prefix_reference': 'http://identifiers.org/pmid/'},
+                           'prefix_reference': 'http://identifiers.org/pubmed/'},
+                  'RHEA': {'prefix_prefix': 'RHEA',
+                           'prefix_reference': 'http://rdf.rhea-db.org/'},
                   'RO': {'prefix_prefix': 'RO',
                          'prefix_reference': 'http://purl.obolibrary.org/obo/RO_'},
                   'UniProtKB': {'prefix_prefix': 'UniProtKB',
-                                'prefix_reference': 'http://identifiers.org/uniprot/'},
+                                'prefix_reference': 'http://purl.uniprot.org/uniprot/'},
                   'biolink': {'prefix_prefix': 'biolink',
                               'prefix_reference': 'https://w3id.org/biolink/vocab/'},
                   'dce': {'prefix_prefix': 'dce',
@@ -129,6 +131,14 @@ class ModelStateEnum(str, Enum):
     development = "development"
     # Used when the curator has declared the model is ready for public consumption. Edits might still be performed on the model in future, but the information in the model is believed to be both accurate and reasonably complete. The model may be displayed in public websites.
     production = "production"
+    # When the curator has marked for future deletion.
+    delete = "delete"
+    # The model has been marked for curator review.
+    review = "review"
+    # The model is not intended for use public use; it is likely to be used for internal testing.
+    internal_test = "internal_test"
+    # TBD
+    closed = "closed"
 
 
 class InformationBiomacromoleculeCategory(str, Enum):

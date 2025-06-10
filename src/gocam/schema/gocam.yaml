@@ -672,6 +672,14 @@ enums:
         description: Used when the curator has declared the model is ready for public consumption. Edits might
           still be performed on the model in future, but the information in the model is believed to be both
           accurate and reasonably complete. The model may be displayed in public websites.
+      delete:
+        description: When the curator has marked for future deletion.
+      review:
+        description: The model has been marked for curator review.
+      internal_test:
+        description: The model is not intended for use public use; it is likely to be used for internal testing.
+      closed:
+        description: TBD
 
 
   InformationBiomacromoleculeCategory:
