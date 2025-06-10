@@ -339,6 +339,26 @@
 <td>None</td>
 <td>Used when the curator has declared the model is ready for public consumption</td>
 </tr>
+<tr>
+<td>delete</td>
+<td>None</td>
+<td>When the curator has marked for future deletion</td>
+</tr>
+<tr>
+<td>review</td>
+<td>None</td>
+<td>The model has been marked for curator review</td>
+</tr>
+<tr>
+<td>internal_test</td>
+<td>None</td>
+<td>The model is not intended for use public use; it is likely to be used for int...</td>
+</tr>
+<tr>
+<td>closed</td>
+<td>None</td>
+<td>TBD</td>
+</tr>
 </tbody>
 </table>
 <h2 id="slots">Slots</h2>
@@ -383,6 +403,19 @@ permissible_values:
       consumption. Edits might still be performed on the model in future, but the
       information in the model is believed to be both accurate and reasonably complete.
       The model may be displayed in public websites.
+  delete:
+    text: delete
+    description: When the curator has marked for future deletion.
+  review:
+    text: review
+    description: The model has been marked for curator review.
+  internal_test:
+    text: internal_test
+    description: The model is not intended for use public use; it is likely to be
+      used for internal testing.
+  closed:
+    text: closed
+    description: TBD
 
 </code></pre>
 
