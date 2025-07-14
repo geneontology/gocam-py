@@ -218,8 +218,10 @@
 
 
 
-    MoleculeAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        MoleculeAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       MoleculeAssociation : provenances
@@ -227,8 +229,10 @@
 
 
 
-    MoleculeAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        MoleculeAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       MoleculeAssociation : term
@@ -236,8 +240,10 @@
 
 
 
-    MoleculeAssociation --&gt; "0..1" MoleculeTermObject : term
-    click MoleculeTermObject href "../MoleculeTermObject"
+
+        MoleculeAssociation --&gt; "0..1" MoleculeTermObject : term
+        click MoleculeTermObject href "../MoleculeTermObject"
+
 
 
       MoleculeAssociation : type

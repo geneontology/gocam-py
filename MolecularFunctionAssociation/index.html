@@ -223,8 +223,10 @@
 
 
 
-    MolecularFunctionAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        MolecularFunctionAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       MolecularFunctionAssociation : provenances
@@ -232,8 +234,10 @@
 
 
 
-    MolecularFunctionAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        MolecularFunctionAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       MolecularFunctionAssociation : term
@@ -241,8 +245,10 @@
 
 
 
-    MolecularFunctionAssociation --&gt; "0..1" MolecularFunctionTermObject : term
-    click MolecularFunctionTermObject href "../MolecularFunctionTermObject"
+
+        MolecularFunctionAssociation --&gt; "0..1" MolecularFunctionTermObject : term
+        click MolecularFunctionTermObject href "../MolecularFunctionTermObject"
+
 
 
       MolecularFunctionAssociation : type

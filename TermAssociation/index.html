@@ -231,8 +231,10 @@
 
 
 
-    TermAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        TermAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       TermAssociation : provenances
@@ -240,8 +242,10 @@
 
 
 
-    TermAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        TermAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       TermAssociation : term
@@ -249,8 +253,10 @@
 
 
 
-    TermAssociation --&gt; "0..1" TermObject : term
-    click TermObject href "../TermObject"
+
+        TermAssociation --&gt; "0..1" TermObject : term
+        click TermObject href "../TermObject"
+
 
 
       TermAssociation : type

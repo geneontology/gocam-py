@@ -218,8 +218,10 @@
 
 
 
-    BiologicalProcessAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        BiologicalProcessAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       BiologicalProcessAssociation : happens_during
@@ -227,8 +229,10 @@
 
 
 
-    BiologicalProcessAssociation --&gt; "0..1" PhaseTermObject : happens_during
-    click PhaseTermObject href "../PhaseTermObject"
+
+        BiologicalProcessAssociation --&gt; "0..1" PhaseTermObject : happens_during
+        click PhaseTermObject href "../PhaseTermObject"
+
 
 
       BiologicalProcessAssociation : part_of
@@ -236,8 +240,10 @@
 
 
 
-    BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessAssociation : part_of
-    click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
+
+        BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessAssociation : part_of
+        click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
+
 
 
       BiologicalProcessAssociation : provenances
@@ -245,8 +251,10 @@
 
 
 
-    BiologicalProcessAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        BiologicalProcessAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       BiologicalProcessAssociation : term
@@ -254,8 +262,10 @@
 
 
 
-    BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessTermObject : term
-    click BiologicalProcessTermObject href "../BiologicalProcessTermObject"
+
+        BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessTermObject : term
+        click BiologicalProcessTermObject href "../BiologicalProcessTermObject"
+
 
 
       BiologicalProcessAssociation : type

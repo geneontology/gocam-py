@@ -215,8 +215,10 @@
 
 
 
-    Activity --&gt; "*" CausalAssociation : causal_associations
-    click CausalAssociation href "../CausalAssociation"
+
+        Activity --&gt; "*" CausalAssociation : causal_associations
+        click CausalAssociation href "../CausalAssociation"
+
 
 
       Activity : enabled_by
@@ -224,8 +226,10 @@
 
 
 
-    Activity --&gt; "0..1 _recommended_" EnabledByAssociation : enabled_by
-    click EnabledByAssociation href "../EnabledByAssociation"
+
+        Activity --&gt; "0..1 _recommended_" EnabledByAssociation : enabled_by
+        click EnabledByAssociation href "../EnabledByAssociation"
+
 
 
       Activity : has_input
@@ -233,8 +237,10 @@
 
 
 
-    Activity --&gt; "*" MoleculeAssociation : has_input
-    click MoleculeAssociation href "../MoleculeAssociation"
+
+        Activity --&gt; "*" MoleculeAssociation : has_input
+        click MoleculeAssociation href "../MoleculeAssociation"
+
 
 
       Activity : has_output
@@ -242,8 +248,10 @@
 
 
 
-    Activity --&gt; "*" MoleculeAssociation : has_output
-    click MoleculeAssociation href "../MoleculeAssociation"
+
+        Activity --&gt; "*" MoleculeAssociation : has_output
+        click MoleculeAssociation href "../MoleculeAssociation"
+
 
 
       Activity : has_primary_input
@@ -251,8 +259,10 @@
 
 
 
-    Activity --&gt; "0..1" MoleculeAssociation : has_primary_input
-    click MoleculeAssociation href "../MoleculeAssociation"
+
+        Activity --&gt; "0..1" MoleculeAssociation : has_primary_input
+        click MoleculeAssociation href "../MoleculeAssociation"
+
 
 
       Activity : has_primary_output
@@ -260,8 +270,10 @@
 
 
 
-    Activity --&gt; "0..1" MoleculeAssociation : has_primary_output
-    click MoleculeAssociation href "../MoleculeAssociation"
+
+        Activity --&gt; "0..1" MoleculeAssociation : has_primary_output
+        click MoleculeAssociation href "../MoleculeAssociation"
+
 
 
       Activity : id
@@ -271,8 +283,10 @@
 
 
 
-    Activity --&gt; "0..1 _recommended_" MolecularFunctionAssociation : molecular_function
-    click MolecularFunctionAssociation href "../MolecularFunctionAssociation"
+
+        Activity --&gt; "0..1 _recommended_" MolecularFunctionAssociation : molecular_function
+        click MolecularFunctionAssociation href "../MolecularFunctionAssociation"
+
 
 
       Activity : occurs_in
@@ -280,8 +294,10 @@
 
 
 
-    Activity --&gt; "0..1 _recommended_" CellularAnatomicalEntityAssociation : occurs_in
-    click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation"
+
+        Activity --&gt; "0..1 _recommended_" CellularAnatomicalEntityAssociation : occurs_in
+        click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation"
+
 
 
       Activity : part_of
@@ -289,8 +305,10 @@
 
 
 
-    Activity --&gt; "0..1 _recommended_" BiologicalProcessAssociation : part_of
-    click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
+
+        Activity --&gt; "0..1 _recommended_" BiologicalProcessAssociation : part_of
+        click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
+
 
 
       Activity : provenances
@@ -298,8 +316,10 @@
 
 
 
-    Activity --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        Activity --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
 

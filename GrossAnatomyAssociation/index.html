@@ -218,8 +218,10 @@
 
 
 
-    GrossAnatomyAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        GrossAnatomyAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       GrossAnatomyAssociation : part_of
@@ -227,8 +229,10 @@
 
 
 
-    GrossAnatomyAssociation --&gt; "0..1" GrossAnatomyAssociation : part_of
-    click GrossAnatomyAssociation href "../GrossAnatomyAssociation"
+
+        GrossAnatomyAssociation --&gt; "0..1" GrossAnatomyAssociation : part_of
+        click GrossAnatomyAssociation href "../GrossAnatomyAssociation"
+
 
 
       GrossAnatomyAssociation : provenances
@@ -236,8 +240,10 @@
 
 
 
-    GrossAnatomyAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        GrossAnatomyAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       GrossAnatomyAssociation : term
@@ -245,8 +251,10 @@
 
 
 
-    GrossAnatomyAssociation --&gt; "0..1" GrossAnatomicalStructureTermObject : term
-    click GrossAnatomicalStructureTermObject href "../GrossAnatomicalStructureTermObject"
+
+        GrossAnatomyAssociation --&gt; "0..1" GrossAnatomicalStructureTermObject : term
+        click GrossAnatomicalStructureTermObject href "../GrossAnatomicalStructureTermObject"
+
 
 
       GrossAnatomyAssociation : type

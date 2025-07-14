@@ -210,8 +210,10 @@
 
 
 
-    EvidenceItem --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        EvidenceItem --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       EvidenceItem : reference
@@ -219,8 +221,10 @@
 
 
 
-    EvidenceItem --&gt; "0..1" PublicationObject : reference
-    click PublicationObject href "../PublicationObject"
+
+        EvidenceItem --&gt; "0..1" PublicationObject : reference
+        click PublicationObject href "../PublicationObject"
+
 
 
       EvidenceItem : term
@@ -228,8 +232,10 @@
 
 
 
-    EvidenceItem --&gt; "0..1" EvidenceTermObject : term
-    click EvidenceTermObject href "../EvidenceTermObject"
+
+        EvidenceItem --&gt; "0..1" EvidenceTermObject : term
+        click EvidenceTermObject href "../EvidenceTermObject"
+
 
 
       EvidenceItem : with_objects
@@ -237,8 +243,10 @@
 
 
 
-    EvidenceItem --&gt; "*" Object : with_objects
-    click Object href "../Object"
+
+        EvidenceItem --&gt; "*" Object : with_objects
+        click Object href "../Object"
+
 
 
 

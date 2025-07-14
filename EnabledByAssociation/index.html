@@ -234,8 +234,10 @@
 
 
 
-    EnabledByAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        EnabledByAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       EnabledByAssociation : provenances
@@ -243,8 +245,10 @@
 
 
 
-    EnabledByAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        EnabledByAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       EnabledByAssociation : term
@@ -252,8 +256,10 @@
 
 
 
-    EnabledByAssociation --&gt; "0..1" InformationBiomacromoleculeTermObject : term
-    click InformationBiomacromoleculeTermObject href "../InformationBiomacromoleculeTermObject"
+
+        EnabledByAssociation --&gt; "0..1" InformationBiomacromoleculeTermObject : term
+        click InformationBiomacromoleculeTermObject href "../InformationBiomacromoleculeTermObject"
+
 
 
       EnabledByAssociation : type

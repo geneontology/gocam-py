@@ -213,8 +213,10 @@
 
 
 
-    EnabledByGeneProductAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        EnabledByGeneProductAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       EnabledByGeneProductAssociation : provenances
@@ -222,8 +224,10 @@
 
 
 
-    EnabledByGeneProductAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        EnabledByGeneProductAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       EnabledByGeneProductAssociation : term
@@ -231,8 +235,10 @@
 
 
 
-    EnabledByGeneProductAssociation --&gt; "0..1" GeneProductTermObject : term
-    click GeneProductTermObject href "../GeneProductTermObject"
+
+        EnabledByGeneProductAssociation --&gt; "0..1" GeneProductTermObject : term
+        click GeneProductTermObject href "../GeneProductTermObject"
+
 
 
       EnabledByGeneProductAssociation : type

@@ -218,8 +218,10 @@
 
 
 
-    CausalAssociation --&gt; "0..1" Activity : downstream_activity
-    click Activity href "../Activity"
+
+        CausalAssociation --&gt; "0..1" Activity : downstream_activity
+        click Activity href "../Activity"
+
 
 
       CausalAssociation : evidence
@@ -227,8 +229,10 @@
 
 
 
-    CausalAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        CausalAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       CausalAssociation : predicate
@@ -236,8 +240,10 @@
 
 
 
-    CausalAssociation --&gt; "0..1" PredicateTermObject : predicate
-    click PredicateTermObject href "../PredicateTermObject"
+
+        CausalAssociation --&gt; "0..1" PredicateTermObject : predicate
+        click PredicateTermObject href "../PredicateTermObject"
+
 
 
       CausalAssociation : provenances
@@ -245,8 +251,10 @@
 
 
 
-    CausalAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        CausalAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       CausalAssociation : type

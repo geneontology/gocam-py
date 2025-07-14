@@ -218,8 +218,10 @@
 
 
 
-    CellularAnatomicalEntityAssociation --&gt; "*" EvidenceItem : evidence
-    click EvidenceItem href "../EvidenceItem"
+
+        CellularAnatomicalEntityAssociation --&gt; "*" EvidenceItem : evidence
+        click EvidenceItem href "../EvidenceItem"
+
 
 
       CellularAnatomicalEntityAssociation : part_of
@@ -227,8 +229,10 @@
 
 
 
-    CellularAnatomicalEntityAssociation --&gt; "0..1" CellTypeAssociation : part_of
-    click CellTypeAssociation href "../CellTypeAssociation"
+
+        CellularAnatomicalEntityAssociation --&gt; "0..1" CellTypeAssociation : part_of
+        click CellTypeAssociation href "../CellTypeAssociation"
+
 
 
       CellularAnatomicalEntityAssociation : provenances
@@ -236,8 +240,10 @@
 
 
 
-    CellularAnatomicalEntityAssociation --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        CellularAnatomicalEntityAssociation --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       CellularAnatomicalEntityAssociation : term
@@ -245,8 +251,10 @@
 
 
 
-    CellularAnatomicalEntityAssociation --&gt; "0..1" CellularAnatomicalEntityTermObject : term
-    click CellularAnatomicalEntityTermObject href "../CellularAnatomicalEntityTermObject"
+
+        CellularAnatomicalEntityAssociation --&gt; "0..1" CellularAnatomicalEntityTermObject : term
+        click CellularAnatomicalEntityTermObject href "../CellularAnatomicalEntityTermObject"
+
 
 
       CellularAnatomicalEntityAssociation : type

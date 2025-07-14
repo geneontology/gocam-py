@@ -205,8 +205,10 @@
 
 
 
-    Model --&gt; "*" Activity : activities
-    click Activity href "../Activity"
+
+        Model --&gt; "*" Activity : activities
+        click Activity href "../Activity"
+
 
 
       Model : additional_taxa
@@ -214,8 +216,10 @@
 
 
 
-    Model --&gt; "*" TaxonTermObject : additional_taxa
-    click TaxonTermObject href "../TaxonTermObject"
+
+        Model --&gt; "*" TaxonTermObject : additional_taxa
+        click TaxonTermObject href "../TaxonTermObject"
+
 
 
       Model : comments
@@ -227,8 +231,10 @@
 
 
 
-    Model --&gt; "*" Object : objects
-    click Object href "../Object"
+
+        Model --&gt; "*" Object : objects
+        click Object href "../Object"
+
 
 
       Model : provenances
@@ -236,8 +242,10 @@
 
 
 
-    Model --&gt; "*" ProvenanceInfo : provenances
-    click ProvenanceInfo href "../ProvenanceInfo"
+
+        Model --&gt; "*" ProvenanceInfo : provenances
+        click ProvenanceInfo href "../ProvenanceInfo"
+
 
 
       Model : query_index
@@ -245,8 +253,10 @@
 
 
 
-    Model --&gt; "0..1" QueryIndex : query_index
-    click QueryIndex href "../QueryIndex"
+
+        Model --&gt; "0..1" QueryIndex : query_index
+        click QueryIndex href "../QueryIndex"
+
 
 
       Model : status
@@ -254,8 +264,10 @@
 
 
 
-    Model --&gt; "0..1" ModelStateEnum : status
-    click ModelStateEnum href "../ModelStateEnum"
+
+        Model --&gt; "0..1" ModelStateEnum : status
+        click ModelStateEnum href "../ModelStateEnum"
+
 
 
       Model : taxon
@@ -263,8 +275,10 @@
 
 
 
-    Model --&gt; "0..1" TaxonTermObject : taxon
-    click TaxonTermObject href "../TaxonTermObject"
+
+        Model --&gt; "0..1" TaxonTermObject : taxon
+        click TaxonTermObject href "../TaxonTermObject"
+
 
 
       Model : title
