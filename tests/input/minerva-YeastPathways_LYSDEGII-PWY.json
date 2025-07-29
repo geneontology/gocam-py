@@ -1,0 +1,4703 @@
+{
+  "id": "gomodel:YeastPathways_LYSDEGII-PWY",
+  "individuals": [
+    {
+      "id": "gomodel:ACETCAPR-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYBiochemicalReaction26601",
+          "value-type": "IRI"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "378.25"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.BiochemicalReaction"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "<i>N</i><sup>6</sup>-acetyl-L-lysine + 2-oxoglutarate &harr; 2-keto-6-acetamidocaproate + L-glutamate"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "260.25"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:AMVAL-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYBiochemicalReaction26538",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.BiochemicalReaction"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "418.25"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "5-acetamidovalerate + H<sub>2</sub>O &rarr; acetate + 5-aminopentanoate"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "732.5"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_15377_AMVAL-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:15377",
+          "label": "water"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "H<sub>2</sub>O"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26417",
+          "value-type": "IRI"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_15377_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:15377",
+          "label": "water"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "H<sub>2</sub>O"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26417",
+          "value-type": "IRI"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_15377_KETAMID-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:15377",
+          "label": "water"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "H<sub>2</sub>O"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26417",
+          "value-type": "IRI"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_15378_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:15378",
+          "label": "hydron"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26486",
+          "value-type": "IRI"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "H<SUP>+</SUP>"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_15378_KETAMID-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:15378",
+          "label": "hydron"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "rdfs:label",
+          "value": "H<SUP>+</SUP>"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26486",
+          "value-type": "IRI"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_15378_LYSACET-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:15378",
+          "label": "hydron"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "rdfs:label",
+          "value": "H<SUP>+</SUP>"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26486",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_16120_VAGL-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:16120",
+          "label": "5-oxopentanoate"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "hint-layout-x",
+          "value": "995"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "glutarate semialdehyde"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "673"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26446",
+          "value-type": "IRI"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_16526_KETAMID-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:16526",
+          "label": "carbon dioxide"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26597",
+          "value-type": "IRI"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "CO<SUB>2</SUB>"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_16810_ACETCAPR-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:16810",
+          "label": "2-oxoglutarate(2-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26518",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "2-oxoglutarate"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_16810_VAGL-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:16810",
+          "label": "2-oxoglutarate(2-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "2-oxoglutarate"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26518",
+          "value-type": "IRI"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_29985_ACETCAPR-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:29985",
+          "label": "L-glutamate(1-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26534",
+          "value-type": "IRI"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "glu"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_29985_VAGL-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:29985",
+          "label": "L-glutamate(1-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26534",
+          "value-type": "IRI"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "glu"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_30089_AMVAL-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:30089",
+          "label": "acetate"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "acetate"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26566",
+          "value-type": "IRI"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_30921_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:30921",
+          "label": "glutarate(2-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26458",
+          "value-type": "IRI"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "glutarate"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_32551_LYSACET-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:32551",
+          "label": "L-lysinium(1+)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26632",
+          "value-type": "IRI"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "lys"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_356010_AMVAL-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:356010",
+          "label": "5-aminopentanoic acid zwitterion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "5-aminopentanoate"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "714"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "791"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26502",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_57287_LYSACET-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:57287",
+          "label": "coenzyme A(4-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26664",
+          "value-type": "IRI"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "coenzyme A"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_57288_LYSACET-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:57288",
+          "label": "acetyl-CoA(4-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26648",
+          "value-type": "IRI"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "acetyl-CoA"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_57540_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:57540",
+          "label": "NAD(1-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "NAD<sup>+</sup>"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26434",
+          "value-type": "IRI"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_57540_KETAMID-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:57540",
+          "label": "NAD(1-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "NAD<sup>+</sup>"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26434",
+          "value-type": "IRI"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_57945_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:57945",
+          "label": "NADH(2-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26473",
+          "value-type": "IRI"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "NADH"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_57945_KETAMID-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:57945",
+          "label": "NADH(2-)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "NADH"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26473",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_58260_LYSACET-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:58260",
+          "label": "N(6)-acetyl-L-lysine zwitterion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "651"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "65.25"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "<i>N</i><sup>6</sup>-acetyl-L-lysine"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26613",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_79192_ACETCAPR-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:79192",
+          "label": "6-acetamido-2-oxohexanoate"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "2-keto-6-acetamidocaproate"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26581",
+          "value-type": "IRI"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "327.75"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "681"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:CHEBI_79193_KETAMID-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:79193",
+          "label": "5-acetamidopentanoate"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "751"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYSmallMolecule26549",
+          "value-type": "IRI"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.SmallMolecule"
+        },
+        {
+          "key": "comment",
+          "value": "located_in cytosol"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "5-acetamidovalerate"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "589.75"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0102810",
+          "label": "glutarate-semialdehyde dehydrogenase (NADP+) activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "comment",
+          "value": "Automated change 2023-09-14: GO:0047949 replaced by GO:0102810"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "glutarate semialdehyde + NAD<sup>+</sup> + H<sub>2</sub>O &rarr; glutarate + NADH + 2 H<SUP>+</SUP>"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "414.25"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYBiochemicalReaction26402",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "1277"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.BiochemicalReaction"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:KETAMID-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.BiochemicalReaction"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "541"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "383.25"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "2-keto-6-acetamidocaproate + NAD<sup>+</sup> + H<sub>2</sub>O &rarr; 5-acetamidovalerate + CO<SUB>2</SUB> + NADH + H<SUP>+</SUP>"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYBiochemicalReaction26570",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:LYSACET-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "263.25"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.BiochemicalReaction"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "52.75"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "L-lysine + acetyl-CoA &rarr; <i>N</i><sup>6</sup>-acetyl-L-lysine + coenzyme A + H<SUP>+</SUP>"
+        },
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYBiochemicalReaction26617",
+          "value-type": "IRI"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:VAGL-RXN",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0047589",
+          "label": "5-aminovalerate transaminase activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "skos:exactMatch",
+          "value": "http://http://pathway-2a.yeastgenome.org:8080//YEAST/pathway-biopax?type=3%38object=LYSDEGII-PWYBiochemicalReaction26490",
+          "value-type": "IRI"
+        },
+        {
+          "key": "rdfs:label",
+          "value": "5-aminopentanoate + 2-oxoglutarate &harr; glutarate semialdehyde + L-glutamate"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "931.75"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.BiochemicalReaction"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "280.25"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_ACETCAPR-RXN_BFO_0000066_reaction_ACETCAPR-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_ACETCAPR-RXN_RO_0002233_CHEBI_16810_ACETCAPR-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_ACETCAPR-RXN_RO_0002233_CHEBI_58260_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_ACETCAPR-RXN_RO_0002234_CHEBI_29985_ACETCAPR-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_ACETCAPR-RXN_RO_0002234_CHEBI_79192_ACETCAPR-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_AMVAL-RXN_BFO_0000066_reaction_AMVAL-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_AMVAL-RXN_RO_0002233_CHEBI_15377_AMVAL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_AMVAL-RXN_RO_0002233_CHEBI_79193_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_AMVAL-RXN_RO_0002234_CHEBI_30089_AMVAL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_AMVAL-RXN_RO_0002234_CHEBI_356010_AMVAL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_BFO_0000066_reaction_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002233_CHEBI_15377_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002233_CHEBI_16120_VAGL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002233_CHEBI_57540_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002234_CHEBI_15378_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002234_CHEBI_30921_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002234_CHEBI_57945_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_BFO_0000066_reaction_KETAMID-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_RO_0002233_CHEBI_15377_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_RO_0002233_CHEBI_57540_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_RO_0002233_CHEBI_79192_ACETCAPR-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_RO_0002234_CHEBI_15378_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_RO_0002234_CHEBI_16526_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_RO_0002234_CHEBI_57945_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_RO_0002234_CHEBI_79193_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_LYSACET-RXN_BFO_0000066_reaction_LYSACET-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_LYSACET-RXN_RO_0002233_CHEBI_32551_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_LYSACET-RXN_RO_0002233_CHEBI_57288_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_LYSACET-RXN_RO_0002234_CHEBI_15378_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_LYSACET-RXN_RO_0002234_CHEBI_57287_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_LYSACET-RXN_RO_0002234_CHEBI_58260_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_VAGL-RXN_BFO_0000066_reaction_VAGL-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_VAGL-RXN_RO_0002233_CHEBI_16810_VAGL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_VAGL-RXN_RO_0002233_CHEBI_356010_AMVAL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_VAGL-RXN_RO_0002234_CHEBI_16120_VAGL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_VAGL-RXN_RO_0002234_CHEBI_29985_VAGL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:reaction_ACETCAPR-RXN_location_lociGO_0005829",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005829",
+          "label": "cytosol"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:reaction_AMVAL-RXN_location_lociGO_0005829",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005829",
+          "label": "cytosol"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:reaction_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_location_lociGO_0005829",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005829",
+          "label": "cytosol"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:reaction_KETAMID-RXN_location_lociGO_0005829",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005829",
+          "label": "cytosol"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:reaction_LYSACET-RXN_location_lociGO_0005829",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005829",
+          "label": "cytosol"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:reaction_VAGL-RXN_location_lociGO_0005829",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005829",
+          "label": "cytosol"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0019473",
+          "label": "L-lysine catabolic process to glutarate, by acetylation"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "rdfs:label",
+          "value": "L-lysine degradation III"
+        },
+        {
+          "key": "hint-layout-y",
+          "value": "23"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "hint-layout-x",
+          "value": "337.5"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-5472-917X"
+        },
+        {
+          "key": "date",
+          "value": "2024-07-15"
+        },
+        {
+          "key": "http://www.geneontology.org/formats/oboInOwl#hasDbXref",
+          "value": "YeastPathways_LYSDEGII-PWY"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "skos:note",
+          "value": "org.biopax.paxtools.model.level3.Pathway"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_ACETCAPR-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_AMVAL-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_KETAMID-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_LYSACET-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:ev_w_id_VAGL-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000313",
+          "label": "imported information used in automatic assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "source",
+          "value": "SGD_PWY:LYSDEGII-PWY"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "subject": "gomodel:VAGL-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_29985_VAGL-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_VAGL-RXN_RO_0002234_CHEBI_29985_VAGL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_57945_KETAMID-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_RO_0002234_CHEBI_57945_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:VAGL-RXN",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:reaction_VAGL-RXN_location_lociGO_0005829",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_VAGL-RXN_BFO_0000066_reaction_VAGL-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        },
+        {
+          "key": "comment",
+          "value": "Occurs In Rule. This relation was asserted because all entities involved in the reaction are in the same location. "
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:AMVAL-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_15377_AMVAL-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_AMVAL-RXN_RO_0002233_CHEBI_15377_AMVAL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:ACETCAPR-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_29985_ACETCAPR-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_ACETCAPR-RXN_RO_0002234_CHEBI_29985_ACETCAPR-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:ACETCAPR-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_79192_ACETCAPR-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_ACETCAPR-RXN_RO_0002234_CHEBI_79192_ACETCAPR-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_57945_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002234_CHEBI_57945_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:LYSACET-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_57288_LYSACET-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_LYSACET-RXN_RO_0002233_CHEBI_57288_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_15377_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002233_CHEBI_15377_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:ACETCAPR-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_16810_ACETCAPR-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_ACETCAPR-RXN_RO_0002233_CHEBI_16810_ACETCAPR-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:LYSACET-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_32551_LYSACET-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_LYSACET-RXN_RO_0002233_CHEBI_32551_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_15377_KETAMID-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_RO_0002233_CHEBI_15377_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:AMVAL-RXN",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:reaction_AMVAL-RXN_location_lociGO_0005829",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_AMVAL-RXN_BFO_0000066_reaction_AMVAL-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        },
+        {
+          "key": "comment",
+          "value": "Occurs In Rule. This relation was asserted because all entities involved in the reaction are in the same location. "
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_57540_KETAMID-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_RO_0002233_CHEBI_57540_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:reaction_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_location_lociGO_0005829",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_BFO_0000066_reaction_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        },
+        {
+          "key": "comment",
+          "value": "Occurs In Rule. This relation was asserted because all entities involved in the reaction are in the same location. "
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_16526_KETAMID-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_RO_0002234_CHEBI_16526_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_57540_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002233_CHEBI_57540_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:reaction_KETAMID-RXN_location_lociGO_0005829",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_BFO_0000066_reaction_KETAMID-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        },
+        {
+          "key": "comment",
+          "value": "Occurs In Rule. This relation was asserted because all entities involved in the reaction are in the same location. "
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_79193_KETAMID-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_RO_0002234_CHEBI_79193_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_15378_KETAMID-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_RO_0002234_CHEBI_15378_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:LYSACET-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_57287_LYSACET-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_LYSACET-RXN_RO_0002234_CHEBI_57287_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:LYSACET-RXN",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_LYSACET-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:ACETCAPR-RXN",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:reaction_ACETCAPR-RXN_location_lociGO_0005829",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_ACETCAPR-RXN_BFO_0000066_reaction_ACETCAPR-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        },
+        {
+          "key": "comment",
+          "value": "Occurs In Rule. This relation was asserted because all entities involved in the reaction are in the same location. "
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:LYSACET-RXN",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:reaction_LYSACET-RXN_location_lociGO_0005829",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_LYSACET-RXN_BFO_0000066_reaction_LYSACET-RXN_location_lociGO_0005829_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        },
+        {
+          "key": "comment",
+          "value": "Occurs In Rule. This relation was asserted because all entities involved in the reaction are in the same location. "
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:AMVAL-RXN",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_AMVAL-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:VAGL-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_16120_VAGL-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_VAGL-RXN_RO_0002234_CHEBI_16120_VAGL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:VAGL-RXN",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_VAGL-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:ACETCAPR-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_58260_LYSACET-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_ACETCAPR-RXN_RO_0002233_CHEBI_58260_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:VAGL-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_16810_VAGL-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_VAGL-RXN_RO_0002233_CHEBI_16810_VAGL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:LYSACET-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_15378_LYSACET-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_LYSACET-RXN_RO_0002234_CHEBI_15378_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:ACETCAPR-RXN",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_ACETCAPR-RXN_BFO_0000050_YeastPathways_LYSDEGII-PWY/YeastPathways_LYSDEGII-PWY_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_30921_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002234_CHEBI_30921_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:AMVAL-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_30089_AMVAL-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_AMVAL-RXN_RO_0002234_CHEBI_30089_AMVAL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:VAGL-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_356010_AMVAL-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_VAGL-RXN_RO_0002233_CHEBI_356010_AMVAL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_15378_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002234_CHEBI_15378_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:AMVAL-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_79193_KETAMID-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_AMVAL-RXN_RO_0002233_CHEBI_79193_KETAMID-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:AMVAL-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_356010_AMVAL-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_AMVAL-RXN_RO_0002234_CHEBI_356010_AMVAL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:LYSACET-RXN",
+      "property": "RO:0002234",
+      "property-label": "RO:0002234",
+      "object": "gomodel:CHEBI_58260_LYSACET-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_LYSACET-RXN_RO_0002234_CHEBI_58260_LYSACET-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:KETAMID-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_79192_ACETCAPR-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_KETAMID-RXN_RO_0002233_CHEBI_79192_ACETCAPR-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:CHEBI_16120_VAGL-RXN",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:ev_w_id_GLUTARATE-SEMIALDEHYDE-DEHYDROGENASE-RXN_RO_0002233_CHEBI_16120_VAGL-RXN_SGD_PWY_YeastPathways_LYSDEGII-PWY",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "GOC:sgd_curators"
+        },
+        {
+          "key": "date",
+          "value": "2023-09-14"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://www.yeastgenome.org"
+        },
+        {
+          "key": "comment",
+          "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+        }
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "key": "state",
+      "value": "production"
+    },
+    {
+      "key": "contributor",
+      "value": "GOC:sgd_curators"
+    },
+    {
+      "key": "contributor",
+      "value": "https://orcid.org/0000-0001-5472-917X"
+    },
+    {
+      "key": "date",
+      "value": "2024-07-15"
+    },
+    {
+      "key": "title",
+      "value": "L-lysine degradation III - imported from: Saccharomyces Genome Database"
+    },
+    {
+      "key": "providedBy",
+      "value": "http://www.yeastgenome.org"
+    },
+    {
+      "key": "comment",
+      "value": "Automated change 2023-09-14: GO:0047949 replaced by GO:0102810"
+    },
+    {
+      "key": "comment",
+      "value": "For logical inference, import the integrated tbox ontology http://purl.obolibrary.org/obo/go/extensions/go-lego-reacto.owl"
+    },
+    {
+      "key": "comment",
+      "value": "Imported from Saccharomyces Genome Database: https://pathway.yeastgenome.org/YEAST/NEW-IMAGE?object=LYSDEGII-PWY"
+    },
+    {
+      "key": "https://w3id.org/biolink/vocab/in_taxon",
+      "value": "NCBITaxon:559292",
+      "value-type": "IRI"
+    }
+  ]
+}
