@@ -23,7 +23,7 @@ message BiologicalProcessAssociation
  repeated  evidenceItem evidence = 0
  repeated  provenanceInfo provenances = 0
   phaseTermObject happensDuring = 0
-  biologicalProcessTermObject partOf = 0
+  biologicalProcessAssociation partOf = 0
   biologicalProcessTermObject term = 0
  }
 // A term object that represents a biological process term from GO
@@ -77,7 +77,7 @@ message CellularAnatomicalEntityTermObject
   uriorcurie type = 0
   boolean obsolete = 0
  }
-// An association between an activity and a gene product
+// An association between an activity and an individual gene product
 message EnabledByGeneProductAssociation
  {
   string type = 0
@@ -85,7 +85,7 @@ message EnabledByGeneProductAssociation
  repeated  provenanceInfo provenances = 0
   geneProductTermObject term = 0
  }
-// An association between an activity and a protein complex
+// An association between an activity and a protein complex, where the complex carries out the activity. This should only be used when the activity cannot be attributed to an individual member of the complex, but instead the function is an emergent property of the complex.
 message EnabledByProteinComplexAssociation
  {
   string type = 0
@@ -102,7 +102,7 @@ message EvidenceItem
  repeated  object withObjects = 0
  repeated  provenanceInfo provenances = 0
  }
-// A term object that represents an evidence term from ECO
+// A term object that represents an evidence term from ECO. Only ECO terms that map up to a GO GAF evidence code should be used.
 message EvidenceTermObject
  {
   uriorcurie id = 0
@@ -135,17 +135,19 @@ message GrossAnatomyAssociation
   grossAnatomyAssociation partOf = 0
   grossAnatomicalStructureTermObject term = 0
  }
-// A model of a biological program consisting of a set of causally connected activities
+// A model of a biological program consisting of a set of causally connected activities.
 message Model
  {
   uriorcurie id = 0
   string title = 0
   taxonTermObject taxon = 0
+ repeated  taxonTermObject additionalTaxa = 0
   modelStateEnum status = 0
  repeated  string comments = 0
  repeated  activity activities = 0
  repeated  object objects = 0
  repeated  provenanceInfo provenances = 0
+  queryIndex queryIndex = 0
  }
 // An association between an activity and a molecular function term
 message MolecularFunctionAssociation
@@ -214,10 +216,10 @@ message ProteinComplexTermObject
 // Provenance information for an object
 message ProvenanceInfo
  {
-  string contributor = 0
+ repeated  string contributor = 0
   string created = 0
   string date = 0
-  string providedBy = 0
+ repeated  string providedBy = 0
  }
 // An object that represents a publication or other kind of reference
 message PublicationObject
@@ -228,6 +230,43 @@ message PublicationObject
   boolean obsolete = 0
   string abstractText = 0
   string fullText = 0
+ }
+// An index that is optionally placed on a model in order to support common query or index operations. Note that this index is not typically populated in the working transactional store for a model, it is derived via computation from core primary model information.
+message QueryIndex
+ {
+  integer numberOfActivities = 0
+  integer numberOfEnabledByTerms = 0
+  integer numberOfCausalAssociations = 0
+  integer lengthOfLongestCausalAssociationPath = 0
+  integer numberOfStronglyConnectedComponents = 0
+ repeated  publicationObject flattenedReferences = 0
+ repeated  termObject modelActivityMolecularFunctionTerms = 0
+ repeated  termObject modelActivityMolecularFunctionClosure = 0
+ repeated  termObject modelActivityMolecularFunctionRollup = 0
+ repeated  termObject modelActivityOccursInTerms = 0
+ repeated  termObject modelActivityOccursInClosure = 0
+ repeated  termObject modelActivityOccursInRollup = 0
+ repeated  termObject modelActivityEnabledByTerms = 0
+ repeated  termObject modelActivityEnabledByClosure = 0
+ repeated  termObject modelActivityEnabledByRollup = 0
+ repeated  termObject modelActivityPartOfTerms = 0
+ repeated  termObject modelActivityPartOfClosure = 0
+ repeated  termObject modelActivityPartOfRollup = 0
+ repeated  termObject modelActivityHasInputTerms = 0
+ repeated  termObject modelActivityHasInputClosure = 0
+ repeated  termObject modelActivityHasInputRollup = 0
+ repeated  termObject modelTaxon = 0
+ repeated  termObject modelTaxonClosure = 0
+ repeated  termObject modelTaxonRollup = 0
+ repeated  termObject annotonTerms = 0
+ repeated  activity startActivities = 0
+ repeated  activity endActivities = 0
+ repeated  activity intermediateActivities = 0
+ repeated  activity singletonActivities = 0
+  integer numberOfStartActivities = 0
+  integer numberOfEndActivities = 0
+  integer numberOfIntermediateActivities = 0
+  integer numberOfSingletonActivities = 0
  }
 // A term object that represents a taxon term from NCBITaxon
 message TaxonTermObject

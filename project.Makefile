@@ -9,7 +9,26 @@ HMCY = $(HM) --cluster y --cluster-method ward --cluster-metric cosine
 
 data/gocam.yaml:
 	$(RUN) gocam fetch -f yaml > $@.tmp && mv $@.tmp $@
+.PRECIOUS: data/gocam.yaml
 
+data/gocam-indexed.yaml: data/gocam.yaml
+	$(RUN) gocam index-models $< -o $@.tmp && mv $@.tmp $@
+.PRECIOUS: data/gocam.yaml
+
+data/gocam-indexed.json: data/gocam.yaml
+	$(RUN) gocam index-models -O json $< -o $@.tmp && mv $@.tmp $@
+.PRECIOUS: data/gocam.yaml
+
+data/gocam-flattened.jsonl: data/gocam-indexed.json
+	$(RUN) gocam flatten-models -O jsonl $< -o $@.tmp && mv $@.tmp $@
+.PRECIOUS: data/gocam-flattened.yaml
+
+mongodb-load-flattened: data/gocam-flattened.jsonl
+	linkml-store -d gocams -c flattened insert --replace $<
+
+data/gocam-flattened.slim.json: data/gocam-flattened.jsonl
+	linkml-store -d gocams::flattened query -s "[id, title,taxon,status,model_activity_part_of_rollup_label,model_activity_enabled_by_terms_id,number_of_activities]" -O json -o $@.tmp && mv $@.tmp $@
+.PRECIOUS: data/gocam-flattened.slim.json
 
 MODEL_COUNTS_BY = taxon term enabled-by mf occurs-in part-of provided-by causal-edge-predicate
 

@@ -11,6 +11,8 @@ enum CausalPredicateEnum
     regulates
     negatively_regulates
     positively_regulates
+    provides_input_for
+    removes_input_for
   }
 
 enum InformationBiomacromoleculeCategory
@@ -23,8 +25,12 @@ enum InformationBiomacromoleculeCategory
 
 enum ModelStateEnum
   {
-    production
     development
+    production
+    delete
+    review
+    internal_test
+    closed
   }
 
 type Activity
@@ -55,7 +61,7 @@ type BiologicalProcessAssociation
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
     happensDuring: PhaseTermObject
-    partOf: BiologicalProcessTermObject
+    partOf: BiologicalProcessAssociation
     term: BiologicalProcessTermObject
   }
 
@@ -187,13 +193,15 @@ interface InformationBiomacromoleculeTermObject
 type Model
   {
     id: Uriorcurie!
-    title: String
+    title: String!
     taxon: TaxonTermObject
+    additionalTaxa: [TaxonTermObject]
     status: ModelStateEnum
     comments: [String]
     activities: [Activity]
     objects: [Object]
     provenances: [ProvenanceInfo]
+    queryIndex: QueryIndex
   }
 
 type MolecularFunctionAssociation
@@ -262,10 +270,10 @@ type ProteinComplexTermObject
 
 type ProvenanceInfo
   {
-    contributor: String
+    contributor: [String]
     created: String
     date: String
-    providedBy: String
+    providedBy: [String]
   }
 
 type PublicationObject
@@ -276,6 +284,43 @@ type PublicationObject
     obsolete: Boolean
     abstractText: String
     fullText: String
+  }
+
+type QueryIndex
+  {
+    numberOfActivities: Integer
+    numberOfEnabledByTerms: Integer
+    numberOfCausalAssociations: Integer
+    lengthOfLongestCausalAssociationPath: Integer
+    numberOfStronglyConnectedComponents: Integer
+    flattenedReferences: [PublicationObject]
+    modelActivityMolecularFunctionTerms: [TermObject]
+    modelActivityMolecularFunctionClosure: [TermObject]
+    modelActivityMolecularFunctionRollup: [TermObject]
+    modelActivityOccursInTerms: [TermObject]
+    modelActivityOccursInClosure: [TermObject]
+    modelActivityOccursInRollup: [TermObject]
+    modelActivityEnabledByTerms: [TermObject]
+    modelActivityEnabledByClosure: [TermObject]
+    modelActivityEnabledByRollup: [TermObject]
+    modelActivityPartOfTerms: [TermObject]
+    modelActivityPartOfClosure: [TermObject]
+    modelActivityPartOfRollup: [TermObject]
+    modelActivityHasInputTerms: [TermObject]
+    modelActivityHasInputClosure: [TermObject]
+    modelActivityHasInputRollup: [TermObject]
+    modelTaxon: [TermObject]
+    modelTaxonClosure: [TermObject]
+    modelTaxonRollup: [TermObject]
+    annotonTerms: [TermObject]
+    startActivities: [Activity]
+    endActivities: [Activity]
+    intermediateActivities: [Activity]
+    singletonActivities: [Activity]
+    numberOfStartActivities: Integer
+    numberOfEndActivities: Integer
+    numberOfIntermediateActivities: Integer
+    numberOfSingletonActivities: Integer
   }
 
 type TaxonTermObject

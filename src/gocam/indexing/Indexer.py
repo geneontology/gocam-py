@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+import logging
+from dataclasses import dataclass, field
 from typing import Optional, List, Collection, Tuple
 
 from oaklib import get_adapter
@@ -8,6 +9,8 @@ from oaklib.interfaces import OboGraphInterface
 from gocam.datamodel import Model, Activity, TermAssociation, PublicationObject, TermObject
 from gocam.datamodel import QueryIndex
 import networkx as nx
+
+logger = logging.getLogger(__name__)
 
 @dataclass
 class Indexer:
@@ -20,6 +23,7 @@ class Indexer:
     3. Get term closures for ontology terms
     """
     _go_adapter: OboGraphInterface = None
+    subsets: List[str] = field(default_factory=lambda: ["goslim_generic"])
 
     def go_adapter(self):
         """
@@ -79,9 +83,27 @@ class Indexer:
         """
         if model.query_index and not reindex:
             return
-        go = self.go_adapter()
+
         if not model.query_index:
-            model.query_index = QueryIndex()
+            model.query_index = self.create_query_index(model)
+        elif reindex:
+            self.create_query_index(model, model.query_index)
+        else:
+            logger.info("Already have index")
+
+
+    def create_query_index(self, model: Model, qi: Optional[QueryIndex] = None) -> QueryIndex:
+        """
+        Create a QueryIndex for the given model.
+
+        :param model:
+        :param qi: existing QueryIndex to populate, or None to create a new one
+        :return:
+        """
+        if qi is None:
+            qi = QueryIndex()
+        go = self.go_adapter()
+        model.query_index = qi
         qi = model.query_index
         qi.number_of_activities = len(model.activities)
         all_causal_associations = []
@@ -185,19 +207,43 @@ class Indexer:
             qi.number_of_strongly_connected_components = len(connected_components)
 
 
+        subset_terms = set()
+        for s in self.subsets:
+            subset_terms.update(set(go.subset_members(s)))
+
+        def rollup(terms: Collection[TermObject]) -> List[TermObject]:
+            """
+            Filter terms to only those in the specified subsets.
+            """
+            return [t for t in terms if t.id in subset_terms]
+
+
         mf_direct, mf_closure = self._get_closures(all_mfs)
         qi.model_activity_molecular_function_terms = mf_direct
         qi.model_activity_molecular_function_closure = mf_closure
+        qi.model_activity_molecular_function_rollup = rollup(mf_closure)
+
+        eb_direct, eb_closure = self._get_closures(all_enabled_bys)
+        qi.model_activity_enabled_by_terms = eb_direct
+        qi.model_activity_enabled_by_closure = eb_closure
+
         parts_ofs_direct, parts_ofs_closure = self._get_closures(all_parts_ofs)
         qi.model_activity_part_of_terms = parts_ofs_direct
         qi.model_activity_part_of_closure = parts_ofs_closure
+        qi.model_activity_part_of_rollup = rollup(parts_ofs_closure)
+
         occurs_in_direct, occurs_in_closure = self._get_closures(all_occurs_ins)
         qi.model_activity_occurs_in_terms = occurs_in_direct
         qi.model_activity_occurs_in_closure = occurs_in_closure
+        qi.model_activity_occurs_in_rollup = rollup(occurs_in_closure)
+
         has_inputs_direct, has_inputs_closure = self._get_closures(all_has_inputs)
         qi.model_activity_has_input_terms = has_inputs_direct
         qi.model_activity_has_input_closure = has_inputs_closure
+        qi.model_activity_has_input_rollup = rollup(has_inputs_closure)
+
         qi.annoton_terms = all_annoton_terms
+        return qi
 
 
 

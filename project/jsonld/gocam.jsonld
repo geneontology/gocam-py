@@ -1,6 +1,6 @@
 {
   "name": "gocam",
-  "description": "GO CAM LinkML schema (experimental)\n\nThe central class in this datamodel is a [Model](Model.md). A model consists of a set of\n[Activity](Activity.md) objects.",
+  "description": "Gene Ontology Causal Activity Model (GO-CAM) Schema.\n\nThis schema provides a way of representing causal pathway [Models](Model.md). A model consists of a set of\n[Activity](Activity.md) objects, where each activity object represents the function of either an [individual\ngene product](EnabledByGeneProductAssociation), a [protein complex of gene products](EnabledByGeneProductAssociation),\nor a set of possible gene products.\n\nEach [Models](Model.md) has associated metadata slots. Some slots such as [id](id.md), [title](title.md),\nand [status](status.md) are *required*.",
   "see_also": [
     "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7012280/",
     "https://docs.google.com/presentation/d/1ja0Vkw0AoENJ58emM77dGnqPtY1nfIJMeyVnObBxIxI/edit#slide=id.p8"
@@ -77,15 +77,19 @@
     },
     {
       "prefix_prefix": "UniProtKB",
-      "prefix_reference": "http://identifiers.org/uniprot/"
+      "prefix_reference": "http://purl.uniprot.org/uniprot/"
     },
     {
       "prefix_prefix": "PMID",
-      "prefix_reference": "http://identifiers.org/pmid/"
+      "prefix_reference": "http://identifiers.org/pubmed/"
     },
     {
       "prefix_prefix": "dcterms",
       "prefix_reference": "http://purl.org/dc/terms/"
+    },
+    {
+      "prefix_prefix": "RHEA",
+      "prefix_reference": "http://rdf.rhea-db.org/"
     }
   ],
   "default_prefix": "gocam",
@@ -404,20 +408,42 @@
     {
       "name": "ModelStateEnum",
       "definition_uri": "https://w3id.org/gocam/ModelStateEnum",
-      "description": "Status of a model",
+      "description": "A term describing where the model is in the development life cycle.",
       "from_schema": "https://w3id.org/gocam",
       "permissible_values": [
         {
-          "text": "production"
+          "text": "development",
+          "description": "Used when the curator is still working on the model. Edits are still being made, and the information in the model is not yet guaranteed to be accurate or complete. The model should not be displayed in end-user facing websites, unless it is made clear that the model is a work in progress.",
+          "aliases": [
+            "work in progress"
+          ]
         },
         {
-          "text": "development"
+          "text": "production",
+          "description": "Used when the curator has declared the model is ready for public consumption. Edits might still be performed on the model in future, but the information in the model is believed to be both accurate and reasonably complete. The model may be displayed in public websites."
+        },
+        {
+          "text": "delete",
+          "description": "When the curator has marked for future deletion."
+        },
+        {
+          "text": "review",
+          "description": "The model has been marked for curator review."
+        },
+        {
+          "text": "internal_test",
+          "description": "The model is not intended for use public use; it is likely to be used for internal testing."
+        },
+        {
+          "text": "closed",
+          "description": "TBD"
         }
       ]
     },
     {
       "name": "InformationBiomacromoleculeCategory",
       "definition_uri": "https://w3id.org/gocam/InformationBiomacromoleculeCategory",
+      "description": "A term describing the type of the enabler of an activity.",
       "from_schema": "https://w3id.org/gocam",
       "permissible_values": [
         {
@@ -438,6 +464,7 @@
     {
       "name": "CausalPredicateEnum",
       "definition_uri": "https://w3id.org/gocam/CausalPredicateEnum",
+      "description": "A term describing the causal relationship between two activities. All terms are drawn from the \"causally upstream or within\" (RO:0002418) branch of the Relation Ontology (RO).",
       "from_schema": "https://w3id.org/gocam",
       "permissible_values": [
         {
@@ -479,6 +506,70 @@
         {
           "text": "positively regulates",
           "meaning": "RO:0002213"
+        },
+        {
+          "text": "provides input for",
+          "meaning": "RO:0002413"
+        },
+        {
+          "text": "removes input for",
+          "meaning": "RO:0012010"
+        }
+      ]
+    },
+    {
+      "name": "EvidenceCodeEnum",
+      "definition_uri": "https://w3id.org/gocam/EvidenceCodeEnum",
+      "description": "A term from the subset of ECO that maps up to a GAF evidence code",
+      "from_schema": "https://w3id.org/gocam",
+      "reachable_from": {
+        "source_nodes": [
+          "ECO:0000000"
+        ],
+        "relationship_types": [
+          "rdfs:subClassOf"
+        ]
+      }
+    },
+    {
+      "name": "CellularAnatomicalEntityEnum",
+      "definition_uri": "https://w3id.org/gocam/CellularAnatomicalEntityEnum",
+      "description": "A term from the subset of the cellular anatomical entity branch of GO CC",
+      "from_schema": "https://w3id.org/gocam",
+      "reachable_from": {
+        "source_nodes": [
+          "GO:0110165"
+        ],
+        "relationship_types": [
+          "rdfs:subClassOf"
+        ]
+      }
+    },
+    {
+      "name": "PhaseEnum",
+      "definition_uri": "https://w3id.org/gocam/PhaseEnum",
+      "description": "A term from either the phase branch of GO or the phase branch of an anatomy ontology",
+      "from_schema": "https://w3id.org/gocam",
+      "include": [
+        {
+          "reachable_from": {
+            "source_nodes": [
+              "GO:0044848"
+            ],
+            "relationship_types": [
+              "rdfs:subClassOf"
+            ]
+          }
+        },
+        {
+          "reachable_from": {
+            "source_nodes": [
+              "UBERON:0000105"
+            ],
+            "relationship_types": [
+              "rdfs:subClassOf"
+            ]
+          }
         }
       ]
     }
@@ -513,6 +604,7 @@
         "Model"
       ],
       "range": "string",
+      "required": true,
       "@type": "SlotDefinition"
     },
     {
@@ -529,8 +621,22 @@
       "@type": "SlotDefinition"
     },
     {
+      "name": "model__additional_taxa",
+      "description": "Additional taxa that the model is about",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/additional_taxa",
+      "alias": "additional_taxa",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "TaxonTermObject",
+      "multivalued": true,
+      "@type": "SlotDefinition"
+    },
+    {
       "name": "model__status",
-      "description": "The status of the model",
+      "description": "The status of the model in terms of its progression along the developmental lifecycle",
       "from_schema": "https://w3id.org/gocam",
       "aliases": [
         "model state"
@@ -549,7 +655,7 @@
     },
     {
       "name": "model__comments",
-      "description": "Comments about the model",
+      "description": "Curator-provided comments about the model",
       "from_schema": "https://w3id.org/gocam",
       "mappings": [
         "http://example.org/UNKNOWN/rdfs/comment"
@@ -567,6 +673,9 @@
     {
       "name": "model__activities",
       "description": "All of the activities that are part of the model",
+      "comments": [
+        "this slot is conditionally required. It is optional for models in development state (because a curator may need to instantiate a Model before populating it with activities), but is required for production models. See the associated rule."
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/activities",
       "alias": "activities",
@@ -613,10 +722,37 @@
       "@type": "SlotDefinition"
     },
     {
+      "name": "model__query_index",
+      "description": "An optional object that contains the results of indexing a model with various summary statistics and retrieval indices.",
+      "comments": [
+        "This is typically not populated in the primary transactional store (OLTP processing), because the values will be redundant with the primary edited components of the model. It is intended to be populated in batch *after* editing, and then used for generating reports, or for indexing in web applications."
+      ],
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/query_index",
+      "alias": "query_index",
+      "owner": "Model",
+      "domain_of": [
+        "Model"
+      ],
+      "range": "QueryIndex",
+      "inlined": true,
+      "@type": "SlotDefinition"
+    },
+    {
       "name": "activity__id",
+      "id_prefixes": [
+        "gocam"
+      ],
       "description": "Identifier of the activity unit. Should be in gocam namespace.",
       "comments": [
         "Typically does not need to be exposed to end-user, this exists to allow activity flows"
+      ],
+      "examples": [
+        {
+          "value": "gomodel:63f809ec00000701",
+          "description": "A model representing tRNA repair and recycling",
+          "@type": "Example"
+        }
       ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/id",
@@ -641,6 +777,7 @@
         "Activity"
       ],
       "range": "EnabledByAssociation",
+      "recommended": true,
       "inlined": true,
       "@type": "SlotDefinition"
     },
@@ -658,6 +795,7 @@
         "Activity"
       ],
       "range": "MolecularFunctionAssociation",
+      "recommended": true,
       "inlined": true,
       "@type": "SlotDefinition"
     },
@@ -672,6 +810,7 @@
         "Activity"
       ],
       "range": "CellularAnatomicalEntityAssociation",
+      "recommended": true,
       "inlined": true,
       "@type": "SlotDefinition"
     },
@@ -686,12 +825,16 @@
         "Activity"
       ],
       "range": "BiologicalProcessAssociation",
+      "recommended": true,
       "inlined": true,
       "@type": "SlotDefinition"
     },
     {
       "name": "activity__has_input",
       "description": "The input molecules that are directly consumed by the activity",
+      "todos": [
+        "resolve has_input vs has_primary_input"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/has_input",
       "alias": "has_input",
@@ -708,6 +851,9 @@
     {
       "name": "activity__has_primary_input",
       "description": "The primary input molecule that is directly consumed by the activity",
+      "todos": [
+        "resolve has_input vs has_primary_input"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/has_primary_input",
       "alias": "has_primary_input",
@@ -722,6 +868,9 @@
     {
       "name": "activity__has_output",
       "description": "The output molecules that are directly produced by the activity",
+      "todos": [
+        "resolve has_output vs has_primary_output"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/has_output",
       "alias": "has_output",
@@ -738,6 +887,9 @@
     {
       "name": "activity__has_primary_output",
       "description": "The primary output molecule that is directly produced by the activity",
+      "todos": [
+        "resolve has_output vs has_primary_output"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/has_primary_output",
       "alias": "has_primary_output",
@@ -751,7 +903,10 @@
     },
     {
       "name": "activity__causal_associations",
-      "description": "The causal associations that connect this activity to other activities",
+      "description": "The causal associations that flow out of this activity",
+      "comments": [
+        "All activities in a model must be connected to at least one other activity. If a an activity has no outgoing activities (i.e the value of this slot is empty) then it is a terminal activity in the model. If an activity has no incoming activities, it is an initial activity."
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/causal_associations",
       "alias": "causal_associations",
@@ -783,7 +938,17 @@
     },
     {
       "name": "evidenceItem__term",
+      "id_prefixes": [
+        "ECO"
+      ],
       "description": "The ECO term representing the type of evidence",
+      "examples": [
+        {
+          "value": "ECO:0000314",
+          "description": "direct assay evidence used in manual assertion (IDA)",
+          "@type": "Example"
+        }
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/term",
       "alias": "term",
@@ -792,11 +957,29 @@
         "EvidenceItem"
       ],
       "range": "EvidenceTermObject",
+      "bindings": [
+        {
+          "range": "EvidenceCodeEnum",
+          "obligation_level": {
+            "text": "REQUIRED",
+            "description": "The metadata element is required to be present in the model",
+            "@type": "PermissibleValue"
+          },
+          "binds_value_of": "id",
+          "@type": "EnumBinding"
+        }
+      ],
       "@type": "SlotDefinition"
     },
     {
       "name": "evidenceItem__reference",
       "description": "The publication of reference that describes the evidence",
+      "examples": [
+        {
+          "value": "PMID:32075755",
+          "@type": "Example"
+        }
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/reference",
       "alias": "reference",
@@ -843,6 +1026,10 @@
     },
     {
       "name": "association__type",
+      "description": "The type of association.",
+      "comments": [
+        "when instantiating Association objects in Python and other languages, it isn't necessary to populate this, it is auto-populated from the object class."
+      ],
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/type",
       "designates_type": true,
@@ -856,6 +1043,7 @@
     },
     {
       "name": "association__evidence",
+      "description": "The set of evidence items that support the association.",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/evidence",
       "alias": "evidence",
@@ -870,6 +1058,7 @@
     },
     {
       "name": "association__provenances",
+      "description": "The set of provenance objects that provide metadata about who made the association.",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/provenances",
       "alias": "provenances",
@@ -975,11 +1164,13 @@
       "domain_of": [
         "BiologicalProcessAssociation"
       ],
-      "range": "BiologicalProcessTermObject",
+      "range": "BiologicalProcessAssociation",
+      "inlined": true,
       "@type": "SlotDefinition"
     },
     {
       "name": "cellularAnatomicalEntityAssociation__part_of",
+      "description": "Optional extension allowing hierarchical nesting of CCs",
       "from_schema": "https://w3id.org/gocam",
       "slot_uri": "https://w3id.org/gocam/part_of",
       "alias": "part_of",
@@ -1108,6 +1299,7 @@
         "ProvenanceInfo"
       ],
       "range": "string",
+      "multivalued": true,
       "@type": "SlotDefinition"
     },
     {
@@ -1127,6 +1319,9 @@
     },
     {
       "name": "provenanceInfo__date",
+      "todos": [
+        "consider modeling as date rather than string"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "mappings": [
         "http://example.org/UNKNOWN/dct/date"
@@ -1153,10 +1348,574 @@
         "ProvenanceInfo"
       ],
       "range": "string",
+      "multivalued": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__number_of_activities",
+      "description": "The number of activities in a model.",
+      "comments": [
+        "this includes all activities, even those without an enabler."
+      ],
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/number_of_activities",
+      "alias": "number_of_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__number_of_enabled_by_terms",
+      "description": "The number of molecular entities or sets of entities in a model.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/number_of_enabled_by_terms",
+      "alias": "number_of_enabled_by_terms",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__number_of_causal_associations",
+      "description": "Total number of causal association edges connecting activities in a model.",
+      "todos": [
+        "decide what to do about \"implicit\" causal associations, i.e provides_input_for"
+      ],
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/number_of_causal_associations",
+      "alias": "number_of_causal_associations",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__length_of_longest_causal_association_path",
+      "description": "The maximum number of hops along activities along the direction of causal flow in a model.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/length_of_longest_causal_association_path",
+      "alias": "length_of_longest_causal_association_path",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__number_of_strongly_connected_components",
+      "description": "The number of distinct components that consist of activities that are connected (directly or indirectly) via causal connections. Most models will consist of a single SCC. Some models may consist of two or more \"islands\" where there is no connection from one island to another.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/number_of_strongly_connected_components",
+      "alias": "number_of_strongly_connected_components",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__flattened_references",
+      "description": "All publication objects from the model across different levels combined in one place",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/flattened_references",
+      "alias": "flattened_references",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "PublicationObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_molecular_function_terms",
+      "description": "All MF terms for all activities",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_molecular_function_terms",
+      "alias": "model_activity_molecular_function_terms",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_molecular_function_closure",
+      "annotations": [
+        {
+          "tag": "closure_computed_over",
+          "value": "[rdfs:subClassOf]",
+          "@type": "Annotation"
+        }
+      ],
+      "description": "The reflexive transitive closure of `model_activity_molecular_function_terms`, over the is_a relationship",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_molecular_function_closure",
+      "alias": "model_activity_molecular_function_closure",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_molecular_function_rollup",
+      "description": "The rollup of `model_activity_molecular_function_closure` to a GO subset or slim.",
+      "comments": [
+        "added for completion but may not be useful in practice"
+      ],
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_molecular_function_rollup",
+      "alias": "model_activity_molecular_function_rollup",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_occurs_in_terms",
+      "description": "All direct cellular component localization terms for all activities",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_occurs_in_terms",
+      "alias": "model_activity_occurs_in_terms",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_occurs_in_closure",
+      "annotations": [
+        {
+          "tag": "closure_computed_over",
+          "value": "[rdfs:subClassOf, BFO:0000050]",
+          "@type": "Annotation"
+        }
+      ],
+      "description": "The reflexive transitive closure of `model_activity_occurs_in_terms`, over the is_a and part_of relationship type",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_occurs_in_closure",
+      "alias": "model_activity_occurs_in_closure",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_occurs_in_rollup",
+      "description": "The rollup of `model_activity_occurs_in_closure` to a GO subset or slim.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_occurs_in_rollup",
+      "alias": "model_activity_occurs_in_rollup",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_enabled_by_terms",
+      "description": "All direct enabler terms for all activities",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_enabled_by_terms",
+      "alias": "model_activity_enabled_by_terms",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_enabled_by_closure",
+      "annotations": [
+        {
+          "tag": "closure_computed_over",
+          "value": "[rdfs:subClassOf, BFO:0000051]",
+          "@type": "Annotation"
+        }
+      ],
+      "description": "The reflexive transitive closure of `model_activity_enabled_by_terms`, over the is_a and has_part relationship type (e.g. complex to parts)",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_enabled_by_closure",
+      "alias": "model_activity_enabled_by_closure",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_enabled_by_rollup",
+      "description": "The rollup of `model_activity_enabled_by_closure` to a GO subset or slim.",
+      "comments": [
+        "added for completion but may not be useful in practice"
+      ],
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_enabled_by_rollup",
+      "alias": "model_activity_enabled_by_rollup",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_part_of_terms",
+      "description": "All direct biological process terms for all activities",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_part_of_terms",
+      "alias": "model_activity_part_of_terms",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_part_of_closure",
+      "annotations": [
+        {
+          "tag": "closure_computed_over",
+          "value": "[rdfs:subClassOf, BFO:0000050]",
+          "@type": "Annotation"
+        }
+      ],
+      "description": "The reflexive transitive closure of `model_activity_part_of_terms`, over the is_a and part_of relationship type",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_part_of_closure",
+      "alias": "model_activity_part_of_closure",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_part_of_rollup",
+      "description": "The rollup of `model_activity_part_of_closure` to a GO subset or slim.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_part_of_rollup",
+      "alias": "model_activity_part_of_rollup",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_has_input_terms",
+      "description": "All direct input terms for all activities",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_has_input_terms",
+      "alias": "model_activity_has_input_terms",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_has_input_closure",
+      "annotations": [
+        {
+          "tag": "closure_computed_over",
+          "value": "[rdfs:subClassOf]",
+          "@type": "Annotation"
+        }
+      ],
+      "description": "The reflexive transitive closure of `model_activity_has_input_terms`, over the is_a relationship type",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_has_input_closure",
+      "alias": "model_activity_has_input_closure",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_activity_has_input_rollup",
+      "description": "The rollup of `model_activity_has_input_closure` to a GO subset or slim.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_activity_has_input_rollup",
+      "alias": "model_activity_has_input_rollup",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_taxon",
+      "description": "The primary taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the primary taxon that the model is relevant to.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_taxon",
+      "alias": "model_taxon",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_taxon_closure",
+      "annotations": [
+        {
+          "tag": "closure_computed_over",
+          "value": "[rdfs:subClassOf]",
+          "@type": "Annotation"
+        }
+      ],
+      "description": "The reflexive transitive closure of the taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the set of taxa that are relevant to the model.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_taxon_closure",
+      "alias": "model_taxon_closure",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__model_taxon_rollup",
+      "description": "The rollup of the taxon closure to a NCBITaxon subset or slim.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/model_taxon_rollup",
+      "alias": "model_taxon_rollup",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__annoton_terms",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/annoton_terms",
+      "alias": "annoton_terms",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "TermObject",
+      "multivalued": true,
+      "inlined": true,
+      "inlined_as_list": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__start_activities",
+      "description": "The set of activities that are the starting points of the model, i.e. those that have no incoming causal associations.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/start_activities",
+      "alias": "start_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "Activity",
+      "multivalued": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__end_activities",
+      "description": "The set of activities that are the end points of the model, i.e. those that have no outgoing causal associations.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/end_activities",
+      "alias": "end_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "Activity",
+      "multivalued": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__intermediate_activities",
+      "description": "The set of activities that are neither start nor end activities, i.e. those that have both incoming and outgoing causal associations.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/intermediate_activities",
+      "alias": "intermediate_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "Activity",
+      "multivalued": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__singleton_activities",
+      "description": "The set of activities that have no causal associations, i.e. those that are not connected to any other activity in the model.",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/singleton_activities",
+      "alias": "singleton_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "Activity",
+      "multivalued": true,
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__number_of_start_activities",
+      "description": "The number of start activities in a model",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/number_of_start_activities",
+      "alias": "number_of_start_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__number_of_end_activities",
+      "description": "The number of end activities in a model",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/number_of_end_activities",
+      "alias": "number_of_end_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__number_of_intermediate_activities",
+      "description": "The number of intermediate activities in a model",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/number_of_intermediate_activities",
+      "alias": "number_of_intermediate_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
+      "@type": "SlotDefinition"
+    },
+    {
+      "name": "queryIndex__number_of_singleton_activities",
+      "description": "The number of singleton activities in a model",
+      "from_schema": "https://w3id.org/gocam",
+      "slot_uri": "https://w3id.org/gocam/number_of_singleton_activities",
+      "alias": "number_of_singleton_activities",
+      "owner": "QueryIndex",
+      "domain_of": [
+        "QueryIndex"
+      ],
+      "range": "integer",
       "@type": "SlotDefinition"
     },
     {
       "name": "EnabledByGeneProductAssociation_term",
+      "description": "A \"term\" that is an entity database object representing an individual gene product.",
+      "comments": [
+        "In the context of the GO workflow, the allowed values for this field come from the GPI file from an authoritative source. For example, the authoritative source for human is the EBI GOA group, and the GPI for this group consists of UniProtKB IDs (for proteins) and RNA Central IDs (for RNA gene products)",
+        "A gene identifier may be provided as a value here (if the authoritative GPI allows it). Note that the *interpretation* of the gene ID in the context of a GO-CAM model is the (spliceform and proteoform agnostic) *product* of that gene."
+      ],
+      "examples": [
+        {
+          "value": "UniProtKB:Q96Q11",
+          "description": "The protein product of the Homo sapiens TRNT1 gene",
+          "@type": "Example"
+        },
+        {
+          "value": "RNAcentral:URS00026A1FBE_9606",
+          "description": "An RNA product of this RNA central gene",
+          "@type": "Example"
+        }
+      ],
       "from_schema": "https://w3id.org/gocam",
       "is_a": "enabledByAssociation__term",
       "domain": "EnabledByGeneProductAssociation",
@@ -1173,6 +1932,18 @@
     },
     {
       "name": "EnabledByProteinComplexAssociation_term",
+      "examples": [
+        {
+          "value": "GO:0032991",
+          "description": "The generic GO entry for a protein complex. If this is the value of `term`, then members *must* be specified.",
+          "@type": "Example"
+        },
+        {
+          "value": "ComplexPortal:CPX-969",
+          "description": "The human Caspase-2 complex",
+          "@type": "Example"
+        }
+      ],
       "from_schema": "https://w3id.org/gocam",
       "is_a": "enabledByAssociation__term",
       "domain": "EnabledByProteinComplexAssociation",
@@ -1233,6 +2004,18 @@
       "is_usage_slot": true,
       "usage_slot_name": "term",
       "range": "CellularAnatomicalEntityTermObject",
+      "bindings": [
+        {
+          "range": "CellularAnatomicalEntityEnum",
+          "obligation_level": {
+            "text": "REQUIRED",
+            "description": "The metadata element is required to be present in the model",
+            "@type": "PermissibleValue"
+          },
+          "binds_value_of": "id",
+          "@type": "EnumBinding"
+        }
+      ],
       "@type": "SlotDefinition"
     },
     {
@@ -1288,17 +2071,19 @@
     {
       "name": "Model",
       "definition_uri": "https://w3id.org/gocam/Model",
-      "description": "A model of a biological program consisting of a set of causally connected activities",
+      "description": "A model of a biological program consisting of a set of causally connected activities.",
       "from_schema": "https://w3id.org/gocam",
       "slots": [
         "model__id",
         "model__title",
         "model__taxon",
+        "model__additional_taxa",
         "model__status",
         "model__comments",
         "model__activities",
         "model__objects",
-        "model__provenances"
+        "model__provenances",
+        "model__query_index"
       ],
       "slot_usage": {},
       "attributes": [
@@ -1313,6 +2098,7 @@
           "name": "title",
           "description": "The human-readable descriptive title of the model",
           "slot_uri": "dct:title",
+          "required": true,
           "@type": "SlotDefinition"
         },
         {
@@ -1322,8 +2108,15 @@
           "@type": "SlotDefinition"
         },
         {
+          "name": "additional_taxa",
+          "description": "Additional taxa that the model is about",
+          "range": "TaxonTermObject",
+          "multivalued": true,
+          "@type": "SlotDefinition"
+        },
+        {
           "name": "status",
-          "description": "The status of the model",
+          "description": "The status of the model in terms of its progression along the developmental lifecycle",
           "aliases": [
             "model state"
           ],
@@ -1333,7 +2126,7 @@
         },
         {
           "name": "comments",
-          "description": "Comments about the model",
+          "description": "Curator-provided comments about the model",
           "slot_uri": "rdfs:comment",
           "multivalued": true,
           "@type": "SlotDefinition"
@@ -1341,6 +2134,9 @@
         {
           "name": "activities",
           "description": "All of the activities that are part of the model",
+          "comments": [
+            "this slot is conditionally required. It is optional for models in development state (because a curator may need to instantiate a Model before populating it with activities), but is required for production models. See the associated rule."
+          ],
           "range": "Activity",
           "multivalued": true,
           "inlined_as_list": true,
@@ -1361,9 +2157,44 @@
           "multivalued": true,
           "inlined_as_list": true,
           "@type": "SlotDefinition"
+        },
+        {
+          "name": "query_index",
+          "description": "An optional object that contains the results of indexing a model with various summary statistics and retrieval indices.",
+          "comments": [
+            "This is typically not populated in the primary transactional store (OLTP processing), because the values will be redundant with the primary edited components of the model. It is intended to be populated in batch *after* editing, and then used for generating reports, or for indexing in web applications."
+          ],
+          "range": "QueryIndex",
+          "@type": "SlotDefinition"
         }
       ],
       "class_uri": "https://w3id.org/gocam/Model",
+      "rules": [
+        {
+          "preconditions": {
+            "slot_conditions": [
+              {
+                "name": "state",
+                "equals_string": "production",
+                "@type": "SlotDefinition"
+              }
+            ],
+            "@type": "AnonymousClassExpression"
+          },
+          "postconditions": {
+            "slot_conditions": [
+              {
+                "name": "activities",
+                "required": true,
+                "@type": "SlotDefinition"
+              }
+            ],
+            "@type": "AnonymousClassExpression"
+          },
+          "title": "Production rules must have at least one activity",
+          "@type": "ClassRule"
+        }
+      ],
       "@type": "ClassDefinition"
     },
     {
@@ -1391,9 +2222,19 @@
       "attributes": [
         {
           "name": "id",
+          "id_prefixes": [
+            "gocam"
+          ],
           "description": "Identifier of the activity unit. Should be in gocam namespace.",
           "comments": [
             "Typically does not need to be exposed to end-user, this exists to allow activity flows"
+          ],
+          "examples": [
+            {
+              "value": "gomodel:63f809ec00000701",
+              "description": "A model representing tRNA repair and recycling",
+              "@type": "Example"
+            }
           ],
           "identifier": true,
           "range": "uriorcurie",
@@ -1403,6 +2244,7 @@
           "name": "enabled_by",
           "description": "The gene product or complex that carries out the activity",
           "range": "EnabledByAssociation",
+          "recommended": true,
           "inlined": true,
           "@type": "SlotDefinition"
         },
@@ -1413,6 +2255,7 @@
             "currently BP, CC etc are at the level of the activity, not the MolecularFunctionAssociation"
           ],
           "range": "MolecularFunctionAssociation",
+          "recommended": true,
           "inlined": true,
           "@type": "SlotDefinition"
         },
@@ -1420,6 +2263,7 @@
           "name": "occurs_in",
           "description": "The cellular location in which the activity occurs",
           "range": "CellularAnatomicalEntityAssociation",
+          "recommended": true,
           "inlined": true,
           "@type": "SlotDefinition"
         },
@@ -1427,12 +2271,16 @@
           "name": "part_of",
           "description": "The larger biological process in which the activity is a part",
           "range": "BiologicalProcessAssociation",
+          "recommended": true,
           "inlined": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "has_input",
           "description": "The input molecules that are directly consumed by the activity",
+          "todos": [
+            "resolve has_input vs has_primary_input"
+          ],
           "range": "MoleculeAssociation",
           "multivalued": true,
           "inlined_as_list": true,
@@ -1441,6 +2289,9 @@
         {
           "name": "has_primary_input",
           "description": "The primary input molecule that is directly consumed by the activity",
+          "todos": [
+            "resolve has_input vs has_primary_input"
+          ],
           "range": "MoleculeAssociation",
           "inlined": true,
           "@type": "SlotDefinition"
@@ -1448,6 +2299,9 @@
         {
           "name": "has_output",
           "description": "The output molecules that are directly produced by the activity",
+          "todos": [
+            "resolve has_output vs has_primary_output"
+          ],
           "range": "MoleculeAssociation",
           "multivalued": true,
           "inlined_as_list": true,
@@ -1456,13 +2310,19 @@
         {
           "name": "has_primary_output",
           "description": "The primary output molecule that is directly produced by the activity",
+          "todos": [
+            "resolve has_output vs has_primary_output"
+          ],
           "range": "MoleculeAssociation",
           "inlined": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "causal_associations",
-          "description": "The causal associations that connect this activity to other activities",
+          "description": "The causal associations that flow out of this activity",
+          "comments": [
+            "All activities in a model must be connected to at least one other activity. If a an activity has no outgoing activities (i.e the value of this slot is empty) then it is a terminal activity in the model. If an activity has no incoming activities, it is an initial activity."
+          ],
           "range": "CausalAssociation",
           "multivalued": true,
           "inlined_as_list": true,
@@ -1495,13 +2355,41 @@
       "attributes": [
         {
           "name": "term",
+          "id_prefixes": [
+            "ECO"
+          ],
           "description": "The ECO term representing the type of evidence",
+          "examples": [
+            {
+              "value": "ECO:0000314",
+              "description": "direct assay evidence used in manual assertion (IDA)",
+              "@type": "Example"
+            }
+          ],
           "range": "EvidenceTermObject",
+          "bindings": [
+            {
+              "range": "EvidenceCodeEnum",
+              "obligation_level": {
+                "text": "REQUIRED",
+                "description": "The metadata element is required to be present in the model",
+                "@type": "PermissibleValue"
+              },
+              "binds_value_of": "id",
+              "@type": "EnumBinding"
+            }
+          ],
           "@type": "SlotDefinition"
         },
         {
           "name": "reference",
           "description": "The publication of reference that describes the evidence",
+          "examples": [
+            {
+              "value": "PMID:32075755",
+              "@type": "Example"
+            }
+          ],
           "range": "PublicationObject",
           "@type": "SlotDefinition"
         },
@@ -1543,11 +2431,16 @@
       "attributes": [
         {
           "name": "type",
+          "description": "The type of association.",
+          "comments": [
+            "when instantiating Association objects in Python and other languages, it isn't necessary to populate this, it is auto-populated from the object class."
+          ],
           "designates_type": true,
           "@type": "SlotDefinition"
         },
         {
           "name": "evidence",
+          "description": "The set of evidence items that support the association.",
           "range": "EvidenceItem",
           "multivalued": true,
           "inlined": true,
@@ -1555,6 +2448,7 @@
         },
         {
           "name": "provenances",
+          "description": "The set of provenance objects that provide metadata about who made the association.",
           "range": "ProvenanceInfo",
           "multivalued": true,
           "inlined_as_list": true,
@@ -1567,7 +2461,10 @@
     {
       "name": "EnabledByAssociation",
       "definition_uri": "https://w3id.org/gocam/EnabledByAssociation",
-      "description": "An association between an activity and the gene product or complex that carries it out",
+      "description": "An association between an activity and the gene product or complex or set of potential gene products\n  that carry out that activity.",
+      "comments": [
+        "Note that this is an abstract class, and should ot be instantiated directly, instead instantiate a subclass depending on what kind of entity enables the association"
+      ],
       "from_schema": "https://w3id.org/gocam",
       "is_a": "Association",
       "abstract": true,
@@ -1592,7 +2489,7 @@
     {
       "name": "EnabledByGeneProductAssociation",
       "definition_uri": "https://w3id.org/gocam/EnabledByGeneProductAssociation",
-      "description": "An association between an activity and a gene product",
+      "description": "An association between an activity and an individual gene product",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "EnabledByAssociation",
       "slots": [
@@ -1608,7 +2505,10 @@
     {
       "name": "EnabledByProteinComplexAssociation",
       "definition_uri": "https://w3id.org/gocam/EnabledByProteinComplexAssociation",
-      "description": "An association between an activity and a protein complex",
+      "description": "An association between an activity and a protein complex, where the complex carries out the activity. This should only be used when the activity cannot be attributed to an individual member of the complex, but instead the function is an emergent property of the complex.",
+      "comments": [
+        "Protein complexes can be specified either by *pre-composition* or *post-composition*. For pre-composition, a species-specific named protein complex (such as an entry in ComplexPortal) can be specified, in which case the value of `members` is *implicit*. For post-composition, the placeholder term \"GO:0032991\" can be used, in which case `members` must be *explicitly* specified. An intermediate case is when a named class in GO that is a subclass of \"GO:0032991\" is used. In this case, `members` should still be specified, as this may only be partially specified by the GO class."
+      ],
       "from_schema": "https://w3id.org/gocam",
       "is_a": "EnabledByAssociation",
       "slots": [
@@ -1629,6 +2529,32 @@
         }
       ],
       "class_uri": "https://w3id.org/gocam/EnabledByProteinComplexAssociation",
+      "rules": [
+        {
+          "preconditions": {
+            "slot_conditions": [
+              {
+                "name": "term",
+                "equals_string": "GO:0032991",
+                "@type": "SlotDefinition"
+              }
+            ],
+            "@type": "AnonymousClassExpression"
+          },
+          "postconditions": {
+            "slot_conditions": [
+              {
+                "name": "members",
+                "required": true,
+                "@type": "SlotDefinition"
+              }
+            ],
+            "@type": "AnonymousClassExpression"
+          },
+          "title": "members must be specified when the generic GO complex is specified",
+          "@type": "ClassRule"
+        }
+      ],
       "@type": "ClassDefinition"
     },
     {
@@ -1668,7 +2594,7 @@
     {
       "name": "TermAssociation",
       "definition_uri": "https://w3id.org/gocam/TermAssociation",
-      "description": "An association between an activity and a term, potentially with extensions",
+      "description": "An association between an activity and a term, potentially with extensions. This is an abstract class for grouping purposes, it should not be directly instantiated, instead a subclass should be instantiated.",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "Association",
       "abstract": true,
@@ -1695,7 +2621,7 @@
       "definition_uri": "https://w3id.org/gocam/MolecularFunctionAssociation",
       "description": "An association between an activity and a molecular function term",
       "todos": [
-        "account for non-MF activity types in Reactome"
+        "account for non-MF activity types in Reactome (MolecularEvent)"
       ],
       "from_schema": "https://w3id.org/gocam",
       "is_a": "TermAssociation",
@@ -1734,7 +2660,8 @@
         {
           "name": "part_of",
           "description": "Optional extension allowing hierarchical nesting of BPs",
-          "range": "BiologicalProcessTermObject",
+          "range": "BiologicalProcessAssociation",
+          "inlined": true,
           "@type": "SlotDefinition"
         }
       ],
@@ -1758,7 +2685,9 @@
       "attributes": [
         {
           "name": "part_of",
+          "description": "Optional extension allowing hierarchical nesting of CCs",
           "range": "CellTypeAssociation",
+          "inlined": true,
           "@type": "SlotDefinition"
         }
       ],
@@ -1924,7 +2853,7 @@
         "ECO"
       ],
       "definition_uri": "https://w3id.org/gocam/EvidenceTermObject",
-      "description": "A term object that represents an evidence term from ECO",
+      "description": "A term object that represents an evidence term from ECO. Only ECO terms that map up to a GO GAF evidence code should be used.",
       "from_schema": "https://w3id.org/gocam",
       "is_a": "TermObject",
       "slots": [
@@ -2182,6 +3111,7 @@
         {
           "name": "contributor",
           "slot_uri": "dct:contributor",
+          "multivalued": true,
           "@type": "SlotDefinition"
         },
         {
@@ -2191,24 +3121,369 @@
         },
         {
           "name": "date",
+          "todos": [
+            "consider modeling as date rather than string"
+          ],
           "slot_uri": "dct:date",
           "@type": "SlotDefinition"
         },
         {
           "name": "provided_by",
           "slot_uri": "pav:providedBy",
+          "multivalued": true,
           "@type": "SlotDefinition"
         }
       ],
       "class_uri": "https://w3id.org/gocam/ProvenanceInfo",
       "@type": "ClassDefinition"
+    },
+    {
+      "name": "QueryIndex",
+      "definition_uri": "https://w3id.org/gocam/QueryIndex",
+      "description": "An index that is optionally placed on a model in order to support common query or index operations. Note that this index is not typically populated in the working transactional store for a model, it is derived via computation from core primary model information.",
+      "from_schema": "https://w3id.org/gocam",
+      "slots": [
+        "queryIndex__number_of_activities",
+        "queryIndex__number_of_enabled_by_terms",
+        "queryIndex__number_of_causal_associations",
+        "queryIndex__length_of_longest_causal_association_path",
+        "queryIndex__number_of_strongly_connected_components",
+        "queryIndex__flattened_references",
+        "queryIndex__model_activity_molecular_function_terms",
+        "queryIndex__model_activity_molecular_function_closure",
+        "queryIndex__model_activity_molecular_function_rollup",
+        "queryIndex__model_activity_occurs_in_terms",
+        "queryIndex__model_activity_occurs_in_closure",
+        "queryIndex__model_activity_occurs_in_rollup",
+        "queryIndex__model_activity_enabled_by_terms",
+        "queryIndex__model_activity_enabled_by_closure",
+        "queryIndex__model_activity_enabled_by_rollup",
+        "queryIndex__model_activity_part_of_terms",
+        "queryIndex__model_activity_part_of_closure",
+        "queryIndex__model_activity_part_of_rollup",
+        "queryIndex__model_activity_has_input_terms",
+        "queryIndex__model_activity_has_input_closure",
+        "queryIndex__model_activity_has_input_rollup",
+        "queryIndex__model_taxon",
+        "queryIndex__model_taxon_closure",
+        "queryIndex__model_taxon_rollup",
+        "queryIndex__annoton_terms",
+        "queryIndex__start_activities",
+        "queryIndex__end_activities",
+        "queryIndex__intermediate_activities",
+        "queryIndex__singleton_activities",
+        "queryIndex__number_of_start_activities",
+        "queryIndex__number_of_end_activities",
+        "queryIndex__number_of_intermediate_activities",
+        "queryIndex__number_of_singleton_activities"
+      ],
+      "slot_usage": {},
+      "attributes": [
+        {
+          "name": "number_of_activities",
+          "description": "The number of activities in a model.",
+          "comments": [
+            "this includes all activities, even those without an enabler."
+          ],
+          "range": "integer",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "number_of_enabled_by_terms",
+          "description": "The number of molecular entities or sets of entities in a model.",
+          "range": "integer",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "number_of_causal_associations",
+          "description": "Total number of causal association edges connecting activities in a model.",
+          "todos": [
+            "decide what to do about \"implicit\" causal associations, i.e provides_input_for"
+          ],
+          "range": "integer",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "length_of_longest_causal_association_path",
+          "description": "The maximum number of hops along activities along the direction of causal flow in a model.",
+          "range": "integer",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "number_of_strongly_connected_components",
+          "description": "The number of distinct components that consist of activities that are connected (directly or indirectly) via causal connections. Most models will consist of a single SCC. Some models may consist of two or more \"islands\" where there is no connection from one island to another.",
+          "range": "integer",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "flattened_references",
+          "description": "All publication objects from the model across different levels combined in one place",
+          "range": "PublicationObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_molecular_function_terms",
+          "description": "All MF terms for all activities",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_molecular_function_closure",
+          "annotations": [
+            {
+              "tag": "closure_computed_over",
+              "value": "[rdfs:subClassOf]",
+              "@type": "Annotation"
+            }
+          ],
+          "description": "The reflexive transitive closure of `model_activity_molecular_function_terms`, over the is_a relationship",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_molecular_function_rollup",
+          "description": "The rollup of `model_activity_molecular_function_closure` to a GO subset or slim.",
+          "comments": [
+            "added for completion but may not be useful in practice"
+          ],
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_occurs_in_terms",
+          "description": "All direct cellular component localization terms for all activities",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_occurs_in_closure",
+          "annotations": [
+            {
+              "tag": "closure_computed_over",
+              "value": "[rdfs:subClassOf, BFO:0000050]",
+              "@type": "Annotation"
+            }
+          ],
+          "description": "The reflexive transitive closure of `model_activity_occurs_in_terms`, over the is_a and part_of relationship type",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_occurs_in_rollup",
+          "description": "The rollup of `model_activity_occurs_in_closure` to a GO subset or slim.",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_enabled_by_terms",
+          "description": "All direct enabler terms for all activities",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_enabled_by_closure",
+          "annotations": [
+            {
+              "tag": "closure_computed_over",
+              "value": "[rdfs:subClassOf, BFO:0000051]",
+              "@type": "Annotation"
+            }
+          ],
+          "description": "The reflexive transitive closure of `model_activity_enabled_by_terms`, over the is_a and has_part relationship type (e.g. complex to parts)",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_enabled_by_rollup",
+          "description": "The rollup of `model_activity_enabled_by_closure` to a GO subset or slim.",
+          "comments": [
+            "added for completion but may not be useful in practice"
+          ],
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_part_of_terms",
+          "description": "All direct biological process terms for all activities",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_part_of_closure",
+          "annotations": [
+            {
+              "tag": "closure_computed_over",
+              "value": "[rdfs:subClassOf, BFO:0000050]",
+              "@type": "Annotation"
+            }
+          ],
+          "description": "The reflexive transitive closure of `model_activity_part_of_terms`, over the is_a and part_of relationship type",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_part_of_rollup",
+          "description": "The rollup of `model_activity_part_of_closure` to a GO subset or slim.",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_has_input_terms",
+          "description": "All direct input terms for all activities",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_has_input_closure",
+          "annotations": [
+            {
+              "tag": "closure_computed_over",
+              "value": "[rdfs:subClassOf]",
+              "@type": "Annotation"
+            }
+          ],
+          "description": "The reflexive transitive closure of `model_activity_has_input_terms`, over the is_a relationship type",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_activity_has_input_rollup",
+          "description": "The rollup of `model_activity_has_input_closure` to a GO subset or slim.",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_taxon",
+          "description": "The primary taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the primary taxon that the model is relevant to.",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_taxon_closure",
+          "annotations": [
+            {
+              "tag": "closure_computed_over",
+              "value": "[rdfs:subClassOf]",
+              "@type": "Annotation"
+            }
+          ],
+          "description": "The reflexive transitive closure of the taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the set of taxa that are relevant to the model.",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "model_taxon_rollup",
+          "description": "The rollup of the taxon closure to a NCBITaxon subset or slim.",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "annoton_terms",
+          "range": "TermObject",
+          "multivalued": true,
+          "inlined_as_list": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "start_activities",
+          "description": "The set of activities that are the starting points of the model, i.e. those that have no incoming causal associations.",
+          "range": "Activity",
+          "multivalued": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "end_activities",
+          "description": "The set of activities that are the end points of the model, i.e. those that have no outgoing causal associations.",
+          "range": "Activity",
+          "multivalued": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "intermediate_activities",
+          "description": "The set of activities that are neither start nor end activities, i.e. those that have both incoming and outgoing causal associations.",
+          "range": "Activity",
+          "multivalued": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "singleton_activities",
+          "description": "The set of activities that have no causal associations, i.e. those that are not connected to any other activity in the model.",
+          "range": "Activity",
+          "multivalued": true,
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "number_of_start_activities",
+          "description": "The number of start activities in a model",
+          "range": "integer",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "number_of_end_activities",
+          "description": "The number of end activities in a model",
+          "range": "integer",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "number_of_intermediate_activities",
+          "description": "The number of intermediate activities in a model",
+          "range": "integer",
+          "@type": "SlotDefinition"
+        },
+        {
+          "name": "number_of_singleton_activities",
+          "description": "The number of singleton activities in a model",
+          "range": "integer",
+          "@type": "SlotDefinition"
+        }
+      ],
+      "class_uri": "https://w3id.org/gocam/QueryIndex",
+      "@type": "ClassDefinition"
     }
   ],
   "metamodel_version": "1.7.0",
   "source_file": "gocam.yaml",
-  "source_file_date": "2025-01-27T20:23:30",
-  "source_file_size": 13819,
-  "generation_date": "2025-01-27T20:25:17",
+  "source_file_date": "2025-07-29T09:39:20",
+  "source_file_size": 31448,
+  "generation_date": "2025-07-29T09:39:31",
   "@type": "SchemaDefinition",
   "@context": [
     "project/jsonld/gocam.context.jsonld",

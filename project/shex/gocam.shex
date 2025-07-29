@@ -79,7 +79,7 @@ linkml:Sparqlpath xsd:string
     (  $<BiologicalProcessAssociation_tes> (  &<TermAssociation_tes> ;
           rdf:type [ <TermAssociation> ] ? ;
           <happens_during> @<PhaseTermObject> ? ;
-          <part_of> @<BiologicalProcessTermObject> ? ;
+          <part_of> @<BiologicalProcessAssociation> ? ;
           <term> @<BiologicalProcessTermObject> ?
        ) ;
        rdf:type [ <BiologicalProcessAssociation> ] ?
@@ -229,13 +229,17 @@ linkml:Sparqlpath xsd:string
 }
 
 <Model> CLOSED {
-    (  $<Model_tes> (  dct:title @linkml:String ? ;
+    (  $<Model_tes> (  dct:title @linkml:String ;
           <taxon> @<TaxonTermObject> ? ;
-          pav:status [ <https://w3id.org/gocam/ModelStateEnum#production> <https://w3id.org/gocam/ModelStateEnum#development> ] ? ;
+          <additional_taxa> @<TaxonTermObject> * ;
+          pav:status [ <https://w3id.org/gocam/ModelStateEnum#development> <https://w3id.org/gocam/ModelStateEnum#production>
+             <https://w3id.org/gocam/ModelStateEnum#delete> <https://w3id.org/gocam/ModelStateEnum#review>
+             <https://w3id.org/gocam/ModelStateEnum#internal_test> <https://w3id.org/gocam/ModelStateEnum#closed> ] ? ;
           rdfs1:comment @linkml:String * ;
           <activities> @<Activity> * ;
           <objects> @<Object> * ;
-          <provenances> @<ProvenanceInfo> *
+          <provenances> @<ProvenanceInfo> * ;
+          <query_index> @<QueryIndex> ?
        ) ;
        rdf:type [ <Model> ]
     )
@@ -311,10 +315,10 @@ linkml:Sparqlpath xsd:string
 }
 
 <ProvenanceInfo> CLOSED {
-    (  $<ProvenanceInfo_tes> (  dct:contributor @linkml:String ? ;
+    (  $<ProvenanceInfo_tes> (  dct:contributor @linkml:String * ;
           dct:created @linkml:String ? ;
           dct:date @linkml:String ? ;
-          pav:providedBy @linkml:String ?
+          pav:providedBy @linkml:String *
        ) ;
        rdf:type [ <ProvenanceInfo> ] ?
     )
@@ -327,6 +331,45 @@ linkml:Sparqlpath xsd:string
           <full_text> @linkml:String ?
        ) ;
        rdf:type [ <PublicationObject> ]
+    )
+}
+
+<QueryIndex> CLOSED {
+    (  $<QueryIndex_tes> (  <number_of_activities> @linkml:Integer ? ;
+          <number_of_enabled_by_terms> @linkml:Integer ? ;
+          <number_of_causal_associations> @linkml:Integer ? ;
+          <length_of_longest_causal_association_path> @linkml:Integer ? ;
+          <number_of_strongly_connected_components> @linkml:Integer ? ;
+          <flattened_references> @<PublicationObject> * ;
+          <model_activity_molecular_function_terms> @<TermObject> * ;
+          <model_activity_molecular_function_closure> @<TermObject> * ;
+          <model_activity_molecular_function_rollup> @<TermObject> * ;
+          <model_activity_occurs_in_terms> @<TermObject> * ;
+          <model_activity_occurs_in_closure> @<TermObject> * ;
+          <model_activity_occurs_in_rollup> @<TermObject> * ;
+          <model_activity_enabled_by_terms> @<TermObject> * ;
+          <model_activity_enabled_by_closure> @<TermObject> * ;
+          <model_activity_enabled_by_rollup> @<TermObject> * ;
+          <model_activity_part_of_terms> @<TermObject> * ;
+          <model_activity_part_of_closure> @<TermObject> * ;
+          <model_activity_part_of_rollup> @<TermObject> * ;
+          <model_activity_has_input_terms> @<TermObject> * ;
+          <model_activity_has_input_closure> @<TermObject> * ;
+          <model_activity_has_input_rollup> @<TermObject> * ;
+          <model_taxon> @<TermObject> * ;
+          <model_taxon_closure> @<TermObject> * ;
+          <model_taxon_rollup> @<TermObject> * ;
+          <annoton_terms> @<TermObject> * ;
+          <start_activities> @<Activity> * ;
+          <end_activities> @<Activity> * ;
+          <intermediate_activities> @<Activity> * ;
+          <singleton_activities> @<Activity> * ;
+          <number_of_start_activities> @linkml:Integer ? ;
+          <number_of_end_activities> @linkml:Integer ? ;
+          <number_of_intermediate_activities> @linkml:Integer ? ;
+          <number_of_singleton_activities> @linkml:Integer ?
+       ) ;
+       rdf:type [ <QueryIndex> ] ?
     )
 }
 
