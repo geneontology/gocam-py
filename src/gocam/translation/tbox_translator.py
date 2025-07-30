@@ -7,10 +7,9 @@ from pyhornedowl.pyhornedowl import PyIndexedOntology
 
 from gocam.datamodel import Model, Activity, TermAssociation, BiologicalProcessAssociation, \
     CellularAnatomicalEntityTermObject, CellularAnatomicalEntityAssociation, CellTypeAssociation, \
-    GrossAnatomyAssociation, EnabledByProteinComplexAssociation, EnabledByGeneProductAssociation, MoleculeAssociation
-from gocam.translation.minerva_wrapper import OCCURS_IN, HAS_INPUT, HAS_PRIMARY_INPUT, HAS_PRIMARY_OUTPUT
-from tests.test_translation.test_minerva_wrapper import ENABLED_BY
-from tmp.gocam import MolecularFunctionAssociation
+    GrossAnatomyAssociation, EnabledByProteinComplexAssociation, EnabledByGeneProductAssociation, MoleculeAssociation, \
+    MolecularFunctionAssociation
+from gocam.translation.minerva_wrapper import OCCURS_IN, HAS_INPUT, HAS_PRIMARY_INPUT, HAS_PRIMARY_OUTPUT, ENABLED_BY
 import pyhornedowl
 from pyhornedowl.model import SubClassOf, ObjectSomeValuesFrom, IRI, Class, ObjectProperty, DeclareClass, \
     AnnotationAssertion, Annotation, SimpleLiteral
@@ -133,7 +132,7 @@ class TBoxTranslator:
         if activity.occurs_in:
             yield from self.translate_cellular_anatomical_entity(model, activity.id, activity.occurs_in)
         yield from self.translate_io(activity.id, activity.has_input, HAS_INPUT)
-        yield from self.translate_io(activity.id, [activity.has_primary_output], HAS_PRIMARY_INPUT)
+        yield from self.translate_io(activity.id, [activity.has_primary_input], HAS_PRIMARY_INPUT)
         yield from self.translate_io(activity.id, activity.has_output, HAS_OUTPUT)
         yield from self.translate_io(activity.id, [activity.has_primary_output], HAS_PRIMARY_OUTPUT)
 
