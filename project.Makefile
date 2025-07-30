@@ -23,6 +23,13 @@ data/gocam-flattened.jsonl: data/gocam-indexed.json
 	$(RUN) gocam flatten-models -O jsonl $< -o $@.tmp && mv $@.tmp $@
 .PRECIOUS: data/gocam-flattened.yaml
 
+data/gocam.owl: data/gocam.yaml
+	$(RUN) gocam convert -O owl $< -o $@.tmp && mv $@.tmp $@
+.PRECIOUS: data/gocam.owl
+
+data/gocam.cx2: data/gocam.yaml
+	$(RUN) gocam convert -O cx2 $< -o $@.tmp && mv $@.tmp $@
+
 mongodb-load-flattened: data/gocam-flattened.jsonl
 	linkml-store -d gocams -c flattened insert --replace $<
 

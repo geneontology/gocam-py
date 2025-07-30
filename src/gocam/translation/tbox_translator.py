@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Iterator, Union, Iterable, Optional, Dict, List
 
+from mkdocs.commands.serve import serve
 from oaklib.datamodels.vocabulary import IN_TAXON, RDFS_LABEL, PART_OF, IS_A, HAS_PART, MOLECULAR_FUNCTION, HAS_OUTPUT
 from pyhornedowl.pyhornedowl import PyIndexedOntology
 
@@ -13,6 +14,9 @@ from tmp.gocam import MolecularFunctionAssociation
 import pyhornedowl
 from pyhornedowl.model import SubClassOf, ObjectSomeValuesFrom, IRI, Class, ObjectProperty, DeclareClass, \
     AnnotationAssertion, Annotation, SimpleLiteral
+import logging
+
+logger = logging.getLogger(__name__)
 
 HAPPENS_DURING = "RO:0002092"
 
@@ -57,8 +61,20 @@ class TBoxTranslator:
         :return:
         """
         for model in models:
+            logger.info(f"Translating model {model.id} with title {model.title}")
             for axiom in self.translate_model_iter(model):
                 self.ontology.add_axiom(axiom)
+
+    def save_ontology(self, path: str, serialization : Optional[str] = None) -> None:
+        """
+        Save the current ontology to a file.
+
+        :param path: The file path to save the ontology.
+        :param serialization: The serialization format (e.g., "ofn", "turtle", "owlxml"). If None, defaults to "ofn".
+        """
+        if not serialization:
+            serialization = "ofn"
+        self.ontology.save_to_file(path, serialization=serialization)
 
     def translate_model_iter(self, model: Model) -> Iterator[SIMPLE_AXIOM]:
         """
@@ -73,7 +89,10 @@ class TBoxTranslator:
             yield from self.translate_activity(model, a)
             # yield from self.add_edge(a.id, PART_OF, model.id)
         taxon = model.taxon
-        yield from self.add_annotation(model.id, IN_TAXON, taxon)
+        if taxon:
+            yield from self.add_annotation(model.id, IN_TAXON, taxon)
+        else:
+            logger.warning(f"Model {model.id} has no taxon")
 
     def translate_activity(self, model: Model, activity: Activity) -> Iterator[SIMPLE_AXIOM]:
         if activity.molecular_function:
@@ -114,9 +133,9 @@ class TBoxTranslator:
         if activity.occurs_in:
             yield from self.translate_cellular_anatomical_entity(model, activity.id, activity.occurs_in)
         yield from self.translate_io(activity.id, activity.has_input, HAS_INPUT)
-        yield from self.translate_io(activity.id, activity.has_primary_output, HAS_PRIMARY_INPUT)
+        yield from self.translate_io(activity.id, [activity.has_primary_output], HAS_PRIMARY_INPUT)
         yield from self.translate_io(activity.id, activity.has_output, HAS_OUTPUT)
-        yield from self.translate_io(activity.id, activity.has_primary_output, HAS_PRIMARY_OUTPUT)
+        yield from self.translate_io(activity.id, [activity.has_primary_output], HAS_PRIMARY_OUTPUT)
 
     def _process_part_of_root(self, model: Model, ta: Union[Activity, BiologicalProcessAssociation]) -> str:
         if ta.part_of:
@@ -165,7 +184,8 @@ class TBoxTranslator:
     def translate_io(self, subject: str, tas: Optional[List[MoleculeAssociation]], predicate: str) -> Iterator[SubClassOf]:
         if tas:
             for ta in tas:
-                yield from self.add_edge(subject, predicate, ta.term)
+                if ta and ta.term and subject:
+                    yield from self.add_edge(subject, predicate, ta.term)
 
     def add_annotation(self, subject: str, predicate: str, object: str) -> Iterator[AnnotationAssertion]:
         p_iri = self.iri(predicate)
@@ -191,7 +211,11 @@ class TBoxTranslator:
         try:
             return self.ontology.curie(id)
         except ValueError as e:
-            [pfx, _] = id.split(":")
+            if ":" not in id:
+                id = f"TEMP:{id}"
+                logger.warning(f"Assuming {id} is a CURIE, but it does not contain a prefix")
+            id_parts = id.split(":")
+            pfx = id_parts[0]
             self.ontology.add_prefix_mapping(pfx, f"http://identifiers.org/{pfx}:")
             try:
                 return self.ontology.curie(id)

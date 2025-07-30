@@ -10,6 +10,7 @@ import click
 import ndex2
 import yaml
 from linkml_runtime.loaders import json_loader, yaml_loader
+from mkdocs.commands.serve import serve
 
 from gocam import __version__
 from gocam.datamodel import Model
@@ -18,6 +19,9 @@ from gocam.translation.cx2 import model_to_cx2
 from gocam.indexing.Indexer import Indexer
 from gocam.indexing.Flattener import Flattener
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 @click.group()
 @click.option("-v", "--verbose", count=True)
@@ -131,13 +135,16 @@ def fetch(model_ids, as_minerva, format, add_indexes):
     type=click.Choice(["json", "yaml"]),
     help="Input format. Not required unless reading from stdin.",
 )
-@click.option("--output-format", "-O", type=click.Choice(["cx2"]), required=True)
+@click.option("--output-format", "-O", type=click.Choice(["cx2", "owl"]), required=True)
 @click.option("--output", "-o", type=click.File("w"), default="-")
 @click.option("--dot-layout", is_flag=True, help="Apply dot layout (requires Graphviz)")
 @click.option("--ndex-upload", is_flag=True, help="Upload to NDEx (only for CX2)")
 @click.argument("model", type=click.File("r"), default="-")
 def convert(model, input_format, output_format, output, dot_layout, ndex_upload):
-    """Convert GO-CAM models."""
+    """Convert GO-CAM models.
+
+    Currently supports converting to CX2 format and uploading to NDEx.
+    """
     if ndex_upload and output_format != "cx2":
         raise click.UsageError("NDEx upload requires output format to be CX2")
 
@@ -152,16 +159,25 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
     if input_format == "json":
         deserialized = json.load(model)
     elif input_format == "yaml":
-        deserialized = yaml.safe_load(model)
+        deserialized = list(yaml.safe_load_all(model))
     else:
         raise click.UsageError("Invalid input format")
 
     try:
-        model = Model.model_validate(deserialized)
+        if isinstance(deserialized, list):
+            logger.info(f"Parsing {len(deserialized)} models from input")
+            models = [Model.model_validate(m) for m in deserialized]
+        else:
+            logger.info("Parsing a single model from input")
+            models = [Model.model_validate(deserialized)]
+        logger.info(f"Parsed {len(models)} models from input")
     except Exception as e:
         raise click.UsageError(f"Could not load model: {e}")
 
     if output_format == "cx2":
+        if len(models) != 1:
+            raise click.UsageError("CX2 format only supports a single model")
+        model = models[0]
         cx2 = model_to_cx2(model, apply_dot_layout=dot_layout)
 
         if ndex_upload:
@@ -185,6 +201,11 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
             )
         else:
             click.echo(json.dumps(cx2), file=output)
+    elif output_format == "owl":
+        from gocam.translation.tbox_translator import TBoxTranslator
+        tbox_translator = TBoxTranslator()
+        tbox_translator.load_models(models)
+        tbox_translator.save_ontology(output.name, serialization="ofn")
 
 
 @cli.command()

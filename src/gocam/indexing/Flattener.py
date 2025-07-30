@@ -14,6 +14,11 @@ ROW = Dict[str, FIELD_VALUE]
 class Flattener:
     """
     A class to flatten a GO-CAM model into a single row representation.
+
+    Each field in the row is either:
+
+    - an atomic value (str, int, float, bool, None)
+    - a list of strings (for fields that are lists in the model, e.g. terms)
     """
     fields: Optional[List[str]] = None
 

@@ -43,4 +43,5 @@ def test_model_to_tbox(example_model):
     axioms = ont.get_axioms()
     for a in axioms:
         print(a)
+    OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
     ont.save_to_file(str(OUTPUT_DIR / f"{model_acc}.ofn"))
