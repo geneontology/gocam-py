@@ -272,7 +272,7 @@ class MinervaWrapper:
         enabled_by_facts = facts_by_property.get(ENABLED_BY, [])
         if not enabled_by_facts:
             logger.warning(f"Missing {ENABLED_BY} facts in {facts_by_property}")
-            # raise ValueError(f"Missing {ENABLED_BY} in {facts_by_property}")
+            raise ValueError(f"Missing {ENABLED_BY} in {facts_by_property}")
         for fact in enabled_by_facts:
             subject, object_ = fact["subject"], fact["object"]
             if subject not in individual_to_term:
