@@ -215,7 +215,7 @@ class Indexer:
             """
             Filter terms to only those in the specified subsets.
             """
-            return [t for t in terms if t.id in subset_terms]
+            return list({t for t in terms if t.id in subset_terms})
 
 
         mf_direct, mf_closure = self._get_closures(all_mfs)
