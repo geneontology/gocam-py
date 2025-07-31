@@ -305,8 +305,10 @@ class MinervaWrapper:
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
             else:
-                logger.warning(f"Unknown enabled_by type for {object_}")
-                continue
+                logger.warning(f"Unknown enabled_by type for {object_}; assuming gene product")
+                enabled_by_association = EnabledByGeneProductAssociation(
+                    term=gene_id, evidence=evs, provenances=[prov]
+                )
 
             activity = Activity(
                 id=subject,
