@@ -587,7 +587,7 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 </tr>
 <tr>
 <td><a href="end_activities/">end_activities</a></td>
-<td></td>
+<td>The set of activities that are the end points of the model, i</td>
 </tr>
 <tr>
 <td><a href="evidence/">evidence</a></td>
@@ -627,7 +627,7 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 </tr>
 <tr>
 <td><a href="intermediate_activities/">intermediate_activities</a></td>
-<td></td>
+<td>The set of activities that are neither start nor end activities, i</td>
 </tr>
 <tr>
 <td><a href="label/">label</a></td>
@@ -642,16 +642,36 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <td>The gene products that are part of the complex</td>
 </tr>
 <tr>
+<td><a href="model_activity_enabled_by_closure/">model_activity_enabled_by_closure</a></td>
+<td>The reflexive transitive closure of <code>model_activity_enabled_by_terms</code>, over t...</td>
+</tr>
+<tr>
+<td><a href="model_activity_enabled_by_rollup/">model_activity_enabled_by_rollup</a></td>
+<td>The rollup of <code>model_activity_enabled_by_closure</code> to a GO subset or slim</td>
+</tr>
+<tr>
+<td><a href="model_activity_enabled_by_terms/">model_activity_enabled_by_terms</a></td>
+<td>All direct enabler terms for all activities</td>
+</tr>
+<tr>
 <td><a href="model_activity_has_input_closure/">model_activity_has_input_closure</a></td>
-<td></td>
+<td>The reflexive transitive closure of <code>model_activity_has_input_terms</code>, over th...</td>
+</tr>
+<tr>
+<td><a href="model_activity_has_input_rollup/">model_activity_has_input_rollup</a></td>
+<td>The rollup of <code>model_activity_has_input_closure</code> to a GO subset or slim</td>
 </tr>
 <tr>
 <td><a href="model_activity_has_input_terms/">model_activity_has_input_terms</a></td>
-<td></td>
+<td>All direct input terms for all activities</td>
 </tr>
 <tr>
 <td><a href="model_activity_molecular_function_closure/">model_activity_molecular_function_closure</a></td>
 <td>The reflexive transitive closure of <code>model_activity_molecular_function_terms</code>...</td>
+</tr>
+<tr>
+<td><a href="model_activity_molecular_function_rollup/">model_activity_molecular_function_rollup</a></td>
+<td>The rollup of <code>model_activity_molecular_function_closure</code> to a GO subset or s...</td>
 </tr>
 <tr>
 <td><a href="model_activity_molecular_function_terms/">model_activity_molecular_function_terms</a></td>
@@ -659,19 +679,39 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 </tr>
 <tr>
 <td><a href="model_activity_occurs_in_closure/">model_activity_occurs_in_closure</a></td>
-<td></td>
+<td>The reflexive transitive closure of <code>model_activity_occurs_in_terms</code>, over th...</td>
+</tr>
+<tr>
+<td><a href="model_activity_occurs_in_rollup/">model_activity_occurs_in_rollup</a></td>
+<td>The rollup of <code>model_activity_occurs_in_closure</code> to a GO subset or slim</td>
 </tr>
 <tr>
 <td><a href="model_activity_occurs_in_terms/">model_activity_occurs_in_terms</a></td>
-<td></td>
+<td>All direct cellular component localization terms for all activities</td>
 </tr>
 <tr>
 <td><a href="model_activity_part_of_closure/">model_activity_part_of_closure</a></td>
-<td></td>
+<td>The reflexive transitive closure of <code>model_activity_part_of_terms</code>, over the ...</td>
+</tr>
+<tr>
+<td><a href="model_activity_part_of_rollup/">model_activity_part_of_rollup</a></td>
+<td>The rollup of <code>model_activity_part_of_closure</code> to a GO subset or slim</td>
 </tr>
 <tr>
 <td><a href="model_activity_part_of_terms/">model_activity_part_of_terms</a></td>
-<td></td>
+<td>All direct biological process terms for all activities</td>
+</tr>
+<tr>
+<td><a href="model_taxon/">model_taxon</a></td>
+<td>The primary taxon term for the model, over the NCBITaxon:subClassOf relations...</td>
+</tr>
+<tr>
+<td><a href="model_taxon_closure/">model_taxon_closure</a></td>
+<td>The reflexive transitive closure of the taxon term for the model, over the NC...</td>
+</tr>
+<tr>
+<td><a href="model_taxon_rollup/">model_taxon_rollup</a></td>
+<td>The rollup of the taxon closure to a NCBITaxon subset or slim</td>
 </tr>
 <tr>
 <td><a href="molecular_function/">molecular_function</a></td>
@@ -747,11 +787,11 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 </tr>
 <tr>
 <td><a href="singleton_activities/">singleton_activities</a></td>
-<td></td>
+<td>The set of activities that have no causal associations, i</td>
 </tr>
 <tr>
 <td><a href="start_activities/">start_activities</a></td>
-<td></td>
+<td>The set of activities that are the starting points of the model, i</td>
 </tr>
 <tr>
 <td><a href="status/">status</a></td>
@@ -760,10 +800,6 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <tr>
 <td><a href="taxon/">taxon</a></td>
 <td>The primary taxon that the model is about</td>
-</tr>
-<tr>
-<td><a href="taxon_closure/">taxon_closure</a></td>
-<td></td>
 </tr>
 <tr>
 <td><a href="term/">term</a></td>
