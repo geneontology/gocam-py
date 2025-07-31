@@ -585,59 +585,132 @@ classes:
         inlined_as_list: true
         annotations:
           closure_computed_over: "[rdfs:subClassOf]"
+      model_activity_molecular_function_rollup:
+        description: The rollup of `model_activity_molecular_function_closure` to a GO subset or slim.
+        comments:
+          - added for completion but may not be useful in practice
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
       model_activity_occurs_in_terms:
+        description: All direct cellular component localization terms for all activities
         range: TermObject
         multivalued: true
         inlined_as_list: true
       model_activity_occurs_in_closure:
+        description: The reflexive transitive closure of `model_activity_occurs_in_terms`, over the is_a and part_of
+          relationship type
         range: TermObject
         multivalued: true
         inlined_as_list: true
         annotations:
           closure_computed_over: "[rdfs:subClassOf, BFO:0000050]"
+      model_activity_occurs_in_rollup:
+        description: The rollup of `model_activity_occurs_in_closure` to a GO subset or slim.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_enabled_by_terms:
+        description: All direct enabler terms for all activities
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_enabled_by_closure:
+        description: The reflexive transitive closure of `model_activity_enabled_by_terms`, over the is_a
+          and has_part relationship type (e.g. complex to parts)
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+        annotations:
+          closure_computed_over: "[rdfs:subClassOf, BFO:0000051]"
+      model_activity_enabled_by_rollup:
+        description: The rollup of `model_activity_enabled_by_closure` to a GO subset or slim.
+        comments:
+          - added for completion but may not be useful in practice
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
       model_activity_part_of_terms:
+        description: All direct biological process terms for all activities
         range: TermObject
         multivalued: true
         inlined_as_list: true
       model_activity_part_of_closure:
+        description: The reflexive transitive closure of `model_activity_part_of_terms`, over the is_a and part_of
+          relationship type
         range: TermObject
         multivalued: true
         inlined_as_list: true
         annotations:
           closure_computed_over: "[rdfs:subClassOf, BFO:0000050]"
+      model_activity_part_of_rollup:
+        description: The rollup of `model_activity_part_of_closure` to a GO subset or slim.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
       model_activity_has_input_terms:
+        description: All direct input terms for all activities
         range: TermObject
         multivalued: true
         inlined_as_list: true
       model_activity_has_input_closure:
+        description: The reflexive transitive closure of `model_activity_has_input_terms`, over the is_a
+          relationship type
         range: TermObject
         multivalued: true
         inlined_as_list: true
         annotations:
           closure_computed_over: "[rdfs:subClassOf]"
-      taxon_closure:
+      model_activity_has_input_rollup:
+        description: The rollup of `model_activity_has_input_closure` to a GO subset or slim.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_taxon:
+        description: The primary taxon term for the model, over the NCBITaxon:subClassOf relationship type.
+          This is used to determine the primary taxon that the model is relevant to.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_taxon_closure:
+        description: The reflexive transitive closure of the taxon term for the model, over the
+          NCBITaxon:subClassOf relationship type. This is used to determine the set of taxa that are
+          relevant to the model.
         range: TermObject
         multivalued: true
         inlined_as_list: true
         annotations:
           closure_computed_over: "[rdfs:subClassOf]"
+      model_taxon_rollup:
+        description: The rollup of the taxon closure to a NCBITaxon subset or slim.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
       annoton_terms:
         range: TermObject
         multivalued: true
         inlined_as_list: true
       start_activities:
+        description: The set of activities that are the starting points of the model, i.e. those that have no
+          incoming causal associations.
         range: Activity
         multivalued: true
         inlined: false
       end_activities:
+        description: The set of activities that are the end points of the model, i.e. those that have no
+          outgoing causal associations.
         range: Activity
         multivalued: true
         inlined: false
       intermediate_activities:
+        description: The set of activities that are neither start nor end activities, i.e. those that have
+          both incoming and outgoing causal associations.
         range: Activity
         multivalued: true
         inlined: false
       singleton_activities:
+        description: The set of activities that have no causal associations, i.e. those that are not connected
+          to any other activity in the model.
         range: Activity
         multivalued: true
         inlined: false
@@ -653,8 +726,6 @@ classes:
       number_of_singleton_activities:
         description: The number of singleton activities in a model
         range: integer
-
-
 
 
 enums:

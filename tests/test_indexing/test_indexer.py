@@ -6,7 +6,7 @@ import networkx as nx
 from linkml_runtime.loaders import yaml_loader
 
 from gocam.datamodel import Model, QueryIndex
-from gocam.indexing.indexer import Indexer
+from gocam.indexing.Indexer import Indexer
 from tests import EXAMPLES_DIR, INPUT_DIR
 
 
@@ -28,7 +28,7 @@ def mock_go_adapter():
 def test_index_model(example_model):
     """Test that a model can be indexed."""
     # Create an indexer with a mock GO adapter
-    with patch('gocam.indexing.indexer.get_adapter') as mock_get_adapter:
+    with patch('gocam.indexing.Indexer.get_adapter') as mock_get_adapter:
         mock_adapter = MagicMock()
         mock_adapter.ancestors.return_value = ["GO:0001", "GO:0002"]
         mock_adapter.label.return_value = "Test Term"
@@ -69,7 +69,7 @@ def test_index_model(example_model):
 
 def test_model_to_digraph(example_model, mock_go_adapter):
     """Test converting a model to a directed graph."""
-    with patch('gocam.indexing.indexer.get_adapter') as mock_get_adapter:
+    with patch('gocam.indexing.Indexer.get_adapter') as mock_get_adapter:
         mock_get_adapter.return_value = mock_go_adapter
         
         indexer = Indexer()
@@ -91,7 +91,7 @@ def test_model_to_digraph(example_model, mock_go_adapter):
 
 def test_get_closures(mock_go_adapter):
     """Test getting term closures."""
-    with patch('gocam.indexing.indexer.get_adapter') as mock_get_adapter:
+    with patch('gocam.indexing.Indexer.get_adapter') as mock_get_adapter:
         mock_get_adapter.return_value = mock_go_adapter
         
         indexer = Indexer()
@@ -117,7 +117,7 @@ def test_indexer_with_empty_model():
     model.activities = []
     
     # Create an indexer with a mock GO adapter
-    with patch('gocam.indexing.indexer.get_adapter') as mock_get_adapter:
+    with patch('gocam.indexing.Indexer.get_adapter') as mock_get_adapter:
         mock_adapter = MagicMock()
         mock_adapter.ancestors.return_value = []
         mock_adapter.label.return_value = "Test Term"

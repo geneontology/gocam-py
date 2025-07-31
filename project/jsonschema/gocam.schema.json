@@ -5,7 +5,7 @@
             "description": "An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model",
             "properties": {
                 "causal_associations": {
-                    "description": "The causal associations that connect this activity to other activities",
+                    "description": "The causal associations that flow out of this activity",
                     "items": {
                         "$ref": "#/$defs/CausalAssociation"
                     },
@@ -132,6 +132,7 @@
             "description": "An association between an activity and a biological process term",
             "properties": {
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -148,13 +149,18 @@
                     ]
                 },
                 "part_of": {
-                    "description": "Optional extension allowing hierarchical nesting of BPs",
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/BiologicalProcessAssociation"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Optional extension allowing hierarchical nesting of BPs"
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -171,6 +177,7 @@
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "BiologicalProcessAssociation"
                     ],
@@ -230,6 +237,7 @@
                     ]
                 },
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -246,6 +254,7 @@
                     ]
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -255,6 +264,7 @@
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "CausalAssociation"
                     ],
@@ -268,7 +278,7 @@
             "type": "object"
         },
         "CausalPredicateEnum": {
-            "description": "",
+            "description": "A term describing the causal relationship between two activities. All terms are drawn from the \"causally upstream or within\" (RO:0002418) branch of the Relation Ontology (RO).",
             "enum": [
                 "causally upstream of, positive effect",
                 "causally upstream of, negative effect",
@@ -279,7 +289,9 @@
                 "causally upstream of or within, positive effect",
                 "regulates",
                 "negatively regulates",
-                "positively regulates"
+                "positively regulates",
+                "provides input for",
+                "removes input for"
             ],
             "title": "CausalPredicateEnum",
             "type": "string"
@@ -289,6 +301,7 @@
             "description": "An association between an activity and a cell type term",
             "properties": {
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -308,6 +321,7 @@
                     ]
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -324,6 +338,7 @@
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "CellTypeAssociation"
                     ],
@@ -376,6 +391,7 @@
             "description": "An association between an activity and a cellular anatomical entity term",
             "properties": {
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -392,9 +408,11 @@
                         {
                             "type": "null"
                         }
-                    ]
+                    ],
+                    "description": "Optional extension allowing hierarchical nesting of CCs"
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -411,6 +429,7 @@
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "CellularAnatomicalEntityAssociation"
                     ],
@@ -422,6 +441,11 @@
             },
             "title": "CellularAnatomicalEntityAssociation",
             "type": "object"
+        },
+        "CellularAnatomicalEntityEnum": {
+            "description": "A term from the subset of the cellular anatomical entity branch of GO CC",
+            "title": "CellularAnatomicalEntityEnum",
+            "type": "string"
         },
         "CellularAnatomicalEntityTermObject": {
             "additionalProperties": false,
@@ -460,9 +484,10 @@
         },
         "EnabledByGeneProductAssociation": {
             "additionalProperties": false,
-            "description": "An association between an activity and a gene product",
+            "description": "An association between an activity and an individual gene product",
             "properties": {
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -472,6 +497,7 @@
                     ]
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -481,13 +507,14 @@
                     ]
                 },
                 "term": {
-                    "description": "The gene product or complex that carries out the activity",
+                    "description": "A \"term\" that is an entity database object representing an individual gene product.",
                     "type": [
                         "string",
                         "null"
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "EnabledByGeneProductAssociation"
                     ],
@@ -502,9 +529,20 @@
         },
         "EnabledByProteinComplexAssociation": {
             "additionalProperties": false,
-            "description": "An association between an activity and a protein complex",
+            "description": "An association between an activity and a protein complex, where the complex carries out the activity. This should only be used when the activity cannot be attributed to an individual member of the complex, but instead the function is an emergent property of the complex.",
+            "if": {
+                "properties": {
+                    "term": {
+                        "const": "GO:0032991"
+                    }
+                },
+                "required": [
+                    "term"
+                ]
+            },
             "properties": {
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -524,6 +562,7 @@
                     ]
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -540,6 +579,7 @@
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "EnabledByProteinComplexAssociation"
                     ],
@@ -549,8 +589,21 @@
                     ]
                 }
             },
+            "then": {
+                "properties": {
+                    "members": {}
+                },
+                "required": [
+                    "members"
+                ]
+            },
             "title": "EnabledByProteinComplexAssociation",
             "type": "object"
+        },
+        "EvidenceCodeEnum": {
+            "description": "A term from the subset of ECO that maps up to a GAF evidence code",
+            "title": "EvidenceCodeEnum",
+            "type": "string"
         },
         "EvidenceItem": {
             "additionalProperties": false,
@@ -596,7 +649,7 @@
         },
         "EvidenceTermObject": {
             "additionalProperties": false,
-            "description": "A term object that represents an evidence term from ECO",
+            "description": "A term object that represents an evidence term from ECO. Only ECO terms that map up to a GO GAF evidence code should be used.",
             "properties": {
                 "id": {
                     "type": "string"
@@ -704,6 +757,7 @@
             "description": "An association between an activity and a gross anatomical structure term",
             "properties": {
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -723,6 +777,7 @@
                     ]
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -739,6 +794,7 @@
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "GrossAnatomyAssociation"
                     ],
@@ -752,7 +808,7 @@
             "type": "object"
         },
         "InformationBiomacromoleculeCategory": {
-            "description": "",
+            "description": "A term describing the type of the enabler of an activity.",
             "enum": [
                 "GeneOrReferenceProtein",
                 "ProteinIsoform",
@@ -764,7 +820,17 @@
         },
         "Model": {
             "additionalProperties": false,
-            "description": "A model of a biological program consisting of a set of causally connected activities",
+            "description": "A model of a biological program consisting of a set of causally connected activities.",
+            "if": {
+                "properties": {
+                    "state": {
+                        "const": "production"
+                    }
+                },
+                "required": [
+                    "state"
+                ]
+            },
             "properties": {
                 "activities": {
                     "description": "All of the activities that are part of the model",
@@ -776,8 +842,18 @@
                         "null"
                     ]
                 },
+                "additional_taxa": {
+                    "description": "Additional taxa that the model is about",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
                 "comments": {
-                    "description": "Comments about the model",
+                    "description": "Curator-provided comments about the model",
                     "items": {
                         "type": "string"
                     },
@@ -856,9 +932,20 @@
                         "null"
                     ]
                 },
+                "query_index": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/QueryIndex"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "An optional object that contains the results of indexing a model with various summary statistics and retrieval indices."
+                },
                 "status": {
                     "$ref": "#/$defs/ModelStateEnum",
-                    "description": "The status of the model"
+                    "description": "The status of the model in terms of its progression along the developmental lifecycle"
                 },
                 "taxon": {
                     "description": "The primary taxon that the model is about",
@@ -869,23 +956,33 @@
                 },
                 "title": {
                     "description": "The human-readable descriptive title of the model",
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": "string"
                 }
             },
             "required": [
-                "id"
+                "id",
+                "title"
             ],
+            "then": {
+                "properties": {
+                    "activities": {}
+                },
+                "required": [
+                    "activities"
+                ]
+            },
             "title": "Model",
             "type": "object"
         },
         "ModelStateEnum": {
-            "description": "Status of a model",
+            "description": "A term describing where the model is in the development life cycle.",
             "enum": [
+                "development",
                 "production",
-                "development"
+                "delete",
+                "review",
+                "internal_test",
+                "closed"
             ],
             "title": "ModelStateEnum",
             "type": "string"
@@ -895,6 +992,7 @@
             "description": "An association between an activity and a molecular function term",
             "properties": {
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -904,6 +1002,7 @@
                     ]
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -920,6 +1019,7 @@
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "MolecularFunctionAssociation"
                     ],
@@ -972,6 +1072,7 @@
             "description": "An association between an activity and a molecule term",
             "properties": {
                 "evidence": {
+                    "description": "The set of evidence items that support the association.",
                     "items": {
                         "$ref": "#/$defs/EvidenceItem"
                     },
@@ -981,6 +1082,7 @@
                     ]
                 },
                 "provenances": {
+                    "description": "The set of provenance objects that provide metadata about who made the association.",
                     "items": {
                         "$ref": "#/$defs/ProvenanceInfo"
                     },
@@ -997,6 +1099,7 @@
                     ]
                 },
                 "type": {
+                    "description": "The type of association.",
                     "enum": [
                         "MoleculeAssociation"
                     ],
@@ -1078,6 +1181,11 @@
             ],
             "title": "Object",
             "type": "object"
+        },
+        "PhaseEnum": {
+            "description": "A term from either the phase branch of GO or the phase branch of an anatomy ontology",
+            "title": "PhaseEnum",
+            "type": "string"
         },
         "PhaseTermObject": {
             "additionalProperties": false,
@@ -1189,8 +1297,11 @@
             "description": "Provenance information for an object",
             "properties": {
                 "contributor": {
+                    "items": {
+                        "type": "string"
+                    },
                     "type": [
-                        "string",
+                        "array",
                         "null"
                     ]
                 },
@@ -1207,8 +1318,11 @@
                     ]
                 },
                 "provided_by": {
+                    "items": {
+                        "type": "string"
+                    },
                     "type": [
-                        "string",
+                        "array",
                         "null"
                     ]
                 }
@@ -1261,6 +1375,1019 @@
                 "id"
             ],
             "title": "PublicationObject",
+            "type": "object"
+        },
+        "QueryIndex": {
+            "additionalProperties": false,
+            "description": "An index that is optionally placed on a model in order to support common query or index operations. Note that this index is not typically populated in the working transactional store for a model, it is derived via computation from core primary model information.",
+            "properties": {
+                "annoton_terms": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "end_activities": {
+                    "description": "The set of activities that are the end points of the model, i.e. those that have no outgoing causal associations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "flattened_references": {
+                    "description": "All publication objects from the model across different levels combined in one place",
+                    "items": {
+                        "$ref": "#/$defs/PublicationObject"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "intermediate_activities": {
+                    "description": "The set of activities that are neither start nor end activities, i.e. those that have both incoming and outgoing causal associations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "length_of_longest_causal_association_path": {
+                    "description": "The maximum number of hops along activities along the direction of causal flow in a model.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "model_activity_enabled_by_closure": {
+                    "description": "The reflexive transitive closure of `model_activity_enabled_by_terms`, over the is_a and has_part relationship type (e.g. complex to parts)",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_enabled_by_rollup": {
+                    "description": "The rollup of `model_activity_enabled_by_closure` to a GO subset or slim.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_enabled_by_terms": {
+                    "description": "All direct enabler terms for all activities",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_has_input_closure": {
+                    "description": "The reflexive transitive closure of `model_activity_has_input_terms`, over the is_a relationship type",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_has_input_rollup": {
+                    "description": "The rollup of `model_activity_has_input_closure` to a GO subset or slim.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_has_input_terms": {
+                    "description": "All direct input terms for all activities",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_molecular_function_closure": {
+                    "description": "The reflexive transitive closure of `model_activity_molecular_function_terms`, over the is_a relationship",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_molecular_function_rollup": {
+                    "description": "The rollup of `model_activity_molecular_function_closure` to a GO subset or slim.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_molecular_function_terms": {
+                    "description": "All MF terms for all activities",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_occurs_in_closure": {
+                    "description": "The reflexive transitive closure of `model_activity_occurs_in_terms`, over the is_a and part_of relationship type",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_occurs_in_rollup": {
+                    "description": "The rollup of `model_activity_occurs_in_closure` to a GO subset or slim.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_occurs_in_terms": {
+                    "description": "All direct cellular component localization terms for all activities",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_part_of_closure": {
+                    "description": "The reflexive transitive closure of `model_activity_part_of_terms`, over the is_a and part_of relationship type",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_part_of_rollup": {
+                    "description": "The rollup of `model_activity_part_of_closure` to a GO subset or slim.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_activity_part_of_terms": {
+                    "description": "All direct biological process terms for all activities",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_taxon": {
+                    "description": "The primary taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the primary taxon that the model is relevant to.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_taxon_closure": {
+                    "description": "The reflexive transitive closure of the taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the set of taxa that are relevant to the model.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "model_taxon_rollup": {
+                    "description": "The rollup of the taxon closure to a NCBITaxon subset or slim.",
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EvidenceTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MolecularFunctionTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/BiologicalProcessTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellularAnatomicalEntityTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/MoleculeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/CellTypeTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GrossAnatomicalStructureTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PhaseTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/TaxonTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/PredicateTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/GeneProductTermObject"
+                            },
+                            {
+                                "$ref": "#/$defs/ProteinComplexTermObject"
+                            }
+                        ]
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "number_of_activities": {
+                    "description": "The number of activities in a model.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "number_of_causal_associations": {
+                    "description": "Total number of causal association edges connecting activities in a model.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "number_of_enabled_by_terms": {
+                    "description": "The number of molecular entities or sets of entities in a model.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "number_of_end_activities": {
+                    "description": "The number of end activities in a model",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "number_of_intermediate_activities": {
+                    "description": "The number of intermediate activities in a model",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "number_of_singleton_activities": {
+                    "description": "The number of singleton activities in a model",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "number_of_start_activities": {
+                    "description": "The number of start activities in a model",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "number_of_strongly_connected_components": {
+                    "description": "The number of distinct components that consist of activities that are connected (directly or indirectly) via causal connections. Most models will consist of a single SCC. Some models may consist of two or more \"islands\" where there is no connection from one island to another.",
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "singleton_activities": {
+                    "description": "The set of activities that have no causal associations, i.e. those that are not connected to any other activity in the model.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "start_activities": {
+                    "description": "The set of activities that are the starting points of the model, i.e. those that have no incoming causal associations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                }
+            },
+            "title": "QueryIndex",
             "type": "object"
         },
         "TaxonTermObject": {
