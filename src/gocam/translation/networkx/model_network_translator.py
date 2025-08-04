@@ -285,7 +285,11 @@ class ModelNetworkTranslator(GraphTranslator):
                 if contributors:
                     attrs[f'{prefix}_product_contributors'] = contributors
     
-    def _merge_edge_attributes(self, existing: Dict, new: Dict) -> Dict:
+    def _merge_edge_attributes(
+        self,
+        existing: Dict[str, Union[str, List[str]]],
+        new: Dict[str, Union[str, List[str]]]
+    ) -> Dict[str, Union[str, List[str]]]:
         """
         Merge edge attributes when multiple causal relationships exist between same genes.
         
