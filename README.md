@@ -614,6 +614,9 @@ The JSON output contains:
   - **Causal Relationship**: `causal_predicate` (e.g., "RO:0002629"), `causal_predicate_has_reference`, `causal_predicate_assessed_by`, `causal_predicate_contributors`
 - **model_info**: Model metadata (optional, controlled by `include_model_info` parameter)
 
+The output follows NetworkX `node_link_data` format standards with `directed`, `multigraph`, and `graph` fields. 
+Model metadata is stored in `graph.model_info` following NetworkX conventions for graph-level attributes.
+
 Evidence collections preserve the original GO-CAM evidence with references (PMIDs, etc.) and evidence codes (ECO terms) for full traceability.
 
 ### Example Output
