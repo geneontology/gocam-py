@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass, field
-from typing import Optional, List, Collection, Tuple, Any
+from typing import Optional, List, Collection, Tuple, Any, Set
 
 from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import PART_OF, IS_A
