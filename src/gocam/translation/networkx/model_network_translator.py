@@ -126,7 +126,7 @@ class ModelNetworkTranslator(GraphTranslator):
         model: Model,
         source_gene: str,
         target_gene: str
-    ) -> Dict[str, str]:
+    ) -> Dict[str, Any]:
         """
         Get edge attributes containing GO terms and relationship information.
         
