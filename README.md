@@ -536,3 +536,87 @@ See the CLI help for more information and options:
 ```bash
 gocam convert --help
 ```
+
+## Gene-to-Gene Format Translation
+
+Convert GO-CAM models to gene-to-gene format where nodes are gene products and edges represent causal relationships with GO terms as edge properties.
+
+### Basic Usage
+
+```python
+from gocam.translation.networkx.model_network_translator import ModelNetworkTranslator
+from gocam.datamodel import Model
+import json
+
+# Load GO-CAM model from JSON file
+with open('gocam_model.json', 'r') as f:
+    gocam_data = json.load(f)
+model = Model.model_validate(gocam_data)
+
+# Create translator and convert to gene-to-gene JSON
+translator = ModelNetworkTranslator()
+json_output = translator.translate_models_to_json([model])
+print(json_output)
+```
+
+```python
+# Or from a JSON string
+gocam_json_string = """
+{
+  "id": "gomodel:568b0f9600000284",
+  "title": "Antibacterial innate immune response in the intestine via MAPK cascade",
+  "taxon": "NCBITaxon:6239",
+  "activities": [
+    {
+      "id": "gomodel:568b0f9600000284/57ec3a7e00000079",
+      "enabled_by": {"term": "WB:WBGene00006575"},
+      "molecular_function": {"term": "GO:0035591"},
+      "causal_associations": [
+        {
+          "predicate": "RO:0002629",
+          "downstream_activity": "gomodel:568b0f9600000284/57ec3a7e00000109"
+        }
+      ]
+    }
+  ]
+}
+"""
+
+gocam_data = json.loads(gocam_json_string)
+model = Model.model_validate(gocam_data)
+json_output = translator.translate_models_to_json([model])
+```
+
+### Multiple Models
+
+```python
+# Process multiple models together (combined into single network)
+models = [model1, model2, model3]
+combined_json = translator.translate_models_to_json(models)
+
+# Process multiple models individually
+for model in models:
+    json_output = translator.translate_models_to_json([model])
+    print(f"Model {model.id}:")
+    print(json_output)
+```
+
+### Output Format
+
+The JSON output contains:
+- **nodes**: Gene products with `id`, `gene_product`, `model_id`, and `label` (if available)
+- **edges**: Causal relationships with GO term properties:
+  - `source_gene_molecular_function`, `target_gene_molecular_function`
+  - `source_gene_biological_process`, `target_gene_biological_process`
+  - `source_gene_occurs_in`, `target_gene_occurs_in`
+  - `causal_predicate` (e.g., "RO:0002629")
+- **model_info**: Model metadata (optional, controlled by `include_model_info` parameter)
+
+### NetworkX Graph Access
+
+```python
+# Get NetworkX DiGraph directly (for analysis)
+g2g_graph = translator.translate_models([model])
+print(f"Genes: {g2g_graph.number_of_nodes()}")
+print(f"Causal relationships: {g2g_graph.number_of_edges()}")
+```

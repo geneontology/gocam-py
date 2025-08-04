@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Iterable, Dict, Set, Optional
+import json
 
 import networkx as nx
 
@@ -231,3 +232,66 @@ class ModelNetworkTranslator(GraphTranslator):
                 merged[key] = value
                 
         return merged
+    
+    def translate_models_to_json(self, models: Iterable[Model], include_model_info: bool = True) -> str:
+        """
+        Translate GO-CAM models to gene-to-gene format and return as JSON string.
+        
+        Args:
+            models: Iterable of GO-CAM Model objects to translate
+            include_model_info: Whether to include model metadata in the output
+            
+        Returns:
+            JSON string representation of the gene-to-gene network
+        """
+        g2g_graph = self.translate_models(models)
+        g2g_dict = self._graph_to_dict(g2g_graph, models, include_model_info)
+        return json.dumps(g2g_dict, indent=2)
+    
+    def _graph_to_dict(self, g2g_graph: nx.DiGraph, models: Iterable[Model], include_model_info: bool) -> Dict:
+        """
+        Convert NetworkX graph to JSON-serializable dictionary.
+        
+        Args:
+            g2g_graph: The gene-to-gene NetworkX DiGraph
+            models: The original GO-CAM models (for metadata)
+            include_model_info: Whether to include model metadata
+            
+        Returns:
+            Dictionary representation of the gene-to-gene network
+        """
+        result = {
+            "nodes": [
+                {"id": node, **attrs}
+                for node, attrs in g2g_graph.nodes(data=True)
+            ],
+            "edges": [
+                {"source": source, "target": target, **attrs}
+                for source, target, attrs in g2g_graph.edges(data=True)
+            ]
+        }
+        
+        if include_model_info:
+            models_list = list(models)
+            if len(models_list) == 1:
+                # Single model metadata
+                model = models_list[0]
+                result["model_info"] = {
+                    "id": model.id,
+                    "title": model.title,
+                    "taxon": model.taxon,
+                    "status": model.status
+                }
+            else:
+                # Multiple models metadata
+                result["models_info"] = [
+                    {
+                        "id": model.id,
+                        "title": model.title,
+                        "taxon": model.taxon,
+                        "status": model.status
+                    }
+                    for model in models_list
+                ]
+        
+        return result
