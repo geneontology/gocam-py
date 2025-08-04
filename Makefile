@@ -124,7 +124,7 @@ gen-test-inputs:
 # generates all project files
 
 gen-project:
-	$(RUN) gen-project ${CONFIG_YAML} -d $(DEST) $(SOURCE_SCHEMA_PATH)
+	$(RUN) gen-project ${CONFIG_YAML} --exclude excel --exclude graphql -d $(DEST) $(SOURCE_SCHEMA_PATH)
 
 
 # non-empty arg triggers owl (workaround https://github.com/linkml/linkml/issues/1453)
@@ -145,7 +145,7 @@ endif
 test: test-schema test-python test-examples
 
 test-schema:
-	$(RUN) gen-project ${CONFIG_YAML} -d tmp $(SOURCE_SCHEMA_PATH)
+	$(RUN) gen-project ${CONFIG_YAML} --exclude excel --exclude graphql -d tmp $(SOURCE_SCHEMA_PATH)
 
 test-python:
 	$(RUN) pytest tests

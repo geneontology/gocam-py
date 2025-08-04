@@ -1,8 +1,6 @@
 # Configuration of generators (defaults illustrated)
 ---
 generator_args:
-  excel:
-    mergeimports: true
   owl:
     mergeimports: true
     metaclasses: true
@@ -10,8 +8,6 @@ generator_args:
     # throws 'Cannot handle metadata profile: rdfs'
     # metadata_profile: rdfs
   markdown:
-    mergeimports: true
-  graphql:
     mergeimports: true
   java:
     mergeimports: true
