@@ -105,7 +105,7 @@ class Indexer:
         go = self.go_adapter()
         model.query_index = qi
         qi = model.query_index
-        qi.number_of_activities = len(model.activities)
+        qi.number_of_activities = len(model.activities or [])
         all_causal_associations = []
         all_refs = set()
         all_mfs = set()
@@ -122,7 +122,7 @@ class Indexer:
                 refs = {e.reference for e in ta.evidence if e.reference}
             return refs
 
-        for a in model.activities:
+        for a in model.activities or []:
             annoton_term_id_parts = []
             if a.causal_associations:
                 all_causal_associations.extend(a.causal_associations)
@@ -215,7 +215,16 @@ class Indexer:
             """
             Filter terms to only those in the specified subsets.
             """
-            return list({t for t in terms if t.id in subset_terms})
+            # Use list comprehension instead of set comprehension to avoid hashability issues
+            filtered_terms = [t for t in terms if t.id in subset_terms]
+            # Remove duplicates by id while preserving order
+            seen_ids = set()
+            result = []
+            for t in filtered_terms:
+                if t.id not in seen_ids:
+                    seen_ids.add(t.id)
+                    result.append(t)
+            return result
 
 
         mf_direct, mf_closure = self._get_closures(all_mfs)
@@ -261,7 +270,7 @@ class Indexer:
             causal relationships from source to target activities
         """
         g = nx.DiGraph()
-        for a in model.activities:
+        for a in model.activities or []:
             if a.causal_associations:
                 for ca in a.causal_associations:
                     if ca.downstream_activity:
