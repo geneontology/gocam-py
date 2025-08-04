@@ -605,12 +605,16 @@ for model in models:
 
 The JSON output contains:
 - **nodes**: Gene products with `id`, `gene_product`, `model_id`, and `label` (if available)
-- **edges**: Causal relationships with GO term properties:
-  - `source_gene_molecular_function`, `target_gene_molecular_function`
-  - `source_gene_biological_process`, `target_gene_biological_process`
-  - `source_gene_occurs_in`, `target_gene_occurs_in`
-  - `causal_predicate` (e.g., "RO:0002629")
+- **edges**: Causal relationships with GO term properties and evidence:
+  - **GO Terms**: `source_gene_molecular_function`, `target_gene_molecular_function`, `source_gene_biological_process`, `target_gene_biological_process`, `source_gene_occurs_in`, `target_gene_occurs_in`, `source_gene_product`, `target_gene_product`
+  - **Evidence Collections** (multivalued lists):
+    - `source_{term}_has_reference`, `target_{term}_has_reference` (e.g., `source_molecular_function_has_reference`)
+    - `source_{term}_assessed_by`, `target_{term}_assessed_by` (e.g., `source_occurs_in_assessed_by`)
+    - `source_{term}_contributors`, `target_{term}_contributors` (e.g., `source_occurs_in_contributors`)
+  - **Causal Relationship**: `causal_predicate` (e.g., "RO:0002629"), `causal_predicate_has_reference`, `causal_predicate_assessed_by`, `causal_predicate_contributors`
 - **model_info**: Model metadata (optional, controlled by `include_model_info` parameter)
+
+Evidence collections preserve the original GO-CAM evidence with references (PMIDs, etc.) and evidence codes (ECO terms) for full traceability.
 
 ### NetworkX Graph Access
 

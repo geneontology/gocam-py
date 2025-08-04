@@ -146,9 +146,27 @@ class ModelNetworkTranslator(GraphTranslator):
             'model_id': model.id
         }
         
-        # Add causal relationship predicate
+        # Add causal relationship predicate with evidence
         if causal_assoc.predicate:
             attrs['causal_predicate'] = causal_assoc.predicate
+            
+            # Add evidence for the causal association
+            if causal_assoc.evidence:
+                references = [e.reference for e in causal_assoc.evidence if e.reference]
+                evidence_codes = [e.term for e in causal_assoc.evidence if e.term]
+                contributors = []
+                for e in causal_assoc.evidence:
+                    if e.provenances:
+                        for prov in e.provenances:
+                            if prov.contributor:
+                                contributors.extend(prov.contributor)
+                
+                if references:
+                    attrs['causal_predicate_has_reference'] = references
+                if evidence_codes:
+                    attrs['causal_predicate_assessed_by'] = evidence_codes
+                if contributors:
+                    attrs['causal_predicate_contributors'] = contributors
         
         # Add GO terms from source activity
         self._add_activity_go_terms(source_activity, model, attrs, "source_gene")
@@ -178,7 +196,7 @@ class ModelNetworkTranslator(GraphTranslator):
     
     def _add_activity_go_terms(self, activity: Activity, model: Model, attrs: Dict[str, str], prefix: str) -> None:
         """
-        Add GO terms from an activity to the edge attributes.
+        Add GO terms from an activity to the edge attributes with evidence information.
         
         Args:
             activity: The activity to extract GO terms from
@@ -186,21 +204,86 @@ class ModelNetworkTranslator(GraphTranslator):
             attrs: Dictionary to add attributes to
             prefix: Prefix for attribute names ("source_gene" or "target_gene")
         """
-        # Add molecular function
+        # Add molecular function with evidence
         if activity.molecular_function and activity.molecular_function.term:
             attrs[f'{prefix}_molecular_function'] = activity.molecular_function.term
+            if activity.molecular_function.evidence:
+                # Extract references, evidence codes, and contributors
+                references = [e.reference for e in activity.molecular_function.evidence if e.reference]
+                evidence_codes = [e.term for e in activity.molecular_function.evidence if e.term]
+                contributors = []
+                for e in activity.molecular_function.evidence:
+                    if e.provenances:
+                        for prov in e.provenances:
+                            if prov.contributor:
+                                contributors.extend(prov.contributor)
+                
+                if references:
+                    attrs[f'{prefix}_molecular_function_has_reference'] = references
+                if evidence_codes:
+                    attrs[f'{prefix}_molecular_function_assessed_by'] = evidence_codes
+                if contributors:
+                    attrs[f'{prefix}_molecular_function_contributors'] = contributors
         
-        # Add biological process  
+        # Add biological process with evidence
         if activity.part_of and activity.part_of.term:
             attrs[f'{prefix}_biological_process'] = activity.part_of.term
+            if activity.part_of.evidence:
+                references = [e.reference for e in activity.part_of.evidence if e.reference]
+                evidence_codes = [e.term for e in activity.part_of.evidence if e.term]
+                contributors = []
+                for e in activity.part_of.evidence:
+                    if e.provenances:
+                        for prov in e.provenances:
+                            if prov.contributor:
+                                contributors.extend(prov.contributor)
+                
+                if references:
+                    attrs[f'{prefix}_biological_process_has_reference'] = references
+                if evidence_codes:
+                    attrs[f'{prefix}_biological_process_assessed_by'] = evidence_codes
+                if contributors:
+                    attrs[f'{prefix}_biological_process_contributors'] = contributors
         
-        # Add cellular component
+        # Add cellular component with evidence
         if activity.occurs_in and activity.occurs_in.term:
             attrs[f'{prefix}_occurs_in'] = activity.occurs_in.term
+            if activity.occurs_in.evidence:
+                references = [e.reference for e in activity.occurs_in.evidence if e.reference]
+                evidence_codes = [e.term for e in activity.occurs_in.evidence if e.term]
+                contributors = []
+                for e in activity.occurs_in.evidence:
+                    if e.provenances:
+                        for prov in e.provenances:
+                            if prov.contributor:
+                                contributors.extend(prov.contributor)
+                
+                if references:
+                    attrs[f'{prefix}_occurs_in_has_reference'] = references
+                if evidence_codes:
+                    attrs[f'{prefix}_occurs_in_assessed_by'] = evidence_codes
+                if contributors:
+                    attrs[f'{prefix}_occurs_in_contributors'] = contributors
         
-        # Add gene product (enabled_by)
+        # Add gene product (enabled_by) with evidence
         if activity.enabled_by and activity.enabled_by.term:
             attrs[f'{prefix}_product'] = activity.enabled_by.term
+            if activity.enabled_by.evidence:
+                references = [e.reference for e in activity.enabled_by.evidence if e.reference]
+                evidence_codes = [e.term for e in activity.enabled_by.evidence if e.term]
+                contributors = []
+                for e in activity.enabled_by.evidence:
+                    if e.provenances:
+                        for prov in e.provenances:
+                            if prov.contributor:
+                                contributors.extend(prov.contributor)
+                
+                if references:
+                    attrs[f'{prefix}_product_has_reference'] = references
+                if evidence_codes:
+                    attrs[f'{prefix}_product_assessed_by'] = evidence_codes
+                if contributors:
+                    attrs[f'{prefix}_product_contributors'] = contributors
     
     def _merge_edge_attributes(self, existing: Dict, new: Dict) -> Dict:
         """

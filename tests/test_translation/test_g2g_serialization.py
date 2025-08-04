@@ -26,21 +26,37 @@ activities:
     evidence:
     - term: ECO:0000314
       reference: PMID:15625192
+      provenances:
+      - contributor: 
+        - https://orcid.org/0000-0002-1706-4196
+        date: '2019-09-23'
     term: GO:0035591
   occurs_in:
     evidence:
     - term: ECO:0000314
       reference: PMID:15625192
+      provenances:
+      - contributor: 
+        - https://orcid.org/0000-0002-3013-9906
+        date: '2019-06-28'
     term: GO:0005737
   part_of:
     evidence:
     - term: ECO:0000315
       reference: PMID:19837372
+      provenances:
+      - contributor: 
+        - https://orcid.org/0000-0002-1706-4196
+        date: '2021-07-08'
     term: GO:0140367
   causal_associations:
   - evidence:
     - term: ECO:0000315
       reference: PMID:15123841
+      provenances:
+      - contributor: 
+        - https://orcid.org/0000-0002-3013-9906
+        date: '2019-05-31'
     predicate: RO:0002629
     downstream_activity: gomodel:568b0f9600000284/57ec3a7e00000109
 - id: gomodel:568b0f9600000284/5b528b1100002286
@@ -427,3 +443,177 @@ class TestG2GSerialization:
         for node, attrs in g2g_graph.nodes(data=True):
             assert attrs["gene_product"] == node
             assert node.startswith("WB:WBGene")
+    
+    def test_evidence_collections_basic(self, readme_model, translator):
+        """Test that evidence collections are properly included in edges."""
+        g2g_graph = translator.translate_models([readme_model])
+        
+        # Find an edge with evidence to test
+        edge_with_evidence = None
+        for source, target, attrs in g2g_graph.edges(data=True):
+            if any(key.endswith('_has_reference') for key in attrs.keys()):
+                edge_with_evidence = (source, target, attrs)
+                break
+        
+        assert edge_with_evidence is not None, "Should find at least one edge with evidence"
+        source, target, attrs = edge_with_evidence
+        
+        # Check for evidence collection attributes
+        evidence_attrs = [key for key in attrs.keys() 
+                         if any(suffix in key for suffix in ['_has_reference', '_assessed_by', '_contributors'])]
+        assert len(evidence_attrs) > 0, "Should have evidence collection attributes"
+    
+    def test_molecular_function_evidence_collections(self, readme_model, translator):
+        """Test molecular function evidence collections are properly extracted."""
+        g2g_graph = translator.translate_models([readme_model])
+        
+        # Find edge from tir-1 to nsy-1 which should have molecular function evidence
+        tir1_to_nsy1_attrs = g2g_graph.edges["WB:WBGene00006575", "WB:WBGene00003822"]
+        
+        # Check source molecular function evidence
+        assert "source_gene_molecular_function_has_reference" in tir1_to_nsy1_attrs
+        assert "source_gene_molecular_function_assessed_by" in tir1_to_nsy1_attrs
+        
+        # Verify reference format
+        source_refs = tir1_to_nsy1_attrs["source_gene_molecular_function_has_reference"]
+        assert isinstance(source_refs, list)
+        assert "PMID:15625192" in source_refs
+        
+        # Verify evidence code format
+        source_codes = tir1_to_nsy1_attrs["source_gene_molecular_function_assessed_by"]
+        assert isinstance(source_codes, list)
+        assert "ECO:0000314" in source_codes
+        
+        # Check target molecular function evidence
+        assert "target_gene_molecular_function_has_reference" in tir1_to_nsy1_attrs
+        assert "target_gene_molecular_function_assessed_by" in tir1_to_nsy1_attrs
+        
+        target_refs = tir1_to_nsy1_attrs["target_gene_molecular_function_has_reference"]
+        assert isinstance(target_refs, list)
+        assert "PMID:11751572" in target_refs
+    
+    def test_biological_process_evidence_collections(self, readme_model, translator):
+        """Test biological process evidence collections are properly extracted."""
+        g2g_graph = translator.translate_models([readme_model])
+        
+        # Find edge that should have biological process evidence
+        tir1_to_nsy1_attrs = g2g_graph.edges["WB:WBGene00006575", "WB:WBGene00003822"]
+        
+        # Check source biological process evidence
+        assert "source_gene_biological_process_has_reference" in tir1_to_nsy1_attrs
+        assert "source_gene_biological_process_assessed_by" in tir1_to_nsy1_attrs
+        
+        source_refs = tir1_to_nsy1_attrs["source_gene_biological_process_has_reference"]
+        assert isinstance(source_refs, list)
+        assert "PMID:19837372" in source_refs
+        
+        source_codes = tir1_to_nsy1_attrs["source_gene_biological_process_assessed_by"]
+        assert isinstance(source_codes, list)
+        assert "ECO:0000315" in source_codes
+    
+    def test_occurs_in_evidence_collections(self, readme_model, translator):
+        """Test cellular component (occurs_in) evidence collections are properly extracted."""
+        g2g_graph = translator.translate_models([readme_model])
+        
+        # Find edge with occurs_in evidence
+        tir1_to_nsy1_attrs = g2g_graph.edges["WB:WBGene00006575", "WB:WBGene00003822"]
+        
+        # Check source occurs_in evidence
+        assert "source_gene_occurs_in_has_reference" in tir1_to_nsy1_attrs
+        assert "source_gene_occurs_in_assessed_by" in tir1_to_nsy1_attrs
+        
+        source_refs = tir1_to_nsy1_attrs["source_gene_occurs_in_has_reference"]
+        assert isinstance(source_refs, list)
+        assert "PMID:15625192" in source_refs
+        
+        source_codes = tir1_to_nsy1_attrs["source_gene_occurs_in_assessed_by"]
+        assert isinstance(source_codes, list)
+        assert "ECO:0000314" in source_codes
+    
+    def test_causal_predicate_evidence_collections(self, readme_model, translator):
+        """Test causal predicate evidence collections are properly extracted."""
+        g2g_graph = translator.translate_models([readme_model])
+        
+        # Find edge with causal association evidence
+        tir1_to_nsy1_attrs = g2g_graph.edges["WB:WBGene00006575", "WB:WBGene00003822"]
+        
+        # Check causal predicate evidence
+        assert "causal_predicate_has_reference" in tir1_to_nsy1_attrs
+        assert "causal_predicate_assessed_by" in tir1_to_nsy1_attrs
+        
+        causal_refs = tir1_to_nsy1_attrs["causal_predicate_has_reference"]
+        assert isinstance(causal_refs, list)
+        assert "PMID:15123841" in causal_refs
+        
+        causal_codes = tir1_to_nsy1_attrs["causal_predicate_assessed_by"]
+        assert isinstance(causal_codes, list)
+        assert "ECO:0000315" in causal_codes
+    
+    def test_contributors_evidence_collections(self, readme_model, translator):
+        """Test contributor evidence collections are properly extracted."""
+        g2g_graph = translator.translate_models([readme_model])
+        
+        # Find edge from tir-1 to nsy-1 which should have contributor evidence
+        tir1_to_nsy1_attrs = g2g_graph.edges["WB:WBGene00006575", "WB:WBGene00003822"]
+        
+        # Check for specific contributor evidence that should be present
+        expected_contributors = [
+            "https://orcid.org/0000-0002-1706-4196",
+            "https://orcid.org/0000-0002-3013-9906"
+        ]
+        
+        # Check source molecular function contributors
+        assert "source_gene_molecular_function_contributors" in tir1_to_nsy1_attrs
+        source_mf_contributors = tir1_to_nsy1_attrs["source_gene_molecular_function_contributors"]
+        assert isinstance(source_mf_contributors, list)
+        assert "https://orcid.org/0000-0002-1706-4196" in source_mf_contributors
+        
+        # Check source occurs_in contributors
+        assert "source_gene_occurs_in_contributors" in tir1_to_nsy1_attrs
+        source_occurs_contributors = tir1_to_nsy1_attrs["source_gene_occurs_in_contributors"]
+        assert isinstance(source_occurs_contributors, list)
+        assert "https://orcid.org/0000-0002-3013-9906" in source_occurs_contributors
+        
+        # Check source biological process contributors
+        assert "source_gene_biological_process_contributors" in tir1_to_nsy1_attrs
+        source_bp_contributors = tir1_to_nsy1_attrs["source_gene_biological_process_contributors"]
+        assert isinstance(source_bp_contributors, list)
+        assert "https://orcid.org/0000-0002-1706-4196" in source_bp_contributors
+        
+        # Check causal predicate contributors
+        assert "causal_predicate_contributors" in tir1_to_nsy1_attrs
+        causal_contributors = tir1_to_nsy1_attrs["causal_predicate_contributors"]
+        assert isinstance(causal_contributors, list)
+        assert "https://orcid.org/0000-0002-3013-9906" in causal_contributors
+    
+    def test_evidence_collections_are_lists(self, readme_model, translator):
+        """Test that all evidence collection attributes are lists (multivalued)."""
+        g2g_graph = translator.translate_models([readme_model])
+        
+        for source, target, attrs in g2g_graph.edges(data=True):
+            for key, value in attrs.items():
+                if any(suffix in key for suffix in ['_has_reference', '_assessed_by', '_contributors']):
+                    assert isinstance(value, list), f"Evidence collection {key} should be a list, got {type(value)}"
+                    assert len(value) > 0, f"Evidence collection {key} should not be empty"
+    
+    def test_json_serialization_with_evidence_collections(self, readme_model, translator):
+        """Test that evidence collections are properly serialized in JSON output."""
+        json_output = translator.translate_models_to_json([readme_model])
+        
+        import json
+        result = json.loads(json_output)
+        
+        # Find edges with evidence collections
+        edges_with_evidence = []
+        for edge in result["edges"]:
+            evidence_attrs = [key for key in edge.keys() 
+                             if any(suffix in key for suffix in ['_has_reference', '_assessed_by', '_contributors'])]
+            if evidence_attrs:
+                edges_with_evidence.append((edge, evidence_attrs))
+        
+        assert len(edges_with_evidence) > 0, "Should have edges with evidence collections in JSON output"
+        
+        # Verify structure of evidence collections in JSON
+        for edge, evidence_attrs in edges_with_evidence:
+            for attr in evidence_attrs:
+                assert isinstance(edge[attr], list), f"JSON evidence collection {attr} should be a list"
