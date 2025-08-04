@@ -600,7 +600,6 @@ class TestG2GSerialization:
         """Test that evidence collections are properly serialized in JSON output."""
         json_output = translator.translate_models_to_json([readme_model])
         
-        import json
         result = json.loads(json_output)
         
         # Find edges with evidence collections
