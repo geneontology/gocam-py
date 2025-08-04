@@ -274,6 +274,19 @@
     Identifier and Mapping Information
   </a>
   
+    <nav class="md-nav" aria-label="Identifier and Mapping Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#schema-source" class="md-nav__link">
+    Schema Source
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -311,6 +324,7 @@
 
 
 <h1 id="slot-provenances">Slot: provenances</h1>
+<p><em>A generic slot for provenance information</em></p>
 <p>URI: <a href="https://w3id.org/gocam/provenances">gocam:provenances</a>
 Alias: provenances</p>
 <!-- no inheritance hierarchy -->
@@ -326,13 +340,13 @@ Alias: provenances</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
-<td>An association between an activity and a cell type term</td>
+<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
+<td>An association between an activity and the gene product or complex or set of ...</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../CausalAssociation/">CausalAssociation</a></td>
-<td>A causal association between two activities</td>
+<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
+<td>An association between an activity and a protein complex, where the complex c...</td>
 <td>no</td>
 </tr>
 <tr>
@@ -346,48 +360,23 @@ Alias: provenances</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
-<td>An association between an activity and a molecular function term</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../Model/">Model</a></td>
-<td>A model of a biological program consisting of a set of causally connected act...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
-<td>An association between an activity and a cellular anatomical entity term</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
-<td>An association between an activity and the gene product or complex or set of ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
-<td>An association between an activity and a protein complex, where the complex c...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../GrossAnatomyAssociation/">GrossAnatomyAssociation</a></td>
-<td>An association between an activity and a gross anatomical structure term</td>
-<td>no</td>
-</tr>
-<tr>
 <td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
 <td>An association between an activity and a molecule term</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../EvidenceItem/">EvidenceItem</a></td>
-<td>An individual piece of evidence that is associated with an assertion in a mod...</td>
+<td><a href="../EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
+<td>An association between an activity and an individual gene product</td>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../Association/">Association</a></td>
-<td>An abstract grouping for different kinds of evidence-associated provenance</td>
+<td><a href="../CausalAssociation/">CausalAssociation</a></td>
+<td>A causal association between two activities</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
+<td>An association between an activity and a molecular function term</td>
 <td>no</td>
 </tr>
 <tr>
@@ -396,17 +385,51 @@ Alias: provenances</p>
 <td>no</td>
 </tr>
 <tr>
-<td><a href="../EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
-<td>An association between an activity and an individual gene product</td>
+<td><a href="../GrossAnatomyAssociation/">GrossAnatomyAssociation</a></td>
+<td>An association between an activity and a gross anatomical structure term</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
+<td>An association between an activity and a cell type term</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
+<td>An association between an activity and a cellular anatomical entity term</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../Model/">Model</a></td>
+<td>A model of a biological program consisting of a set of causally connected act...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../Association/">Association</a></td>
+<td>An abstract grouping for different kinds of evidence-associated provenance</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../EvidenceItem/">EvidenceItem</a></td>
+<td>An individual piece of evidence that is associated with an assertion in a mod...</td>
 <td>no</td>
 </tr>
 </tbody>
 </table>
 <h2 id="properties">Properties</h2>
 <ul>
-<li>Range: <a href="../String/">String</a></li>
+<li>
+<p>Range: <a href="../ProvenanceInfo/">ProvenanceInfo</a></p>
+</li>
+<li>
+<p>Multivalued: True</p>
+</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
+<h3 id="schema-source">Schema Source</h3>
+<ul>
+<li>from schema: https://w3id.org/gocam</li>
+</ul>
 <h2 id="mappings">Mappings</h2>
 <table>
 <thead>
@@ -430,13 +453,18 @@ Alias: provenances</p>
 <details>
 
 <pre><code class="language-yaml">name: provenances
+description: A generic slot for provenance information
+from_schema: https://w3id.org/gocam
+rank: 1000
+slot_uri: gocam:provenances
 alias: provenances
 domain_of:
 - Model
 - Activity
 - EvidenceItem
 - Association
-range: string
+range: ProvenanceInfo
+multivalued: true
 
 </code></pre>
 

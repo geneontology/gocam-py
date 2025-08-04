@@ -387,7 +387,7 @@
 <tbody>
 <tr>
 <td>slot_conditions</td>
-<td><code>{'state': {'equals_string': 'production'}}</code></td>
+<td><code>{'status': {'equals_string': 'production'}}</code></td>
 <td><code>{'activities': {'required': True}}</code></td>
 <td></td>
 </tr>
@@ -519,7 +519,6 @@ attributes:
     name: provenances
     description: Model-level provenance information
     from_schema: https://w3id.org/gocam
-    rank: 1000
     domain_of:
     - Model
     - Activity
@@ -546,8 +545,8 @@ attributes:
 rules:
 - preconditions:
     slot_conditions:
-      state:
-        name: state
+      status:
+        name: status
         equals_string: production
   postconditions:
     slot_conditions:
@@ -673,7 +672,6 @@ attributes:
     name: provenances
     description: Model-level provenance information
     from_schema: https://w3id.org/gocam
-    rank: 1000
     alias: provenances
     owner: Model
     domain_of:
@@ -703,8 +701,8 @@ attributes:
 rules:
 - preconditions:
     slot_conditions:
-      state:
-        name: state
+      status:
+        name: status
         equals_string: production
   postconditions:
     slot_conditions:

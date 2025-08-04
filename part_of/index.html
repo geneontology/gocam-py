@@ -274,6 +274,19 @@
     Identifier and Mapping Information
   </a>
   
+    <nav class="md-nav" aria-label="Identifier and Mapping Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#schema-source" class="md-nav__link">
+    Schema Source
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -311,6 +324,7 @@
 
 
 <h1 id="slot-part_of">Slot: part_of</h1>
+<p><em>A generic slot for part-of relationships</em></p>
 <p>URI: <a href="https://w3id.org/gocam/part_of">gocam:part_of</a>
 Alias: part_of</p>
 <!-- no inheritance hierarchy -->
@@ -331,6 +345,16 @@ Alias: part_of</p>
 <td>no</td>
 </tr>
 <tr>
+<td><a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
+<td>An association between an activity and a biological process term</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
+<td>An association between an activity and a cell type term</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
 <td>An association between an activity and a cellular anatomical entity term</td>
 <td>no</td>
@@ -340,16 +364,6 @@ Alias: part_of</p>
 <td>An association between an activity and a gross anatomical structure term</td>
 <td>no</td>
 </tr>
-<tr>
-<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
-<td>An association between an activity and a cell type term</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
-<td>An association between an activity and a biological process term</td>
-<td>no</td>
-</tr>
 </tbody>
 </table>
 <h2 id="properties">Properties</h2>
@@ -357,6 +371,10 @@ Alias: part_of</p>
 <li>Range: <a href="../String/">String</a></li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
+<h3 id="schema-source">Schema Source</h3>
+<ul>
+<li>from schema: https://w3id.org/gocam</li>
+</ul>
 <h2 id="mappings">Mappings</h2>
 <table>
 <thead>
@@ -380,6 +398,10 @@ Alias: part_of</p>
 <details>
 
 <pre><code class="language-yaml">name: part_of
+description: A generic slot for part-of relationships
+from_schema: https://w3id.org/gocam
+rank: 1000
+slot_uri: gocam:part_of
 alias: part_of
 domain_of:
 - Activity

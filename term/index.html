@@ -274,6 +274,19 @@
     Identifier and Mapping Information
   </a>
   
+    <nav class="md-nav" aria-label="Identifier and Mapping Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#schema-source" class="md-nav__link">
+    Schema Source
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -311,6 +324,7 @@
 
 
 <h1 id="slot-term">Slot: term</h1>
+<p><em>A generic slot for ontology terms</em></p>
 <p>URI: <a href="https://w3id.org/gocam/term">gocam:term</a>
 Alias: term</p>
 <!-- no inheritance hierarchy -->
@@ -326,8 +340,13 @@ Alias: term</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
-<td>An association between an activity and a cell type term</td>
+<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
+<td>An association between an activity and the gene product or complex or set of ...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
+<td>An association between an activity and a protein complex, where the complex c...</td>
 <td>yes</td>
 </tr>
 <tr>
@@ -336,8 +355,33 @@ Alias: term</p>
 <td>no</td>
 </tr>
 <tr>
+<td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td>An association between an activity and a molecule term</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
+<td>An association between an activity and an individual gene product</td>
+<td>yes</td>
+</tr>
+<tr>
 <td><a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
 <td>An association between an activity and a molecular function term</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
+<td>An association between an activity and a biological process term</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../GrossAnatomyAssociation/">GrossAnatomyAssociation</a></td>
+<td>An association between an activity and a gross anatomical structure term</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
+<td>An association between an activity and a cell type term</td>
 <td>yes</td>
 </tr>
 <tr>
@@ -346,47 +390,21 @@ Alias: term</p>
 <td>yes</td>
 </tr>
 <tr>
-<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
-<td>An association between an activity and a protein complex, where the complex c...</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
-<td>An association between an activity and the gene product or complex or set of ...</td>
-<td>no</td>
-</tr>
-<tr>
-<td><a href="../GrossAnatomyAssociation/">GrossAnatomyAssociation</a></td>
-<td>An association between an activity and a gross anatomical structure term</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
-<td>An association between an activity and a molecule term</td>
-<td>yes</td>
-</tr>
-<tr>
 <td><a href="../EvidenceItem/">EvidenceItem</a></td>
 <td>An individual piece of evidence that is associated with an assertion in a mod...</td>
 <td>no</td>
-</tr>
-<tr>
-<td><a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
-<td>An association between an activity and a biological process term</td>
-<td>yes</td>
-</tr>
-<tr>
-<td><a href="../EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
-<td>An association between an activity and an individual gene product</td>
-<td>yes</td>
 </tr>
 </tbody>
 </table>
 <h2 id="properties">Properties</h2>
 <ul>
-<li>Range: <a href="../String/">String</a></li>
+<li>Range: <a href="../TermObject/">TermObject</a></li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
+<h3 id="schema-source">Schema Source</h3>
+<ul>
+<li>from schema: https://w3id.org/gocam</li>
+</ul>
 <h2 id="mappings">Mappings</h2>
 <table>
 <thead>
@@ -410,12 +428,16 @@ Alias: term</p>
 <details>
 
 <pre><code class="language-yaml">name: term
+description: A generic slot for ontology terms
+from_schema: https://w3id.org/gocam
+rank: 1000
+slot_uri: gocam:term
 alias: term
 domain_of:
 - EvidenceItem
 - EnabledByAssociation
 - TermAssociation
-range: string
+range: TermObject
 
 </code></pre>
 
