@@ -116,7 +116,12 @@ class Indexer:
         all_annoton_terms = []
 
         def term_association_references(term_association: Optional[TermAssociation]) -> Set[str]:
-            """Extract references from a TermAssociation."""
+            """
+            Extract references from a TermAssociation.
+
+            Returns:
+                Set[str]: A set of reference strings extracted from the evidence of the TermAssociation.
+            """
             refs = set()
             if term_association and term_association.evidence:
                 refs = {e.reference for e in term_association.evidence if e.reference}
