@@ -1,11 +1,16 @@
 id: https://w3id.org/gocam
 name: gocam
 description: |-
-  GO CAM LinkML schema (experimental)
-
-  The central class in this datamodel is a [Model](Model.md). A model consists of a set of
-  [Activity](Activity.md) objects.
-
+  Gene Ontology Causal Activity Model (GO-CAM) Schema.
+  
+  This schema provides a way of representing causal pathway [Models](Model.md). A model consists of a set of
+  [Activity](Activity.md) objects, where each activity object represents the function of either an [individual
+  gene product](EnabledByGeneProductAssociation), a [protein complex of gene products](EnabledByGeneProductAssociation),
+  or a set of possible gene products.
+  
+  Each [Models](Model.md) has associated metadata slots. Some slots such as [id](id.md), [title](title.md),
+  and [status](status.md) are *required*.
+  
 imports:
  - linkml:types
 
@@ -26,9 +31,10 @@ prefixes:
   gomodel: http://model.geneontology.org/
   oio: http://www.geneontology.org/formats/oboInOwl#
   orcid: https://orcid.org/
-  UniProtKB: http://identifiers.org/uniprot/
-  PMID: http://identifiers.org/pmid/
+  UniProtKB: http://purl.uniprot.org/uniprot/
+  PMID: http://identifiers.org/pubmed/
   dcterms: http://purl.org/dc/terms/
+  RHEA: http://rdf.rhea-db.org/
 
 default_prefix: gocam
 default_range: string
@@ -39,7 +45,17 @@ see_also:
 classes:
 
   Model:
-    description: A model of a biological program consisting of a set of causally connected activities
+    description: A model of a biological program consisting of a set of causally connected activities.
+    rules:
+      - title: Production rules must have at least one activity
+        preconditions:
+          slot_conditions:
+            state:
+              equals_string: production
+        postconditions:
+          slot_conditions:
+            activities:
+              required: true
     attributes:
       id:
         description: The identifier of the model. Should be in gocam namespace.
@@ -47,22 +63,31 @@ classes:
         range: uriorcurie
       title:
         description: The human-readable descriptive title of the model
+        required: true
         slot_uri: dct:title
       taxon:
         description: The primary taxon that the model is about
         range: TaxonTermObject
+      additional_taxa:
+        description: Additional taxa that the model is about
+        range: TaxonTermObject
+        multivalued: true
       status:
-        description: The status of the model
+        description: The status of the model in terms of its progression along the developmental lifecycle
         aliases:
           - model state
         range: ModelStateEnum
         slot_uri: pav:status
       comments:
-        description: Comments about the model
+        description: Curator-provided comments about the model
         slot_uri: rdfs:comment
         multivalued: true
       activities:
         description: All of the activities that are part of the model
+        comments:
+          - this slot is conditionally required. It is optional for models in development state (because
+              a curator may need to instantiate a Model before populating it with activities), but is
+              required for production models. See the associated rule.
         range: Activity
         inlined_as_list: true
         multivalued: true
@@ -78,6 +103,15 @@ classes:
         range: ProvenanceInfo
         inlined_as_list: true
         multivalued: true
+      query_index:
+        description: An optional object that contains the results of indexing a model with various summary
+          statistics and retrieval indices.
+        comments:
+          - This is typically not populated in the primary transactional store (OLTP processing), because
+              the values will be redundant with the primary edited components of the model. It is intended
+              to be populated in batch *after* editing, and then used for generating reports, or for
+              indexing in web applications.
+        range: QueryIndex
 
   Activity:
     description: An individual activity in a causal model, representing the individual molecular 
@@ -91,44 +125,65 @@ classes:
         range: uriorcurie
         comments:
           - Typically does not need to be exposed to end-user, this exists to allow activity flows
+        id_prefixes:
+          - gocam
+        examples:
+          - value: gomodel:63f809ec00000701
+            description: A model representing tRNA repair and recycling
       enabled_by:
         description: The gene product or complex that carries out the activity
         range: EnabledByAssociation
         inlined: true
+        recommended: true
       molecular_function:
         description: The molecular function that is carried out by the gene product or complex
         range: MolecularFunctionAssociation
         inlined: true
         todos:
           - currently BP, CC etc are at the level of the activity, not the MolecularFunctionAssociation
+        recommended: true
       occurs_in:
         description: The cellular location in which the activity occurs
         range: CellularAnatomicalEntityAssociation
         inlined: true
+        recommended: true
       part_of:
         description: The larger biological process in which the activity is a part
         range: BiologicalProcessAssociation
         inlined: true
+        recommended: true
       has_input:
         description: The input molecules that are directly consumed by the activity
+        todos:
+          - resolve has_input vs has_primary_input
         range: MoleculeAssociation
         inlined_as_list: true
         multivalued: true
       has_primary_input:
         description: The primary input molecule that is directly consumed by the activity
+        todos:
+          - resolve has_input vs has_primary_input
         range: MoleculeAssociation
         inlined: true
       has_output:
         description: The output molecules that are directly produced by the activity
+        todos:
+          - resolve has_output vs has_primary_output
         range: MoleculeAssociation
         inlined_as_list: true
         multivalued: true
       has_primary_output:
         description: The primary output molecule that is directly produced by the activity
+        todos:
+          - resolve has_output vs has_primary_output
         range: MoleculeAssociation
         inlined: true
       causal_associations:
-        description: The causal associations that connect this activity to other activities
+        description: The causal associations that flow out of this activity
+        comments:
+          - All activities in a model must be connected to at least one other activity. If a an activity
+              has no outgoing activities (i.e the value of this slot is empty) then it is a terminal
+              activity in the model. If an activity has no incoming activities, it is an initial activity.
         range: CausalAssociation
         inlined_as_list: true
         multivalued: true
@@ -144,9 +199,20 @@ classes:
       term:
         description: The ECO term representing the type of evidence
         range: EvidenceTermObject
+        id_prefixes:
+          - ECO
+        bindings:
+          - binds_value_of: id
+            range: EvidenceCodeEnum
+            obligation_level: REQUIRED
+        examples:
+          - value: ECO:0000314
+            description: direct assay evidence used in manual assertion (IDA)
       reference:
         description: The publication of reference that describes the evidence
         range: PublicationObject
+        examples:
+          - value: PMID:32075755
       with_objects:
         description: Supporting database entities or terms
         aliases:
@@ -165,19 +231,29 @@ classes:
     abstract: true
     attributes:
       type:
+        description: The type of association.
+        comments:
+          - when instantiating Association objects in Python and other languages, it isn't
+              necessary to populate this, it is auto-populated from the object class.
         designates_type: true
       evidence:
+        description: The set of evidence items that support the association.
         range: EvidenceItem
         inlined: true
         multivalued: true
       provenances:
+        description: The set of provenance objects that provide metadata about who made the association.
         range: ProvenanceInfo
         inlined_as_list: true
         multivalued: true
 
   EnabledByAssociation:
     description: >-
-      An association between an activity and the gene product or complex that carries it out
+      An association between an activity and the gene product or complex or set of potential gene products
+        that carry out that activity.
+    comments:
+      - Note that this is an abstract class, and should ot be instantiated
+          directly, instead instantiate a subclass depending on what kind of entity enables the association
     is_a: Association
     abstract: true
     attributes:
@@ -186,14 +262,47 @@ classes:
         range: InformationBiomacromoleculeTermObject
 
   EnabledByGeneProductAssociation:
-    description: An association between an activity and a gene product
+    description: An association between an activity and an individual gene product
     is_a: EnabledByAssociation
     slot_usage:
       term:
+        description: A "term" that is an entity database object representing an individual gene product.
+        comments:
+          - In the context of the GO workflow, the allowed values for this field come from the GPI file
+              from an authoritative source. For example, the authoritative source for human is the EBI GOA
+              group, and the GPI for this group consists of UniProtKB IDs (for proteins) and RNA Central
+              IDs (for RNA gene products)
+          - A gene identifier may be provided as a value here (if the authoritative GPI allows it). Note
+              that the *interpretation* of the gene ID in the context of a GO-CAM model is the (spliceform
+              and proteoform agnostic) *product* of that gene.
         range: GeneProductTermObject
+        examples:
+          - value: UniProtKB:Q96Q11
+            description: The protein product of the Homo sapiens TRNT1 gene
+          - value: RNAcentral:URS00026A1FBE_9606
+            description: An RNA product of this RNA central gene
 
   EnabledByProteinComplexAssociation:
-    description: An association between an activity and a protein complex
+    description: An association between an activity and a protein complex, where the complex
+      carries out the activity. This should only be used when the activity cannot be attributed to
+      an individual member of the complex, but instead the function is an emergent property of the complex.
+    comments:
+      - Protein complexes can be specified either by *pre-composition* or *post-composition*. For pre-composition,
+          a species-specific named protein complex (such as an entry in ComplexPortal) can be specified, in
+          which case the value of `members` is *implicit*. For post-composition, the placeholder term "GO:0032991"
+          can be used, in which case `members` must be *explicitly* specified. An intermediate case is when
+          a named class in GO that is a subclass of "GO:0032991" is used. In this case, `members` should still
+          be specified, as this may only be partially specified by the GO class.
+    rules:
+      - title: members must be specified when the generic GO complex is specified
+        preconditions:
+          slot_conditions:
+            term:
+              equals_string: GO:0032991
+        postconditions:
+          slot_conditions:
+            members:
+              required: true
     is_a: EnabledByAssociation
     attributes:
       members:
@@ -203,6 +312,12 @@ classes:
     slot_usage:
       term:
         range: ProteinComplexTermObject
+        examples:
+          - value: GO:0032991
+            description: The generic GO entry for a protein complex.
+              If this is the value of `term`, then members *must* be specified.
+          - value: ComplexPortal:CPX-969
+            description: The human Caspase-2 complex
 
   CausalAssociation:
     description: A causal association between two activities
@@ -218,7 +333,9 @@ classes:
         range: Activity
 
   TermAssociation:
-    description: An association between an activity and a term, potentially with extensions
+    description: An association between an activity and a term, potentially with extensions.
+      This is an abstract class for grouping purposes, it should not be directly instantiated, 
+      instead a subclass should be instantiated.
     is_a: Association
     abstract: true
     attributes:
@@ -229,7 +346,7 @@ classes:
   MolecularFunctionAssociation:
     description: An association between an activity and a molecular function term
     todos:
-      - account for non-MF activity types in Reactome
+      - account for non-MF activity types in Reactome (MolecularEvent)
     is_a: TermAssociation
     slot_usage:
       term:
@@ -244,7 +361,8 @@ classes:
         range: PhaseTermObject
       part_of:
         description: Optional extension allowing hierarchical nesting of BPs
-        range: BiologicalProcessTermObject
+        range: BiologicalProcessAssociation
+        inlined: true
     slot_usage:
       term:
         range: BiologicalProcessTermObject
@@ -254,10 +372,16 @@ classes:
     is_a: TermAssociation
     attributes:
       part_of:
+        description: Optional extension allowing hierarchical nesting of CCs
         range: CellTypeAssociation
+        inlined: true
     slot_usage:
       term:
         range: CellularAnatomicalEntityTermObject
+        bindings:
+          - binds_value_of: id
+            range: CellularAnatomicalEntityEnum
+            obligation_level: REQUIRED
 
   CellTypeAssociation:
     description: An association between an activity and a cell type term
@@ -317,7 +441,8 @@ classes:
       - DOI
 
   EvidenceTermObject:
-    description: A term object that represents an evidence term from ECO
+    description: A term object that represents an evidence term from ECO. Only ECO terms that
+      map up to a GO GAF evidence code should be used.
     is_a: TermObject
     id_prefixes:
       - ECO
@@ -408,20 +533,228 @@ classes:
         slot_uri: dct:created
       date:
         slot_uri: dct:date
+        todos:
+          - consider modeling as date rather than string
       provided_by:
         multivalued: true
         slot_uri: pav:providedBy
 
+  QueryIndex:
+    description: An index that is optionally placed on a model in order to support common query or index
+      operations. Note that this index is not typically populated in the working transactional store for
+      a model, it is derived via computation from core primary model information.
+    attributes:
+      number_of_activities:
+        description: The number of activities in a model.
+        comments:
+          - this includes all activities, even those without an enabler.
+        # equals_expression: "len(../activities)"
+        range: integer
+      number_of_enabled_by_terms:
+        description: The number of molecular entities or sets of entities in a model.
+        # equals_expression: "len(../activities/enabled_by)"
+        range: integer
+      number_of_causal_associations:
+        description: Total number of causal association edges connecting activities in a model.
+        todos:
+          - decide what to do about "implicit" causal associations, i.e provides_input_for
+        range: integer
+      length_of_longest_causal_association_path:
+        description: The maximum number of hops along activities along the direction of causal flow in a model.
+        range: integer
+      number_of_strongly_connected_components:
+        description: The number of distinct components that consist of activities that are connected (directly or
+          indirectly) via causal connections. Most models will consist of a single SCC. Some models may consist
+          of two or more "islands" where there is no connection from one island to another.
+        range: integer
+      flattened_references:
+        description: All publication objects from the model across different levels combined in one place
+        range: PublicationObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_molecular_function_terms:
+        description: All MF terms for all activities
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_molecular_function_closure:
+        description: The reflexive transitive closure of `model_activity_molecular_function_terms`, over the is_a
+          relationship
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+        annotations:
+          closure_computed_over: "[rdfs:subClassOf]"
+      model_activity_molecular_function_rollup:
+        description: The rollup of `model_activity_molecular_function_closure` to a GO subset or slim.
+        comments:
+          - added for completion but may not be useful in practice
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_occurs_in_terms:
+        description: All direct cellular component localization terms for all activities
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_occurs_in_closure:
+        description: The reflexive transitive closure of `model_activity_occurs_in_terms`, over the is_a and part_of
+          relationship type
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+        annotations:
+          closure_computed_over: "[rdfs:subClassOf, BFO:0000050]"
+      model_activity_occurs_in_rollup:
+        description: The rollup of `model_activity_occurs_in_closure` to a GO subset or slim.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_enabled_by_terms:
+        description: All direct enabler terms for all activities
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_enabled_by_closure:
+        description: The reflexive transitive closure of `model_activity_enabled_by_terms`, over the is_a
+          and has_part relationship type (e.g. complex to parts)
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+        annotations:
+          closure_computed_over: "[rdfs:subClassOf, BFO:0000051]"
+      model_activity_enabled_by_rollup:
+        description: The rollup of `model_activity_enabled_by_closure` to a GO subset or slim.
+        comments:
+          - added for completion but may not be useful in practice
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_part_of_terms:
+        description: All direct biological process terms for all activities
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_part_of_closure:
+        description: The reflexive transitive closure of `model_activity_part_of_terms`, over the is_a and part_of
+          relationship type
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+        annotations:
+          closure_computed_over: "[rdfs:subClassOf, BFO:0000050]"
+      model_activity_part_of_rollup:
+        description: The rollup of `model_activity_part_of_closure` to a GO subset or slim.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_has_input_terms:
+        description: All direct input terms for all activities
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_has_input_closure:
+        description: The reflexive transitive closure of `model_activity_has_input_terms`, over the is_a
+          relationship type
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+        annotations:
+          closure_computed_over: "[rdfs:subClassOf]"
+      model_activity_has_input_rollup:
+        description: The rollup of `model_activity_has_input_closure` to a GO subset or slim.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_taxon:
+        description: The primary taxon term for the model, over the NCBITaxon:subClassOf relationship type.
+          This is used to determine the primary taxon that the model is relevant to.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_taxon_closure:
+        description: The reflexive transitive closure of the taxon term for the model, over the
+          NCBITaxon:subClassOf relationship type. This is used to determine the set of taxa that are
+          relevant to the model.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+        annotations:
+          closure_computed_over: "[rdfs:subClassOf]"
+      model_taxon_rollup:
+        description: The rollup of the taxon closure to a NCBITaxon subset or slim.
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      annoton_terms:
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      start_activities:
+        description: The set of activities that are the starting points of the model, i.e. those that have no
+          incoming causal associations.
+        range: Activity
+        multivalued: true
+        inlined: false
+      end_activities:
+        description: The set of activities that are the end points of the model, i.e. those that have no
+          outgoing causal associations.
+        range: Activity
+        multivalued: true
+        inlined: false
+      intermediate_activities:
+        description: The set of activities that are neither start nor end activities, i.e. those that have
+          both incoming and outgoing causal associations.
+        range: Activity
+        multivalued: true
+        inlined: false
+      singleton_activities:
+        description: The set of activities that have no causal associations, i.e. those that are not connected
+          to any other activity in the model.
+        range: Activity
+        multivalued: true
+        inlined: false
+      number_of_start_activities:
+        description: The number of start activities in a model
+        range: integer
+      number_of_end_activities:
+        description: The number of end activities in a model
+        range: integer
+      number_of_intermediate_activities:
+        description: The number of intermediate activities in a model
+        range: integer
+      number_of_singleton_activities:
+        description: The number of singleton activities in a model
+        range: integer
+
+
 enums:
 
   ModelStateEnum:
-    description: >-
-      Status of a model
+    description: A term describing where the model is in the development life cycle.
     permissible_values:
-      production:
       development:
+        description: Used when the curator is still working on the model. Edits are still being made, and the
+          information in the model is not yet guaranteed to be accurate or complete. The model should not
+          be displayed in end-user facing websites, unless it is made clear that the model is a work in progress.
+        aliases:
+          - work in progress
+      production:
+        description: Used when the curator has declared the model is ready for public consumption. Edits might
+          still be performed on the model in future, but the information in the model is believed to be both
+          accurate and reasonably complete. The model may be displayed in public websites.
+      delete:
+        description: When the curator has marked for future deletion.
+      review:
+        description: The model has been marked for curator review.
+      internal_test:
+        description: The model is not intended for use public use; it is likely to be used for internal testing.
+      closed:
+        description: TBD
+
 
   InformationBiomacromoleculeCategory:
+    description: A term describing the type of the enabler of an activity.
     permissible_values:
       GeneOrReferenceProtein:
         meaning: biolink.GeneOrGeneProduct
@@ -430,6 +763,8 @@ enums:
       Unknown:
 
   CausalPredicateEnum:
+    description: A term describing the causal relationship between two activities. All terms are drawn from
+      the "causally upstream or within" (RO:0002418) branch of the Relation Ontology (RO).
     permissible_values:
       causally upstream of, positive effect:
         meaning: RO:0002304
@@ -451,5 +786,44 @@ enums:
         meaning: RO:0002212
       positively regulates:
         meaning: RO:0002213
+      provides input for:
+        meaning: RO:0002413
+      removes input for:
+        meaning: RO:0012010
+
+  EvidenceCodeEnum:
+    description: A term from the subset of ECO that maps up to a GAF evidence code
+    reachable_from:
+      source_nodes:
+        - ECO:0000000
+      is_direct: false
+      relationship_types:
+        - rdfs:subClassOf
+
+  CellularAnatomicalEntityEnum:
+    description: A term from the subset of the cellular anatomical entity branch of GO CC
+    reachable_from:
+      source_nodes:
+        - GO:0110165 # cellular anatomical structure
+      is_direct: false
+      relationship_types:
+        - rdfs:subClassOf
+
+  PhaseEnum:
+    description: A term from either the phase branch of GO or the phase branch of an anatomy ontology
+    include:
+      - reachable_from:
+          source_nodes:
+            - GO:0044848 # biological phase
+          is_direct: false
+          relationship_types:
+            - rdfs:subClassOf
+      - reachable_from:
+          source_nodes:
+            - UBERON:0000105 # life cycle stage
+          is_direct: false
+          relationship_types:
+            - rdfs:subClassOf
+
 
 

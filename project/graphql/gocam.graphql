@@ -1,4 +1,38 @@
 # metamodel_version: 1.7.0
+enum CausalPredicateEnum
+  {
+    causally_upstream_of__COMMA___positive_effect
+    causally_upstream_of__COMMA___negative_effect
+    causally_upstream_of
+    immediately_causally_upstream_of
+    causally_upstream_of_or_within
+    causally_upstream_of_or_within__COMMA___negative_effect
+    causally_upstream_of_or_within__COMMA___positive_effect
+    regulates
+    negatively_regulates
+    positively_regulates
+    provides_input_for
+    removes_input_for
+  }
+
+enum InformationBiomacromoleculeCategory
+  {
+    GeneOrReferenceProtein
+    ProteinIsoform
+    MacromolecularComplex
+    Unknown
+  }
+
+enum ModelStateEnum
+  {
+    development
+    production
+    delete
+    review
+    internal_test
+    closed
+  }
+
 type Activity
   {
     id: Uriorcurie!
@@ -26,9 +60,9 @@ type BiologicalProcessAssociation
     type: String
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
-    term: BiologicalProcessTermObject
     happensDuring: PhaseTermObject
-    partOf: BiologicalProcessTermObject
+    partOf: BiologicalProcessAssociation
+    term: BiologicalProcessTermObject
   }
 
 type BiologicalProcessTermObject
@@ -53,8 +87,8 @@ type CellTypeAssociation
     type: String
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
-    term: CellTypeTermObject
     partOf: GrossAnatomyAssociation
+    term: CellTypeTermObject
   }
 
 type CellTypeTermObject
@@ -70,8 +104,8 @@ type CellularAnatomicalEntityAssociation
     type: String
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
-    term: CellularAnatomicalEntityTermObject
     partOf: CellTypeAssociation
+    term: CellularAnatomicalEntityTermObject
   }
 
 type CellularAnatomicalEntityTermObject
@@ -144,8 +178,8 @@ type GrossAnatomyAssociation
     type: String
     evidence: [EvidenceItem]
     provenances: [ProvenanceInfo]
-    term: GrossAnatomicalStructureTermObject
     partOf: GrossAnatomyAssociation
+    term: GrossAnatomicalStructureTermObject
   }
 
 interface InformationBiomacromoleculeTermObject
@@ -159,13 +193,15 @@ interface InformationBiomacromoleculeTermObject
 type Model
   {
     id: Uriorcurie!
-    title: String
+    title: String!
     taxon: TaxonTermObject
+    additionalTaxa: [TaxonTermObject]
     status: ModelStateEnum
     comments: [String]
     activities: [Activity]
     objects: [Object]
     provenances: [ProvenanceInfo]
+    queryIndex: QueryIndex
   }
 
 type MolecularFunctionAssociation
@@ -234,10 +270,10 @@ type ProteinComplexTermObject
 
 type ProvenanceInfo
   {
-    contributor: String
+    contributor: [String]
     created: String
     date: String
-    providedBy: String
+    providedBy: [String]
   }
 
 type PublicationObject
@@ -248,6 +284,43 @@ type PublicationObject
     obsolete: Boolean
     abstractText: String
     fullText: String
+  }
+
+type QueryIndex
+  {
+    numberOfActivities: Integer
+    numberOfEnabledByTerms: Integer
+    numberOfCausalAssociations: Integer
+    lengthOfLongestCausalAssociationPath: Integer
+    numberOfStronglyConnectedComponents: Integer
+    flattenedReferences: [PublicationObject]
+    modelActivityMolecularFunctionTerms: [TermObject]
+    modelActivityMolecularFunctionClosure: [TermObject]
+    modelActivityMolecularFunctionRollup: [TermObject]
+    modelActivityOccursInTerms: [TermObject]
+    modelActivityOccursInClosure: [TermObject]
+    modelActivityOccursInRollup: [TermObject]
+    modelActivityEnabledByTerms: [TermObject]
+    modelActivityEnabledByClosure: [TermObject]
+    modelActivityEnabledByRollup: [TermObject]
+    modelActivityPartOfTerms: [TermObject]
+    modelActivityPartOfClosure: [TermObject]
+    modelActivityPartOfRollup: [TermObject]
+    modelActivityHasInputTerms: [TermObject]
+    modelActivityHasInputClosure: [TermObject]
+    modelActivityHasInputRollup: [TermObject]
+    modelTaxon: [TermObject]
+    modelTaxonClosure: [TermObject]
+    modelTaxonRollup: [TermObject]
+    annotonTerms: [TermObject]
+    startActivities: [Activity]
+    endActivities: [Activity]
+    intermediateActivities: [Activity]
+    singletonActivities: [Activity]
+    numberOfStartActivities: Integer
+    numberOfEndActivities: Integer
+    numberOfIntermediateActivities: Integer
+    numberOfSingletonActivities: Integer
   }
 
 type TaxonTermObject

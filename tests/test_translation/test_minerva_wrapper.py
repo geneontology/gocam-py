@@ -125,6 +125,22 @@ def test_multivalued_input_and_output():
     assert len(cs_activity.has_input) == 3
     assert len(cs_activity.has_output) == 2
 
+def test_missing_enabled_by():
+    """Test that activities without an enabled_by association are handled correctly."""
+    minerva_object = load_minerva_object("YeastPathways_LYSDEGII-PWY")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    # Find activities without an enabled_by association
+    activities_without_enabled_by = [
+        a for a in model.activities if a.enabled_by is None
+    ]
+
+    # Verify that there are no such activities
+    assert len(activities_without_enabled_by) == 0, (
+        "There should be no activities without an enabled_by association."
+    )
+
 
 def test_provenance_on_evidence():
     """Test that all contributor and providedBy annotations are included on the ProvenanceInfo
@@ -236,3 +252,119 @@ def test_evidence_with_objects():
     evidence = kinase_activity.enabled_by.evidence[0]
     assert len(evidence.with_objects) == 2
     assert all(re.match(r"^[A-Z]+:[A-Z0-9]+$", obj) for obj in evidence.with_objects)
+
+
+def test_additional_taxa():
+    """Test that model with multiple taxa correctly handles primary taxon and additional_taxa."""
+    # Create a copy of the test file with minimal content for controlled testing
+    minerva_object = {
+        "id": "gomodel:test123",
+        "annotations": [
+            {
+                "key": "title",
+                "value": "Test model with multiple taxa"
+            },
+            # First taxon annotation (Human)
+            {
+                "key": "https://w3id.org/biolink/vocab/in_taxon",
+                "value": "NCBITaxon:9606",
+                "value-type": "IRI"
+            },
+            # Second taxon annotation (E. coli)
+            {
+                "key": "https://w3id.org/biolink/vocab/in_taxon",
+                "value": "NCBITaxon:562",
+                "value-type": "IRI"
+            }
+        ],
+        "individuals": [],
+        "facts": []
+    }
+    
+    # Add a minimal individual and fact to make it a valid model
+    minerva_object["individuals"] = [
+        {
+            "id": "gomodel:test123/activity1",
+            "type": [{"type": "class", "id": "GO:0003674", "label": "molecular_function"}],
+            "root-type": [{"type": "class", "id": "GO:0003674", "label": "molecular_function"}],
+            "annotations": []
+        },
+        {
+            "id": "gomodel:test123/protein1",
+            "type": [{"type": "class", "id": "UniProtKB:P12345", "label": "test protein"}],
+            "root-type": [{"type": "class", "id": "CHEBI:33695", "label": "information biomacromolecule"}],
+            "annotations": []
+        }
+    ]
+    
+    minerva_object["facts"] = [
+        {
+            "subject": "gomodel:test123/activity1",
+            "property": "RO:0002333",
+            "object": "gomodel:test123/protein1",
+            "annotations": []
+        }
+    ]
+    
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+    
+    # Verify that the model makes human the primary taxon and E. coli additional
+    assert model.taxon == "NCBITaxon:9606"
+    assert len(model.additional_taxa) == 1
+    assert model.additional_taxa[0] == "NCBITaxon:562"
+    
+    # Test with two non-host taxa
+    minerva_object["annotations"] = [
+        {
+            "key": "title",
+            "value": "Test model with multiple taxa"
+        },
+        {
+            "key": "https://w3id.org/biolink/vocab/in_taxon",
+            "value": "NCBITaxon:562"    # E. coli (not a host)
+        },
+        {
+            "key": "https://w3id.org/biolink/vocab/in_taxon",
+            "value": "NCBITaxon:623"    # Shigella (not a host)
+        }
+    ]
+    
+    model = mw.minerva_object_to_model(minerva_object)
+    
+    # When no hosts, the first taxon should be primary
+    assert model.taxon == "NCBITaxon:562"
+    assert len(model.additional_taxa) == 1
+    assert model.additional_taxa[0] == "NCBITaxon:623"
+
+
+def test_host_taxon_prioritization():
+    """Test that host taxa are properly prioritized when multiple taxa are present."""
+    minerva_object = load_minerva_object("6348a65d00000661")
+    
+    # First, ensure we're working with a fresh copy with no taxon annotations
+    minerva_object["annotations"] = [ann for ann in minerva_object["annotations"] 
+                               if ann.get("key") != "https://w3id.org/biolink/vocab/in_taxon" 
+                               and ann.get("key") != "in_taxon"]
+    
+    # Add taxon annotations: one host and one pathogen (in non-host-first order)
+    minerva_object["annotations"].extend([
+        {
+            "key": "https://w3id.org/biolink/vocab/in_taxon", 
+            "value": "NCBITaxon:623",    # Shigella (pathogen)
+            "value-type": "IRI"
+        },
+        {
+            "key": "https://w3id.org/biolink/vocab/in_taxon",
+            "value": "NCBITaxon:9606",   # Human (host)
+            "value-type": "IRI"
+        }
+    ])
+    
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+    
+    # Verify the model prioritizes the host taxon as primary, even though it was added second
+    assert model.taxon == "NCBITaxon:9606"
+    assert len(model.additional_taxa) == 1
+    assert model.additional_taxa[0] == "NCBITaxon:623"

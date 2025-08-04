@@ -21,6 +21,7 @@ from gocam.datamodel import (
     Object,
     ProvenanceInfo,
 )
+from gocam.vocabulary.taxa import TaxonVocabulary
 
 ENABLED_BY = "RO:0002333"
 PART_OF = "BFO:0000050"
@@ -64,7 +65,11 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
     """
     anns = defaultdict(list)
     for a in obj.get("annotations", []):
-        anns[_normalize_property(a["key"])].append(a["value"])
+        key = _normalize_property(a["key"])
+        value = a["value"]
+        logger.debug(f"Processing annotation: {key}={value}")
+        anns[key].append(value)
+    logger.debug(f"Multivalued annotations: {dict(anns)}")
     return anns
 
 
@@ -266,7 +271,7 @@ class MinervaWrapper:
 
         enabled_by_facts = facts_by_property.get(ENABLED_BY, [])
         if not enabled_by_facts:
-            raise ValueError(f"Missing {ENABLED_BY} in {facts_by_property}")
+            logger.warning(f"Missing {ENABLED_BY} facts in {facts_by_property}")
         for fact in enabled_by_facts:
             subject, object_ = fact["subject"], fact["object"]
             if subject not in individual_to_term:
@@ -300,8 +305,10 @@ class MinervaWrapper:
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
             else:
-                logger.warning(f"Unknown enabled_by type for {object_}")
-                continue
+                logger.warning(f"Unknown enabled_by type for {object_}; assuming gene product")
+                enabled_by_association = EnabledByGeneProductAssociation(
+                    term=gene_id, evidence=evs, provenances=[prov]
+                )
 
             activity = Activity(
                 id=subject,
@@ -418,14 +425,51 @@ class MinervaWrapper:
             provided_by=annotations_mv.get("providedBy"),
         )
 
-        cam = Model(
-            id=id,
-            title=annotations["title"],
-            status=annotations.get("state", None),
-            comments=annotations_mv.get("comment", None),
-            taxon=annotations.get("in_taxon", None),
-            activities=activities,
-            objects=objects,
-            provenances=[provenance],
-        )
+        # Get all taxa from the annotations
+        all_taxa = annotations_mv.get(TaxonVocabulary.TAXON_ANNOTATION_KEY, [])
+        
+        # Add legacy taxon key if it exists (backward compatibility)
+        legacy_taxon = annotations.get(TaxonVocabulary.LEGACY_TAXON_KEY)
+        if legacy_taxon and legacy_taxon not in all_taxa:
+            all_taxa.append(legacy_taxon)
+            
+        # If no taxa, nothing to do
+        if not all_taxa:
+            taxon = None
+            additional_taxa = []
+        # If only one taxon, it's the primary
+        elif len(all_taxa) == 1:
+            taxon = all_taxa[0]
+            additional_taxa = []
+        # Multiple taxa - prioritize host taxa as primary
+        else:
+            # Find host taxa in the list
+            host_matches = [t for t in all_taxa if TaxonVocabulary.is_host_taxon(t)]
+            if host_matches:
+                # Use the first host taxon as primary
+                taxon = host_matches[0]
+                # All others are additional taxa
+                additional_taxa = [t for t in all_taxa if t != taxon]
+            else:
+                # No host matches, just use the first as primary
+                taxon = all_taxa[0]
+                additional_taxa = all_taxa[1:]
+        
+        # Build model parameters
+        model_args = {
+            "id": id,
+            "title": annotations["title"],
+            "status": annotations.get("state", None),
+            "comments": annotations_mv.get("comment", None),
+            "taxon": taxon,
+            "activities": activities,
+            "objects": objects,
+            "provenances": [provenance],
+        }
+        
+        # Only add additional_taxa if it has values
+        if additional_taxa and len(additional_taxa) > 0:
+            model_args["additional_taxa"] = additional_taxa
+        
+        cam = Model(**model_args)
         return cam

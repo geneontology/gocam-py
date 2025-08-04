@@ -1,0 +1,2693 @@
+{
+  "id": "gomodel:6348a65d00000661",
+  "individuals": [
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000662",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0004252",
+          "label": "serine-type endopeptidase activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000663",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:P12544",
+          "label": "GZMA Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000664",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0140507",
+          "label": "granzyme-mediated programmed cell death signaling pathway"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000665",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:Q8TAX9-1",
+          "label": "GSDMB Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000666",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0022829",
+          "label": "wide pore channel activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000667",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:P14222",
+          "label": "PRF1 Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000668",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0071806",
+          "label": "protein transmembrane transport"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000669",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005886",
+          "label": "plasma membrane"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000670",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:P12544",
+          "label": "GZMA Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000671",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005737",
+          "label": "cytoplasm"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000672",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0051604",
+          "label": "protein maturation"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000673",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:Q8TAX9-1",
+          "label": "GSDMB Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000674",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0017038",
+          "label": "protein import"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000675",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:1901612",
+          "label": "cardiolipin binding"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000676",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:Q8TAX9-1",
+          "label": "GSDMB Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000677",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:1902483",
+          "label": "cytotoxic T cell pyroptotic cell death"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000679",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0022829",
+          "label": "wide pore channel activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000680",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:Q8TAX9-1",
+          "label": "GSDMB Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000681",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:1902483",
+          "label": "cytotoxic T cell pyroptotic cell death"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000683",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "source",
+          "value": "PMID:20038786"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000684",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "PMID:20038786"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000685",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "PMID:20038786"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000686",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "source",
+          "value": "PMID:20038786"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000687",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "source",
+          "value": "PMID:20038786"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000688",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000689",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000690",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000691",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000692",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000693",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000694",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000695",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000696",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0051873",
+          "label": "killing by host of symbiont cells"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000697",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000698",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0050829",
+          "label": "defense response to Gram-negative bacterium"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000699",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000701",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000702",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000703",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0051873",
+          "label": "killing by host of symbiont cells"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000704",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000705",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0050829",
+          "label": "defense response to Gram-negative bacterium"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000706",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000709",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0061630",
+          "label": "ubiquitin protein ligase activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000710",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:P18014",
+          "label": "ipaH7.8 SHIFL"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000711",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0006511",
+          "label": "ubiquitin-dependent protein catabolic process"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0008150",
+          "label": "biological_process"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000712",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:Q8TAX9-1",
+          "label": "GSDMB Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000713",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0030430",
+          "label": "host cell cytoplasm"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "CARO:0000000",
+          "label": "anatomical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000714",
+      "type": [
+        {
+          "type": "class",
+          "id": "UniProtKB:Q8TAX9-1",
+          "label": "GSDMB Hsap"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:36080",
+          "label": "protein"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000715",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000716",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000717",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000718",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000719",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:6348a65d00000661/6348a65d00000720",
+      "type": [
+        {
+          "type": "class",
+          "id": "ECO:0000314",
+          "label": "direct assay evidence used in manual assertion"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "ECO:0000000",
+          "label": "evidence"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "source",
+          "value": "PMID:34022140"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000666",
+      "property": "RO:0002304",
+      "property-label": "RO:0002304",
+      "object": "gomodel:6348a65d00000661/6348a65d00000662",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000675",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000677",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000695",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000666",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:6348a65d00000661/6348a65d00000669",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000687",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000709",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000711",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000716",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000709",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:6348a65d00000661/6348a65d00000714",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000718",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000709",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:6348a65d00000661/6348a65d00000713",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000717",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000675",
+      "property": "RO:0002333",
+      "property-label": "RO:0002333",
+      "object": "gomodel:6348a65d00000661/6348a65d00000676",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000694",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000677",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000696",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000697",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000696",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000698",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000699",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000681",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000703",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000704",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000679",
+      "property": "RO:0002333",
+      "property-label": "RO:0002333",
+      "object": "gomodel:6348a65d00000661/6348a65d00000680",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000701",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000666",
+      "property": "RO:0002333",
+      "property-label": "RO:0002333",
+      "object": "gomodel:6348a65d00000661/6348a65d00000667",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000683",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000675",
+      "property": "RO:0002629",
+      "property-label": "RO:0002629",
+      "object": "gomodel:6348a65d00000661/6348a65d00000679",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2023-03-16"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "comment",
+          "value": "Automated change 2023-03-16: RO:0002213 replaced by RO:0002629"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000709",
+      "property": "RO:0002333",
+      "property-label": "RO:0002333",
+      "object": "gomodel:6348a65d00000661/6348a65d00000710",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000715",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000672",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000664",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000692",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000711",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:6348a65d00000661/6348a65d00000712",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000719",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000662",
+      "property": "BFO:0000066",
+      "property-label": "BFO:0000066",
+      "object": "gomodel:6348a65d00000661/6348a65d00000671",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000691",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000662",
+      "property": "RO:0002629",
+      "property-label": "RO:0002629",
+      "object": "gomodel:6348a65d00000661/6348a65d00000675",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2023-03-16"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "comment",
+          "value": "Automated change 2023-03-16: RO:0002213 replaced by RO:0002629"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000668",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000674",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000686",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000709",
+      "property": "RO:0002630",
+      "property-label": "RO:0002630",
+      "object": "gomodel:6348a65d00000661/6348a65d00000675",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000720",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2023-03-16"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        },
+        {
+          "key": "comment",
+          "value": "Automated change 2023-03-16: RO:0002212 replaced by RO:0002630"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000662",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000672",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000689",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000666",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000668",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000684",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000662",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:6348a65d00000661/6348a65d00000665",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000690",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000662",
+      "property": "RO:0002333",
+      "property-label": "RO:0002333",
+      "object": "gomodel:6348a65d00000661/6348a65d00000663",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000688",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000703",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000705",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000706",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000666",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:6348a65d00000661/6348a65d00000670",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000685",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000672",
+      "property": "RO:0002233",
+      "property-label": "RO:0002233",
+      "object": "gomodel:6348a65d00000661/6348a65d00000673",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000693",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:6348a65d00000661/6348a65d00000679",
+      "property": "BFO:0000050",
+      "property-label": "BFO:0000050",
+      "object": "gomodel:6348a65d00000661/6348a65d00000681",
+      "annotations": [
+        {
+          "key": "evidence",
+          "value": "gomodel:6348a65d00000661/6348a65d00000702",
+          "value-type": "IRI"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0001-7299-6685"
+        },
+        {
+          "key": "date",
+          "value": "2022-10-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "https://www.uniprot.org"
+        }
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "key": "state",
+      "value": "production"
+    },
+    {
+      "key": "contributor",
+      "value": "https://orcid.org/0000-0001-7299-6685"
+    },
+    {
+      "key": "date",
+      "value": "2023-03-16"
+    },
+    {
+      "key": "title",
+      "value": "Cytotoxic T cell pyroptosis mediated by GSDMB isoform 1 in response to infection by Gram-negative bacteria and its inhibition by S.flexneri IpaH7.8 (Human and S.flexneri)"
+    },
+    {
+      "key": "providedBy",
+      "value": "https://www.uniprot.org"
+    },
+    {
+      "key": "comment",
+      "value": "Automated change 2023-03-16: RO:0002212 replaced by RO:0002630"
+    },
+    {
+      "key": "comment",
+      "value": "Automated change 2023-03-16: RO:0002213 replaced by RO:0002629"
+    },
+    {
+      "key": "wasDerivedFrom",
+      "value": "gomodel:6348a65d00000594",
+      "value-type": "IRI"
+    },
+    {
+      "key": "https://w3id.org/biolink/vocab/in_taxon",
+      "value": "NCBITaxon:623",
+      "value-type": "IRI"
+    },
+    {
+      "key": "https://w3id.org/biolink/vocab/in_taxon",
+      "value": "NCBITaxon:9606",
+      "value-type": "IRI"
+    }
+  ]
+}
