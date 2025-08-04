@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, Dict, Set, Optional
+from typing import Iterable, Dict, Set, Optional, Any, Union, List
 import json
 
 import networkx as nx
@@ -337,7 +337,7 @@ class ModelNetworkTranslator(GraphTranslator):
     
     def _graph_to_dict(self, g2g_graph: nx.DiGraph, models: Iterable[Model], include_model_info: bool) -> Dict:
         """
-        Convert NetworkX graph to JSON-serializable dictionary.
+        Convert NetworkX graph to JSON-serializable dictionary following NetworkX standards.
         
         Args:
             g2g_graph: The gene-to-gene NetworkX DiGraph
@@ -345,9 +345,13 @@ class ModelNetworkTranslator(GraphTranslator):
             include_model_info: Whether to include model metadata
             
         Returns:
-            Dictionary representation of the gene-to-gene network
+            Dictionary representation of the gene-to-gene network in NetworkX format
         """
+        # Start with NetworkX standard format
         result = {
+            "directed": True,
+            "multigraph": False,
+            "graph": {},
             "nodes": [
                 {"id": node, **attrs}
                 for node, attrs in g2g_graph.nodes(data=True)
@@ -358,12 +362,13 @@ class ModelNetworkTranslator(GraphTranslator):
             ]
         }
         
+        # Add model metadata to graph attributes following NetworkX standards
         if include_model_info:
             models_list = list(models)
             if len(models_list) == 1:
                 # Single model metadata
                 model = models_list[0]
-                result["model_info"] = {
+                result["graph"]["model_info"] = {
                     "id": model.id,
                     "title": model.title,
                     "taxon": model.taxon,
@@ -371,7 +376,7 @@ class ModelNetworkTranslator(GraphTranslator):
                 }
             else:
                 # Multiple models metadata
-                result["models_info"] = [
+                result["graph"]["models_info"] = [
                     {
                         "id": model.id,
                         "title": model.title,

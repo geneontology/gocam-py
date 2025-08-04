@@ -616,6 +616,74 @@ The JSON output contains:
 
 Evidence collections preserve the original GO-CAM evidence with references (PMIDs, etc.) and evidence codes (ECO terms) for full traceability.
 
+### Example Output
+
+```json
+{
+  "directed": true,
+  "multigraph": false,
+  "graph": {
+    "model_info": {
+      "id": "gomodel:568b0f9600000284",
+      "title": "Antibacterial innate immune response in the intestine via MAPK cascade (C. elegans)",
+      "taxon": "NCBITaxon:6239",
+      "status": "production"
+    }
+  },
+  "nodes": [
+    {
+      "id": "WB:WBGene00006575",
+      "gene_product": "WB:WBGene00006575",
+      "model_id": "gomodel:568b0f9600000284"
+    },
+    {
+      "id": "WB:WBGene00003822",
+      "gene_product": "WB:WBGene00003822",
+      "model_id": "gomodel:568b0f9600000284"
+    }
+  ],
+  "edges": [
+    {
+      "source": "WB:WBGene00006575",
+      "target": "WB:WBGene00003822",
+      "source_gene": "WB:WBGene00006575",
+      "target_gene": "WB:WBGene00003822",
+      "model_id": "gomodel:568b0f9600000284",
+      "causal_predicate": "RO:0002629",
+      "causal_predicate_has_reference": ["PMID:15123841"],
+      "causal_predicate_assessed_by": ["ECO:0000315"],
+      "causal_predicate_contributors": ["https://orcid.org/0000-0002-3013-9906"],
+      "source_gene_molecular_function": "GO:0035591",
+      "source_gene_molecular_function_has_reference": ["PMID:15625192"],
+      "source_gene_molecular_function_assessed_by": ["ECO:0000314"],
+      "source_gene_molecular_function_contributors": ["https://orcid.org/0000-0002-1706-4196"],
+      "source_gene_biological_process": "GO:0140367",
+      "source_gene_biological_process_has_reference": ["PMID:19837372"],
+      "source_gene_biological_process_assessed_by": ["ECO:0000315"],
+      "source_gene_biological_process_contributors": ["https://orcid.org/0000-0002-1706-4196"],
+      "source_gene_occurs_in": "GO:0005737",
+      "source_gene_occurs_in_has_reference": ["PMID:15625192"],
+      "source_gene_occurs_in_assessed_by": ["ECO:0000314"],
+      "source_gene_occurs_in_contributors": ["https://orcid.org/0000-0002-3013-9906"],
+      "source_gene_product": "WB:WBGene00006575",
+      "target_gene_molecular_function": "GO:0004709",
+      "target_gene_molecular_function_has_reference": ["PMID:11751572"],
+      "target_gene_molecular_function_assessed_by": ["ECO:0000314"],
+      "target_gene_molecular_function_contributors": ["https://orcid.org/0000-0002-1706-4196"],
+      "target_gene_biological_process": "GO:0140367",
+      "target_gene_biological_process_has_reference": ["PMID:12142542"],
+      "target_gene_biological_process_assessed_by": ["ECO:0000315"],
+      "target_gene_biological_process_contributors": ["https://orcid.org/0000-0002-1706-4196"],
+      "target_gene_occurs_in": "GO:0005737",
+      "target_gene_occurs_in_has_reference": ["PMID:15625192"],
+      "target_gene_occurs_in_assessed_by": ["ECO:0000314"],
+      "target_gene_occurs_in_contributors": ["https://orcid.org/0000-0002-3013-9906"],
+      "target_gene_product": "WB:WBGene00003822"
+    }
+  ]
+}
+```
+
 ### NetworkX Graph Access
 
 ```python
