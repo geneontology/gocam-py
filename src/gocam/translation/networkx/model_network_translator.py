@@ -148,13 +148,6 @@ class ModelNetworkTranslator(GraphTranslator):
         # Add causal relationship predicate
         if causal_assoc.predicate:
             attrs['causal_predicate'] = causal_assoc.predicate
-            
-            # Add predicate label if available
-            if model.objects:
-                for obj in model.objects:
-                    if obj.id == causal_assoc.predicate and obj.label:
-                        attrs['causal_predicate_label'] = obj.label
-                        break
         
         # Add GO terms from source activity
         self._add_activity_go_terms(source_activity, model, attrs, "source_gene")
@@ -184,7 +177,7 @@ class ModelNetworkTranslator(GraphTranslator):
     
     def _add_activity_go_terms(self, activity: Activity, model: Model, attrs: Dict[str, str], prefix: str) -> None:
         """
-        Add GO terms and labels from an activity to the edge attributes.
+        Add GO terms from an activity to the edge attributes.
         
         Args:
             activity: The activity to extract GO terms from
@@ -195,46 +188,18 @@ class ModelNetworkTranslator(GraphTranslator):
         # Add molecular function
         if activity.molecular_function and activity.molecular_function.term:
             attrs[f'{prefix}_molecular_function'] = activity.molecular_function.term
-            
-            # Add MF label if available
-            if model.objects:
-                for obj in model.objects:
-                    if obj.id == activity.molecular_function.term and obj.label:
-                        attrs[f'{prefix}_molecular_function_label'] = obj.label
-                        break
         
-        # Add biological process
+        # Add biological process  
         if activity.part_of and activity.part_of.term:
             attrs[f'{prefix}_biological_process'] = activity.part_of.term
-            
-            # Add BP label if available  
-            if model.objects:
-                for obj in model.objects:
-                    if obj.id == activity.part_of.term and obj.label:
-                        attrs[f'{prefix}_biological_process_label'] = obj.label
-                        break
         
         # Add cellular component
         if activity.occurs_in and activity.occurs_in.term:
             attrs[f'{prefix}_occurs_in'] = activity.occurs_in.term
-            
-            # Add CC label if available
-            if model.objects:
-                for obj in model.objects:
-                    if obj.id == activity.occurs_in.term and obj.label:
-                        attrs[f'{prefix}_occurs_in_label'] = obj.label
-                        break
         
         # Add gene product (enabled_by)
         if activity.enabled_by and activity.enabled_by.term:
             attrs[f'{prefix}_product'] = activity.enabled_by.term
-            
-            # Add gene product label if available
-            if model.objects:
-                for obj in model.objects:
-                    if obj.id == activity.enabled_by.term and obj.label:
-                        attrs[f'{prefix}_product_label'] = obj.label
-                        break
     
     def _merge_edge_attributes(self, existing: Dict, new: Dict) -> Dict:
         """

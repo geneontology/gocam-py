@@ -125,15 +125,15 @@ class Indexer:
         for activity in model.activities or []:
             annoton_term_id_parts = []
             if activity.causal_associations:
-                all_causal_associations.extend(a.causal_associations)
+                all_causal_associations.extend(activity.causal_associations)
 
             if activity.enabled_by:
-                all_refs.update(term_association_references(a.enabled_by))
+                all_refs.update(term_association_references(activity.enabled_by))
                 all_enabled_bys.add(activity.enabled_by.term)
                 annoton_term_id_parts.append(activity.enabled_by.term)
             
             if activity.molecular_function:
-                all_refs.update(term_association_references(a.molecular_function))
+                all_refs.update(term_association_references(activity.molecular_function))
                 all_mfs.add(activity.molecular_function.term)
                 annoton_term_id_parts.append(activity.molecular_function.term)
 
@@ -145,7 +145,7 @@ class Indexer:
                         all_parts_ofs.add(ta.term)
                         annoton_term_id_parts.append(ta.term)
                 else:
-                    all_refs.update(term_association_references(a.part_of))
+                    all_refs.update(term_association_references(activity.part_of))
                     all_parts_ofs.add(activity.part_of.term)
                     annoton_term_id_parts.append(activity.part_of.term)
                         
