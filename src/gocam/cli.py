@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import List, Optional
 
 import click
-import ndex2
 import yaml
 from linkml_runtime.loaders import json_loader, yaml_loader
 from mkdocs.commands.serve import serve
@@ -82,6 +81,7 @@ def cli(verbose: int, quiet: bool, stacktrace: bool):
     help="Export as minerva json/yaml",
 )
 @click.argument("model_ids", nargs=-1)
+
 def fetch(model_ids, as_minerva, format, add_indexes):
     """Fetch GO-CAM models.
 
@@ -181,6 +181,8 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
         cx2 = model_to_cx2(model, apply_dot_layout=dot_layout)
 
         if ndex_upload:
+            import ndex2
+
             # This is very basic proof-of-concept usage of the NDEx client. Once we have a better
             # idea of how we want to use it, we can refactor this to allow more CLI options for
             # connection details, visibility, adding the new network to a group, etc. At that point
