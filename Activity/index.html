@@ -209,7 +209,7 @@
 <p>URI: <a href="https://w3id.org/gocam/Activity">gocam:Activity</a></p>
 <div class="mermaid"> classDiagram
     class Activity
-    click Activity href "../Activity"
+    click Activity href "../Activity/"
       Activity : causal_associations
 
 
@@ -217,7 +217,7 @@
 
 
         Activity --&gt; "*" CausalAssociation : causal_associations
-        click CausalAssociation href "../CausalAssociation"
+        click CausalAssociation href "../CausalAssociation/"
 
 
 
@@ -228,7 +228,7 @@
 
 
         Activity --&gt; "0..1 _recommended_" EnabledByAssociation : enabled_by
-        click EnabledByAssociation href "../EnabledByAssociation"
+        click EnabledByAssociation href "../EnabledByAssociation/"
 
 
 
@@ -239,7 +239,7 @@
 
 
         Activity --&gt; "*" MoleculeAssociation : has_input
-        click MoleculeAssociation href "../MoleculeAssociation"
+        click MoleculeAssociation href "../MoleculeAssociation/"
 
 
 
@@ -250,7 +250,7 @@
 
 
         Activity --&gt; "*" MoleculeAssociation : has_output
-        click MoleculeAssociation href "../MoleculeAssociation"
+        click MoleculeAssociation href "../MoleculeAssociation/"
 
 
 
@@ -261,7 +261,7 @@
 
 
         Activity --&gt; "0..1" MoleculeAssociation : has_primary_input
-        click MoleculeAssociation href "../MoleculeAssociation"
+        click MoleculeAssociation href "../MoleculeAssociation/"
 
 
 
@@ -272,7 +272,7 @@
 
 
         Activity --&gt; "0..1" MoleculeAssociation : has_primary_output
-        click MoleculeAssociation href "../MoleculeAssociation"
+        click MoleculeAssociation href "../MoleculeAssociation/"
 
 
 
@@ -285,7 +285,7 @@
 
 
         Activity --&gt; "0..1 _recommended_" MolecularFunctionAssociation : molecular_function
-        click MolecularFunctionAssociation href "../MolecularFunctionAssociation"
+        click MolecularFunctionAssociation href "../MolecularFunctionAssociation/"
 
 
 
@@ -296,7 +296,7 @@
 
 
         Activity --&gt; "0..1 _recommended_" CellularAnatomicalEntityAssociation : occurs_in
-        click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation"
+        click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation/"
 
 
 
@@ -307,7 +307,7 @@
 
 
         Activity --&gt; "0..1 _recommended_" BiologicalProcessAssociation : part_of
-        click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
+        click BiologicalProcessAssociation href "../BiologicalProcessAssociation/"
 
 
 
@@ -318,7 +318,7 @@
 
 
         Activity --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 

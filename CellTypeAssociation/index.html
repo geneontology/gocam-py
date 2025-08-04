@@ -209,9 +209,9 @@
 <p>URI: <a href="https://w3id.org/gocam/CellTypeAssociation">gocam:CellTypeAssociation</a></p>
 <div class="mermaid"> classDiagram
     class CellTypeAssociation
-    click CellTypeAssociation href "../CellTypeAssociation"
+    click CellTypeAssociation href "../CellTypeAssociation/"
       TermAssociation &lt;|-- CellTypeAssociation
-        click TermAssociation href "../TermAssociation"
+        click TermAssociation href "../TermAssociation/"
 
       CellTypeAssociation : evidence
 
@@ -220,7 +220,7 @@
 
 
         CellTypeAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -231,7 +231,7 @@
 
 
         CellTypeAssociation --&gt; "0..1" GrossAnatomyAssociation : part_of
-        click GrossAnatomyAssociation href "../GrossAnatomyAssociation"
+        click GrossAnatomyAssociation href "../GrossAnatomyAssociation/"
 
 
 
@@ -242,7 +242,7 @@
 
 
         CellTypeAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -253,7 +253,7 @@
 
 
         CellTypeAssociation --&gt; "0..1" CellTypeTermObject : term
-        click CellTypeTermObject href "../CellTypeTermObject"
+        click CellTypeTermObject href "../CellTypeTermObject/"
 
 
 

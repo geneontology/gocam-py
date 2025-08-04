@@ -204,9 +204,9 @@
 <p>URI: <a href="https://w3id.org/gocam/EnabledByGeneProductAssociation">gocam:EnabledByGeneProductAssociation</a></p>
 <div class="mermaid"> classDiagram
     class EnabledByGeneProductAssociation
-    click EnabledByGeneProductAssociation href "../EnabledByGeneProductAssociation"
+    click EnabledByGeneProductAssociation href "../EnabledByGeneProductAssociation/"
       EnabledByAssociation &lt;|-- EnabledByGeneProductAssociation
-        click EnabledByAssociation href "../EnabledByAssociation"
+        click EnabledByAssociation href "../EnabledByAssociation/"
 
       EnabledByGeneProductAssociation : evidence
 
@@ -215,7 +215,7 @@
 
 
         EnabledByGeneProductAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -226,7 +226,7 @@
 
 
         EnabledByGeneProductAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -237,7 +237,7 @@
 
 
         EnabledByGeneProductAssociation --&gt; "0..1" GeneProductTermObject : term
-        click GeneProductTermObject href "../GeneProductTermObject"
+        click GeneProductTermObject href "../GeneProductTermObject/"
 
 
 

@@ -209,9 +209,9 @@
 <p>URI: <a href="https://w3id.org/gocam/GrossAnatomyAssociation">gocam:GrossAnatomyAssociation</a></p>
 <div class="mermaid"> classDiagram
     class GrossAnatomyAssociation
-    click GrossAnatomyAssociation href "../GrossAnatomyAssociation"
+    click GrossAnatomyAssociation href "../GrossAnatomyAssociation/"
       TermAssociation &lt;|-- GrossAnatomyAssociation
-        click TermAssociation href "../TermAssociation"
+        click TermAssociation href "../TermAssociation/"
 
       GrossAnatomyAssociation : evidence
 
@@ -220,7 +220,7 @@
 
 
         GrossAnatomyAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -231,7 +231,7 @@
 
 
         GrossAnatomyAssociation --&gt; "0..1" GrossAnatomyAssociation : part_of
-        click GrossAnatomyAssociation href "../GrossAnatomyAssociation"
+        click GrossAnatomyAssociation href "../GrossAnatomyAssociation/"
 
 
 
@@ -242,7 +242,7 @@
 
 
         GrossAnatomyAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -253,7 +253,7 @@
 
 
         GrossAnatomyAssociation --&gt; "0..1" GrossAnatomicalStructureTermObject : term
-        click GrossAnatomicalStructureTermObject href "../GrossAnatomicalStructureTermObject"
+        click GrossAnatomicalStructureTermObject href "../GrossAnatomicalStructureTermObject/"
 
 
 

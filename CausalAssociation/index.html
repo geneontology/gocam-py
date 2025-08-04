@@ -209,9 +209,9 @@
 <p>URI: <a href="https://w3id.org/gocam/CausalAssociation">gocam:CausalAssociation</a></p>
 <div class="mermaid"> classDiagram
     class CausalAssociation
-    click CausalAssociation href "../CausalAssociation"
+    click CausalAssociation href "../CausalAssociation/"
       Association &lt;|-- CausalAssociation
-        click Association href "../Association"
+        click Association href "../Association/"
 
       CausalAssociation : downstream_activity
 
@@ -220,7 +220,7 @@
 
 
         CausalAssociation --&gt; "0..1" Activity : downstream_activity
-        click Activity href "../Activity"
+        click Activity href "../Activity/"
 
 
 
@@ -231,7 +231,7 @@
 
 
         CausalAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -242,7 +242,7 @@
 
 
         CausalAssociation --&gt; "0..1" PredicateTermObject : predicate
-        click PredicateTermObject href "../PredicateTermObject"
+        click PredicateTermObject href "../PredicateTermObject/"
 
 
 
@@ -253,7 +253,7 @@
 
 
         CausalAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 

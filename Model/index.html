@@ -147,6 +147,20 @@
   </a>
 </li>
 <li class="md-nav__item">
+<a class="md-nav__link" href="#rules">
+    Rules
+  </a>
+<nav aria-label="Rules" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#production-rules-must-have-at-least-one-activity">
+    Production rules must have at least one activity
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
 <a class="md-nav__link" href="#identifier-and-mapping-information">
     Identifier and Mapping Information
   </a>
@@ -199,7 +213,7 @@
 <p>URI: <a href="https://w3id.org/gocam/Model">gocam:Model</a></p>
 <div class="mermaid"> classDiagram
     class Model
-    click Model href "../Model"
+    click Model href "../Model/"
       Model : activities
 
 
@@ -207,7 +221,7 @@
 
 
         Model --&gt; "*" Activity : activities
-        click Activity href "../Activity"
+        click Activity href "../Activity/"
 
 
 
@@ -218,7 +232,7 @@
 
 
         Model --&gt; "*" TaxonTermObject : additional_taxa
-        click TaxonTermObject href "../TaxonTermObject"
+        click TaxonTermObject href "../TaxonTermObject/"
 
 
 
@@ -233,7 +247,7 @@
 
 
         Model --&gt; "*" Object : objects
-        click Object href "../Object"
+        click Object href "../Object/"
 
 
 
@@ -244,7 +258,7 @@
 
 
         Model --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -255,7 +269,7 @@
 
 
         Model --&gt; "0..1" QueryIndex : query_index
-        click QueryIndex href "../QueryIndex"
+        click QueryIndex href "../QueryIndex/"
 
 
 
@@ -266,7 +280,7 @@
 
 
         Model --&gt; "0..1" ModelStateEnum : status
-        click ModelStateEnum href "../ModelStateEnum"
+        click ModelStateEnum href "../ModelStateEnum/"
 
 
 
@@ -277,7 +291,7 @@
 
 
         Model --&gt; "0..1" TaxonTermObject : taxon
-        click TaxonTermObject href "../TaxonTermObject"
+        click TaxonTermObject href "../TaxonTermObject/"
 
 
 
@@ -356,6 +370,26 @@
 <td>0..1 <br/> <a href="../QueryIndex/">QueryIndex</a></td>
 <td>An optional object that contains the results of indexing a model with various...</td>
 <td>direct</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rules">Rules</h2>
+<h3 id="production-rules-must-have-at-least-one-activity">Production rules must have at least one activity</h3>
+<table>
+<thead>
+<tr>
+<th>Rule Applied</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Elseconditions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>slot_conditions</td>
+<td><code>{'state': {'equals_string': 'production'}}</code></td>
+<td><code>{'activities': {'required': True}}</code></td>
+<td></td>
 </tr>
 </tbody>
 </table>

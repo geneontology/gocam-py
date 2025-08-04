@@ -214,9 +214,9 @@
 <p>URI: <a href="https://w3id.org/gocam/MolecularFunctionAssociation">gocam:MolecularFunctionAssociation</a></p>
 <div class="mermaid"> classDiagram
     class MolecularFunctionAssociation
-    click MolecularFunctionAssociation href "../MolecularFunctionAssociation"
+    click MolecularFunctionAssociation href "../MolecularFunctionAssociation/"
       TermAssociation &lt;|-- MolecularFunctionAssociation
-        click TermAssociation href "../TermAssociation"
+        click TermAssociation href "../TermAssociation/"
 
       MolecularFunctionAssociation : evidence
 
@@ -225,7 +225,7 @@
 
 
         MolecularFunctionAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -236,7 +236,7 @@
 
 
         MolecularFunctionAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -247,7 +247,7 @@
 
 
         MolecularFunctionAssociation --&gt; "0..1" MolecularFunctionTermObject : term
-        click MolecularFunctionTermObject href "../MolecularFunctionTermObject"
+        click MolecularFunctionTermObject href "../MolecularFunctionTermObject/"
 
 
 

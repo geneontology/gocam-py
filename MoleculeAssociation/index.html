@@ -209,9 +209,9 @@
 <p>URI: <a href="https://w3id.org/gocam/MoleculeAssociation">gocam:MoleculeAssociation</a></p>
 <div class="mermaid"> classDiagram
     class MoleculeAssociation
-    click MoleculeAssociation href "../MoleculeAssociation"
+    click MoleculeAssociation href "../MoleculeAssociation/"
       TermAssociation &lt;|-- MoleculeAssociation
-        click TermAssociation href "../TermAssociation"
+        click TermAssociation href "../TermAssociation/"
 
       MoleculeAssociation : evidence
 
@@ -220,7 +220,7 @@
 
 
         MoleculeAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -231,7 +231,7 @@
 
 
         MoleculeAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -242,7 +242,7 @@
 
 
         MoleculeAssociation --&gt; "0..1" MoleculeTermObject : term
-        click MoleculeTermObject href "../MoleculeTermObject"
+        click MoleculeTermObject href "../MoleculeTermObject/"
 
 
 

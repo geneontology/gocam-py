@@ -204,7 +204,7 @@
 <p>URI: <a href="https://w3id.org/gocam/EvidenceItem">gocam:EvidenceItem</a></p>
 <div class="mermaid"> classDiagram
     class EvidenceItem
-    click EvidenceItem href "../EvidenceItem"
+    click EvidenceItem href "../EvidenceItem/"
       EvidenceItem : provenances
 
 
@@ -212,7 +212,7 @@
 
 
         EvidenceItem --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -223,7 +223,7 @@
 
 
         EvidenceItem --&gt; "0..1" PublicationObject : reference
-        click PublicationObject href "../PublicationObject"
+        click PublicationObject href "../PublicationObject/"
 
 
 
@@ -234,7 +234,7 @@
 
 
         EvidenceItem --&gt; "0..1" EvidenceTermObject : term
-        click EvidenceTermObject href "../EvidenceTermObject"
+        click EvidenceTermObject href "../EvidenceTermObject/"
 
 
 
@@ -245,7 +245,7 @@
 
 
         EvidenceItem --&gt; "*" Object : with_objects
-        click Object href "../Object"
+        click Object href "../Object/"
 
 
 

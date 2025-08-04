@@ -207,23 +207,23 @@
 <p>URI: <a href="https://w3id.org/gocam/TermAssociation">gocam:TermAssociation</a></p>
 <div class="mermaid"> classDiagram
     class TermAssociation
-    click TermAssociation href "../TermAssociation"
+    click TermAssociation href "../TermAssociation/"
       Association &lt;|-- TermAssociation
-        click Association href "../Association"
+        click Association href "../Association/"
 
 
       TermAssociation &lt;|-- MolecularFunctionAssociation
-        click MolecularFunctionAssociation href "../MolecularFunctionAssociation"
+        click MolecularFunctionAssociation href "../MolecularFunctionAssociation/"
       TermAssociation &lt;|-- BiologicalProcessAssociation
-        click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
+        click BiologicalProcessAssociation href "../BiologicalProcessAssociation/"
       TermAssociation &lt;|-- CellularAnatomicalEntityAssociation
-        click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation"
+        click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation/"
       TermAssociation &lt;|-- CellTypeAssociation
-        click CellTypeAssociation href "../CellTypeAssociation"
+        click CellTypeAssociation href "../CellTypeAssociation/"
       TermAssociation &lt;|-- GrossAnatomyAssociation
-        click GrossAnatomyAssociation href "../GrossAnatomyAssociation"
+        click GrossAnatomyAssociation href "../GrossAnatomyAssociation/"
       TermAssociation &lt;|-- MoleculeAssociation
-        click MoleculeAssociation href "../MoleculeAssociation"
+        click MoleculeAssociation href "../MoleculeAssociation/"
 
 
       TermAssociation : evidence
@@ -233,7 +233,7 @@
 
 
         TermAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -244,7 +244,7 @@
 
 
         TermAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -255,7 +255,7 @@
 
 
         TermAssociation --&gt; "0..1" TermObject : term
-        click TermObject href "../TermObject"
+        click TermObject href "../TermObject/"
 
 
 

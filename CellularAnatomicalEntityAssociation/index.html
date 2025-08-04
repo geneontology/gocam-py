@@ -209,9 +209,9 @@
 <p>URI: <a href="https://w3id.org/gocam/CellularAnatomicalEntityAssociation">gocam:CellularAnatomicalEntityAssociation</a></p>
 <div class="mermaid"> classDiagram
     class CellularAnatomicalEntityAssociation
-    click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation"
+    click CellularAnatomicalEntityAssociation href "../CellularAnatomicalEntityAssociation/"
       TermAssociation &lt;|-- CellularAnatomicalEntityAssociation
-        click TermAssociation href "../TermAssociation"
+        click TermAssociation href "../TermAssociation/"
 
       CellularAnatomicalEntityAssociation : evidence
 
@@ -220,7 +220,7 @@
 
 
         CellularAnatomicalEntityAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -231,7 +231,7 @@
 
 
         CellularAnatomicalEntityAssociation --&gt; "0..1" CellTypeAssociation : part_of
-        click CellTypeAssociation href "../CellTypeAssociation"
+        click CellTypeAssociation href "../CellTypeAssociation/"
 
 
 
@@ -242,7 +242,7 @@
 
 
         CellularAnatomicalEntityAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -253,7 +253,7 @@
 
 
         CellularAnatomicalEntityAssociation --&gt; "0..1" CellularAnatomicalEntityTermObject : term
-        click CellularAnatomicalEntityTermObject href "../CellularAnatomicalEntityTermObject"
+        click CellularAnatomicalEntityTermObject href "../CellularAnatomicalEntityTermObject/"
 
 
 

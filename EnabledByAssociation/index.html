@@ -218,15 +218,15 @@
 <p>URI: <a href="https://w3id.org/gocam/EnabledByAssociation">gocam:EnabledByAssociation</a></p>
 <div class="mermaid"> classDiagram
     class EnabledByAssociation
-    click EnabledByAssociation href "../EnabledByAssociation"
+    click EnabledByAssociation href "../EnabledByAssociation/"
       Association &lt;|-- EnabledByAssociation
-        click Association href "../Association"
+        click Association href "../Association/"
 
 
       EnabledByAssociation &lt;|-- EnabledByGeneProductAssociation
-        click EnabledByGeneProductAssociation href "../EnabledByGeneProductAssociation"
+        click EnabledByGeneProductAssociation href "../EnabledByGeneProductAssociation/"
       EnabledByAssociation &lt;|-- EnabledByProteinComplexAssociation
-        click EnabledByProteinComplexAssociation href "../EnabledByProteinComplexAssociation"
+        click EnabledByProteinComplexAssociation href "../EnabledByProteinComplexAssociation/"
 
 
       EnabledByAssociation : evidence
@@ -236,7 +236,7 @@
 
 
         EnabledByAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -247,7 +247,7 @@
 
 
         EnabledByAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -258,7 +258,7 @@
 
 
         EnabledByAssociation --&gt; "0..1" InformationBiomacromoleculeTermObject : term
-        click InformationBiomacromoleculeTermObject href "../InformationBiomacromoleculeTermObject"
+        click InformationBiomacromoleculeTermObject href "../InformationBiomacromoleculeTermObject/"
 
 
 

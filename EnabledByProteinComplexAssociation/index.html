@@ -152,6 +152,20 @@
   </a>
 </li>
 <li class="md-nav__item">
+<a class="md-nav__link" href="#rules">
+    Rules
+  </a>
+<nav aria-label="Rules" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#members-must-be-specified-when-the-generic-go-complex-is-specified">
+    members must be specified when the generic GO complex is specified
+  </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
 <a class="md-nav__link" href="#comments">
     Comments
   </a>
@@ -209,9 +223,9 @@
 <p>URI: <a href="https://w3id.org/gocam/EnabledByProteinComplexAssociation">gocam:EnabledByProteinComplexAssociation</a></p>
 <div class="mermaid"> classDiagram
     class EnabledByProteinComplexAssociation
-    click EnabledByProteinComplexAssociation href "../EnabledByProteinComplexAssociation"
+    click EnabledByProteinComplexAssociation href "../EnabledByProteinComplexAssociation/"
       EnabledByAssociation &lt;|-- EnabledByProteinComplexAssociation
-        click EnabledByAssociation href "../EnabledByAssociation"
+        click EnabledByAssociation href "../EnabledByAssociation/"
 
       EnabledByProteinComplexAssociation : evidence
 
@@ -220,7 +234,7 @@
 
 
         EnabledByProteinComplexAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -231,7 +245,7 @@
 
 
         EnabledByProteinComplexAssociation --&gt; "*" GeneProductTermObject : members
-        click GeneProductTermObject href "../GeneProductTermObject"
+        click GeneProductTermObject href "../GeneProductTermObject/"
 
 
 
@@ -242,7 +256,7 @@
 
 
         EnabledByProteinComplexAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -253,7 +267,7 @@
 
 
         EnabledByProteinComplexAssociation --&gt; "0..1" ProteinComplexTermObject : term
-        click ProteinComplexTermObject href "../ProteinComplexTermObject"
+        click ProteinComplexTermObject href "../ProteinComplexTermObject/"
 
 
 
@@ -311,6 +325,26 @@
 <td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
 <td>The set of provenance objects that provide metadata about who made the associ...</td>
 <td><a href="../Association/">Association</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="rules">Rules</h2>
+<h3 id="members-must-be-specified-when-the-generic-go-complex-is-specified">members must be specified when the generic GO complex is specified</h3>
+<table>
+<thead>
+<tr>
+<th>Rule Applied</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Elseconditions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>slot_conditions</td>
+<td><code>{'term': {'equals_string': 'GO:0032991'}}</code></td>
+<td><code>{'members': {'required': True}}</code></td>
+<td></td>
 </tr>
 </tbody>
 </table>

@@ -209,9 +209,9 @@
 <p>URI: <a href="https://w3id.org/gocam/BiologicalProcessAssociation">gocam:BiologicalProcessAssociation</a></p>
 <div class="mermaid"> classDiagram
     class BiologicalProcessAssociation
-    click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
+    click BiologicalProcessAssociation href "../BiologicalProcessAssociation/"
       TermAssociation &lt;|-- BiologicalProcessAssociation
-        click TermAssociation href "../TermAssociation"
+        click TermAssociation href "../TermAssociation/"
 
       BiologicalProcessAssociation : evidence
 
@@ -220,7 +220,7 @@
 
 
         BiologicalProcessAssociation --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -231,7 +231,7 @@
 
 
         BiologicalProcessAssociation --&gt; "0..1" PhaseTermObject : happens_during
-        click PhaseTermObject href "../PhaseTermObject"
+        click PhaseTermObject href "../PhaseTermObject/"
 
 
 
@@ -242,7 +242,7 @@
 
 
         BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessAssociation : part_of
-        click BiologicalProcessAssociation href "../BiologicalProcessAssociation"
+        click BiologicalProcessAssociation href "../BiologicalProcessAssociation/"
 
 
 
@@ -253,7 +253,7 @@
 
 
         BiologicalProcessAssociation --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
@@ -264,7 +264,7 @@
 
 
         BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessTermObject : term
-        click BiologicalProcessTermObject href "../BiologicalProcessTermObject"
+        click BiologicalProcessTermObject href "../BiologicalProcessTermObject/"
 
 
 

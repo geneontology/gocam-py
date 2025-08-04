@@ -207,13 +207,13 @@
 <p>URI: <a href="https://w3id.org/gocam/Association">gocam:Association</a></p>
 <div class="mermaid"> classDiagram
     class Association
-    click Association href "../Association"
+    click Association href "../Association/"
       Association &lt;|-- EnabledByAssociation
-        click EnabledByAssociation href "../EnabledByAssociation"
+        click EnabledByAssociation href "../EnabledByAssociation/"
       Association &lt;|-- CausalAssociation
-        click CausalAssociation href "../CausalAssociation"
+        click CausalAssociation href "../CausalAssociation/"
       Association &lt;|-- TermAssociation
-        click TermAssociation href "../TermAssociation"
+        click TermAssociation href "../TermAssociation/"
 
       Association : evidence
 
@@ -222,7 +222,7 @@
 
 
         Association --&gt; "*" EvidenceItem : evidence
-        click EvidenceItem href "../EvidenceItem"
+        click EvidenceItem href "../EvidenceItem/"
 
 
 
@@ -233,7 +233,7 @@
 
 
         Association --&gt; "*" ProvenanceInfo : provenances
-        click ProvenanceInfo href "../ProvenanceInfo"
+        click ProvenanceInfo href "../ProvenanceInfo/"
 
 
 
