@@ -194,7 +194,7 @@ class ModelNetworkTranslator(GraphTranslator):
                 return activity
         return None
     
-    def _add_activity_go_terms(self, activity: Activity, model: Model, attrs: Dict[str, str], prefix: str) -> None:
+    def _add_activity_go_terms(self, activity: Activity, model: Model, attrs: Dict[str, Any], prefix: str) -> None:
         """
         Add GO terms from an activity to the edge attributes with evidence information.
         
