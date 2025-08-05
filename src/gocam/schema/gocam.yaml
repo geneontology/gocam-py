@@ -17,6 +17,8 @@ imports:
 prefixes:
   pav: http://purl.org/pav/
   dce: http://purl.org/dc/elements/1.1/
+  dct: http://purl.org/dc/terms/
+  rdfs: http://www.w3.org/2000/01/rdf-schema#
   lego: http://geneontology.org/lego/
   linkml: https://w3id.org/linkml/
   biolink: https://w3id.org/biolink/vocab/
@@ -33,11 +35,37 @@ prefixes:
   orcid: https://orcid.org/
   UniProtKB: http://purl.uniprot.org/uniprot/
   PMID: http://identifiers.org/pubmed/
+  GOREF: http://purl.obolibrary.org/obo/go/references/
+  DOI: http://doi.org/
+  CHEBI: http://purl.obolibrary.org/obo/CHEBI_
+  CL: http://purl.obolibrary.org/obo/CL_
+  PO: http://purl.obolibrary.org/obo/PO_
+  FAO: http://purl.obolibrary.org/obo/FAO_
+  DDANAT: http://purl.obolibrary.org/obo/DDANAT_
+  UBERON: http://purl.obolibrary.org/obo/UBERON_
   dcterms: http://purl.org/dc/terms/
   RHEA: http://rdf.rhea-db.org/
 
 default_prefix: gocam
 default_range: string
+
+slots:
+  
+  term:
+    description: A generic slot for ontology terms
+    range: TermObject
+    slot_uri: gocam:term
+    
+  provenances:
+    description: A generic slot for provenance information
+    range: ProvenanceInfo
+    slot_uri: gocam:provenances
+    multivalued: true
+    
+  part_of:
+    description: A generic slot for part-of relationships
+    slot_uri: gocam:part_of
+    
 see_also:
   - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7012280/
   - https://docs.google.com/presentation/d/1ja0Vkw0AoENJ58emM77dGnqPtY1nfIJMeyVnObBxIxI/edit#slide=id.p8
@@ -50,7 +78,7 @@ classes:
       - title: Production rules must have at least one activity
         preconditions:
           slot_conditions:
-            state:
+            status:
               equals_string: production
         postconditions:
           slot_conditions:
