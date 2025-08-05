@@ -9,9 +9,9 @@ from tests import INPUT_DIR
 
 
 
-def test_translate_models_basic(input_model, translator):
+def test_translate_models_basic(get_model, translator):
     """Test basic translation of a GO-CAM model to gene-to-gene format."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     # Translate single model
     g2g_graph = translator.translate_models([model])
@@ -29,9 +29,9 @@ def test_translate_models_basic(input_model, translator):
         assert attrs['model_id'] == model.id
 
 
-def test_gene_to_gene_edges(input_model, translator):
+def test_gene_to_gene_edges(get_model, translator):
     """Test that edges represent gene-to-gene relationships with GO term properties."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     g2g_graph = translator.translate_models([model])
     
@@ -50,10 +50,10 @@ def test_gene_to_gene_edges(input_model, translator):
             assert attrs['model_id'] == model.id
 
 
-def test_multiple_models(input_model, translator):
+def test_multiple_models(get_model, translator):
     """Test translation of multiple models into a single graph."""
-    model1 = input_model("Model-63f809ec00000701")
-    model2 = input_model("Model-6606056e00002011")
+    model1 = get_model("input/Model-63f809ec00000701")
+    model2 = get_model("input/Model-6606056e00002011")
     
     g2g_graph = translator.translate_models([model1, model2])
     
@@ -69,9 +69,9 @@ def test_multiple_models(input_model, translator):
     assert model1.id in model_ids_in_nodes or model2.id in model_ids_in_nodes
 
 
-def test_go_term_edge_attributes(input_model, translator):
+def test_go_term_edge_attributes(get_model, translator):
     """Test that edges contain GO term information as attributes."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     g2g_graph = translator.translate_models([model])
     
@@ -106,9 +106,9 @@ def test_go_term_edge_attributes(input_model, translator):
     assert edges_with_target_go_terms >= 0  # At minimum, no errors should occur
 
 
-def test_both_source_and_target_gene_attributes(input_model, translator):
+def test_both_source_and_target_gene_attributes(get_model, translator):
     """Test that edges include GO terms for both source and target genes."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     g2g_graph = translator.translate_models([model])
     
@@ -148,9 +148,9 @@ def test_model_without_activities(translator):
     assert g2g_graph.number_of_edges() == 0
 
 
-def test_json_output_with_model_info(input_model, translator):
+def test_json_output_with_model_info(get_model, translator):
     """Test JSON output includes model_info by default."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     json_output = translator.translate_models_to_json([model])
     data = json.loads(json_output)
@@ -166,9 +166,9 @@ def test_json_output_with_model_info(input_model, translator):
     assert model_info["status"] == model.status
 
 
-def test_json_output_without_model_info(input_model, translator):
+def test_json_output_without_model_info(get_model, translator):
     """Test JSON output excludes model_info when requested."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     json_output = translator.translate_models_to_json([model], include_model_info=False)
     data = json.loads(json_output)
@@ -179,10 +179,10 @@ def test_json_output_without_model_info(input_model, translator):
     assert data["graph"] == {}
 
 
-def test_json_output_multiple_models_info(input_model, translator):
+def test_json_output_multiple_models_info(get_model, translator):
     """Test JSON output with multiple models includes models_info."""
-    model1 = input_model("Model-63f809ec00000701")
-    model2 = input_model("Model-6606056e00002011")
+    model1 = get_model("input/Model-63f809ec00000701")
+    model2 = get_model("input/Model-6606056e00002011")
     
     json_output = translator.translate_models_to_json([model1, model2])
     data = json.loads(json_output)
@@ -201,9 +201,9 @@ def test_json_output_multiple_models_info(input_model, translator):
     assert model2.id in model_ids
 
 
-def test_networkx_json_format_compliance(input_model, translator):
+def test_networkx_json_format_compliance(get_model, translator):
     """Test that JSON output complies with NetworkX node_link_data format."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     json_output = translator.translate_models_to_json([model])
     data = json.loads(json_output)
@@ -228,9 +228,9 @@ def test_networkx_json_format_compliance(input_model, translator):
     assert data["multigraph"] is False
 
 
-def test_networkx_roundtrip_compatibility(input_model, translator):
+def test_networkx_roundtrip_compatibility(get_model, translator):
     """Test that our JSON output can be read back by NetworkX."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     # Generate our JSON
     json_output = translator.translate_models_to_json([model])
@@ -255,9 +255,9 @@ def test_networkx_roundtrip_compatibility(input_model, translator):
         assert reconstructed_graph.graph["model_info"] == data["graph"]["model_info"]
 
 
-def test_json_node_structure(input_model, translator):
+def test_json_node_structure(get_model, translator):
     """Test that nodes in JSON output have correct structure."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     json_output = translator.translate_models_to_json([model])
     data = json.loads(json_output)
@@ -274,9 +274,9 @@ def test_json_node_structure(input_model, translator):
         assert node["model_id"] == model.id
 
 
-def test_json_edge_structure(input_model, translator):
+def test_json_edge_structure(get_model, translator):
     """Test that edges in JSON output have correct structure."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     json_output = translator.translate_models_to_json([model])
     data = json.loads(json_output)
@@ -298,9 +298,9 @@ def test_json_edge_structure(input_model, translator):
             assert edge["target"] == edge["target_gene"]
 
 
-def test_evidence_collections_in_json(input_model, translator):
+def test_evidence_collections_in_json(get_model, translator):
     """Test that evidence collections are properly included in JSON output."""
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
     
     json_output = translator.translate_models_to_json([model])
     data = json.loads(json_output)
@@ -339,9 +339,9 @@ def test_evidence_collections_in_json(input_model, translator):
 
 # Model 568b0f9600000284 Tests (using Model-568b0f9600000284.yaml from tests/input)
 
-def test_model_basic_conversion_568b0f9600000284(input_model, translator):
+def test_model_basic_conversion_568b0f9600000284(get_model, translator):
     """Test basic conversion of model 568b0f9600000284 from GO-CAM to gene-to-gene format."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Should have 7 gene nodes (one per activity)
@@ -363,9 +363,9 @@ def test_model_basic_conversion_568b0f9600000284(input_model, translator):
     assert set(g2g_graph.nodes()) == expected_genes
 
 
-def test_model_node_attributes_568b0f9600000284(input_model, translator):
+def test_model_node_attributes_568b0f9600000284(get_model, translator):
     """Test that gene nodes have expected attributes in model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Check a specific node
@@ -375,9 +375,9 @@ def test_model_node_attributes_568b0f9600000284(input_model, translator):
     assert tir1_attrs["label"] == "tir-1 Cele"
 
 
-def test_model_specific_edge_go_terms_568b0f9600000284(input_model, translator):
+def test_model_specific_edge_go_terms_568b0f9600000284(get_model, translator):
     """Test GO terms are correctly assigned to specific edges in model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Find the edge from tir-1 to nsy-1
@@ -394,9 +394,9 @@ def test_model_specific_edge_go_terms_568b0f9600000284(input_model, translator):
     assert tir1_to_nsy1_attrs["target_gene_occurs_in"] == "GO:0005737"
 
 
-def test_model_edge_without_occurs_in_568b0f9600000284(input_model, translator):
+def test_model_edge_without_occurs_in_568b0f9600000284(get_model, translator):
     """Test edge where target gene has no occurs_in annotation in model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Find edge from tpa-1 to dkf-2
@@ -409,9 +409,9 @@ def test_model_edge_without_occurs_in_568b0f9600000284(input_model, translator):
     assert tpa1_to_dkf2_attrs["target_gene_occurs_in"] == "GO:0009898"
 
 
-def test_model_causal_pathway_structure_568b0f9600000284(input_model, translator):
+def test_model_causal_pathway_structure_568b0f9600000284(get_model, translator):
     """Test that the causal pathway structure is preserved in model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Expected causal relationships based on README model
@@ -428,9 +428,9 @@ def test_model_causal_pathway_structure_568b0f9600000284(input_model, translator
     assert actual_edges == expected_edges
 
 
-def test_model_multiple_inputs_to_same_gene_568b0f9600000284(input_model, translator):
+def test_model_multiple_inputs_to_same_gene_568b0f9600000284(get_model, translator):
     """Test handling of multiple causal inputs to the same gene (pmk-1) in model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # pmk-1 (WB:WBGene00004055) should have two incoming edges
@@ -441,9 +441,9 @@ def test_model_multiple_inputs_to_same_gene_568b0f9600000284(input_model, transl
     assert set(pmk1_predecessors) == expected_predecessors
 
 
-def test_model_all_genes_have_go_annotations_568b0f9600000284(input_model, translator):
+def test_model_all_genes_have_go_annotations_568b0f9600000284(get_model, translator):
     """Test that all edges have some GO term annotations in model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     for source, target, attrs in g2g_graph.edges(data=True):
@@ -456,9 +456,9 @@ def test_model_all_genes_have_go_annotations_568b0f9600000284(input_model, trans
         assert "target_gene_biological_process" in attrs
 
 
-def test_model_statistics_568b0f9600000284(input_model, translator):
+def test_model_statistics_568b0f9600000284(get_model, translator):
     """Test that final statistics match expected values for model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Original model: 7 activities
@@ -474,9 +474,9 @@ def test_model_statistics_568b0f9600000284(input_model, translator):
         assert node.startswith("WB:WBGene")
 
 
-def test_model_evidence_collections_basic_568b0f9600000284(input_model, translator):
+def test_model_evidence_collections_basic_568b0f9600000284(get_model, translator):
     """Test that evidence collections are properly included in edges for model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Find an edge with evidence to test
@@ -495,9 +495,9 @@ def test_model_evidence_collections_basic_568b0f9600000284(input_model, translat
     assert len(evidence_attrs) > 0, "Should have evidence collection attributes"
 
 
-def test_model_molecular_function_evidence_collections_568b0f9600000284(input_model, translator):
+def test_model_molecular_function_evidence_collections_568b0f9600000284(get_model, translator):
     """Test molecular function evidence collections are properly extracted for model 568b0f9600000284."""
-    model = input_model("Model-568b0f9600000284")
+    model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Find edge from tir-1 to nsy-1 which should have molecular function evidence

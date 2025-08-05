@@ -4,9 +4,9 @@ from ndex2.cx2 import CX2Network, RawCX2NetworkFactory
 from gocam.translation.cx2 import model_to_cx2
 
 
-def test_model_to_cx2(example_model):
+def test_model_to_cx2(get_model):
     """Test the model_to_cx2 function."""
-    model = example_model("Model-663d668500002178")
+    model = get_model("input/Model-663d668500002178")
     cx2 = model_to_cx2(model)
 
     assert isinstance(cx2, list)
@@ -20,9 +20,9 @@ def test_model_to_cx2(example_model):
     assert len(edge_aspect["edges"]) == 21, "Incorrect number of edges in CX2"
 
 
-def test_load_cx2_to_ndex(example_model):
+def test_load_cx2_to_ndex(get_model):
     """Test loading generated CX2 file by NDEx library."""
-    model = example_model("Model-663d668500002178")
+    model = get_model("input/Model-663d668500002178")
     cx2 = model_to_cx2(model)
 
     factory = RawCX2NetworkFactory()
@@ -33,9 +33,9 @@ def test_load_cx2_to_ndex(example_model):
     assert len(cx2_network.get_edges()) == 21, "Incorrect number of edges in CX2"
 
 
-def test_node_type_attribute(input_model):
+def test_node_type_attribute(get_model):
     """Test that the `type` attribute is correctly set for nodes."""
-    model = input_model("Model-6606056e00002011")
+    model = get_model("input/Model-6606056e00002011")
     cx2 = model_to_cx2(model)
 
     node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
@@ -50,8 +50,8 @@ def test_node_type_attribute(input_model):
             assert node_attrs["type"] == "gene" or node_attrs["type"] == "molecule"
 
 
-def test_node_name_and_member_attributes(input_model):
-    model = input_model("Model-6606056e00002011")
+def test_node_name_and_member_attributes(get_model):
+    model = get_model("input/Model-6606056e00002011")
     cx2 = model_to_cx2(model)
 
     node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
@@ -67,8 +67,8 @@ def test_node_name_and_member_attributes(input_model):
             assert "Hsap" not in node_attrs["name"]
 
 
-def test_activity_input_output_notes(input_model):
-    model = input_model("Model-63f809ec00000701")
+def test_activity_input_output_notes(get_model):
+    model = get_model("input/Model-63f809ec00000701")
     cx2 = model_to_cx2(model)
 
     node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
@@ -104,11 +104,11 @@ def test_activity_input_output_notes(input_model):
     assert output_edge is not None
 
 
-def test_issue_65_protein_inputs_filtered(input_model):
+def test_issue_65_protein_inputs_filtered(get_model):
     """Test that protein inputs are filtered at the CX level (issue #65)"""
     from gocam.datamodel import MoleculeAssociation
 
-    model = input_model("Model-63f809ec00000701")
+    model = get_model("input/Model-63f809ec00000701")
 
     # Find activities with protein inputs
     activities_with_protein_inputs = []
