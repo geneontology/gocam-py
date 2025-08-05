@@ -1,37 +1,7 @@
 import pytest
-import yaml
 from ndex2.cx2 import CX2Network, RawCX2NetworkFactory
 
-from gocam.datamodel import Model
 from gocam.translation.cx2 import model_to_cx2
-from tests import EXAMPLES_DIR, INPUT_DIR
-
-
-@pytest.fixture
-def get_model():
-    def _get_model(model_path):
-        with open(model_path, "r") as f:
-            deserialized = yaml.safe_load(f)
-        model = Model.model_validate(deserialized)
-        return model
-
-    return _get_model
-
-
-@pytest.fixture
-def example_model(get_model):
-    def _get_example_model(example_name):
-        return get_model(EXAMPLES_DIR / f"{example_name}.yaml")
-
-    return _get_example_model
-
-
-@pytest.fixture
-def input_model(get_model):
-    def _get_input_model(model_name):
-        return get_model(INPUT_DIR / f"{model_name}.yaml")
-
-    return _get_input_model
 
 
 def test_model_to_cx2(example_model):

@@ -114,12 +114,12 @@ def test_both_source_and_target_gene_attributes(input_model, translator):
     
     # Check that edges have both source and target gene information
     for source, target, attrs in g2g_graph.edges(data=True):
-        # Basic edge attributes should always be present
+        # Basic-edge attributes should always be present
         assert 'source_gene' in attrs
         assert 'target_gene' in attrs
         assert 'model_id' in attrs
         
-        # Check that source and target match edge endpoints
+        # Check that source and target match-edge endpoints
         assert attrs['source_gene'] == source
         assert attrs['target_gene'] == target
         
@@ -128,7 +128,7 @@ def test_both_source_and_target_gene_attributes(input_model, translator):
 
 
 def test_empty_model_list(translator):
-    """Test translation of empty model list."""
+    """Test translation of an empty model list."""
     g2g_graph = translator.translate_models([])
     
     assert isinstance(g2g_graph, nx.DiGraph)
@@ -137,7 +137,7 @@ def test_empty_model_list(translator):
 
 
 def test_model_without_activities(translator):
-    """Test handling of model without activities."""
+    """Test handling of a model without activities."""
     # Create a minimal model
     model = Model(id="test:empty", title="Empty Test Model")
     

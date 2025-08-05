@@ -105,6 +105,8 @@ def model_to_cx2(
 
     def _format_evidence_list(evidence_list: List[EvidenceItem]) -> str:
         """Format a list of evidence items as an HTML unordered list."""
+        if evidence_list is None:
+            return ""
         evidence_list_items = []
         for e in evidence_list:
             evidence_item = ""
@@ -237,7 +239,7 @@ def model_to_cx2(
                 node_attributes["member"].append(member_name)
 
         node_attributes["Evidence"] = _format_evidence_list(
-            activity.enabled_by.evidence
+            activity.enabled_by.evidence if activity.enabled_by else None
         )
 
         if activity.molecular_function:

@@ -11,7 +11,7 @@ from gocam.translation.networkx.model_network_translator import ModelNetworkTran
 # Get the tests directory path
 TESTS_DIR = Path(__file__).parent
 INPUT_DIR = TESTS_DIR / "input"
-EXAMPLES_DIR = INPUT_DIR.parent.parent / "examples"  # Assuming examples are in project root
+EXAMPLES_DIR = TESTS_DIR / "../src/data/examples"
 
 
 @pytest.fixture
