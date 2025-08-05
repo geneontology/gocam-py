@@ -548,14 +548,45 @@ from gocam.translation.networkx.model_network_translator import ModelNetworkTran
 from gocam.datamodel import Model
 import json
 
-# Load GO-CAM model from JSON file
-with open('gocam_model.json', 'r') as f:
-    gocam_data = json.load(f)
-model = Model.model_validate(gocam_data)
+# Test with a complete example (you can run this directly!)
+gocam_json_string = """
+{
+  "id": "gomodel:568b0f9600000284",
+  "title": "Antibacterial innate immune response in the intestine via MAPK cascade",
+  "taxon": "NCBITaxon:6239",
+  "activities": [
+    {
+      "id": "gomodel:568b0f9600000284/57ec3a7e00000079",
+      "enabled_by": {"term": "WB:WBGene00006575"},
+      "molecular_function": {"term": "GO:0035591"},
+      "causal_associations": [
+        {
+          "predicate": "RO:0002629",
+          "downstream_activity": "gomodel:568b0f9600000284/57ec3a7e00000109"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:568b0f9600000284/57ec3a7e00000109",
+      "enabled_by": {"term": "WB:WBGene00003822"},
+      "molecular_function": {"term": "GO:0004709"}
+    }
+  ]
+}
+"""
+
+# Parse the JSON and create model
+model = Model.model_validate_json(gocam_json_string)
 
 # Create translator and convert to gene-to-gene JSON
 translator = ModelNetworkTranslator()
 json_output = translator.translate_models_to_json([model])
+print("Translation successful!")
+print(f"Output: {len(json_output)} characters")
+
+# Parse and show structure
+result = json.loads(json_output)
+print(f"Nodes: {len(result['nodes'])}, Edges: {len(result['edges'])}")
 print(json_output)
 ```
 
@@ -582,8 +613,7 @@ gocam_json_string = """
 }
 """
 
-gocam_data = json.loads(gocam_json_string)
-model = Model.model_validate(gocam_data)
+model = Model.model_validate_json(gocam_json_string)
 json_output = translator.translate_models_to_json([model])
 ```
 

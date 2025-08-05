@@ -48,7 +48,8 @@ activities:
       - MGI:MGI:97616
       - FB:FBgn0262738
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     term: GO:0004435
   part_of:
@@ -58,7 +59,8 @@ activities:
       with_objects:
       - SGD:S000006189
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     term: GO:0032958
   causal_associations:
@@ -95,7 +97,8 @@ activities:
       - MGI:MGI:97616
       - FB:FBgn0262738
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002565
@@ -109,7 +112,8 @@ activities:
       with_objects:
       - SGD:S000004825
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0043495
   occurs_in:
@@ -125,21 +129,24 @@ activities:
       with_objects:
       - SGD:S000004825
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000266
       reference: GO_REF:0000024
       with_objects:
       - SGD:S000004825
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000266
       reference: GO_REF:0000024
       with_objects:
       - SGD:S000004825
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     predicate: RO:0002629
     downstream_activity: gomodel:663d668500002178/663d668500002205
@@ -154,14 +161,16 @@ activities:
     - term: ECO:0000315
       reference: PMID:9560432
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000316
       reference: PMID:9560432
       with_objects:
       - PomBase:SPAC4F8.15
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -169,7 +178,8 @@ activities:
       - PANTHER:PTN000628316
       - PomBase:SPAC20G8.03
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0005366
   occurs_in:
@@ -179,7 +189,8 @@ activities:
       with_objects:
       - SGD:S000002905
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0005886
   part_of:
@@ -187,7 +198,8 @@ activities:
     - term: ECO:0000315
       reference: PMID:9560432
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -196,7 +208,8 @@ activities:
       - PomBase:SPAC4F8.15
       - PomBase:SPAC20G8.03
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:1904679
   causal_associations:
@@ -204,14 +217,16 @@ activities:
     - term: ECO:0000315
       reference: PMID:9560432
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000316
       reference: PMID:9560432
       with_objects:
       - PomBase:SPAC4F8.15
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -219,14 +234,16 @@ activities:
       - PANTHER:PTN000628316
       - PomBase:SPAC20G8.03
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000316
       reference: PMID:9560432
       with_objects:
       - PomBase:SPAC4F8.15
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002281
@@ -234,7 +251,8 @@ activities:
     - term: ECO:0000315
       reference: PMID:9560432
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -242,7 +260,8 @@ activities:
       - PANTHER:PTN000628316
       - PomBase:SPAC20G8.03
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002281
@@ -263,7 +282,8 @@ activities:
       - dictyBase:DDB_G0278739
       - UniProtKB:Q92551
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     term: GO:0000828
   part_of:
@@ -282,7 +302,8 @@ activities:
       - SGD:S000002424
       - FB:FBgn0283680
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     term: GO:0032958
   causal_associations:
@@ -302,7 +323,8 @@ activities:
       - dictyBase:DDB_G0278739
       - UniProtKB:Q92551
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -316,7 +338,8 @@ activities:
       - dictyBase:DDB_G0278739
       - UniProtKB:Q92551
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002267
@@ -331,7 +354,8 @@ activities:
       - PANTHER:PTN000963723
       - SGD:S000002580
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     term: GO:0008440
   part_of:
@@ -350,7 +374,8 @@ activities:
       - SGD:S000002424
       - FB:FBgn0283680
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     term: GO:0032958
   causal_associations:
@@ -361,7 +386,8 @@ activities:
       - PANTHER:PTN000963723
       - SGD:S000002580
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002550
@@ -372,7 +398,8 @@ activities:
       - PANTHER:PTN000963723
       - SGD:S000002580
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -380,7 +407,8 @@ activities:
       - PANTHER:PTN000963723
       - SGD:S000002580
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002550
@@ -392,7 +420,8 @@ activities:
     - term: ECO:0000315
       reference: PMID:15249580
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0052811
   part_of:
@@ -400,12 +429,14 @@ activities:
     - term: ECO:0000315
       reference: PMID:29975157
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     - term: ECO:0000315
       reference: PMID:15249580
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0046854
   causal_associations:
@@ -413,7 +444,8 @@ activities:
     - term: ECO:0000315
       reference: PMID:15249580
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002532
@@ -425,7 +457,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:10960485
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -440,7 +473,8 @@ activities:
       - SGD:S000002723
       - ZFIN:ZDB-GENE-050327-41
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     term: GO:0035299
   part_of:
@@ -448,7 +482,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:10960485
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -460,7 +495,8 @@ activities:
       - CGD:CAL0000194997
       - FB:FBgn0050295
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     term: GO:0032958
   causal_associations:
@@ -468,7 +504,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:10960485
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -483,7 +520,8 @@ activities:
       - SGD:S000002723
       - ZFIN:ZDB-GENE-050327-41
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002574
@@ -491,7 +529,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:10960485
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     - term: ECO:0000318
       reference: GO_REF:0000033
@@ -506,7 +545,8 @@ activities:
       - SGD:S000002723
       - ZFIN:ZDB-GENE-050327-41
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-24'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002574
@@ -520,7 +560,8 @@ activities:
       with_objects:
       - SGD:S000004296
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0004430
   part_of:
@@ -530,7 +571,8 @@ activities:
       with_objects:
       - SGD:S000004296
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0046854
 - id: gomodel:663d668500002178/663d668500002281
@@ -541,7 +583,8 @@ activities:
     - term: ECO:0000269
       reference: PMID:1324908
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0003881
   part_of:
@@ -549,7 +592,8 @@ activities:
     - term: ECO:0000269
       reference: PMID:1324908
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0006661
   causal_associations:
@@ -557,7 +601,8 @@ activities:
     - term: ECO:0000269
       reference: PMID:1324908
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002211
@@ -565,7 +610,8 @@ activities:
     - term: ECO:0000269
       reference: PMID:1324908
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     predicate: RO:0002413
     downstream_activity: gomodel:663d668500002178/663d668500002205
@@ -577,7 +623,8 @@ activities:
     - term: ECO:0000314
       reference: PMID:35536002
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0052723
   part_of:
@@ -585,7 +632,8 @@ activities:
     - term: ECO:0000315
       reference: PMID:25254656
       provenances:
-      - contributor: https://orcid.org/0000-0001-6330-7526
+      - contributor:
+        - https://orcid.org/0000-0001-6330-7526
         date: '2024-05-23'
     term: GO:0043647
 objects:

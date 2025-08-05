@@ -42,20 +42,15 @@ class ModelNetworkTranslator(GraphTranslator):
             graph: NetworkX DiGraph to add nodes and edges to
         """
         # Create query index for efficient lookups
-        qi = self.indexer.create_query_index(model)
+        self.indexer.create_query_index(model)
         
         # Build mapping from activity ID to gene product
         activity_to_gene: Dict[str, str] = {}
-        gene_to_activities: Dict[str, Set[str]] = {}
         
         for activity in model.activities or []:
             if activity.enabled_by and activity.enabled_by.term:
                 gene_product = activity.enabled_by.term
                 activity_to_gene[activity.id] = gene_product
-                
-                if gene_product not in gene_to_activities:
-                    gene_to_activities[gene_product] = set()
-                gene_to_activities[gene_product].add(activity.id)
                 
                 # Add gene product as node if not already present
                 if not graph.has_node(gene_product):
@@ -320,20 +315,21 @@ class ModelNetworkTranslator(GraphTranslator):
                 
         return merged
     
-    def translate_models_to_json(self, models: Iterable[Model], include_model_info: bool = True) -> str:
+    def translate_models_to_json(self, models: Iterable[Model], include_model_info: bool = True, indent: Optional[int] = None) -> str:
         """
         Translate GO-CAM models to gene-to-gene format and return as JSON string.
         
         Args:
             models: Iterable of GO-CAM Model objects to translate
             include_model_info: Whether to include model metadata in the output
+            indent: Number of spaces for JSON indentation (None for compact output)
             
         Returns:
             JSON string representation of the gene-to-gene network
         """
         g2g_graph = self.translate_models(models)
         g2g_dict = self._graph_to_dict(g2g_graph, models, include_model_info)
-        return json.dumps(g2g_dict, indent=2)
+        return json.dumps(g2g_dict, indent=indent)
     
     def _graph_to_dict(self, g2g_graph: nx.DiGraph, models: Iterable[Model], include_model_info: bool) -> Dict:
         """

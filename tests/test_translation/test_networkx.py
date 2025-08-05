@@ -8,27 +8,6 @@ from gocam.translation.networkx.model_network_translator import ModelNetworkTran
 from tests import INPUT_DIR
 
 
-@pytest.fixture
-def get_model():
-    def _get_model(model_path):
-        with open(model_path, "r") as f:
-            deserialized = yaml.safe_load(f)
-        model = Model.model_validate(deserialized)
-        return model
-    return _get_model
-
-
-@pytest.fixture
-def input_model(get_model):
-    def _get_input_model(model_name):
-        return get_model(INPUT_DIR / f"{model_name}.yaml")
-    return _get_input_model
-
-
-@pytest.fixture
-def translator():
-    return ModelNetworkTranslator()
-
 
 def test_translate_models_basic(input_model, translator):
     """Test basic translation of a GO-CAM model to gene-to-gene format."""
@@ -356,3 +335,192 @@ def test_evidence_collections_in_json(input_model, translator):
     # (This assertion might need adjustment based on actual test data)
     # For now, we just ensure no errors occur during processing
     assert isinstance(evidence_attrs_found, bool)
+
+
+# Model 568b0f9600000284 Tests (using Model-568b0f9600000284.yaml from tests/input)
+
+def test_model_basic_conversion_568b0f9600000284(input_model, translator):
+    """Test basic conversion of model 568b0f9600000284 from GO-CAM to gene-to-gene format."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # Should have 7 gene nodes (one per activity)
+    assert g2g_graph.number_of_nodes() == 7
+    
+    # Should have 6 causal edges
+    assert g2g_graph.number_of_edges() == 6
+    
+    # Verify expected genes are present
+    expected_genes = {
+        "WB:WBGene00006575",  # tir-1
+        "WB:WBGene00006599",  # tpa-1
+        "WB:WBGene00012019",  # dkf-2
+        "WB:WBGene00003822",  # nsy-1
+        "WB:WBGene00004758",  # sek-1
+        "WB:WBGene00004055",  # pmk-1
+        "WB:WBGene00000223",  # atf-7
+    }
+    assert set(g2g_graph.nodes()) == expected_genes
+
+
+def test_model_node_attributes_568b0f9600000284(input_model, translator):
+    """Test that gene nodes have expected attributes in model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # Check a specific node
+    tir1_attrs = g2g_graph.nodes["WB:WBGene00006575"]
+    assert tir1_attrs["gene_product"] == "WB:WBGene00006575"
+    assert tir1_attrs["model_id"] == "gomodel:568b0f9600000284"
+    assert tir1_attrs["label"] == "tir-1 Cele"
+
+
+def test_model_specific_edge_go_terms_568b0f9600000284(input_model, translator):
+    """Test GO terms are correctly assigned to specific edges in model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # Find the edge from tir-1 to nsy-1
+    tir1_to_nsy1_attrs = g2g_graph.edges["WB:WBGene00006575", "WB:WBGene00003822"]
+    
+    # Check source (tir-1) GO terms
+    assert tir1_to_nsy1_attrs["source_gene_molecular_function"] == "GO:0035591"
+    assert tir1_to_nsy1_attrs["source_gene_biological_process"] == "GO:0140367"
+    assert tir1_to_nsy1_attrs["source_gene_occurs_in"] == "GO:0005737"
+    
+    # Check target (nsy-1) GO terms
+    assert tir1_to_nsy1_attrs["target_gene_molecular_function"] == "GO:0004709"
+    assert tir1_to_nsy1_attrs["target_gene_biological_process"] == "GO:0140367"
+    assert tir1_to_nsy1_attrs["target_gene_occurs_in"] == "GO:0005737"
+
+
+def test_model_edge_without_occurs_in_568b0f9600000284(input_model, translator):
+    """Test edge where target gene has no occurs_in annotation in model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # Find edge from tpa-1 to dkf-2
+    tpa1_to_dkf2_attrs = g2g_graph.edges["WB:WBGene00006599", "WB:WBGene00012019"]
+    
+    # tpa-1 has no occurs_in, so that property should not exist
+    assert "source_gene_occurs_in" not in tpa1_to_dkf2_attrs
+    
+    # dkf-2 has occurs_in, so it should exist for target
+    assert tpa1_to_dkf2_attrs["target_gene_occurs_in"] == "GO:0009898"
+
+
+def test_model_causal_pathway_structure_568b0f9600000284(input_model, translator):
+    """Test that the causal pathway structure is preserved in model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # Expected causal relationships based on README model
+    expected_edges = {
+        ("WB:WBGene00006575", "WB:WBGene00003822"),  # tir-1 -> nsy-1
+        ("WB:WBGene00006599", "WB:WBGene00012019"),  # tpa-1 -> dkf-2
+        ("WB:WBGene00012019", "WB:WBGene00004055"),  # dkf-2 -> pmk-1
+        ("WB:WBGene00003822", "WB:WBGene00004758"),  # nsy-1 -> sek-1
+        ("WB:WBGene00004758", "WB:WBGene00004055"),  # sek-1 -> pmk-1
+        ("WB:WBGene00004055", "WB:WBGene00000223"),  # pmk-1 -> atf-7
+    }
+    
+    actual_edges = set(g2g_graph.edges())
+    assert actual_edges == expected_edges
+
+
+def test_model_multiple_inputs_to_same_gene_568b0f9600000284(input_model, translator):
+    """Test handling of multiple causal inputs to the same gene (pmk-1) in model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # pmk-1 (WB:WBGene00004055) should have two incoming edges
+    pmk1_predecessors = list(g2g_graph.predecessors("WB:WBGene00004055"))
+    assert len(pmk1_predecessors) == 2
+    
+    expected_predecessors = {"WB:WBGene00012019", "WB:WBGene00004758"}  # dkf-2, sek-1
+    assert set(pmk1_predecessors) == expected_predecessors
+
+
+def test_model_all_genes_have_go_annotations_568b0f9600000284(input_model, translator):
+    """Test that all edges have some GO term annotations in model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    for source, target, attrs in g2g_graph.edges(data=True):
+        # Should have at least molecular function for both source and target
+        assert "source_gene_molecular_function" in attrs
+        assert "target_gene_molecular_function" in attrs
+        
+        # All should have biological process (part_of in this example)
+        assert "source_gene_biological_process" in attrs
+        assert "target_gene_biological_process" in attrs
+
+
+def test_model_statistics_568b0f9600000284(input_model, translator):
+    """Test that final statistics match expected values for model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # Original model: 7 activities
+    assert len(model.activities) == 7
+    
+    # Gene-to-gene network: 7 genes, 6 causal relationships
+    assert g2g_graph.number_of_nodes() == 7
+    assert g2g_graph.number_of_edges() == 6
+    
+    # All nodes should be gene products
+    for node, attrs in g2g_graph.nodes(data=True):
+        assert attrs["gene_product"] == node
+        assert node.startswith("WB:WBGene")
+
+
+def test_model_evidence_collections_basic_568b0f9600000284(input_model, translator):
+    """Test that evidence collections are properly included in edges for model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # Find an edge with evidence to test
+    edge_with_evidence = None
+    for source, target, attrs in g2g_graph.edges(data=True):
+        if any(key.endswith('_has_reference') for key in attrs.keys()):
+            edge_with_evidence = (source, target, attrs)
+            break
+    
+    assert edge_with_evidence is not None, "Should find at least one edge with evidence"
+    source, target, attrs = edge_with_evidence
+    
+    # Check for evidence collection attributes
+    evidence_attrs = [key for key in attrs.keys() 
+                     if any(suffix in key for suffix in ['_has_reference', '_assessed_by', '_contributors'])]
+    assert len(evidence_attrs) > 0, "Should have evidence collection attributes"
+
+
+def test_model_molecular_function_evidence_collections_568b0f9600000284(input_model, translator):
+    """Test molecular function evidence collections are properly extracted for model 568b0f9600000284."""
+    model = input_model("Model-568b0f9600000284")
+    g2g_graph = translator.translate_models([model])
+    
+    # Find edge from tir-1 to nsy-1 which should have molecular function evidence
+    tir1_to_nsy1_attrs = g2g_graph.edges["WB:WBGene00006575", "WB:WBGene00003822"]
+    
+    # Check source molecular function evidence
+    assert "source_gene_molecular_function_has_reference" in tir1_to_nsy1_attrs
+    assert "source_gene_molecular_function_assessed_by" in tir1_to_nsy1_attrs
+    
+    # Verify reference format
+    source_refs = tir1_to_nsy1_attrs["source_gene_molecular_function_has_reference"]
+    assert isinstance(source_refs, list)
+    assert "PMID:15625192" in source_refs
+    
+    # Verify evidence code format
+    source_codes = tir1_to_nsy1_attrs["source_gene_molecular_function_assessed_by"]
+    assert isinstance(source_codes, list)
+    assert "ECO:0000314" in source_codes
+    
+    # Check target molecular function evidence
+    assert "target_gene_molecular_function_has_reference" in tir1_to_nsy1_attrs
+    assert "target_gene_molecular_function_assessed_by" in tir1_to_nsy1_attrs
+    
+    target_refs = tir1_to_nsy1_attrs["target_gene_molecular_function_has_reference"]
+    assert isinstance(target_refs, list)
+    assert "PMID:11751572" in target_refs
