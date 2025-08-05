@@ -536,3 +536,192 @@ See the CLI help for more information and options:
 ```bash
 gocam convert --help
 ```
+
+## Gene-to-Gene Format Translation
+
+Convert GO-CAM models to gene-to-gene format where nodes are gene products and edges represent causal relationships with GO terms as edge properties.
+
+### Basic Usage
+
+```python
+from gocam.translation.networkx.model_network_translator import ModelNetworkTranslator
+from gocam.datamodel import Model
+import json
+
+# Test with a complete example (you can run this directly!)
+gocam_json_string = """
+{
+  "id": "gomodel:568b0f9600000284",
+  "title": "Antibacterial innate immune response in the intestine via MAPK cascade",
+  "taxon": "NCBITaxon:6239",
+  "activities": [
+    {
+      "id": "gomodel:568b0f9600000284/57ec3a7e00000079",
+      "enabled_by": {"term": "WB:WBGene00006575"},
+      "molecular_function": {"term": "GO:0035591"},
+      "causal_associations": [
+        {
+          "predicate": "RO:0002629",
+          "downstream_activity": "gomodel:568b0f9600000284/57ec3a7e00000109"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:568b0f9600000284/57ec3a7e00000109",
+      "enabled_by": {"term": "WB:WBGene00003822"},
+      "molecular_function": {"term": "GO:0004709"}
+    }
+  ]
+}
+"""
+
+# Parse the JSON and create model
+model = Model.model_validate_json(gocam_json_string)
+
+# Create translator and convert to gene-to-gene JSON
+translator = ModelNetworkTranslator()
+json_output = translator.translate_models_to_json([model])
+print("Translation successful!")
+print(f"Output: {len(json_output)} characters")
+
+# Parse and show structure
+result = json.loads(json_output)
+print(f"Nodes: {len(result['nodes'])}, Edges: {len(result['edges'])}")
+print(json_output)
+```
+
+```python
+# Or from a JSON string
+gocam_json_string = """
+{
+  "id": "gomodel:568b0f9600000284",
+  "title": "Antibacterial innate immune response in the intestine via MAPK cascade",
+  "taxon": "NCBITaxon:6239",
+  "activities": [
+    {
+      "id": "gomodel:568b0f9600000284/57ec3a7e00000079",
+      "enabled_by": {"term": "WB:WBGene00006575"},
+      "molecular_function": {"term": "GO:0035591"},
+      "causal_associations": [
+        {
+          "predicate": "RO:0002629",
+          "downstream_activity": "gomodel:568b0f9600000284/57ec3a7e00000109"
+        }
+      ]
+    }
+  ]
+}
+"""
+
+model = Model.model_validate_json(gocam_json_string)
+json_output = translator.translate_models_to_json([model])
+```
+
+### Multiple Models
+
+```python
+# Process multiple models together (combined into single network)
+models = [model1, model2, model3]
+combined_json = translator.translate_models_to_json(models)
+
+# Process multiple models individually
+for model in models:
+    json_output = translator.translate_models_to_json([model])
+    print(f"Model {model.id}:")
+    print(json_output)
+```
+
+### Output Format
+
+The JSON output contains:
+- **nodes**: Gene products with `id`, `gene_product`, `model_id`, and `label` (if available)
+- **edges**: Causal relationships with GO term properties and evidence:
+  - **GO Terms**: `source_gene_molecular_function`, `target_gene_molecular_function`, `source_gene_biological_process`, `target_gene_biological_process`, `source_gene_occurs_in`, `target_gene_occurs_in`, `source_gene_product`, `target_gene_product`
+  - **Evidence Collections** (multivalued lists):
+    - `source_{term}_has_reference`, `target_{term}_has_reference` (e.g., `source_molecular_function_has_reference`)
+    - `source_{term}_assessed_by`, `target_{term}_assessed_by` (e.g., `source_occurs_in_assessed_by`)
+    - `source_{term}_contributors`, `target_{term}_contributors` (e.g., `source_occurs_in_contributors`)
+  - **Causal Relationship**: `causal_predicate` (e.g., "RO:0002629"), `causal_predicate_has_reference`, `causal_predicate_assessed_by`, `causal_predicate_contributors`
+- **model_info**: Model metadata (optional, controlled by `include_model_info` parameter)
+
+The output follows NetworkX `node_link_data` format standards with `directed`, `multigraph`, and `graph` fields. 
+Model metadata is stored in `graph.model_info` following NetworkX conventions for graph-level attributes.
+
+Evidence collections preserve the original GO-CAM evidence with references (PMIDs, etc.) and evidence codes (ECO terms) for full traceability.
+
+### Example Output
+
+```json
+{
+  "directed": true,
+  "multigraph": false,
+  "graph": {
+    "model_info": {
+      "id": "gomodel:568b0f9600000284",
+      "title": "Antibacterial innate immune response in the intestine via MAPK cascade (C. elegans)",
+      "taxon": "NCBITaxon:6239",
+      "status": "production"
+    }
+  },
+  "nodes": [
+    {
+      "id": "WB:WBGene00006575",
+      "gene_product": "WB:WBGene00006575",
+      "model_id": "gomodel:568b0f9600000284"
+    },
+    {
+      "id": "WB:WBGene00003822",
+      "gene_product": "WB:WBGene00003822",
+      "model_id": "gomodel:568b0f9600000284"
+    }
+  ],
+  "edges": [
+    {
+      "source": "WB:WBGene00006575",
+      "target": "WB:WBGene00003822",
+      "source_gene": "WB:WBGene00006575",
+      "target_gene": "WB:WBGene00003822",
+      "model_id": "gomodel:568b0f9600000284",
+      "causal_predicate": "RO:0002629",
+      "causal_predicate_has_reference": ["PMID:15123841"],
+      "causal_predicate_assessed_by": ["ECO:0000315"],
+      "causal_predicate_contributors": ["https://orcid.org/0000-0002-3013-9906"],
+      "source_gene_molecular_function": "GO:0035591",
+      "source_gene_molecular_function_has_reference": ["PMID:15625192"],
+      "source_gene_molecular_function_assessed_by": ["ECO:0000314"],
+      "source_gene_molecular_function_contributors": ["https://orcid.org/0000-0002-1706-4196"],
+      "source_gene_biological_process": "GO:0140367",
+      "source_gene_biological_process_has_reference": ["PMID:19837372"],
+      "source_gene_biological_process_assessed_by": ["ECO:0000315"],
+      "source_gene_biological_process_contributors": ["https://orcid.org/0000-0002-1706-4196"],
+      "source_gene_occurs_in": "GO:0005737",
+      "source_gene_occurs_in_has_reference": ["PMID:15625192"],
+      "source_gene_occurs_in_assessed_by": ["ECO:0000314"],
+      "source_gene_occurs_in_contributors": ["https://orcid.org/0000-0002-3013-9906"],
+      "source_gene_product": "WB:WBGene00006575",
+      "target_gene_molecular_function": "GO:0004709",
+      "target_gene_molecular_function_has_reference": ["PMID:11751572"],
+      "target_gene_molecular_function_assessed_by": ["ECO:0000314"],
+      "target_gene_molecular_function_contributors": ["https://orcid.org/0000-0002-1706-4196"],
+      "target_gene_biological_process": "GO:0140367",
+      "target_gene_biological_process_has_reference": ["PMID:12142542"],
+      "target_gene_biological_process_assessed_by": ["ECO:0000315"],
+      "target_gene_biological_process_contributors": ["https://orcid.org/0000-0002-1706-4196"],
+      "target_gene_occurs_in": "GO:0005737",
+      "target_gene_occurs_in_has_reference": ["PMID:15625192"],
+      "target_gene_occurs_in_assessed_by": ["ECO:0000314"],
+      "target_gene_occurs_in_contributors": ["https://orcid.org/0000-0002-3013-9906"],
+      "target_gene_product": "WB:WBGene00003822"
+    }
+  ]
+}
+```
+
+### NetworkX Graph Access
+
+```python
+# Get NetworkX DiGraph directly (for analysis)
+g2g_graph = translator.translate_models([model])
+print(f"Genes: {g2g_graph.number_of_nodes()}")
+print(f"Causal relationships: {g2g_graph.number_of_edges()}")
+```

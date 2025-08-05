@@ -157,19 +157,28 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
             raise click.BadParameter("Could not infer input format")
 
     if input_format == "json":
-        deserialized = json.load(model)
+        # Use Pydantic's built-in JSON parser for better performance
+        json_content = model.read()
+        try:
+            # Try to parse as a single model first
+            models = [Model.model_validate_json(json_content)]
+            logger.info("Parsing a single model from input")
+        except Exception:
+            # If that fails, try parsing as a list of models
+            deserialized = json.loads(json_content)
+            if isinstance(deserialized, list):
+                logger.info(f"Parsing {len(deserialized)} models from input")
+                models = [Model.model_validate(m) for m in deserialized]
+            else:
+                raise
     elif input_format == "yaml":
         deserialized = list(yaml.safe_load_all(model))
+        logger.info(f"Parsing {len(deserialized)} models from input")
+        models = [Model.model_validate(m) for m in deserialized]
     else:
         raise click.UsageError("Invalid input format")
 
     try:
-        if isinstance(deserialized, list):
-            logger.info(f"Parsing {len(deserialized)} models from input")
-            models = [Model.model_validate(m) for m in deserialized]
-        else:
-            logger.info("Parsing a single model from input")
-            models = [Model.model_validate(deserialized)]
         logger.info(f"Parsed {len(models)} models from input")
     except Exception as e:
         raise click.UsageError(f"Could not load model: {e}")
@@ -263,13 +272,16 @@ def index_models(input_file, input_format, output_format, output_file, reindex):
     models: List[Model] = []
     if input_format == "json":
         # For JSON, expect a list of model objects
-        with open(input_path, "r") as f:
-            data = json.load(f)
+        with open(input_path, "rb") as f:
+            json_content = f.read()
+            data = json.loads(json_content)
             if not isinstance(data, list):
                 raise click.BadParameter("JSON input must be a list of models")
             for model_dict in data:
                 try:
-                    model = Model.model_validate(model_dict)
+                    # Use Pydantic's built-in JSON parser for better performance
+                    model_json = json.dumps(model_dict)
+                    model = Model.model_validate_json(model_json)
                     models.append(model)
                 except Exception as e:
                     click.echo(f"Warning: Could not load model: {e}", err=True)
@@ -378,13 +390,16 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
     models: List[Model] = []
     if input_format == "json":
         # For JSON, expect a list of model objects
-        with open(input_path, "r") as f:
-            data = json.load(f)
+        with open(input_path, "rb") as f:
+            json_content = f.read()
+            data = json.loads(json_content)
             if not isinstance(data, list):
                 raise click.BadParameter("JSON input must be a list of models")
             for model_dict in data:
                 try:
-                    model = Model.model_validate(model_dict)
+                    # Use Pydantic's built-in JSON parser for better performance
+                    model_json = json.dumps(model_dict)
+                    model = Model.model_validate_json(model_json)
                     models.append(model)
                 except Exception as e:
                     click.echo(f"Warning: Could not load model: {e}", err=True)

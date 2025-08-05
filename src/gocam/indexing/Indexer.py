@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass, field
-from typing import Optional, List, Collection, Tuple
+from typing import Optional, List, Collection, Tuple, Any, Set
 
 from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import PART_OF, IS_A
@@ -105,7 +105,7 @@ class Indexer:
         go = self.go_adapter()
         model.query_index = qi
         qi = model.query_index
-        qi.number_of_activities = len(model.activities)
+        qi.number_of_activities = len(model.activities or [])
         all_causal_associations = []
         all_refs = set()
         all_mfs = set()
@@ -115,59 +115,64 @@ class Indexer:
         all_has_inputs = set()
         all_annoton_terms = []
 
-        def ta_ref(ta: Optional[TermAssociation]) -> List[str]:
-            """Extract references from a TermAssociation."""
+        def term_association_references(term_association: Optional[TermAssociation]) -> Set[str]:
+            """
+            Extract references from a TermAssociation.
+
+            Returns:
+                Set[str]: A set of reference strings extracted from the evidence of the TermAssociation.
+            """
             refs = set()
-            if ta and ta.evidence:
-                refs = {e.reference for e in ta.evidence if e.reference}
+            if term_association and term_association.evidence:
+                refs = {e.reference for e in term_association.evidence if e.reference}
             return refs
 
-        for a in model.activities:
+        for activity in model.activities or []:
             annoton_term_id_parts = []
-            if a.causal_associations:
-                all_causal_associations.extend(a.causal_associations)
+            if activity.causal_associations:
+                all_causal_associations.extend(activity.causal_associations)
 
-            if a.enabled_by:
-                all_refs.update(ta_ref(a.enabled_by))
-                all_enabled_bys.add(a.enabled_by.term)
-                annoton_term_id_parts.append(a.enabled_by.term)
+            if activity.enabled_by:
+                all_refs.update(term_association_references(activity.enabled_by))
+                all_enabled_bys.add(activity.enabled_by.term)
+                annoton_term_id_parts.append(activity.enabled_by.term)
             
-            if a.molecular_function:
-                all_refs.update(ta_ref(a.molecular_function))
-                all_mfs.add(a.molecular_function.term)
-                annoton_term_id_parts.append(a.molecular_function.term)
+            if activity.molecular_function:
+                all_refs.update(term_association_references(activity.molecular_function))
+                all_mfs.add(activity.molecular_function.term)
+                annoton_term_id_parts.append(activity.molecular_function.term)
 
-            if a.part_of:
+            if activity.part_of:
                 # Handle both single and list cases
-                if isinstance(a.part_of, list):
-                    for ta in a.part_of:
-                        all_refs.update(ta_ref(ta))
+                if isinstance(activity.part_of, list):
+                    for ta in activity.part_of:
+                        all_refs.update(term_association_references(ta))
                         all_parts_ofs.add(ta.term)
                         annoton_term_id_parts.append(ta.term)
                 else:
-                    all_refs.update(ta_ref(a.part_of))
-                    all_parts_ofs.add(a.part_of.term)
-                    annoton_term_id_parts.append(a.part_of.term)
+                    all_refs.update(term_association_references(activity.part_of))
+                    all_parts_ofs.add(activity.part_of.term)
+                    annoton_term_id_parts.append(activity.part_of.term)
                         
-            if a.occurs_in:
+            if activity.occurs_in:
                 # Handle both single and list cases
-                if isinstance(a.occurs_in, list):
-                    for ta in a.occurs_in:
-                        all_refs.update(ta_ref(ta))
+                if isinstance(activity.occurs_in, list):
+                    for ta in activity.occurs_in:
+                        all_refs.update(term_association_references(ta))
                         all_occurs_ins.add(ta.term)
                         annoton_term_id_parts.append(ta.term)
                 else:
-                    all_refs.update(ta_ref(a.occurs_in))
-                    all_occurs_ins.add(a.occurs_in.term)
-                    annoton_term_id_parts.append(a.occurs_in.term)
+                    all_refs.update(term_association_references(activity.occurs_in))
+                    all_occurs_ins.add(activity.occurs_in.term)
+                    annoton_term_id_parts.append(activity.occurs_in.term)
                 
-            if a.has_input:
-                for ta in a.has_input:
-                    all_refs.update(ta_ref(ta))
+            if activity.has_input:
+                for ta in activity.has_input:
+                    all_refs.update(term_association_references(ta))
                     all_has_inputs.add(ta.term)
                     annoton_term_id_parts.append(ta.term)
 
-            if a.enabled_by:
+            if activity.enabled_by:
                 def _label(x):
                     lbl = go.label(x)
                     if lbl:
@@ -188,9 +193,9 @@ class Indexer:
             PublicationObject(id=ref) for ref in all_refs
         ]
         graph = self.model_to_digraph(model)
-        # use nx to find longest path and all SCCs
+        # use nx to find the longest path and all SCCs
         if graph.number_of_nodes() > 0:
-            # Find longest path length
+            # Find the longest path length
             longest_path = 0
             for node in graph.nodes():
                 for other_node in graph.nodes():
@@ -215,7 +220,16 @@ class Indexer:
             """
             Filter terms to only those in the specified subsets.
             """
-            return list({t for t in terms if t.id in subset_terms})
+            # Use list comprehension instead of set comprehension to avoid hashability issues
+            filtered_terms = [t for t in terms if t.id in subset_terms]
+            # Remove duplicates by id while preserving order
+            seen_ids = set()
+            result = []
+            for t in filtered_terms:
+                if t.id not in seen_ids:
+                    seen_ids.add(t.id)
+                    result.append(t)
+            return result
 
 
         mf_direct, mf_closure = self._get_closures(all_mfs)
@@ -261,7 +275,7 @@ class Indexer:
             causal relationships from source to target activities
         """
         g = nx.DiGraph()
-        for a in model.activities:
+        for a in model.activities or []:
             if a.causal_associations:
                 for ca in a.causal_associations:
                     if ca.downstream_activity:

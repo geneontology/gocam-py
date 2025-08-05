@@ -49,7 +49,7 @@ SPECIES_CODES = [
     "Xenopus",
 ]
 
-# This image gets referenced in the network description. as recommended by NDEx. The process of
+# This image gets referenced in the network description, as recommended by NDEx. The process of
 # generating this graphic is not fully automated, but it is described here:
 # https://github.com/pkalita-lbl/ndex-gocam-legend
 LEGEND_GRAPHIC_SRC = "https://geneontology.org/assets/ndex-gocam-legend-v2.png"
@@ -105,6 +105,8 @@ def model_to_cx2(
 
     def _format_evidence_list(evidence_list: List[EvidenceItem]) -> str:
         """Format a list of evidence items as an HTML unordered list."""
+        if evidence_list is None:
+            return ""
         evidence_list_items = []
         for e in evidence_list:
             evidence_item = ""
@@ -237,7 +239,7 @@ def model_to_cx2(
                 node_attributes["member"].append(member_name)
 
         node_attributes["Evidence"] = _format_evidence_list(
-            activity.enabled_by.evidence
+            activity.enabled_by.evidence if activity.enabled_by else None
         )
 
         if activity.molecular_function:
