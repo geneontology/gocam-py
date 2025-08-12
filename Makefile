@@ -66,6 +66,7 @@ help: status
 	@echo "make testdoc -- builds docs and runs local test server"
 	@echo "make deploy -- deploys site"
 	@echo "make update -- updates linkml version"
+	@echo "make translate-collection -- translate GO-CAM collection to networkx and cx2"
 	@echo "make help -- show this help"
 	@echo ""
 
@@ -227,6 +228,14 @@ git-status:
 .cruft.json:
 	echo "creating a stub for .cruft.json. IMPORTANT: setup via cruft not cookiecutter recommended!" ; \
 	touch $@
+
+# Translate GO-CAM collection to networkx and cx2 formats
+translate-collection:
+	$(RUN) gocam translate-collection
+
+# Translate GO-CAM collection with custom parameters (example)
+translate-collection-test:
+	$(RUN) gocam -v translate-collection --limit 5
 
 clean:
 	rm -rf $(DEST)
