@@ -702,7 +702,7 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
                             "models_failed": failed_count
                         }
                         
-                        metadata_path = os.path.join(directory_path, "metadata.json")
+                        metadata_path = os.path.join(directory_path, "gocam_metadata.json")
                         with open(metadata_path, 'w') as f:
                             json.dump(metadata, f, indent=2)
                         
