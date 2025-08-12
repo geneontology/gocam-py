@@ -653,6 +653,7 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
             # Process each model
             processed_count = 0
             failed_count = 0
+            processed_model_ids = []
             
             for json_file in json_files:
                 model_filename = os.path.splitext(os.path.basename(json_file))[0]
@@ -663,6 +664,9 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
                 if model is None:
                     failed_count += 1
                     continue
+                
+                # Track successfully processed model ID
+                processed_model_ids.append(model.id)
                 
                 # Translate to requested formats
                 if "networkx" in formats:
@@ -706,6 +710,16 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
                         with open(metadata_path, 'w') as f:
                             json.dump(metadata, f, indent=2)
                         
+                        # Create model index file
+                        model_index = {
+                            "model_ids": processed_model_ids,
+                            "total_models": len(processed_model_ids)
+                        }
+                        
+                        index_path = os.path.join(directory_path, "gocam_model_index.json")
+                        with open(index_path, 'w') as f:
+                            json.dump(model_index, f, indent=2)
+                        
                         with tarfile.open(archive_path, "w:gz") as tar:
                             # Add all files in the directory, including metadata
                             for file_name in os.listdir(directory_path):
@@ -713,8 +727,9 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
                                 if os.path.isfile(file_path):
                                     tar.add(file_path, arcname=file_name)
                         
-                        # Clean up temporary metadata file
+                        # Clean up temporary files
                         os.unlink(metadata_path)
+                        os.unlink(index_path)
                         
                         click.echo(f"Successfully created archive: {archive_path}", err=True)
                         
