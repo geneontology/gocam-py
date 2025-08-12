@@ -512,7 +512,13 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
     type=int,
     help="Limit the number of models to process (for testing)",
 )
-def translate_collection(url, formats, output_networkx, output_cx2, limit):
+@click.option(
+    "--archive/--no-archive",
+    default=True,
+    show_default=True,
+    help="Create gzipped tar archives of output directories",
+)
+def translate_collection(url, formats, output_networkx, output_cx2, limit, archive):
     """
     Download GO-CAM models and translate them to different formats.
     
@@ -668,6 +674,59 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit):
                 processed_count += 1
             
             click.echo(f"Processing complete. Successfully processed: {processed_count}, Failed: {failed_count}", err=True)
+            
+            # Create tar.gz archives if requested
+            if archive:
+                def create_archive(directory_path: str, format_name: str):
+                    """Create a gzipped tar archive of a directory."""
+                    if not os.path.exists(directory_path) or not os.listdir(directory_path):
+                        click.echo(f"Skipping archive for {format_name}: directory is empty or doesn't exist", err=True)
+                        return
+                    
+                    # Create archive filename
+                    import datetime
+                    schema_version = __version__
+                    archive_name = f"gocam_{format_name}.tar.gz"
+                    archive_path = os.path.join(os.path.dirname(directory_path), archive_name)
+                    
+                    click.echo(f"Creating {format_name} archive: {archive_path}", err=True)
+                    
+                    try:
+                        # Create metadata file
+                        metadata = {
+                            "schema_version": schema_version,
+                            "format": format_name,
+                            "created_at": datetime.datetime.now().isoformat(),
+                            "source_url": url,
+                            "models_processed": processed_count,
+                            "models_failed": failed_count
+                        }
+                        
+                        metadata_path = os.path.join(directory_path, "metadata.json")
+                        with open(metadata_path, 'w') as f:
+                            json.dump(metadata, f, indent=2)
+                        
+                        with tarfile.open(archive_path, "w:gz") as tar:
+                            # Add all files in the directory, including metadata
+                            for file_name in os.listdir(directory_path):
+                                file_path = os.path.join(directory_path, file_name)
+                                if os.path.isfile(file_path):
+                                    tar.add(file_path, arcname=file_name)
+                        
+                        # Clean up temporary metadata file
+                        os.unlink(metadata_path)
+                        
+                        click.echo(f"Successfully created archive: {archive_path}", err=True)
+                        
+                    except Exception as e:
+                        logger.error(f"Failed to create archive for {format_name}: {e}")
+                
+                # Create archives for each format that was processed
+                if "networkx" in formats and processed_count > 0:
+                    create_archive(output_paths["networkx"], "networkx")
+                
+                if "cx2" in formats and processed_count > 0:
+                    create_archive(output_paths["cx2"], "cx2")
             
         except Exception as e:
             logger.error(f"Translation failed with error: {e}")
