@@ -1,11 +1,14 @@
 import csv
 import datetime
+import io
 import json
 import logging
 import os
 import sys
 import tarfile
 import tempfile
+import threading
+import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -16,6 +19,11 @@ import yaml
 from linkml_runtime.loaders import json_loader, yaml_loader
 from mkdocs.commands.serve import serve
 
+try:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = None
+
 from gocam import __version__
 from gocam.datamodel import Model
 from gocam.translation import MinervaWrapper
@@ -24,7 +32,11 @@ from gocam.translation.networkx.model_network_translator import ModelNetworkTran
 from gocam.indexing.Indexer import Indexer
 from gocam.indexing.Flattener import Flattener
 
-import logging
+# Optional imports
+try:
+    from gocam.translation.tbox_translator import TBoxTranslator
+except ImportError:
+    TBoxTranslator = None
 
 logger = logging.getLogger(__name__)
 
@@ -196,7 +208,10 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
         cx2 = model_to_cx2(model, apply_dot_layout=dot_layout)
 
         if ndex_upload:
-            import ndex2
+            try:
+                import ndex2
+            except ImportError:
+                raise click.UsageError("ndex2 package is required for NDEx upload. Install with: pip install ndex2")
 
             # This is very basic proof-of-concept usage of the NDEx client. Once we have a better
             # idea of how we want to use it, we can refactor this to allow more CLI options for
@@ -453,7 +468,6 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
             fieldnames = sorted(all_fields)
             
             # Convert to TSV
-            import io
             output_buffer = io.StringIO()
             writer = csv.DictWriter(
                 output_buffer, 
@@ -581,62 +595,20 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
         logger.info(f"Found {len(json_files)} JSON model files")
         return json_files
 
-    def load_models_concurrent(json_files: List[str], max_workers: int = 10, 
-                              progress_callback=None) -> Dict[str, Model]:
-        """Load GO-CAM models from files concurrently."""
-        models = {}
-        
-        def load_single_model(file_path: str) -> Tuple[str, Optional[Model]]:
-            """Load a single model and return (filename, model)."""
-            model_filename = os.path.splitext(os.path.basename(file_path))[0]
-            try:
-                with open(file_path, 'r') as f:
-                    minerva_dict = json.load(f)
-                    model = MinervaWrapper.minerva_object_to_model(minerva_dict)
-                    return model_filename, model
-            except Exception as e:
-                logger.error(f"Failed to load model from {file_path}: {e}")
-                return model_filename, None
-        
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            future_to_file = {
-                executor.submit(load_single_model, json_file): json_file
-                for json_file in json_files
-            }
-            
-            for future in as_completed(future_to_file):
-                file_path = future_to_file[future]
-                try:
-                    model_filename, model = future.result()
-                    if model is not None:
-                        models[model_filename] = model
-                    if progress_callback:
-                        progress_callback()
-                except Exception as exc:
-                    logger.error(f"File {file_path} generated an exception: {exc}")
-                    if progress_callback:
-                        progress_callback()
-        
-        return models
 
-    def load_model_from_file(file_path: str) -> Optional[Model]:
-        """Load a GO-CAM model from a Minerva JSON file."""
-        try:
-            with open(file_path, 'r') as f:
-                minerva_dict = json.load(f)
-                # Convert from Minerva format to GO-CAM model
-                model = MinervaWrapper.minerva_object_to_model(minerva_dict)
-                return model
-        except Exception as e:
-            logger.error(f"Failed to load model from {file_path}: {e}")
-            return None
-
+    # Create a minimal no-op indexer to avoid expensive database operations
+    class NoOpIndexer:
+        """Minimal indexer that skips expensive GO database operations."""
+        def create_query_index(self, model):
+            """No-op implementation to avoid 31+ second GO database lookups per model."""
+            pass
+    
     def translate_to_networkx(model: Model, output_path: str, model_filename: str):
         """Translate a model to NetworkX format and save as JSON."""
         try:
-            # Initialize the translator
-            indexer = Indexer()
-            translator = ModelNetworkTranslator(indexer=indexer)
+            # Use a minimal no-op indexer to avoid expensive GO database operations
+            # The original indexer was causing 31+ second delays per model
+            translator = ModelNetworkTranslator(indexer=NoOpIndexer())
             
             # Translate the model
             json_output = translator.translate_models_to_json([model], include_model_info=True)
@@ -688,91 +660,91 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
             # Find all JSON model files
             json_files = find_json_models(extracted_dir, limit)
             
-            # Load models concurrently (much faster than serial loading)
-            click.echo(f"Loading {len(json_files)} models concurrently...", err=True)
+            # Suppress warnings from minerva_wrapper for cleaner output
+            warnings.filterwarnings("ignore", module="gocam.translation.minerva_wrapper")
             
-            # Progress tracking for loading
-            loaded_count = 0
-            def loading_progress():
-                nonlocal loaded_count
-                loaded_count += 1
+            # Also suppress specific logger warnings that are too verbose
+            minerva_logger = logging.getLogger("gocam.translation.minerva_wrapper")
+            original_level = minerva_logger.level
+            minerva_logger.setLevel(logging.ERROR)
+            
+            # Direct load+translate approach: process models without storing all in memory
+            import time
+            
+            # Progress tracking
+            progress_lock = threading.Lock()
+            start_time = time.time()
+            processed_count = 0
+            failed_count = 0
+            processed_model_ids = []
+            
+            def report_progress(phase, count, total, start_time):
+                elapsed = time.time() - start_time
+                rate = count / elapsed if elapsed > 0 else 0
+                percentage = (count / total) * 100
+                click.echo(f"{phase}: {count}/{total} ({percentage:.1f}%) at {rate:.1f} models/sec", err=True)
+            
+            click.echo(f"Processing {len(json_files)} models (load+translate)...", err=True)
+            
+            def load_and_translate_single(file_path: str) -> bool:
+                """Load a model from file and translate it to all requested formats."""
+                nonlocal processed_count, failed_count, processed_model_ids
                 
-            try:
-                from tqdm import tqdm
-                loading_progress_bar = tqdm(total=len(json_files), desc="Loading models", unit="model")
-                def loading_progress_with_bar():
-                    loading_progress()
-                    loading_progress_bar.update(1)
-                progress_callback = loading_progress_with_bar
-            except ImportError:
-                progress_callback = loading_progress
-                click.echo(f"Loading {len(json_files)} models...", err=True)
-            
-            # Load all models concurrently
-            models_dict = load_models_concurrent(json_files, max_workers=max_workers, progress_callback=progress_callback)
-            
-            try:
-                loading_progress_bar.close()
-            except:
-                pass
-            
-            processed_count = len(models_dict)
-            failed_count = len(json_files) - processed_count
-            processed_model_ids = [model.id for model in models_dict.values()]
-            
-            click.echo(f"Loaded {processed_count} models, {failed_count} failed", err=True)
-            
-            # Now translate to requested formats
-            if models_dict:
-                # Process formats concurrently
-                def translate_format_batch(format_name: str, models: Dict[str, Model]):
-                    """Translate all models to a specific format concurrently."""
-                    click.echo(f"Translating {len(models)} models to {format_name} format...", err=True)
+                model_filename = os.path.splitext(os.path.basename(file_path))[0]
+                file_start_time = time.time()
+                try:
+                    # Load model
+                    load_start = time.time()
+                    with open(file_path, 'r') as f:
+                        minerva_dict = json.load(f)
+                        model = MinervaWrapper.minerva_object_to_model(minerva_dict)
+                    load_time = time.time() - load_start
                     
-                    def translate_single(args):
-                        filename, model = args
-                        try:
-                            if format_name == "networkx":
-                                translate_to_networkx(model, output_paths["networkx"], filename)
-                            elif format_name == "cx2":
-                                translate_to_cx2(model, output_paths["cx2"], filename)
-                            return True
-                        except Exception as e:
-                            logger.error(f"Failed to translate {filename} to {format_name}: {e}")
-                            return False
+                    # Translate to all requested formats
+                    translation_times = {}
+                    for format_name in format:
+                        trans_start = time.time()
+                        if format_name == "networkx":
+                            translate_to_networkx(model, output_paths["networkx"], model_filename)
+                        elif format_name == "cx2":
+                            translate_to_cx2(model, output_paths["cx2"], model_filename)
+                        translation_times[format_name] = time.time() - trans_start
                     
-                    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                        try:
-                            from tqdm import tqdm
-                            model_items = list(models.items())
-                            translation_progress = tqdm(total=len(model_items), desc=f"Translating to {format_name}", unit="model")
-                            
-                            futures = {executor.submit(translate_single, item): item for item in model_items}
-                            for future in as_completed(futures):
-                                translation_progress.update(1)
-                                
-                            translation_progress.close()
-                        except ImportError:
-                            # No tqdm, just run without progress bar
-                            futures = {executor.submit(translate_single, item): item for item in models.items()}
-                            for future in as_completed(futures):
-                                pass
+                    total_time = time.time() - file_start_time
+                    
+                    # Track success
+                    with progress_lock:
+                        processed_count += 1
+                        processed_model_ids.append(model.id)
+                        if processed_count % 100 == 0 or processed_count % max(1, len(json_files) // 20) == 0:
+                            report_progress("Processed", processed_count, len(json_files), start_time)
+                        
+                        # Log timing for first few models to diagnose bottlenecks
+                        if processed_count <= 10:
+                            trans_times_str = ", ".join([f"{k}: {v:.2f}s" for k, v in translation_times.items()])
+                            logger.info(f"Model {model_filename}: load={load_time:.2f}s, translations=({trans_times_str}), total={total_time:.2f}s")
+                    
+                    return True
+                    
+                except Exception as e:
+                    logger.error(f"Failed to process model from {file_path}: {e}")
+                    with progress_lock:
+                        failed_count += 1
+                    return False
+            
+            # Process all files concurrently
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = {executor.submit(load_and_translate_single, json_file): json_file for json_file in json_files}
                 
-                # Process each requested format
-                with ThreadPoolExecutor(max_workers=len(format)) as format_executor:
-                    format_futures = []
-                    
-                    if "networkx" in format:
-                        future = format_executor.submit(translate_format_batch, "networkx", models_dict)
-                        format_futures.append(future)
-                    
-                    if "cx2" in format:
-                        future = format_executor.submit(translate_format_batch, "cx2", models_dict)
-                        format_futures.append(future)
-                    
-                    # Wait for all formats to complete
-                    for future in as_completed(format_futures):
+                try:
+                    for future in as_completed(futures):
                         future.result()  # This will raise any exceptions
+                except KeyboardInterrupt:
+                    logger.info("Interrupted by user, cancelling remaining tasks...")
+                    for future in futures:
+                        future.cancel()
+                    raise
+            
             
             click.echo(f"Processing complete. Successfully processed: {processed_count}, Failed: {failed_count}", err=True)
             
@@ -840,7 +812,12 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
                 if "cx2" in format and processed_count > 0:
                     create_archive(output_paths["cx2"], "cx2")
             
+            # Restore original logger level
+            minerva_logger.setLevel(original_level)
+            
         except Exception as e:
+            # Restore original logger level even on exception
+            minerva_logger.setLevel(original_level)
             logger.error(f"Translation failed with error: {e}")
             raise click.ClickException(f"Translation failed: {e}")
 
