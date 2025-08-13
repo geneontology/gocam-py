@@ -1,4 +1,5 @@
 import csv
+import datetime
 import json
 import logging
 import os
@@ -488,7 +489,7 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
     show_default=True,
 )
 @click.option(
-    "--formats",
+    "--format",
     multiple=True,
     type=click.Choice(["networkx", "cx2"]),
     default=["networkx", "cx2"],
@@ -518,7 +519,7 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
     show_default=True,
     help="Create gzipped tar archives of output directories",
 )
-def translate_collection(url, formats, output_networkx, output_cx2, limit, archive):
+def translate_collection(url, format, output_networkx, output_cx2, limit, archive):
     """
     Download GO-CAM models and translate them to different formats.
     
@@ -531,7 +532,7 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
         gocam translate-collection
         
         # Only NetworkX format with custom output directory
-        gocam translate-collection --formats networkx --output-networkx ./my_output
+        gocam translate-collection --format networkx --output-networkx ./my_output
         
         # Test with limited models
         gocam translate-collection --limit 5
@@ -540,35 +541,33 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
         """Download and extract a gzipped tarball."""
         logger.info(f"Downloading tarball from {url}")
         
-        with tempfile.NamedTemporaryFile(suffix='.tgz', delete=False) as tmp_file:
-            try:
-                urlretrieve(url, tmp_file.name)
-                logger.info(f"Downloaded tarball to {tmp_file.name}")
+        with tempfile.NamedTemporaryFile(suffix='.tgz') as tmp_file:
+            urlretrieve(url, tmp_file.name)
+            logger.info(f"Downloaded tarball to {tmp_file.name}")
+            
+            # Extract the tarball
+            logger.info(f"Extracting tarball to {extract_dir}")
+            with tarfile.open(tmp_file.name, 'r:gz') as tar:
+                tar.extractall(path=extract_dir)
                 
-                # Extract the tarball
-                logger.info(f"Extracting tarball to {extract_dir}")
-                with tarfile.open(tmp_file.name, 'r:gz') as tar:
-                    tar.extractall(path=extract_dir)
-                    
-                    # Find the extracted directory
-                    extracted_dirs = [d for d in os.listdir(extract_dir) 
-                                    if os.path.isdir(os.path.join(extract_dir, d))]
-                    if extracted_dirs:
-                        return os.path.join(extract_dir, extracted_dirs[0])
-                    else:
-                        return extract_dir
-                        
-            finally:
-                # Clean up the temporary file
-                os.unlink(tmp_file.name)
+                # Find the extracted directory
+                extracted_dirs = [d for d in os.listdir(extract_dir) 
+                                if os.path.isdir(os.path.join(extract_dir, d))]
+                if extracted_dirs:
+                    return os.path.join(extract_dir, extracted_dirs[0])
+                else:
+                    return extract_dir
 
-    def find_json_models(directory: str) -> List[str]:
-        """Find all JSON model files in a directory."""
+    def find_json_models(directory: str, limit: Optional[int] = None) -> List[str]:
+        """Find JSON model files in a directory, optionally limiting the number."""
         json_files = []
         for root, dirs, files in os.walk(directory):
             for file in files:
                 if file.endswith('.json'):
                     json_files.append(os.path.join(root, file))
+                    if limit and len(json_files) >= limit:
+                        logger.info(f"Found {len(json_files)} JSON model files (limited)")
+                        return json_files
         
         logger.info(f"Found {len(json_files)} JSON model files")
         return json_files
@@ -593,7 +592,7 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
             translator = ModelNetworkTranslator(indexer=indexer)
             
             # Translate the model
-            json_output = translator.translate_models_to_json([model], include_model_info=True, indent=2)
+            json_output = translator.translate_models_to_json([model], include_model_info=True)
             
             # Save to file
             output_file = os.path.join(output_path, f"{model_filename}_networkx.json")
@@ -609,30 +608,30 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
         """Translate a model to CX2 format and save as JSON."""
         try:
             # Translate the model
-            cx2_data = model_to_cx2(model)
+            cx2_data = model_to_cx2(model, validate_iquery_gene_symbol_pattern=False)
             
             # Save to file
             output_file = os.path.join(output_path, f"{model_filename}_cx2.json")
             with open(output_file, 'w') as f:
-                json.dump(cx2_data, f, indent=2)
+                json.dump(cx2_data, f)
             
             logger.debug(f"Saved CX2 translation to {output_file}")
             
         except Exception as e:
             logger.error(f"Failed to translate {model_filename} to CX2: {e}")
 
-    # Ensure formats is a list (Click's multiple option sometimes returns a tuple)
-    if isinstance(formats, tuple):
-        formats = list(formats)
+    # Ensure format is a list (Click's multiple option sometimes returns a tuple)
+    if isinstance(format, tuple):
+        format = list(format)
     
     # Create output directories
     output_paths = {}
-    if "networkx" in formats:
+    if "networkx" in format:
         output_paths["networkx"] = output_networkx
         os.makedirs(output_networkx, exist_ok=True)
         click.echo(f"Created output directory for NetworkX: {output_networkx}", err=True)
     
-    if "cx2" in formats:
+    if "cx2" in format:
         output_paths["cx2"] = output_cx2
         os.makedirs(output_cx2, exist_ok=True)
         click.echo(f"Created output directory for CX2: {output_cx2}", err=True)
@@ -644,11 +643,7 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
             extracted_dir = download_and_extract_tarball(url, temp_dir)
             
             # Find all JSON model files
-            json_files = find_json_models(extracted_dir)
-            
-            if limit:
-                json_files = json_files[:limit]
-                click.echo(f"Limited processing to {len(json_files)} models", err=True)
+            json_files = find_json_models(extracted_dir, limit)
             
             # Process each model
             processed_count = 0
@@ -669,10 +664,10 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
                 processed_model_ids.append(model.id)
                 
                 # Translate to requested formats
-                if "networkx" in formats:
+                if "networkx" in format:
                     translate_to_networkx(model, output_paths["networkx"], model_filename)
                 
-                if "cx2" in formats:
+                if "cx2" in format:
                     translate_to_cx2(model, output_paths["cx2"], model_filename)
                 
                 processed_count += 1
@@ -688,7 +683,6 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
                         return
                     
                     # Create archive filename
-                    import datetime
                     schema_version = __version__
                     archive_name = f"gocam_{format_name}.tar.gz"
                     archive_path = os.path.join(os.path.dirname(directory_path), archive_name)
@@ -737,10 +731,10 @@ def translate_collection(url, formats, output_networkx, output_cx2, limit, archi
                         logger.error(f"Failed to create archive for {format_name}: {e}")
                 
                 # Create archives for each format that was processed
-                if "networkx" in formats and processed_count > 0:
+                if "networkx" in format and processed_count > 0:
                     create_archive(output_paths["networkx"], "networkx")
                 
-                if "cx2" in formats and processed_count > 0:
+                if "cx2" in format and processed_count > 0:
                     create_archive(output_paths["cx2"], "cx2")
             
         except Exception as e:
