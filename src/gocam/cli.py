@@ -640,7 +640,14 @@ def translate_collection(url, format, output, limit, archive):
             failed_count = 0
             processed_model_ids = []
             
-            for json_file in json_files:
+            try:
+                from tqdm import tqdm
+                progress_bar = tqdm(json_files, desc="Processing models", unit="model")
+            except ImportError:
+                progress_bar = json_files
+                click.echo(f"Processing {len(json_files)} models...", err=True)
+            
+            for json_file in progress_bar:
                 model_filename = os.path.splitext(os.path.basename(json_file))[0]
                 logger.info(f"Processing model: {model_filename}")
                 
