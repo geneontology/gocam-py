@@ -497,15 +497,9 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
     show_default=True,
 )
 @click.option(
-    "--output-networkx",
-    default="/tmp/networkx",
-    help="Output directory for NetworkX format files",
-    show_default=True,
-)
-@click.option(
-    "--output-cx2",
-    default="/tmp/cx2",
-    help="Output directory for CX2 format files",
+    "--output",
+    default="/tmp/gocam-output",
+    help="Base output directory (format subdirectories will be created automatically)",
     show_default=True,
 )
 @click.option(
@@ -519,7 +513,7 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
     show_default=True,
     help="Create gzipped tar archives of output directories",
 )
-def translate_collection(url, format, output_networkx, output_cx2, limit, archive):
+def translate_collection(url, format, output, limit, archive):
     """
     Download GO-CAM models and translate them to different formats.
     
@@ -532,7 +526,7 @@ def translate_collection(url, format, output_networkx, output_cx2, limit, archiv
         gocam translate-collection
         
         # Only NetworkX format with custom output directory
-        gocam translate-collection --format networkx --output-networkx ./my_output
+        gocam translate-collection --format networkx --output ./my_output
         
         # Test with limited models
         gocam translate-collection --limit 5
@@ -624,17 +618,13 @@ def translate_collection(url, format, output_networkx, output_cx2, limit, archiv
     if isinstance(format, tuple):
         format = list(format)
     
-    # Create output directories
+    # Create output directories based on selected formats
     output_paths = {}
-    if "networkx" in format:
-        output_paths["networkx"] = output_networkx
-        os.makedirs(output_networkx, exist_ok=True)
-        click.echo(f"Created output directory for NetworkX: {output_networkx}", err=True)
-    
-    if "cx2" in format:
-        output_paths["cx2"] = output_cx2
-        os.makedirs(output_cx2, exist_ok=True)
-        click.echo(f"Created output directory for CX2: {output_cx2}", err=True)
+    for fmt in format:
+        # Always create subdirectories for each format
+        output_paths[fmt] = os.path.join(output, fmt)
+        os.makedirs(output_paths[fmt], exist_ok=True)
+        click.echo(f"Created output directory for {fmt}: {output_paths[fmt]}", err=True)
     
     # Create temporary directory for extraction
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -685,7 +675,8 @@ def translate_collection(url, format, output_networkx, output_cx2, limit, archiv
                     # Create archive filename
                     schema_version = __version__
                     archive_name = f"gocam_{format_name}.tar.gz"
-                    archive_path = os.path.join(os.path.dirname(directory_path), archive_name)
+                    # Place archive in the base output directory
+                    archive_path = os.path.join(output, archive_name)
                     
                     click.echo(f"Creating {format_name} archive: {archive_path}", err=True)
                     
