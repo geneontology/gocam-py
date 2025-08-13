@@ -660,6 +660,10 @@ def translate_collection(url, format, output, limit, archive):
                 # Track successfully processed model ID
                 processed_model_ids.append(model.id)
                 
+                # Log whether this is a causal model
+                is_causal = any(activity.causal_associations for activity in (model.activities or []) if activity.causal_associations)
+                logger.debug(f"Model {model.id} is {'causal' if is_causal else 'non-causal'}")
+                
                 # Translate to requested formats
                 if "networkx" in format:
                     translate_to_networkx(model, output_paths["networkx"], model_filename)
