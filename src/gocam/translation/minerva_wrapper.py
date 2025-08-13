@@ -1,9 +1,6 @@
-import asyncio
 import logging
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from functools import lru_cache
 from typing import DefaultDict, Dict, Iterator, List, Optional, Tuple
 
 import requests
@@ -116,19 +113,6 @@ class MinervaWrapper:
     session: requests.Session = field(default_factory=lambda: requests.Session())
     gocam_index_url: str = "https://go-public.s3.amazonaws.com/files/gocam-models.json"
     gocam_endpoint_base: str = "https://api.geneontology.org/api/go-cam/"
-    max_concurrent_requests: int = 10
-    _model_cache: Dict[str, Dict] = field(default_factory=dict, init=False)
-    _enable_cache: bool = True
-
-    def __post_init__(self):
-        """Configure session for optimal performance."""
-        adapter = requests.adapters.HTTPAdapter(
-            pool_connections=self.max_concurrent_requests,
-            pool_maxsize=self.max_concurrent_requests * 2,
-            max_retries=3
-        )
-        self.session.mount('https://', adapter)
-        self.session.mount('http://', adapter)
 
     def models(self) -> Iterator[Model]:
         """Iterator over all GO-CAM models from the index.
@@ -171,24 +155,12 @@ class MinervaWrapper:
         """
         if not gocam_id:
             raise ValueError(f"Missing GO-CAM ID: {gocam_id}")
-        
-        # Check cache first
-        if self._enable_cache and gocam_id in self._model_cache:
-            logger.debug(f"Cache hit for GO-CAM ID: {gocam_id}")
-            return self._model_cache[gocam_id]
-        
         local_id = gocam_id.replace("gocam:", "")
         url = f"{self.gocam_endpoint_base}{local_id}"
         logger.info(f"Fetch Minerva JSON from: {url}")
         response = self.session.get(url)
         response.raise_for_status()
-        minerva_obj = response.json()
-        
-        # Cache the result
-        if self._enable_cache:
-            self._model_cache[gocam_id] = minerva_obj
-        
-        return minerva_obj
+        return response.json()
 
     def fetch_model(self, gocam_id: str) -> Model:
         """Fetch a GO-CAM Model for a given GO-CAM ID.
@@ -201,97 +173,6 @@ class MinervaWrapper:
         minerva_object = self.fetch_minerva_object(gocam_id)
         return self.minerva_object_to_model(minerva_object)
 
-    def fetch_models_concurrent(self, gocam_ids: List[str], progress_callback=None) -> List[Model]:
-        """Fetch multiple GO-CAM Models concurrently.
-        
-        :param gocam_ids: List of GO-CAM IDs
-        :type gocam_ids: List[str]
-        :param progress_callback: Optional callback function for progress updates
-        :return: List of GO-CAM Models
-        :rtype: List[Model]
-        """
-        models = []
-        
-        with ThreadPoolExecutor(max_workers=self.max_concurrent_requests) as executor:
-            # Submit all fetch tasks
-            future_to_id = {
-                executor.submit(self._fetch_model_safe, gocam_id): gocam_id 
-                for gocam_id in gocam_ids
-            }
-            
-            # Collect results as they complete
-            for future in as_completed(future_to_id):
-                gocam_id = future_to_id[future]
-                try:
-                    model = future.result()
-                    if model is not None:
-                        models.append(model)
-                    if progress_callback:
-                        progress_callback()
-                except Exception as exc:
-                    logger.error(f"GO-CAM {gocam_id} generated an exception: {exc}")
-                    if progress_callback:
-                        progress_callback()
-        
-        return models
-
-    def _fetch_model_safe(self, gocam_id: str) -> Optional[Model]:
-        """Safely fetch a model, returning None on error."""
-        try:
-            return self.fetch_model(gocam_id)
-        except Exception as e:
-            logger.error(f"Failed to fetch model {gocam_id}: {e}")
-            return None
-
-    def fetch_minerva_objects_concurrent(self, gocam_ids: List[str], progress_callback=None) -> Dict[str, Dict]:
-        """Fetch multiple Minerva objects concurrently, returning a dict keyed by ID.
-        
-        :param gocam_ids: List of GO-CAM IDs
-        :type gocam_ids: List[str]  
-        :param progress_callback: Optional callback function for progress updates
-        :return: Dict mapping GO-CAM ID to Minerva JSON object
-        :rtype: Dict[str, Dict]
-        """
-        minerva_objects = {}
-        
-        with ThreadPoolExecutor(max_workers=self.max_concurrent_requests) as executor:
-            # Submit all fetch tasks
-            future_to_id = {
-                executor.submit(self._fetch_minerva_object_safe, gocam_id): gocam_id 
-                for gocam_id in gocam_ids
-            }
-            
-            # Collect results as they complete
-            for future in as_completed(future_to_id):
-                gocam_id = future_to_id[future]
-                try:
-                    minerva_obj = future.result()
-                    if minerva_obj is not None:
-                        minerva_objects[gocam_id] = minerva_obj
-                    if progress_callback:
-                        progress_callback()
-                except Exception as exc:
-                    logger.error(f"GO-CAM {gocam_id} generated an exception: {exc}")
-                    if progress_callback:
-                        progress_callback()
-        
-        return minerva_objects
-
-    def _fetch_minerva_object_safe(self, gocam_id: str) -> Optional[Dict]:
-        """Safely fetch a minerva object, returning None on error."""
-        try:
-            return self.fetch_minerva_object(gocam_id)
-        except Exception as e:
-            logger.error(f"Failed to fetch minerva object {gocam_id}: {e}")
-            return None
-
-    def clear_cache(self):
-        """Clear the model cache."""
-        self._model_cache.clear()
-
-    def get_cache_size(self) -> int:
-        """Get the current size of the model cache."""
-        return len(self._model_cache)
 
     @staticmethod
     def minerva_object_to_model(obj: Dict) -> Model:
