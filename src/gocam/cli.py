@@ -674,7 +674,7 @@ def translate_collection(url, format, output, limit, archive):
                     
                     # Create archive filename
                     schema_version = __version__
-                    archive_name = f"gocam_{format_name}.tar.gz"
+                    archive_name = f"go-cam-{format_name}.tar.gz"
                     # Place archive in the base output directory
                     archive_path = os.path.join(output, archive_name)
                     
