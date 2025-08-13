@@ -289,7 +289,7 @@ def model_to_cx2(
                 name = (
                     relation_style.label
                     if relation_style is not None
-                    else association.predicate
+                    else association.predicat
                 )
                 edge_attributes = {
                     "name": name,

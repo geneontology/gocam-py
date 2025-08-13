@@ -6,8 +6,9 @@ import os
 import sys
 import tarfile
 import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 from urllib.request import urlretrieve
 
 import click
@@ -513,7 +514,21 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
     show_default=True,
     help="Create gzipped tar archives of output directories",
 )
-def translate_collection(url, format, output, limit, archive):
+@click.option(
+    "--max-workers",
+    type=int,
+    default=10,
+    show_default=True,
+    help="Maximum number of concurrent workers for parallel processing",
+)
+@click.option(
+    "--batch-size",
+    type=int,
+    default=100,
+    show_default=True,
+    help="Number of models to process in each batch (0 for no batching)",
+)
+def translate_collection(url, format, output, limit, archive, max_workers, batch_size):
     """
     Download GO-CAM models and translate them to different formats.
     
@@ -565,6 +580,44 @@ def translate_collection(url, format, output, limit, archive):
         
         logger.info(f"Found {len(json_files)} JSON model files")
         return json_files
+
+    def load_models_concurrent(json_files: List[str], max_workers: int = 10, 
+                              progress_callback=None) -> Dict[str, Model]:
+        """Load GO-CAM models from files concurrently."""
+        models = {}
+        
+        def load_single_model(file_path: str) -> Tuple[str, Optional[Model]]:
+            """Load a single model and return (filename, model)."""
+            model_filename = os.path.splitext(os.path.basename(file_path))[0]
+            try:
+                with open(file_path, 'r') as f:
+                    minerva_dict = json.load(f)
+                    model = MinervaWrapper.minerva_object_to_model(minerva_dict)
+                    return model_filename, model
+            except Exception as e:
+                logger.error(f"Failed to load model from {file_path}: {e}")
+                return model_filename, None
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_file = {
+                executor.submit(load_single_model, json_file): json_file
+                for json_file in json_files
+            }
+            
+            for future in as_completed(future_to_file):
+                file_path = future_to_file[future]
+                try:
+                    model_filename, model = future.result()
+                    if model is not None:
+                        models[model_filename] = model
+                    if progress_callback:
+                        progress_callback()
+                except Exception as exc:
+                    logger.error(f"File {file_path} generated an exception: {exc}")
+                    if progress_callback:
+                        progress_callback()
+        
+        return models
 
     def load_model_from_file(file_path: str) -> Optional[Model]:
         """Load a GO-CAM model from a Minerva JSON file."""
@@ -635,43 +688,91 @@ def translate_collection(url, format, output, limit, archive):
             # Find all JSON model files
             json_files = find_json_models(extracted_dir, limit)
             
-            # Process each model
-            processed_count = 0
-            failed_count = 0
-            processed_model_ids = []
+            # Load models concurrently (much faster than serial loading)
+            click.echo(f"Loading {len(json_files)} models concurrently...", err=True)
             
+            # Progress tracking for loading
+            loaded_count = 0
+            def loading_progress():
+                nonlocal loaded_count
+                loaded_count += 1
+                
             try:
                 from tqdm import tqdm
-                progress_bar = tqdm(json_files, desc="Processing models", unit="model")
+                loading_progress_bar = tqdm(total=len(json_files), desc="Loading models", unit="model")
+                def loading_progress_with_bar():
+                    loading_progress()
+                    loading_progress_bar.update(1)
+                progress_callback = loading_progress_with_bar
             except ImportError:
-                progress_bar = json_files
-                click.echo(f"Processing {len(json_files)} models...", err=True)
+                progress_callback = loading_progress
+                click.echo(f"Loading {len(json_files)} models...", err=True)
             
-            for json_file in progress_bar:
-                model_filename = os.path.splitext(os.path.basename(json_file))[0]
-                logger.info(f"Processing model: {model_filename}")
+            # Load all models concurrently
+            models_dict = load_models_concurrent(json_files, max_workers=max_workers, progress_callback=progress_callback)
+            
+            try:
+                loading_progress_bar.close()
+            except:
+                pass
+            
+            processed_count = len(models_dict)
+            failed_count = len(json_files) - processed_count
+            processed_model_ids = [model.id for model in models_dict.values()]
+            
+            click.echo(f"Loaded {processed_count} models, {failed_count} failed", err=True)
+            
+            # Now translate to requested formats
+            if models_dict:
+                # Process formats concurrently
+                def translate_format_batch(format_name: str, models: Dict[str, Model]):
+                    """Translate all models to a specific format concurrently."""
+                    click.echo(f"Translating {len(models)} models to {format_name} format...", err=True)
+                    
+                    def translate_single(args):
+                        filename, model = args
+                        try:
+                            if format_name == "networkx":
+                                translate_to_networkx(model, output_paths["networkx"], filename)
+                            elif format_name == "cx2":
+                                translate_to_cx2(model, output_paths["cx2"], filename)
+                            return True
+                        except Exception as e:
+                            logger.error(f"Failed to translate {filename} to {format_name}: {e}")
+                            return False
+                    
+                    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                        try:
+                            from tqdm import tqdm
+                            model_items = list(models.items())
+                            translation_progress = tqdm(total=len(model_items), desc=f"Translating to {format_name}", unit="model")
+                            
+                            futures = {executor.submit(translate_single, item): item for item in model_items}
+                            for future in as_completed(futures):
+                                translation_progress.update(1)
+                                
+                            translation_progress.close()
+                        except ImportError:
+                            # No tqdm, just run without progress bar
+                            futures = {executor.submit(translate_single, item): item for item in models.items()}
+                            for future in as_completed(futures):
+                                pass
                 
-                # Load the model
-                model = load_model_from_file(json_file)
-                if model is None:
-                    failed_count += 1
-                    continue
-                
-                # Track successfully processed model ID
-                processed_model_ids.append(model.id)
-                
-                # Log whether this is a causal model
-                is_causal = any(activity.causal_associations for activity in (model.activities or []) if activity.causal_associations)
-                logger.debug(f"Model {model.id} is {'causal' if is_causal else 'non-causal'}")
-                
-                # Translate to requested formats
-                if "networkx" in format:
-                    translate_to_networkx(model, output_paths["networkx"], model_filename)
-                
-                if "cx2" in format:
-                    translate_to_cx2(model, output_paths["cx2"], model_filename)
-                
-                processed_count += 1
+                # Process each requested format
+                with ThreadPoolExecutor(max_workers=len(format)) as format_executor:
+                    format_futures = []
+                    
+                    if "networkx" in format:
+                        future = format_executor.submit(translate_format_batch, "networkx", models_dict)
+                        format_futures.append(future)
+                    
+                    if "cx2" in format:
+                        future = format_executor.submit(translate_format_batch, "cx2", models_dict)
+                        format_futures.append(future)
+                    
+                    # Wait for all formats to complete
+                    for future in as_completed(format_futures):
+                        future.result()  # This will raise any exceptions
             
             click.echo(f"Processing complete. Successfully processed: {processed_count}, Failed: {failed_count}", err=True)
             
