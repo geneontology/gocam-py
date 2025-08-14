@@ -5,11 +5,10 @@ import json
 import networkx as nx
 
 from gocam.datamodel import Model, Activity, CausalAssociation
-from gocam.translation.networkx.graph_translator import GraphTranslator
 
 
 @dataclass
-class ModelNetworkTranslator(GraphTranslator):
+class ModelNetworkTranslator:
     
     def translate_models(self, models: Iterable[Model]) -> nx.DiGraph:
         """
@@ -41,9 +40,6 @@ class ModelNetworkTranslator(GraphTranslator):
             model: GO-CAM Model to add
             graph: NetworkX DiGraph to add nodes and edges to
         """
-        # Create query index for efficient lookups
-        self.indexer.create_query_index(model)
-        
         # Build mapping from activity ID to gene product
         activity_to_gene: Dict[str, str] = {}
         

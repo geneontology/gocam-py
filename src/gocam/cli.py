@@ -533,11 +533,8 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
 )
 def translate_collection(url, format, output, limit, archive, max_workers, batch_size):
     """
-    Download GO-CAM models and translate them to different formats.
-
     Downloads a tarball of GO-CAM models in minerva JSON format, then translates
     each model through networkx and/or cx2 formats.
-
     Examples:
 
         # Translate all models to both formats
@@ -555,9 +552,7 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
 
         with tempfile.NamedTemporaryFile(suffix='.tgz') as tmp_file:
             urlretrieve(url, tmp_file.name)
-            logger.info(f"Downloaded tarball to {tmp_file.name}")
 
-            # Extract the tarball
             logger.info(f"Extracting tarball to {extract_dir}")
             with tarfile.open(tmp_file.name, 'r:gz') as tar:
                 tar.extractall(path=extract_dir)
@@ -584,20 +579,11 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
         logger.info(f"Found {len(json_files)} JSON model files")
         return json_files
 
-
-    # Create a minimal no-op indexer to avoid expensive database operations
-    class NoOpIndexer:
-        """Minimal indexer that skips expensive GO database operations."""
-        def create_query_index(self, model):
-            """No-op implementation to avoid 31+ second GO database lookups per model."""
-            pass
-
     def translate_to_networkx(model: Model, output_path: str, model_filename: str):
         """Translate a model to NetworkX format and save as JSON."""
         try:
-            # Use a minimal no-op indexer to avoid expensive GO database operations
-            # The original indexer was causing 31+ second delays per model
-            translator = ModelNetworkTranslator(indexer=NoOpIndexer())
+            # No indexer necessary - causal associations are already populated by minerva_wrapper
+            translator = ModelNetworkTranslator()
             g2g_graph = translator.translate_models([model])
 
             # Check if the graph has any edges before writing
