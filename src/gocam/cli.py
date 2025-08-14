@@ -187,7 +187,7 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
         raise click.UsageError("Invalid input format")
 
     try:
-logger.debug(f"Parsed {len(models)} models from input")
+        logger.debug(f"Parsed {len(models)} models from input")
     except Exception as e:
         raise click.UsageError(f"Could not load model: {e}")
 
