@@ -7,7 +7,6 @@ import sys
 import tarfile
 import tempfile
 import threading
-import warnings
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -611,10 +610,6 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
                 with open(output_file, 'w') as f:
                     json.dump(g2g_dict, f)
 
-                pass  # File saved successfully
-            else:
-                pass  # Skipped non-causal model
-
         except Exception as e:
             logger.error(f"Failed to translate {model_filename} to NetworkX: {e}")
 
@@ -652,16 +647,6 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
             # Find all JSON model files
             json_files = find_json_models(extracted_dir, limit)
 
-            # Suppress warnings from minerva_wrapper for cleaner output
-            warnings.filterwarnings("ignore", module="gocam.translation.minerva_wrapper")
-
-            # Also suppress specific logger warnings that are too verbose
-            minerva_logger = logging.getLogger("gocam.translation.minerva_wrapper")
-            cx2_logger = logging.getLogger("gocam.translation.cx2.main")
-            original_minerva_level = minerva_logger.level
-            original_cx2_level = cx2_logger.level
-            minerva_logger.setLevel(logging.ERROR)
-            cx2_logger.setLevel(logging.ERROR)
 
             # Progress tracking
             progress_lock = threading.Lock()
@@ -788,14 +773,7 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
                 if "cx2" in format and processed_count > 0:
                     create_archive(output_paths["cx2"], "cx2")
 
-            # Restore original logger levels
-            minerva_logger.setLevel(original_minerva_level)
-            cx2_logger.setLevel(original_cx2_level)
-
         except Exception as e:
-            # Restore original logger levels even on exception
-            minerva_logger.setLevel(original_minerva_level)
-            cx2_logger.setLevel(original_cx2_level)
             logger.error(f"Translation failed with error: {e}")
             raise click.ClickException(f"Translation failed: {e}")
 
