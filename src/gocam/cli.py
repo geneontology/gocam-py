@@ -680,16 +680,25 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
                     return False
 
             # Process all files concurrently
+            stop_event = threading.Event()
+            
+            def interruptible_translate(json_file):
+                if stop_event.is_set():
+                    return
+                return load_and_translate_single(json_file)
+            
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                futures = {executor.submit(load_and_translate_single, json_file): json_file for json_file in json_files}
+                futures = {executor.submit(interruptible_translate, json_file): json_file for json_file in json_files}
 
                 try:
                     for future in as_completed(futures):
+                        if stop_event.is_set():
+                            break
                         future.result()  # This will raise any exceptions
                 except KeyboardInterrupt:
                     logger.info("Interrupted by user, cancelling remaining tasks...")
-                    for future in futures:
-                        future.cancel()
+                    stop_event.set()
+                    executor.shutdown(wait=False)
                     raise
 
 

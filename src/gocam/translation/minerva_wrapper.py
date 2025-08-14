@@ -84,7 +84,7 @@ def _provenance_from_fact(fact: Dict) -> ProvenanceInfo:
 
 def _setattr_with_warning(obj, attr, value):
     if getattr(obj, attr, None) is not None:
-        logger.warning(
+        logger.debug(
             f"Overwriting {attr} for {obj.id if hasattr(obj, 'id') else obj}"
         )
     setattr(obj, attr, value)
@@ -233,7 +233,7 @@ class MinervaWrapper:
             for fact in facts_by_property.get(fact_property, []):
                 subject, object_ = fact["subject"], fact["object"]
                 if object_ not in individual_to_term:
-                    logger.warning(f"Missing {object_} in {individual_to_term}")
+                    logger.debug(f"Missing {object_} in {individual_to_term}")
                     continue
                 for activity in activities_by_mf_id.get(subject, []):
                     evs = _evidence_from_fact(fact)
@@ -267,14 +267,14 @@ class MinervaWrapper:
 
         enabled_by_facts = facts_by_property.get(ENABLED_BY, [])
         if not enabled_by_facts:
-            logger.warning(f"Missing {ENABLED_BY} facts in {facts_by_property}")
+            logger.debug(f"Missing {ENABLED_BY} facts in {facts_by_property}")
         for fact in enabled_by_facts:
             subject, object_ = fact["subject"], fact["object"]
             if subject not in individual_to_term:
-                logger.warning(f"Missing {subject} in {individual_to_term}")
+                logger.debug(f"Missing {subject} in {individual_to_term}")
                 continue
             if object_ not in individual_to_term:
-                logger.warning(f"Missing {object_} in {individual_to_term}")
+                logger.debug(f"Missing {object_} in {individual_to_term}")
                 continue
             gene_id = individual_to_term[object_]
             root_types = individual_to_root_types.get(object_, [])
@@ -301,7 +301,7 @@ class MinervaWrapper:
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
             else:
-                logger.warning(f"Unknown enabled_by type for {object_}; assuming gene product")
+                logger.debug(f"Unknown enabled_by type for {object_}; assuming gene product")
                 enabled_by_association = EnabledByGeneProductAssociation(
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
@@ -387,9 +387,9 @@ class MinervaWrapper:
                 if MOLECULAR_FUNCTION not in individual_to_root_types.get(object_, []):
                     continue
                 if len(subject_activities) > 1:
-                    logger.warning(f"Multiple activities for subject: {subject}")
+                    logger.debug(f"Multiple activities for subject: {subject}")
                 if len(object_activities) > 1:
-                    logger.warning(f"Multiple activities for object: {object_}")
+                    logger.debug(f"Multiple activities for object: {object_}")
 
                 subject_activity = subject_activities[0]
                 object_activity = object_activities[0]
@@ -423,12 +423,12 @@ class MinervaWrapper:
 
         # Get all taxa from the annotations
         all_taxa = annotations_mv.get(TaxonVocabulary.TAXON_ANNOTATION_KEY, [])
-        
+
         # Add legacy taxon key if it exists (backward compatibility)
         legacy_taxon = annotations.get(TaxonVocabulary.LEGACY_TAXON_KEY)
         if legacy_taxon and legacy_taxon not in all_taxa:
             all_taxa.append(legacy_taxon)
-            
+
         # If no taxa, nothing to do
         if not all_taxa:
             taxon = None
@@ -450,7 +450,7 @@ class MinervaWrapper:
                 # No host matches, just use the first as primary
                 taxon = all_taxa[0]
                 additional_taxa = all_taxa[1:]
-        
+
         # Build model parameters
         model_args = {
             "id": id,
@@ -462,10 +462,10 @@ class MinervaWrapper:
             "objects": objects,
             "provenances": [provenance],
         }
-        
+
         # Only add additional_taxa if it has values
         if additional_taxa and len(additional_taxa) > 0:
             model_args["additional_taxa"] = additional_taxa
-        
+
         cam = Model(**model_args)
         return cam
