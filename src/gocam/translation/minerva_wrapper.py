@@ -67,9 +67,7 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
     for a in obj.get("annotations", []):
         key = _normalize_property(a["key"])
         value = a["value"]
-        logger.debug(f"Processing annotation: {key}={value}")
         anns[key].append(value)
-    logger.debug(f"Multivalued annotations: {dict(anns)}")
     return anns
 
 
@@ -157,7 +155,6 @@ class MinervaWrapper:
             raise ValueError(f"Missing GO-CAM ID: {gocam_id}")
         local_id = gocam_id.replace("gocam:", "")
         url = f"{self.gocam_endpoint_base}{local_id}"
-        logger.info(f"Fetch Minerva JSON from: {url}")
         response = self.session.get(url)
         response.raise_for_status()
         return response.json()
@@ -184,8 +181,6 @@ class MinervaWrapper:
         :rtype: Model
         """
         id = obj["id"]
-        logger.info(f"Processing model id: {id}")
-        logger.debug(f"Model: {yaml.dump(obj)}")
 
         # Bookkeeping variables
 
