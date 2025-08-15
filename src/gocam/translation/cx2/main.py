@@ -96,6 +96,7 @@ def model_to_cx2(
                 object_labels[obj.id] = obj.id
 
     # Internal helper functions that access internal state
+    @cache
     def _get_object_label(object_id: str) -> str:
         return object_labels.get(object_id, object_id)
 

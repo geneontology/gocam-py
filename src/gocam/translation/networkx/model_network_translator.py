@@ -5,10 +5,21 @@ import json
 import networkx as nx
 
 from gocam.datamodel import Model, Activity, CausalAssociation
+from gocam.translation.networkx.graph_translator import GraphTranslator
 
 
 @dataclass
-class ModelNetworkTranslator:
+class ModelNetworkTranslator(GraphTranslator):
+    """
+    Translates GO-CAM models into gene-to-gene NetworkX DiGraphs.
+
+    This class inherits from GraphTranslator and provides methods to convert one or more 
+    GO-CAM Model objects into a NetworkX directed graph where nodes represent gene products 
+    and edges represent causal relationships between them.
+
+    Use this class when you need to generate gene-to-gene graphs from GO-CAM models
+    with consistent translation interface.
+    """
     
     def translate_models(self, models: Iterable[Model]) -> nx.DiGraph:
         """

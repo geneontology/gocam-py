@@ -693,7 +693,7 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
             
             def interruptible_translate(json_file):
                 if stop_event.is_set():
-                    return
+                    return False
                 return load_and_translate_single(json_file)
             
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -707,7 +707,7 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
                 except KeyboardInterrupt:
                     logger.info("Interrupted by user, cancelling remaining tasks...")
                     stop_event.set()
-                    executor.shutdown(wait=False)
+                    executor.shutdown(wait=False, cancel_futures=True)
                     raise
 
 
