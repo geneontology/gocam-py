@@ -24,11 +24,6 @@ from gocam.translation.networkx.model_network_translator import ModelNetworkTran
 from gocam.indexing.Indexer import Indexer
 from gocam.indexing.Flattener import Flattener
 
-# Optional imports
-try:
-    from gocam.translation.tbox_translator import TBoxTranslator
-except ImportError:
-    TBoxTranslator = None
 
 logger = logging.getLogger(__name__)
 
@@ -697,7 +692,7 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
                 return load_and_translate_single(json_file)
             
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                futures = {executor.submit(interruptible_translate, json_file): json_file for json_file in json_files}
+                futures = [executor.submit(interruptible_translate, json_file) for json_file in json_files]
 
                 try:
                     for future in as_completed(futures):
