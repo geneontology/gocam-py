@@ -602,13 +602,22 @@ def translate_collection(url, format, output, limit, archive, max_workers, batch
     def translate_to_cx2(model: Model, output_path: str, model_filename: str):
         """Translate a model to CX2 format and save as JSON."""
         try:
-            # Translate the model
-            cx2_data = model_to_cx2(model, validate_iquery_gene_symbol_pattern=False)
-            # Save to file
-            output_file = os.path.join(output_path, f"{model_filename}_cx2.json")
-            with open(output_file, 'w') as f:
-                json.dump(cx2_data, f)
-            pass  # File saved successfully
+            # Check if model has causal associations before translating
+            has_causal_edges = False
+            if model.activities:
+                for activity in model.activities:
+                    if activity.causal_associations:
+                        has_causal_edges = True
+                        break
+            
+            # Only create file if there are causal edges (matching NetworkX behavior)
+            if has_causal_edges:
+                # Translate the model
+                cx2_data = model_to_cx2(model, validate_iquery_gene_symbol_pattern=False)
+                # Save to file
+                output_file = os.path.join(output_path, f"{model_filename}_cx2.json")
+                with open(output_file, 'w') as f:
+                    json.dump(cx2_data, f)
         except Exception as e:
             logger.error(f"Failed to translate {model_filename} to CX2: {e}")
 
