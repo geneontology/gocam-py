@@ -185,6 +185,48 @@ class ModelNetworkTranslator:
                 return activity
         return None
     
+    def _extract_evidence_data(self, evidence_list):
+        """
+        Extract references, evidence codes, and contributors from evidence list.
+        
+        Args:
+            evidence_list: List of evidence items
+            
+        Returns:
+            Tuple of (references, evidence_codes, contributors)
+        """
+        references = [e.reference for e in evidence_list if e.reference]
+        evidence_codes = [e.term for e in evidence_list if e.term]
+        contributors = []
+        for e in evidence_list:
+            if e.provenances:
+                for prov in e.provenances:
+                    if prov.contributor:
+                        contributors.extend(prov.contributor)
+        return references, evidence_codes, contributors
+    
+    def _add_term_with_evidence(self, attrs: Dict[str, Any], term_association, prefix: str, term_type: str) -> None:
+        """
+        Add a term and its evidence to attributes.
+        
+        Args:
+            attrs: Dictionary to add attributes to
+            term_association: The term association with evidence
+            prefix: Prefix for attribute names ("source_gene" or "target_gene")
+            term_type: Type of term (e.g., "molecular_function", "biological_process")
+        """
+        if term_association and term_association.term:
+            attrs[f'{prefix}_{term_type}'] = term_association.term
+            if term_association.evidence:
+                references, evidence_codes, contributors = self._extract_evidence_data(term_association.evidence)
+                
+                if references:
+                    attrs[f'{prefix}_{term_type}_has_reference'] = references
+                if evidence_codes:
+                    attrs[f'{prefix}_{term_type}_assessed_by'] = evidence_codes
+                if contributors:
+                    attrs[f'{prefix}_{term_type}_contributors'] = contributors
+
     def _add_activity_go_terms(self, activity: Activity, model: Model, attrs: Dict[str, Any], prefix: str) -> None:
         """
         Add GO terms from an activity to the edge attributes with evidence information.
@@ -196,85 +238,16 @@ class ModelNetworkTranslator:
             prefix: Prefix for attribute names ("source_gene" or "target_gene")
         """
         # Add molecular function with evidence
-        if activity.molecular_function and activity.molecular_function.term:
-            attrs[f'{prefix}_molecular_function'] = activity.molecular_function.term
-            if activity.molecular_function.evidence:
-                # Extract references, evidence codes, and contributors
-                references = [e.reference for e in activity.molecular_function.evidence if e.reference]
-                evidence_codes = [e.term for e in activity.molecular_function.evidence if e.term]
-                contributors = []
-                for e in activity.molecular_function.evidence:
-                    if e.provenances:
-                        for prov in e.provenances:
-                            if prov.contributor:
-                                contributors.extend(prov.contributor)
-                
-                if references:
-                    attrs[f'{prefix}_molecular_function_has_reference'] = references
-                if evidence_codes:
-                    attrs[f'{prefix}_molecular_function_assessed_by'] = evidence_codes
-                if contributors:
-                    attrs[f'{prefix}_molecular_function_contributors'] = contributors
+        self._add_term_with_evidence(attrs, activity.molecular_function, prefix, "molecular_function")
         
         # Add biological process with evidence
-        if activity.part_of and activity.part_of.term:
-            attrs[f'{prefix}_biological_process'] = activity.part_of.term
-            if activity.part_of.evidence:
-                references = [e.reference for e in activity.part_of.evidence if e.reference]
-                evidence_codes = [e.term for e in activity.part_of.evidence if e.term]
-                contributors = []
-                for e in activity.part_of.evidence:
-                    if e.provenances:
-                        for prov in e.provenances:
-                            if prov.contributor:
-                                contributors.extend(prov.contributor)
-                
-                if references:
-                    attrs[f'{prefix}_biological_process_has_reference'] = references
-                if evidence_codes:
-                    attrs[f'{prefix}_biological_process_assessed_by'] = evidence_codes
-                if contributors:
-                    attrs[f'{prefix}_biological_process_contributors'] = contributors
+        self._add_term_with_evidence(attrs, activity.part_of, prefix, "biological_process")
         
         # Add cellular component with evidence
-        if activity.occurs_in and activity.occurs_in.term:
-            attrs[f'{prefix}_occurs_in'] = activity.occurs_in.term
-            if activity.occurs_in.evidence:
-                references = [e.reference for e in activity.occurs_in.evidence if e.reference]
-                evidence_codes = [e.term for e in activity.occurs_in.evidence if e.term]
-                contributors = []
-                for e in activity.occurs_in.evidence:
-                    if e.provenances:
-                        for prov in e.provenances:
-                            if prov.contributor:
-                                contributors.extend(prov.contributor)
-                
-                if references:
-                    attrs[f'{prefix}_occurs_in_has_reference'] = references
-                if evidence_codes:
-                    attrs[f'{prefix}_occurs_in_assessed_by'] = evidence_codes
-                if contributors:
-                    attrs[f'{prefix}_occurs_in_contributors'] = contributors
+        self._add_term_with_evidence(attrs, activity.occurs_in, prefix, "occurs_in")
         
         # Add gene product (enabled_by) with evidence
-        if activity.enabled_by and activity.enabled_by.term:
-            attrs[f'{prefix}_product'] = activity.enabled_by.term
-            if activity.enabled_by.evidence:
-                references = [e.reference for e in activity.enabled_by.evidence if e.reference]
-                evidence_codes = [e.term for e in activity.enabled_by.evidence if e.term]
-                contributors = []
-                for e in activity.enabled_by.evidence:
-                    if e.provenances:
-                        for prov in e.provenances:
-                            if prov.contributor:
-                                contributors.extend(prov.contributor)
-                
-                if references:
-                    attrs[f'{prefix}_product_has_reference'] = references
-                if evidence_codes:
-                    attrs[f'{prefix}_product_assessed_by'] = evidence_codes
-                if contributors:
-                    attrs[f'{prefix}_product_contributors'] = contributors
+        self._add_term_with_evidence(attrs, activity.enabled_by, prefix, "product")
     
     def _merge_edge_attributes(
         self,

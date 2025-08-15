@@ -282,36 +282,3 @@ class Indexer:
                         g.add_edge(ca.downstream_activity, a.id)
         return g
 
-
-@dataclass
-class NoOpIndexer:
-    """
-    Minimal indexer that skips expensive GO database operations.
-    
-    This is useful for high-throughput translation tasks where indexing
-    would add significant overhead (31+ seconds per model) but isn't needed
-    for the translation output.
-    """
-    
-    def create_query_index(self, model: Model) -> Optional[QueryIndex]:
-        """
-        No-op implementation to avoid expensive GO database lookups.
-        
-        Args:
-            model: The GO-CAM model (ignored)
-            
-        Returns:
-            None, as no indexing is performed
-        """
-        return None
-    
-    def index_model(self, model: Model, reindex: bool = False) -> None:
-        """
-        No-op implementation for compatibility with Indexer interface.
-        
-        Args:
-            model: The GO-CAM model (ignored)
-            reindex: Whether to reindex (ignored)
-        """
-        pass
-

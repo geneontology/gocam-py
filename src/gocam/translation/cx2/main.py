@@ -219,7 +219,9 @@ def model_to_cx2(
             and node_type == NodeType.GENE
             and IQUERY_GENE_SYMBOL_PATTERN.match(node_name) is None
         ):
-            pass  # Gene symbol pattern validation failed
+            logger.debug(
+                f"Name for gene node does not match expected pattern: {node_name}"
+            )
 
         node_attributes = {
             "name": node_name,
@@ -235,7 +237,9 @@ def model_to_cx2(
                     validate_iquery_gene_symbol_pattern
                     and IQUERY_GENE_SYMBOL_PATTERN.match(member_name) is None
                 ):
-                    pass  # Complex member pattern validation failed
+                    logger.warning(
+                        f"Name for complex member does not match expected pattern: {member_name}"
+                    )
                 node_attributes["member"].append(member_name)
 
         node_attributes["Evidence"] = _format_evidence_list(
