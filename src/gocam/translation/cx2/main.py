@@ -86,16 +86,21 @@ def model_to_cx2(
     go_context = _get_context()
     go_converter = go_context.as_converter()
 
+    # Pre-build object lookup dictionary for better performance
+    object_labels = {}
+    if gocam.objects:
+        for obj in gocam.objects:
+            if obj.label:
+                object_labels[obj.id] = _remove_species_code_suffix(obj.label)
+            else:
+                object_labels[obj.id] = obj.id
+
     # Internal helper functions that access internal state
     @cache
     def _get_object_label(object_id: str) -> str:
-        object = next((obj for obj in gocam.objects if obj.id == object_id), None)
-        if object is None:
-            return ""
-        if object.label is None:
-            return object_id
-        return _remove_species_code_suffix(object.label)
+        return object_labels.get(object_id, object_id)
 
+    @cache
     def _format_curie_link(curie: str) -> str:
         try:
             url = go_converter.expand(curie)
@@ -215,7 +220,7 @@ def model_to_cx2(
             and node_type == NodeType.GENE
             and IQUERY_GENE_SYMBOL_PATTERN.match(node_name) is None
         ):
-            logger.warning(
+            logger.debug(
                 f"Name for gene node does not match expected pattern: {node_name}"
             )
 
@@ -283,7 +288,7 @@ def model_to_cx2(
             if association.downstream_activity in activity_nodes_by_activity_id:
                 relation_style = RELATIONS.get(association.predicate, None)
                 if relation_style is None:
-                    logger.warning(
+                    logger.debug(
                         f"Unknown relation style for {association.predicate}"
                     )
                 name = (

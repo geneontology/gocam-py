@@ -1,19 +1,20 @@
 import csv
 import datetime
-import json
+import io
 import logging
 import os
 import sys
 import tarfile
 import tempfile
+import threading
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import List, Optional
 from urllib.request import urlretrieve
 
 import click
 import yaml
-from linkml_runtime.loaders import json_loader, yaml_loader
-from mkdocs.commands.serve import serve
 
 from gocam import __version__
 from gocam.datamodel import Model
@@ -23,7 +24,6 @@ from gocam.translation.networkx.model_network_translator import ModelNetworkTran
 from gocam.indexing.Indexer import Indexer
 from gocam.indexing.Flattener import Flattener
 
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -167,24 +167,21 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
         try:
             # Try to parse as a single model first
             models = [Model.model_validate_json(json_content)]
-            logger.info("Parsing a single model from input")
         except Exception:
             # If that fails, try parsing as a list of models
             deserialized = json.loads(json_content)
             if isinstance(deserialized, list):
-                logger.info(f"Parsing {len(deserialized)} models from input")
                 models = [Model.model_validate(m) for m in deserialized]
             else:
                 raise
     elif input_format == "yaml":
         deserialized = list(yaml.safe_load_all(model))
-        logger.info(f"Parsing {len(deserialized)} models from input")
         models = [Model.model_validate(m) for m in deserialized]
     else:
         raise click.UsageError("Invalid input format")
 
     try:
-        logger.info(f"Parsed {len(models)} models from input")
+        logger.debug(f"Parsed {len(models)} models from input")
     except Exception as e:
         raise click.UsageError(f"Could not load model: {e}")
 
@@ -195,7 +192,10 @@ def convert(model, input_format, output_format, output, dot_layout, ndex_upload)
         cx2 = model_to_cx2(model, apply_dot_layout=dot_layout)
 
         if ndex_upload:
-            import ndex2
+            try:
+                import ndex2
+            except ImportError:
+                raise click.UsageError("ndex2 package is required for NDEx upload. Install with: pip install ndex2")
 
             # This is very basic proof-of-concept usage of the NDEx client. Once we have a better
             # idea of how we want to use it, we can refactor this to allow more CLI options for
@@ -435,7 +435,7 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
 
     # Prepare output
     output_content = None
-    
+
     if output_format == "json":
         output_content = json.dumps(rows, indent=2)
     elif output_format == "jsonl":
@@ -450,13 +450,12 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
             for row in rows:
                 all_fields.update(row.keys())
             fieldnames = sorted(all_fields)
-            
+
             # Convert to TSV
-            import io
             output_buffer = io.StringIO()
             writer = csv.DictWriter(
-                output_buffer, 
-                fieldnames=fieldnames, 
+                output_buffer,
+                fieldnames=fieldnames,
                 delimiter="\t",
                 extrasaction='ignore'
             )
@@ -513,39 +512,48 @@ def flatten_models(input_file, input_format, output_format, output_file, fields)
     show_default=True,
     help="Create gzipped tar archives of output directories",
 )
-def translate_collection(url, format, output, limit, archive):
+@click.option(
+    "--max-workers",
+    type=int,
+    default=10,
+    show_default=True,
+    help="Maximum number of concurrent workers for parallel processing",
+)
+@click.option(
+    "--batch-size",
+    type=int,
+    default=100,
+    show_default=True,
+    help="Number of models to process in each batch (0 for no batching)",
+)
+def translate_collection(url, format, output, limit, archive, max_workers, batch_size):
     """
-    Download GO-CAM models and translate them to different formats.
-    
     Downloads a tarball of GO-CAM models in minerva JSON format, then translates
     each model through networkx and/or cx2 formats.
-    
     Examples:
-    
+
         # Translate all models to both formats
         gocam translate-collection
-        
+
         # Only NetworkX format with custom output directory
         gocam translate-collection --format networkx --output ./my_output
-        
+
         # Test with limited models
         gocam translate-collection --limit 5
     """
     def download_and_extract_tarball(url: str, extract_dir: str) -> str:
         """Download and extract a gzipped tarball."""
         logger.info(f"Downloading tarball from {url}")
-        
+
         with tempfile.NamedTemporaryFile(suffix='.tgz') as tmp_file:
             urlretrieve(url, tmp_file.name)
-            logger.info(f"Downloaded tarball to {tmp_file.name}")
-            
-            # Extract the tarball
+
             logger.info(f"Extracting tarball to {extract_dir}")
             with tarfile.open(tmp_file.name, 'r:gz') as tar:
                 tar.extractall(path=extract_dir)
-                
+
                 # Find the extracted directory
-                extracted_dirs = [d for d in os.listdir(extract_dir) 
+                extracted_dirs = [d for d in os.listdir(extract_dir)
                                 if os.path.isdir(os.path.join(extract_dir, d))]
                 if extracted_dirs:
                     return os.path.join(extract_dir, extracted_dirs[0])
@@ -562,62 +570,56 @@ def translate_collection(url, format, output, limit, archive):
                     if limit and len(json_files) >= limit:
                         logger.info(f"Found {len(json_files)} JSON model files (limited)")
                         return json_files
-        
+
         logger.info(f"Found {len(json_files)} JSON model files")
         return json_files
-
-    def load_model_from_file(file_path: str) -> Optional[Model]:
-        """Load a GO-CAM model from a Minerva JSON file."""
-        try:
-            with open(file_path, 'r') as f:
-                minerva_dict = json.load(f)
-                # Convert from Minerva format to GO-CAM model
-                model = MinervaWrapper.minerva_object_to_model(minerva_dict)
-                return model
-        except Exception as e:
-            logger.error(f"Failed to load model from {file_path}: {e}")
-            return None
 
     def translate_to_networkx(model: Model, output_path: str, model_filename: str):
         """Translate a model to NetworkX format and save as JSON."""
         try:
-            # Initialize the translator
-            indexer = Indexer()
-            translator = ModelNetworkTranslator(indexer=indexer)
-            
-            # Translate the model
-            json_output = translator.translate_models_to_json([model], include_model_info=True)
-            
-            # Save to file
-            output_file = os.path.join(output_path, f"{model_filename}_networkx.json")
-            with open(output_file, 'w') as f:
-                f.write(json_output)
-            
-            logger.debug(f"Saved NetworkX translation to {output_file}")
-            
+            # No indexer necessary - causal associations are already populated by minerva_wrapper
+            translator = ModelNetworkTranslator()
+            g2g_graph = translator.translate_models([model])
+
+            # Check if the graph has any edges before writing
+            if g2g_graph.number_of_edges() > 0:
+                # Convert graph to dict directly to avoid redundant translation
+                g2g_dict = translator._graph_to_dict(g2g_graph, [model], include_model_info=True)
+
+                # Save to file
+                output_file = os.path.join(output_path, f"{model_filename}_networkx.json")
+                with open(output_file, 'w') as f:
+                    json.dump(g2g_dict, f)
+
         except Exception as e:
             logger.error(f"Failed to translate {model_filename} to NetworkX: {e}")
 
     def translate_to_cx2(model: Model, output_path: str, model_filename: str):
         """Translate a model to CX2 format and save as JSON."""
         try:
-            # Translate the model
-            cx2_data = model_to_cx2(model, validate_iquery_gene_symbol_pattern=False)
+            # Check if model has causal associations before translating
+            has_causal_edges = False
+            if model.activities:
+                for activity in model.activities:
+                    if activity.causal_associations:
+                        has_causal_edges = True
+                        break
             
-            # Save to file
-            output_file = os.path.join(output_path, f"{model_filename}_cx2.json")
-            with open(output_file, 'w') as f:
-                json.dump(cx2_data, f)
-            
-            logger.debug(f"Saved CX2 translation to {output_file}")
-            
+            # Only create file if there are causal edges (matching NetworkX behavior)
+            if has_causal_edges:
+                # Translate the model
+                cx2_data = model_to_cx2(model, validate_iquery_gene_symbol_pattern=False)
+                # Save to file
+                output_file = os.path.join(output_path, f"{model_filename}_cx2.json")
+                with open(output_file, 'w') as f:
+                    json.dump(cx2_data, f)
         except Exception as e:
             logger.error(f"Failed to translate {model_filename} to CX2: {e}")
 
     # Ensure format is a list (Click's multiple option sometimes returns a tuple)
     if isinstance(format, tuple):
         format = list(format)
-    
+
     # Create output directories based on selected formats
     output_paths = {}
     for fmt in format:
@@ -625,52 +627,87 @@ def translate_collection(url, format, output, limit, archive):
         output_paths[fmt] = os.path.join(output, fmt)
         os.makedirs(output_paths[fmt], exist_ok=True)
         click.echo(f"Created output directory for {fmt}: {output_paths[fmt]}", err=True)
-    
+
     # Create temporary directory for extraction
     with tempfile.TemporaryDirectory() as temp_dir:
         try:
             # Download and extract the tarball
             extracted_dir = download_and_extract_tarball(url, temp_dir)
-            
+
             # Find all JSON model files
             json_files = find_json_models(extracted_dir, limit)
-            
-            # Process each model
+
+
+            # Progress tracking
+            progress_lock = threading.Lock()
             processed_count = 0
             failed_count = 0
             processed_model_ids = []
+
+            def report_progress(phase, count, total):
+                percentage = (count / total) * 100
+                click.echo(f"{phase}: {count}/{total} ({percentage:.1f}%)", err=True)
+
+            click.echo(f"Processing {len(json_files)} models (load+translate)...", err=True)
+
+            def load_and_translate_single(file_path: str) -> bool:
+                """Load a model from file and translate it to all requested formats."""
+                nonlocal processed_count, failed_count, processed_model_ids
+
+                model_filename = os.path.splitext(os.path.basename(file_path))[0]
+                try:
+                    # Load model
+                    with open(file_path, 'r') as f:
+                        minerva_dict = json.load(f)
+                        model = MinervaWrapper.minerva_object_to_model(minerva_dict)
+
+                    # Translate to all requested formats
+                    for format_name in format:
+                        if format_name == "networkx":
+                            translate_to_networkx(model, output_paths["networkx"], model_filename)
+                        elif format_name == "cx2":
+                            translate_to_cx2(model, output_paths["cx2"], model_filename)
+
+                    # Track success
+                    with progress_lock:
+                        processed_count += 1
+                        processed_model_ids.append(model.id)
+                        if processed_count % 100 == 0 or processed_count % max(1, len(json_files) // 20) == 0:
+                            report_progress("Processed", processed_count, len(json_files))
+
+                    return True
+
+                except Exception as e:
+                    logger.error(f"Failed to process model from {file_path}: {e}")
+                    with progress_lock:
+                        failed_count += 1
+                    return False
+
+            # Process all files concurrently
+            stop_event = threading.Event()
             
-            try:
-                from tqdm import tqdm
-                progress_bar = tqdm(json_files, desc="Processing models", unit="model")
-            except ImportError:
-                progress_bar = json_files
-                click.echo(f"Processing {len(json_files)} models...", err=True)
+            def interruptible_translate(json_file):
+                if stop_event.is_set():
+                    return False
+                return load_and_translate_single(json_file)
             
-            for json_file in progress_bar:
-                model_filename = os.path.splitext(os.path.basename(json_file))[0]
-                logger.info(f"Processing model: {model_filename}")
-                
-                # Load the model
-                model = load_model_from_file(json_file)
-                if model is None:
-                    failed_count += 1
-                    continue
-                
-                # Track successfully processed model ID
-                processed_model_ids.append(model.id)
-                
-                # Translate to requested formats
-                if "networkx" in format:
-                    translate_to_networkx(model, output_paths["networkx"], model_filename)
-                
-                if "cx2" in format:
-                    translate_to_cx2(model, output_paths["cx2"], model_filename)
-                
-                processed_count += 1
-            
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = [executor.submit(interruptible_translate, json_file) for json_file in json_files]
+
+                try:
+                    for future in as_completed(futures):
+                        if stop_event.is_set():
+                            break
+                        future.result()  # This will raise any exceptions
+                except KeyboardInterrupt:
+                    logger.info("Interrupted by user, cancelling remaining tasks...")
+                    stop_event.set()
+                    executor.shutdown(wait=False, cancel_futures=True)
+                    raise
+
+
             click.echo(f"Processing complete. Successfully processed: {processed_count}, Failed: {failed_count}", err=True)
-            
+
             # Create tar.gz archives if requested
             if archive:
                 def create_archive(directory_path: str, format_name: str):
@@ -678,15 +715,15 @@ def translate_collection(url, format, output, limit, archive):
                     if not os.path.exists(directory_path) or not os.listdir(directory_path):
                         click.echo(f"Skipping archive for {format_name}: directory is empty or doesn't exist", err=True)
                         return
-                    
+
                     # Create archive filename
                     schema_version = __version__
                     archive_name = f"go-cam-{format_name}.tar.gz"
                     # Place archive in the base output directory
                     archive_path = os.path.join(output, archive_name)
-                    
+
                     click.echo(f"Creating {format_name} archive: {archive_path}", err=True)
-                    
+
                     try:
                         # Create metadata file
                         metadata = {
@@ -697,44 +734,44 @@ def translate_collection(url, format, output, limit, archive):
                             "models_processed": processed_count,
                             "models_failed": failed_count
                         }
-                        
+
                         metadata_path = os.path.join(directory_path, "gocam_metadata.json")
                         with open(metadata_path, 'w') as f:
                             json.dump(metadata, f, indent=2)
-                        
+
                         # Create model index file
                         model_index = {
                             "model_ids": processed_model_ids,
                             "total_models": len(processed_model_ids)
                         }
-                        
+
                         index_path = os.path.join(directory_path, "gocam_model_index.json")
                         with open(index_path, 'w') as f:
                             json.dump(model_index, f, indent=2)
-                        
+
                         with tarfile.open(archive_path, "w:gz") as tar:
                             # Add all files in the directory, including metadata
                             for file_name in os.listdir(directory_path):
                                 file_path = os.path.join(directory_path, file_name)
                                 if os.path.isfile(file_path):
                                     tar.add(file_path, arcname=file_name)
-                        
+
                         # Clean up temporary files
                         os.unlink(metadata_path)
                         os.unlink(index_path)
-                        
+
                         click.echo(f"Successfully created archive: {archive_path}", err=True)
-                        
+
                     except Exception as e:
                         logger.error(f"Failed to create archive for {format_name}: {e}")
-                
+
                 # Create archives for each format that was processed
                 if "networkx" in format and processed_count > 0:
                     create_archive(output_paths["networkx"], "networkx")
-                
+
                 if "cx2" in format and processed_count > 0:
                     create_archive(output_paths["cx2"], "cx2")
-            
+
         except Exception as e:
             logger.error(f"Translation failed with error: {e}")
             raise click.ClickException(f"Translation failed: {e}")

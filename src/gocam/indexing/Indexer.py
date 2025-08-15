@@ -282,7 +282,3 @@ class Indexer:
                         g.add_edge(ca.downstream_activity, a.id)
         return g
 
-
-
-
-
