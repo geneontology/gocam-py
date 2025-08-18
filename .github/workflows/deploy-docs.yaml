@@ -15,7 +15,7 @@ jobs:
       id-token: write  # to verify the deployment originates from an appropriate source
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0  # otherwise, it will fail to push refs to dest repo
 
