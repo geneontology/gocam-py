@@ -457,6 +457,7 @@ class MinervaWrapper:
             "title": annotations["title"],
             "status": annotations.get("state", None),
             "comments": annotations_mv.get("comment", None),
+            "date_modified": annotations.get("date", None),
             "taxon": taxon,
             "activities": activities,
             "objects": objects,

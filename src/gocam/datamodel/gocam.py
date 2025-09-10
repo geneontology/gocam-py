@@ -81,26 +81,44 @@ linkml_meta = LinkMLMeta({'default_prefix': 'gocam',
      'name': 'gocam',
      'prefixes': {'BFO': {'prefix_prefix': 'BFO',
                           'prefix_reference': 'http://purl.obolibrary.org/obo/BFO_'},
+                  'CHEBI': {'prefix_prefix': 'CHEBI',
+                            'prefix_reference': 'http://purl.obolibrary.org/obo/CHEBI_'},
+                  'CL': {'prefix_prefix': 'CL',
+                         'prefix_reference': 'http://purl.obolibrary.org/obo/CL_'},
+                  'DDANAT': {'prefix_prefix': 'DDANAT',
+                             'prefix_reference': 'http://purl.obolibrary.org/obo/DDANAT_'},
+                  'DOI': {'prefix_prefix': 'DOI',
+                          'prefix_reference': 'http://doi.org/'},
                   'ECO': {'prefix_prefix': 'ECO',
                           'prefix_reference': 'http://purl.obolibrary.org/obo/ECO_'},
+                  'FAO': {'prefix_prefix': 'FAO',
+                          'prefix_reference': 'http://purl.obolibrary.org/obo/FAO_'},
                   'GO': {'prefix_prefix': 'GO',
                          'prefix_reference': 'http://purl.obolibrary.org/obo/GO_'},
+                  'GOREF': {'prefix_prefix': 'GOREF',
+                            'prefix_reference': 'http://purl.obolibrary.org/obo/go/references/'},
                   'NCBITaxon': {'prefix_prefix': 'NCBITaxon',
                                 'prefix_reference': 'http://purl.obolibrary.org/obo/NCBITaxon_'},
                   'OBAN': {'prefix_prefix': 'OBAN',
                            'prefix_reference': 'http://purl.org/oban/'},
                   'PMID': {'prefix_prefix': 'PMID',
                            'prefix_reference': 'http://identifiers.org/pubmed/'},
+                  'PO': {'prefix_prefix': 'PO',
+                         'prefix_reference': 'http://purl.obolibrary.org/obo/PO_'},
                   'RHEA': {'prefix_prefix': 'RHEA',
                            'prefix_reference': 'http://rdf.rhea-db.org/'},
                   'RO': {'prefix_prefix': 'RO',
                          'prefix_reference': 'http://purl.obolibrary.org/obo/RO_'},
+                  'UBERON': {'prefix_prefix': 'UBERON',
+                             'prefix_reference': 'http://purl.obolibrary.org/obo/UBERON_'},
                   'UniProtKB': {'prefix_prefix': 'UniProtKB',
                                 'prefix_reference': 'http://purl.uniprot.org/uniprot/'},
                   'biolink': {'prefix_prefix': 'biolink',
                               'prefix_reference': 'https://w3id.org/biolink/vocab/'},
                   'dce': {'prefix_prefix': 'dce',
                           'prefix_reference': 'http://purl.org/dc/elements/1.1/'},
+                  'dct': {'prefix_prefix': 'dct',
+                          'prefix_reference': 'http://purl.org/dc/terms/'},
                   'dcterms': {'prefix_prefix': 'dcterms',
                               'prefix_reference': 'http://purl.org/dc/terms/'},
                   'gocam': {'prefix_prefix': 'gocam',
@@ -118,7 +136,9 @@ linkml_meta = LinkMLMeta({'default_prefix': 'gocam',
                   'orcid': {'prefix_prefix': 'orcid',
                             'prefix_reference': 'https://orcid.org/'},
                   'pav': {'prefix_prefix': 'pav',
-                          'prefix_reference': 'http://purl.org/pav/'}},
+                          'prefix_reference': 'http://purl.org/pav/'},
+                  'rdfs': {'prefix_prefix': 'rdfs',
+                           'prefix_reference': 'http://www.w3.org/2000/01/rdf-schema#'}},
      'see_also': ['https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7012280/',
                   'https://docs.google.com/presentation/d/1ja0Vkw0AoENJ58emM77dGnqPtY1nfIJMeyVnObBxIxI/edit#slide=id.p8'],
      'source_file': 'src/gocam/schema/gocam.yaml'} )
@@ -127,18 +147,30 @@ class ModelStateEnum(str, Enum):
     """
     A term describing where the model is in the development life cycle.
     """
-    # Used when the curator is still working on the model. Edits are still being made, and the information in the model is not yet guaranteed to be accurate or complete. The model should not be displayed in end-user facing websites, unless it is made clear that the model is a work in progress.
     development = "development"
-    # Used when the curator has declared the model is ready for public consumption. Edits might still be performed on the model in future, but the information in the model is believed to be both accurate and reasonably complete. The model may be displayed in public websites.
+    """
+    Used when the curator is still working on the model. Edits are still being made, and the information in the model is not yet guaranteed to be accurate or complete. The model should not be displayed in end-user facing websites, unless it is made clear that the model is a work in progress.
+    """
     production = "production"
-    # When the curator has marked for future deletion.
+    """
+    Used when the curator has declared the model is ready for public consumption. Edits might still be performed on the model in future, but the information in the model is believed to be both accurate and reasonably complete. The model may be displayed in public websites.
+    """
     delete = "delete"
-    # The model has been marked for curator review.
+    """
+    When the curator has marked for future deletion.
+    """
     review = "review"
-    # The model is not intended for use public use; it is likely to be used for internal testing.
+    """
+    The model has been marked for curator review.
+    """
     internal_test = "internal_test"
-    # TBD
+    """
+    The model is not intended for use public use; it is likely to be used for internal testing.
+    """
     closed = "closed"
+    """
+    TBD
+    """
 
 
 class InformationBiomacromoleculeCategory(str, Enum):
@@ -198,8 +230,8 @@ class Model(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
          'rules': [{'postconditions': {'slot_conditions': {'activities': {'name': 'activities',
                                                                           'required': True}}},
-                    'preconditions': {'slot_conditions': {'state': {'equals_string': 'production',
-                                                                    'name': 'state'}}},
+                    'preconditions': {'slot_conditions': {'status': {'equals_string': 'production',
+                                                                     'name': 'status'}}},
                     'title': 'Production rules must have at least one activity'}]})
 
     id: str = Field(default=..., description="""The identifier of the model. Should be in gocam namespace.""", json_schema_extra = { "linkml_meta": {'alias': 'id', 'domain_of': ['Model', 'Activity', 'Object']} })
@@ -210,6 +242,7 @@ class Model(ConfiguredBaseModel):
          'aliases': ['model state'],
          'domain_of': ['Model'],
          'slot_uri': 'pav:status'} })
+    date_modified: Optional[str] = Field(default=None, description="""The date that the model was last modified""", json_schema_extra = { "linkml_meta": {'alias': 'date_modified', 'domain_of': ['Model'], 'slot_uri': 'dct:date'} })
     comments: Optional[list[str]] = Field(default=None, description="""Curator-provided comments about the model""", json_schema_extra = { "linkml_meta": {'alias': 'comments', 'domain_of': ['Model'], 'slot_uri': 'rdfs:comment'} })
     activities: Optional[list[Activity]] = Field(default=None, description="""All of the activities that are part of the model""", json_schema_extra = { "linkml_meta": {'alias': 'activities',
          'comments': ['this slot is conditionally required. It is optional for models '
@@ -908,6 +941,7 @@ class QueryIndex(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
+    taxon_label: Optional[str] = Field(default=None, description="""The label of the primary taxon for the model""", json_schema_extra = { "linkml_meta": {'alias': 'taxon_label', 'domain_of': ['QueryIndex']} })
     number_of_activities: Optional[int] = Field(default=None, description="""The number of activities in a model.""", json_schema_extra = { "linkml_meta": {'alias': 'number_of_activities',
          'comments': ['this includes all activities, even those without an enabler.'],
          'domain_of': ['QueryIndex']} })

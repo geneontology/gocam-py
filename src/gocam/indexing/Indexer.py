@@ -1,12 +1,12 @@
 import logging
 from dataclasses import dataclass, field
-from typing import Optional, List, Collection, Tuple, Any, Set
+from functools import cached_property
+from typing import Optional, List, Collection, Tuple, Set
 
 from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import PART_OF, IS_A
-from oaklib.interfaces import OboGraphInterface
 
-from gocam.datamodel import Model, Activity, TermAssociation, PublicationObject, TermObject
+from gocam.datamodel import Model, TermAssociation, PublicationObject, TermObject
 from gocam.datamodel import QueryIndex
 import networkx as nx
 
@@ -22,19 +22,27 @@ class Indexer:
     2. Convert a model to a directed graph
     3. Get term closures for ontology terms
     """
-    _go_adapter: OboGraphInterface = None
     subsets: List[str] = field(default_factory=lambda: ["goslim_generic"])
 
+    @cached_property
     def go_adapter(self):
         """
-        Get or initialize the GO ontology adapter.
+        Get the GO ontology adapter.
         
         Returns:
             An OboGraphInterface implementation for GO
         """
-        if not self._go_adapter:
-            self._go_adapter = get_adapter("sqlite:obo:go")
-        return self._go_adapter
+        return get_adapter("sqlite:obo:go")
+
+    @cached_property
+    def ncbi_taxon_adapter(self):
+        """
+        Get the NCBI Taxonomy ontology adapter.
+
+        Returns:
+            An OboGraphInterface implementation for the NCBI Taxonomy database
+        """
+        return get_adapter("sqlite:obo:ncbitaxon")
         
     def _get_closures(self, terms: Collection[str]) -> Tuple[List[TermObject], List[TermObject]]:
         """
@@ -50,20 +58,19 @@ class Indexer:
         """
         if not terms:
             return [], []
-            
-        go = self.go_adapter()
-        ancs = go.ancestors(list(terms), predicates=[IS_A, PART_OF])
+
+        ancs = self.go_adapter.ancestors(list(terms), predicates=[IS_A, PART_OF])
         objs = [
             TermObject(
                 id=t,
-                label=go.label(t),
-            ) for t in terms
+                label=self.go_adapter.label(t),
+            ) for t in terms if t is not None
         ]
         closure = [
             TermObject(
                 id=t,
-                label=go.label(t),
-            ) for t in ancs if not t.startswith("BFO:")
+                label=self.go_adapter.label(t),
+            ) for t in ancs if t is not None and not t.startswith("BFO:")
         ]
         return objs, closure
 
@@ -102,7 +109,6 @@ class Indexer:
         """
         if qi is None:
             qi = QueryIndex()
-        go = self.go_adapter()
         model.query_index = qi
         qi = model.query_index
         qi.number_of_activities = len(model.activities or [])
@@ -114,6 +120,20 @@ class Indexer:
         all_occurs_ins = set()
         all_has_inputs = set()
         all_annoton_terms = []
+        model_objects_by_id = {
+            obj.id: obj
+            for obj in model.objects or []
+        }
+
+        def _label(x):
+            if x in model_objects_by_id and model_objects_by_id[x].label:
+                return model_objects_by_id[x].label
+
+            lbl = self.go_adapter.label(x)
+            if lbl:
+                return lbl
+
+            return x
 
         def term_association_references(term_association: Optional[TermAssociation]) -> Set[str]:
             """
@@ -173,12 +193,7 @@ class Indexer:
                     annoton_term_id_parts.append(ta.term)
 
             if activity.enabled_by:
-                def _label(x):
-                    lbl = go.label(x)
-                    if lbl:
-                        return lbl
-                    else:
-                        return x
+                annoton_term_id_parts = filter(None, annoton_term_id_parts)
                 annoton_term_label_parts = [_label(x) for x in annoton_term_id_parts]
                 annoton_term = TermObject(
                     id="-".join(annoton_term_id_parts),
@@ -214,7 +229,7 @@ class Indexer:
 
         subset_terms = set()
         for s in self.subsets:
-            subset_terms.update(set(go.subset_members(s)))
+            subset_terms.update(set(self.go_adapter.subset_members(s)))
 
         def rollup(terms: Collection[TermObject]) -> List[TermObject]:
             """
@@ -238,6 +253,10 @@ class Indexer:
         qi.model_activity_molecular_function_rollup = rollup(mf_closure)
 
         eb_direct, eb_closure = self._get_closures(all_enabled_bys)
+        for term in eb_direct:
+            term.label = _label(term.id)
+        for term in eb_closure:
+             term.label = _label(term.id)
         qi.model_activity_enabled_by_terms = eb_direct
         qi.model_activity_enabled_by_closure = eb_closure
 
@@ -257,6 +276,10 @@ class Indexer:
         qi.model_activity_has_input_rollup = rollup(has_inputs_closure)
 
         qi.annoton_terms = all_annoton_terms
+
+        if model.taxon:
+            qi.taxon_label = self.ncbi_taxon_adapter.label(model.taxon)
+
         return qi
 
 
