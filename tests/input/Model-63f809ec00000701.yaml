@@ -4,6 +4,7 @@ title: tRNA repair and recycling by ANKZF1, ELAC1 and TRNT1 following activity o
   the RQC complex in response to stalled ribosomes (Human)
 taxon: NCBITaxon:9606
 status: production
+date_modified: '2023-06-08'
 activities:
 - id: gomodel:63f809ec00000701/63f809ec00000742
   enabled_by:

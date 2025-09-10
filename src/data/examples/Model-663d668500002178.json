@@ -1,8 +1,9 @@
 {
   "id": "gomodel:663d668500002178",
-  "title": "phosphatidylinositol phosphate/phosphatidylinositol/ biosynthetic process (GO:0006661)(GO:0043647)\t\n",
+  "title": "phosphatidylinositol/phosphatidylinositol phosphate/ biosynthetic process (GO:0043647)\t (GO:0006661)\n",
   "taxon": "NCBITaxon:4896",
   "status": "production",
+  "date_modified": "2025-05-14",
   "comments": [
     "Need to add \"inositol phosphate metabolic process\" (GO:0043647) to everything after plc1",
     "add major intermediates",
@@ -2159,7 +2160,7 @@
       "contributor": [
         "https://orcid.org/0000-0001-6330-7526"
       ],
-      "date": "2025-03-14",
+      "date": "2025-05-14",
       "provided_by": [
         "http://www.pombase.org"
       ]

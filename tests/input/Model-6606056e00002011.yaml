@@ -3,6 +3,7 @@ id: gomodel:6606056e00002011
 title: CD72 and BCR co-stimulation by sn/RNP self antigen (Human)
 taxon: NCBITaxon:9606
 status: production
+date_modified: '2024-05-07'
 activities:
 - id: gomodel:6606056e00002011/662af8fa00002857
   enabled_by:

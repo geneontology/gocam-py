@@ -106,6 +106,9 @@ classes:
           - model state
         range: ModelStateEnum
         slot_uri: pav:status
+      date_modified:
+        description: The date that the model was last modified
+        slot_uri: dct:date
       comments:
         description: Curator-provided comments about the model
         slot_uri: rdfs:comment
@@ -572,6 +575,9 @@ classes:
       operations. Note that this index is not typically populated in the working transactional store for
       a model, it is derived via computation from core primary model information.
     attributes:
+      taxon_label:
+        description: The label of the primary taxon for the model
+        range: string
       number_of_activities:
         description: The number of activities in a model.
         comments:
