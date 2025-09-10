@@ -156,7 +156,7 @@ def test_indexer_gets_labels_from_model_objects():
                 }
             },
             {
-                "id": "act1",
+                "id": "act2",
                 "enabled_by": {
                     "type": "EnabledByGeneProductAssociation",
                     "term": "UniProtKB:00002",
