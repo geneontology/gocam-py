@@ -345,10 +345,10 @@ def test_model_basic_conversion_568b0f9600000284(get_model, translator):
     g2g_graph = translator.translate_models([model])
     
     # Should have 7 gene nodes (one per activity)
-    assert g2g_graph.number_of_nodes() == 7
+    assert g2g_graph.number_of_nodes() == 10
     
     # Should have 6 causal edges
-    assert g2g_graph.number_of_edges() == 6
+    assert g2g_graph.number_of_edges() == 9
     
     # Verify expected genes are present
     expected_genes = {
@@ -359,6 +359,9 @@ def test_model_basic_conversion_568b0f9600000284(get_model, translator):
         "WB:WBGene00004758",  # sek-1
         "WB:WBGene00004055",  # pmk-1
         "WB:WBGene00000223",  # atf-7
+        "WB:WBGene00006923",  # vhp-1
+        "WB:WBGene00002187",  # kgb-1
+        "WB:WBGene00011979",  # sysm-1
     }
     assert set(g2g_graph.nodes()) == expected_genes
 
@@ -422,6 +425,9 @@ def test_model_causal_pathway_structure_568b0f9600000284(get_model, translator):
         ("WB:WBGene00003822", "WB:WBGene00004758"),  # nsy-1 -> sek-1
         ("WB:WBGene00004758", "WB:WBGene00004055"),  # sek-1 -> pmk-1
         ("WB:WBGene00004055", "WB:WBGene00000223"),  # pmk-1 -> atf-7
+        ('WB:WBGene00006923', 'WB:WBGene00004055'),  # vhp-1 -> pmk-1
+        ('WB:WBGene00006923', 'WB:WBGene00002187'),  # vhp-1 -> kgb-1
+        ('WB:WBGene00000223', 'WB:WBGene00011979'),  # atf-7 -> sysm-1
     }
     
     actual_edges = set(g2g_graph.edges())
@@ -435,9 +441,9 @@ def test_model_multiple_inputs_to_same_gene_568b0f9600000284(get_model, translat
     
     # pmk-1 (WB:WBGene00004055) should have two incoming edges
     pmk1_predecessors = list(g2g_graph.predecessors("WB:WBGene00004055"))
-    assert len(pmk1_predecessors) == 2
+    assert len(pmk1_predecessors) == 3
     
-    expected_predecessors = {"WB:WBGene00012019", "WB:WBGene00004758"}  # dkf-2, sek-1
+    expected_predecessors = {"WB:WBGene00012019", "WB:WBGene00004758", "WB:WBGene00006923"}  # dkf-2, sek-1, vhp-1
     assert set(pmk1_predecessors) == expected_predecessors
 
 
@@ -461,12 +467,12 @@ def test_model_statistics_568b0f9600000284(get_model, translator):
     model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
-    # Original model: 7 activities
-    assert len(model.activities) == 7
+    # Original model: 10 activities
+    assert len(model.activities) == 10
     
-    # Gene-to-gene network: 7 genes, 6 causal relationships
-    assert g2g_graph.number_of_nodes() == 7
-    assert g2g_graph.number_of_edges() == 6
+    # Gene-to-gene network: 10 genes, 9 causal relationships
+    assert g2g_graph.number_of_nodes() == 10
+    assert g2g_graph.number_of_edges() == 9
     
     # All nodes should be gene products
     for node, attrs in g2g_graph.nodes(data=True):
@@ -495,32 +501,32 @@ def test_model_evidence_collections_basic_568b0f9600000284(get_model, translator
     assert len(evidence_attrs) > 0, "Should have evidence collection attributes"
 
 
-def test_model_molecular_function_evidence_collections_568b0f9600000284(get_model, translator):
-    """Test molecular function evidence collections are properly extracted for model 568b0f9600000284."""
+def test_model_gene_product_evidence_collections_568b0f9600000284(get_model, translator):
+    """Test gene product evidence collections are properly extracted for model 568b0f9600000284."""
     model = get_model("input/Model-568b0f9600000284")
     g2g_graph = translator.translate_models([model])
     
     # Find edge from tir-1 to nsy-1 which should have molecular function evidence
     tir1_to_nsy1_attrs = g2g_graph.edges["WB:WBGene00006575", "WB:WBGene00003822"]
     
-    # Check source molecular function evidence
-    assert "source_gene_molecular_function_has_reference" in tir1_to_nsy1_attrs
-    assert "source_gene_molecular_function_assessed_by" in tir1_to_nsy1_attrs
+    # Check source gene product evidence
+    assert "source_gene_product_has_reference" in tir1_to_nsy1_attrs
+    assert "source_gene_product_assessed_by" in tir1_to_nsy1_attrs
     
     # Verify reference format
-    source_refs = tir1_to_nsy1_attrs["source_gene_molecular_function_has_reference"]
+    source_refs = tir1_to_nsy1_attrs["source_gene_product_has_reference"]
     assert isinstance(source_refs, list)
     assert "PMID:15625192" in source_refs
     
     # Verify evidence code format
-    source_codes = tir1_to_nsy1_attrs["source_gene_molecular_function_assessed_by"]
+    source_codes = tir1_to_nsy1_attrs["source_gene_product_assessed_by"]
     assert isinstance(source_codes, list)
     assert "ECO:0000314" in source_codes
     
-    # Check target molecular function evidence
-    assert "target_gene_molecular_function_has_reference" in tir1_to_nsy1_attrs
-    assert "target_gene_molecular_function_assessed_by" in tir1_to_nsy1_attrs
+    # Check target gene product evidence
+    assert "target_gene_product_has_reference" in tir1_to_nsy1_attrs
+    assert "target_gene_product_assessed_by" in tir1_to_nsy1_attrs
     
-    target_refs = tir1_to_nsy1_attrs["target_gene_molecular_function_has_reference"]
+    target_refs = tir1_to_nsy1_attrs["target_gene_product_has_reference"]
     assert isinstance(target_refs, list)
     assert "PMID:11751572" in target_refs
