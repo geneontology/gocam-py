@@ -487,6 +487,8 @@
 
 
 
+      QueryIndex : taxon_label
+
 
 </div>
 <!-- no inheritance hierarchy -->
@@ -501,6 +503,12 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../taxon_label/">taxon_label</a></td>
+<td>0..1 <br/> <a href="../String/">String</a></td>
+<td>The label of the primary taxon for the model</td>
+<td>direct</td>
+</tr>
 <tr>
 <td><a href="../number_of_activities/">number_of_activities</a></td>
 <td>0..1 <br/> <a href="../Integer/">Integer</a></td>
@@ -755,6 +763,14 @@ description: An index that is optionally placed on a model in order to support c
   primary model information.
 from_schema: https://w3id.org/gocam
 attributes:
+  taxon_label:
+    name: taxon_label
+    description: The label of the primary taxon for the model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: string
   number_of_activities:
     name: number_of_activities
     description: The number of activities in a model.
@@ -1154,6 +1170,16 @@ description: An index that is optionally placed on a model in order to support c
   primary model information.
 from_schema: https://w3id.org/gocam
 attributes:
+  taxon_label:
+    name: taxon_label
+    description: The label of the primary taxon for the model
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: taxon_label
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: string
   number_of_activities:
     name: number_of_activities
     description: The number of activities in a model.
