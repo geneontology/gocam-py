@@ -47,7 +47,7 @@ def load_models(file_path: Path) -> List[Model]:
             else:
                 raise ValueError(f"Unexpected data format in {file_path}")
         else:
-            raise ValueError(f"Unsupported file format: {file_path.suffix}")
+            raise ValueError(f"Unsupported file format: {file_path.suffix}. Supported formats are: .yaml, .json")
 
     models = []
     for model_data in models_data:
