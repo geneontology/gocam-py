@@ -120,6 +120,8 @@ gen-examples:
 .PHONY: gen-test-inputs
 gen-test-inputs:
 	$(RUN) gocam fetch --format yaml 63f809ec00000701 > tests/input/Model-63f809ec00000701.yaml
+	$(RUN) gocam fetch --format yaml 568b0f9600000284 > tests/input/Model-568b0f9600000284.yaml
+	$(RUN) gocam fetch --format yaml 663d668500002178 > tests/input/Model-663d668500002178.yaml
 	$(RUN) gocam fetch --format yaml 6606056e00002011 > tests/input/Model-6606056e00002011.yaml
 
 # generates all project files
