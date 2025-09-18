@@ -363,8 +363,8 @@ class DiamondDetector:
                 impure_count += 1
 
         report.append("\nDiamond Purity:")
-        report.append(f"  Pure diamonds: {pure_count} ({pure_count * 100 // len(self.diamonds) if self.diamonds else 0}%)")
-        report.append(f"  Impure diamonds: {impure_count} ({impure_count * 100 // len(self.diamonds) if self.diamonds else 0}%)")
+        report.append(f"  Pure diamonds: {pure_count} ({round(pure_count * 100 / len(self.diamonds)) if self.diamonds else 0}%)")
+        report.append(f"  Impure diamonds: {impure_count} ({round(impure_count * 100 / len(self.diamonds)) if self.diamonds else 0}%)")
 
         report.append("\nDiamond Type Distribution:")
         for dtype, count in sorted(type_counts.items()):
