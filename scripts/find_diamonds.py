@@ -50,12 +50,13 @@ def load_models(file_path: Path) -> List[Model]:
             raise ValueError(f"Unsupported file format: {file_path.suffix}. Supported formats are: .yaml, .json")
 
     models = []
-    for model_data in models_data:
+    for i, model_data in enumerate(models_data):
         try:
             model = Model(**model_data)
             models.append(model)
         except Exception as e:
-            logger.warning(f"Failed to parse model: {e}")
+            model_id = model_data.get('id', f'index_{i}') if isinstance(model_data, dict) else f'index_{i}'
+            logger.warning(f"Failed to parse model {model_id}: {e}")
 
     logger.info(f"Loaded {len(models)} models")
     return models
