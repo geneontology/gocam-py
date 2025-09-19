@@ -33,6 +33,7 @@ class DiamondPattern:
     intermediate_nodes: Optional[Dict[str, List[str]]] = None  # Intermediate nodes on each path
     classification: str = ""  # Classification of diamond type
     is_pure: bool = True  # Whether this is a pure diamond (no extra edges)
+    path_length_consistent: bool = True  # Whether all parallel paths have same length
 
     @property
     def num_parallel_paths(self) -> int:
@@ -221,12 +222,28 @@ class DiamondDetector:
                                     if sink_id in downstream_map[activity_k]:
                                         parallel_activities.append(activity_k)
 
-                            # Calculate path lengths
-                            # Check upstream path (source to first parallel activity)
-                            upstream_hop, _ = self._find_path_length(source_id, parallel_activities[0], downstream_map)
+                            # Calculate path lengths for all parallel activities
+                            # Validate that all have consistent path lengths
+                            upstream_hops = []
+                            downstream_hops = []
 
-                            # Check downstream path (first parallel activity to sink)
-                            downstream_hop, _ = self._find_path_length(parallel_activities[0], sink_id, downstream_map)
+                            for parallel_id in parallel_activities:
+                                up_hop, _ = self._find_path_length(source_id, parallel_id, downstream_map)
+                                down_hop, _ = self._find_path_length(parallel_id, sink_id, downstream_map)
+                                upstream_hops.append(up_hop)
+                                downstream_hops.append(down_hop)
+
+                            # Check if all parallel paths have same length (true diamond)
+                            # If not, use the most common length or log a warning
+                            upstream_hop = upstream_hops[0] if upstream_hops else 0
+                            downstream_hop = downstream_hops[0] if downstream_hops else 0
+
+                            # Check and record if path lengths are consistent
+                            path_length_consistent = (len(set(upstream_hops)) == 1 and
+                                                     len(set(downstream_hops)) == 1)
+
+                            if not path_length_consistent:
+                                logger.debug(f"Inconsistent path lengths in diamond: upstream={upstream_hops}, downstream={downstream_hops}")
 
                             # Check if diamond is pure (no extra edges)
                             is_pure = self._check_diamond_purity(
@@ -251,7 +268,8 @@ class DiamondDetector:
                                 activity_details=activity_details,
                                 upstream_hops=upstream_hop,
                                 downstream_hops=downstream_hop,
-                                is_pure=is_pure
+                                is_pure=is_pure,
+                                path_length_consistent=path_length_consistent
                             )
 
                             # Avoid duplicates
@@ -280,6 +298,7 @@ class DiamondDetector:
             List of all diamond patterns found
         """
         all_diamonds = []
+        failed_models = []
         for model in models:
             try:
                 diamonds = self.find_diamonds_in_model(model)
@@ -288,6 +307,11 @@ class DiamondDetector:
                     logger.info(f"Found {len(diamonds)} diamond(s) in model {model.id}")
             except Exception as e:
                 logger.error(f"Error processing model {model.id}: {e}")
+                failed_models.append((model.id, str(e)))
+                # Continue processing other models instead of failing entirely
+
+        if failed_models:
+            logger.warning(f"Failed to process {len(failed_models)} model(s): {[m[0] for m in failed_models[:5]]}")
 
         self.diamonds = all_diamonds
         return all_diamonds
