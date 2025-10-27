@@ -769,14 +769,14 @@ beautifulsoup4 = "*"
 
 [[package]]
 name = "google-api-core"
-version = "2.26.0"
+version = "2.27.0"
 description = "Google API client core library"
 optional = false
 python-versions = ">=3.7"
 groups = ["dev"]
 files = [
-    {file = "google_api_core-2.26.0-py3-none-any.whl", hash = "sha256:2b204bd0da2c81f918e3582c48458e24c11771f987f6258e6e227212af78f3ed"},
-    {file = "google_api_core-2.26.0.tar.gz", hash = "sha256:e6e6d78bd6cf757f4aee41dcc85b07f485fbb069d5daa3afb126defba1e91a62"},
+    {file = "google_api_core-2.27.0-py3-none-any.whl", hash = "sha256:779a380db4e21a4ee3d717cf8efbf324e53900bf37e1ffb273e5348a9916dd42"},
+    {file = "google_api_core-2.27.0.tar.gz", hash = "sha256:d32e2f5dd0517e91037169e75bf0a9783b255aff1d11730517c0b2b29e9db06a"},
 ]
 
 [package.dependencies]
@@ -878,14 +878,14 @@ tool = ["click (>=6.0.0)"]
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.70.0"
+version = "1.71.0"
 description = "Common protobufs used in Google APIs"
 optional = false
 python-versions = ">=3.7"
 groups = ["dev"]
 files = [
-    {file = "googleapis_common_protos-1.70.0-py3-none-any.whl", hash = "sha256:b8bfcca8c25a2bb253e0e0b0adaf8c00773e5e6af6fd92397576680b807e0fd8"},
-    {file = "googleapis_common_protos-1.70.0.tar.gz", hash = "sha256:0e1b44e0ea153e6594f9f394fef15193a68aaaea2d843f83e2742717ca753257"},
+    {file = "googleapis_common_protos-1.71.0-py3-none-any.whl", hash = "sha256:59034a1d849dc4d18971997a72ac56246570afdd17f9369a0ff68218d50ab78c"},
+    {file = "googleapis_common_protos-1.71.0.tar.gz", hash = "sha256:1aec01e574e29da63c80ba9f7bbf1ccfaacf1da877f23609fe236ca7c72a2e2e"},
 ]
 
 [package.dependencies]
@@ -2459,20 +2459,20 @@ pyyaml = ">=5.3.1"
 
 [[package]]
 name = "pronto"
-version = "2.7.0"
+version = "2.7.1"
 description = "Python frontend to ontologies."
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
 markers = "extra == \"oaklib\""
 files = [
-    {file = "pronto-2.7.0-py3-none-any.whl", hash = "sha256:da4fb4a6fd67ed7958cc3fc02ad0360ef81e48d2282b8e3fb9715209fcc64952"},
-    {file = "pronto-2.7.0.tar.gz", hash = "sha256:8454b89094f20eb74b3dadfd23d09ac3722a47d40c6ef3f6a1b462bc3faa030b"},
+    {file = "pronto-2.7.1-py3-none-any.whl", hash = "sha256:e35bb06691bb881bc90952b38efa483af7a1a912d8c1d7efc4ee86cf77cfb8a8"},
+    {file = "pronto-2.7.1.tar.gz", hash = "sha256:c169ff9e0bcef03aec7b75934353dd18d67e55d9461c8878c1041f57148f477f"},
 ]
 
 [package.dependencies]
 chardet = ">=5.0,<6.0"
-fastobo = ">=0.13.0,<0.14.0"
+fastobo = ">=0.13.0,<0.15.0"
 networkx = ">=2.3,<4.0"
 python-dateutil = ">=2.8,<3.0"
 
@@ -3103,14 +3103,14 @@ files = [
 
 [[package]]
 name = "rdflib"
-version = "7.2.1"
+version = "7.3.0"
 description = "RDFLib is a Python library for working with RDF, a simple yet powerful language for representing information."
 optional = false
 python-versions = ">=3.8.1"
 groups = ["main", "dev"]
 files = [
-    {file = "rdflib-7.2.1-py3-none-any.whl", hash = "sha256:1a175bc1386a167a42fbfaba003bfa05c164a2a3ca3cb9c0c97f9c9638ca6ac2"},
-    {file = "rdflib-7.2.1.tar.gz", hash = "sha256:cf9b7fa25234e8925da8b1fb09700f8349b5f0f100e785fb4260e737308292ac"},
+    {file = "rdflib-7.3.0-py3-none-any.whl", hash = "sha256:501e29710f1f7f8e5a0b075483050ef512da5130d97f255bd57789424d18e643"},
+    {file = "rdflib-7.3.0.tar.gz", hash = "sha256:2da6a5d3d0da2d095dd7de49e388db1c97542efc035bda4000c154d2b6cf8a6e"},
 ]
 
 [package.dependencies]
