@@ -1,6 +1,6 @@
 ## Add your own custom Makefile targets here
 
-RUN = poetry run
+RUN = uv run
 Q = linkml-store  -d gocams::main
 QI = linkml-store  -d gocams::indexed
 
