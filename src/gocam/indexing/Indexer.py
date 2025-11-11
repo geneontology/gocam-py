@@ -16,23 +16,30 @@ logger = logging.getLogger(__name__)
 class Indexer:
     """
     Indexes GO-CAM models for querying and analysis.
-    
+
     This class provides methods to:
     1. Index a GO-CAM model by computing statistics and closures
     2. Convert a model to a directed graph
     3. Get term closures for ontology terms
+
+    Note:
+        If needed, the go_adapter_descriptor and ncbi_taxon_adapter_descriptor fields should only be
+        set during initialization. Modifying them after initialization will have undefined behavior
+        due to internal caching.
     """
     subsets: List[str] = field(default_factory=lambda: ["goslim_generic"])
+    go_adapter_descriptor: str = "sqlite:obo:go"
+    ncbi_taxon_adapter_descriptor: str = "sqlite:obo:ncbitaxon"
 
     @cached_property
     def go_adapter(self):
         """
         Get the GO ontology adapter.
-        
+
         Returns:
             An OboGraphInterface implementation for GO
         """
-        return get_adapter("sqlite:obo:go")
+        return get_adapter(self.go_adapter_descriptor)
 
     @cached_property
     def ncbi_taxon_adapter(self):
@@ -42,7 +49,7 @@ class Indexer:
         Returns:
             An OboGraphInterface implementation for the NCBI Taxonomy database
         """
-        return get_adapter("sqlite:obo:ncbitaxon")
+        return get_adapter(self.ncbi_taxon_adapter_descriptor)
         
     def _get_closures(self, terms: Collection[str]) -> Tuple[List[TermObject], List[TermObject]]:
         """
