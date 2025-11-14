@@ -289,12 +289,7 @@ class Indexer:
         qi.model_activity_enabled_by_genes = [
             TermObject(id=gene, label=_label(gene))
             for gene in all_enabled_by_genes
-            if gene
-            not in (
-                None,
-                "CHEBI:36080",  # protein
-                "CHEBI:33695",  # information biomacromolecule
-            )
+            if gene and gene not in ("CHEBI:36080", "CHEBI:33695")
         ]
 
         parts_ofs_direct, parts_ofs_closure = self._get_closures(all_parts_ofs)
