@@ -651,16 +651,21 @@ classes:
         inlined_as_list: true
       model_activity_enabled_by_closure:
         description: The reflexive transitive closure of `model_activity_enabled_by_terms`, over the is_a
-          and has_part relationship type (e.g. complex to parts)
+          and part_of relationship types
         range: TermObject
         multivalued: true
         inlined_as_list: true
         annotations:
-          closure_computed_over: "[rdfs:subClassOf, BFO:0000051]"
+          closure_computed_over: "[rdfs:subClassOf, BFO:0000050]"
       model_activity_enabled_by_rollup:
         description: The rollup of `model_activity_enabled_by_closure` to a GO subset or slim.
         comments:
           - added for completion but may not be useful in practice
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
+      model_activity_enabled_by_genes:
+        description: All direct enabler genes and genes that are part of enabler complexes for all activities
         range: TermObject
         multivalued: true
         inlined_as_list: true
