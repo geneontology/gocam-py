@@ -175,3 +175,51 @@ def test_indexer_gets_labels_from_model_objects():
     assert model.query_index.model_activity_enabled_by_terms is not None
     assert len(model.query_index.model_activity_enabled_by_terms) == 2
     assert {term.label for term in model.query_index.model_activity_enabled_by_terms} == {"Test Gene", "Test Term"}
+
+
+def test_indexer_adds_complex_members_to_model_activity_enabled_by_genes():
+    """Test that the indexer adds complex members to model_activity_enabled_by_genes."""
+    model = Model.model_validate({
+        "id": "test",
+        "title": "Test Model",
+        "taxon": "NCBITaxon:9606",
+        "activities": [
+            {
+                "id": "act1",
+                "enabled_by": {
+                    "type": "EnabledByProteinComplexAssociation",
+                    "term": "GO:00001",
+                    "members": ["UniProtKB:00001", "UniProtKB:00002"]
+                }
+            }
+        ],
+        "objects": [
+            {
+                "id": "GO:00001",
+                "label": "Test Complex"
+            },
+            {
+                "id": "UniProtKB:00001",
+                "label": "Test Gene"
+            },
+            {
+                "id": "UniProtKB:00002",
+                "label": "Test Gene 2"
+            }
+        ]
+    })
+    indexer = Indexer()
+    indexer.index_model(model)
+
+    # The indexer should have unpacked the two complex members into model_activity_enabled_by_genes
+    assert model.query_index.model_activity_enabled_by_genes is not None
+    assert len(model.query_index.model_activity_enabled_by_genes) == 2
+    assert {gene.id for gene in model.query_index.model_activity_enabled_by_genes} == {"UniProtKB:00001", "UniProtKB:00002"}
+    assert {gene.label for gene in model.query_index.model_activity_enabled_by_genes} == {"Test Gene", "Test Gene 2"}
+
+    # The original complex term should still be in model_activity_enabled_by_terms
+    assert model.query_index.model_activity_enabled_by_terms is not None
+    assert len(model.query_index.model_activity_enabled_by_terms) == 1
+    assert model.query_index.model_activity_enabled_by_terms[0].id == "GO:00001"
+    assert model.query_index.model_activity_enabled_by_terms[0].label == "Test Complex"
+

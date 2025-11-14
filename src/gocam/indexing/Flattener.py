@@ -71,7 +71,7 @@ class Flattener:
             return {key: [str(v) for v in val]}
         elif isinstance(sample, dict):
             # TODO: make more schema-driven
-            if key.split("_")[-1] in ("terms", "closure", "rollup"):
+            if key.split("_")[-1] in ("terms", "closure", "rollup", "genes"):
                 return {
                     f"{key}_id": [v.get('id', str(v)) for v in val],
                     f"{key}_label": [v.get('label', v.get('id', str(v))) for v in val],
