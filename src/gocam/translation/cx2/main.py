@@ -21,44 +21,15 @@ from gocam.translation.cx2.style import (
     VISUAL_PROPERTIES,
     NodeType,
 )
+from gocam.utils import remove_species_code_suffix
 
 logger = logging.getLogger(__name__)
 
-# Derived from
-# https://github.com/geneontology/wc-gocam-viz/blob/6ef1fcaddfef97ece94d04b7c23ac09c33ace168/src/globals/%40noctua.form/data/taxon-dataset.json
-# If maintaining this list becomes onerous, consider splitting the label on a space and taking only
-# the first part
-SPECIES_CODES = [
-    "Atal",
-    "Btau",
-    "Cele",
-    "Cfam",
-    "Ddis",
-    "Dmel",
-    "Drer",
-    "Ggal",
-    "Hsap",
-    "Mmus",
-    "Pseudomonas",
-    "Rnor",
-    "Scer",
-    "Sjap",
-    "Solanaceae",
-    "Spom",
-    "Sscr",
-    "Xenopus",
-]
 
 # This image gets referenced in the network description, as recommended by NDEx. The process of
 # generating this graphic is not fully automated, but it is described here:
 # https://github.com/pkalita-lbl/ndex-gocam-legend
 LEGEND_GRAPHIC_SRC = "https://geneontology.org/assets/ndex-gocam-legend-v2.png"
-
-
-def _remove_species_code_suffix(label: str) -> str:
-    for code in SPECIES_CODES:
-        label = label.removesuffix(code).strip()
-    return label
 
 
 @cache
@@ -91,7 +62,7 @@ def model_to_cx2(
     if gocam.objects:
         for obj in gocam.objects:
             if obj.label:
-                object_labels[obj.id] = _remove_species_code_suffix(obj.label)
+                object_labels[obj.id] = remove_species_code_suffix(obj.label)
             else:
                 object_labels[obj.id] = obj.id
 
@@ -288,9 +259,7 @@ def model_to_cx2(
             if association.downstream_activity in activity_nodes_by_activity_id:
                 relation_style = RELATIONS.get(association.predicate, None)
                 if relation_style is None:
-                    logger.debug(
-                        f"Unknown relation style for {association.predicate}"
-                    )
+                    logger.debug(f"Unknown relation style for {association.predicate}")
                 name = (
                     relation_style.label
                     if relation_style is not None
