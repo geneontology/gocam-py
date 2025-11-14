@@ -23,6 +23,14 @@ SPECIES_CODES = [
 
 
 def remove_species_code_suffix(label: str) -> str:
+    """Remove known species codes from the end of a label.
+
+    If a label ends with one of the known species codes, remove it and any trailing whitespace.
+    Otherwise, return the label unchanged.
+
+    :param label: The label to process.
+    :return: The processed label.
+    """
     for code in SPECIES_CODES:
         label = label.removesuffix(code).strip()
     return label
