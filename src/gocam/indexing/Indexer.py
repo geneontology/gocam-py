@@ -1,5 +1,5 @@
 import logging
-from functools import cached_property, cache
+from functools import cached_property, lru_cache
 from typing import Optional, List, Collection, Tuple, Set
 
 from oaklib import get_adapter
@@ -63,7 +63,7 @@ class Indexer:
             subset_terms.update(self.go_adapter.subset_members(s))
         return subset_terms
 
-    @cache
+    @lru_cache(maxsize=None)
     def _go_label(self, id: str) -> str | None:
         """
         Get the label for a GO term.
@@ -73,7 +73,7 @@ class Indexer:
         """
         return self.go_adapter.label(id)
 
-    @cache
+    @lru_cache(maxsize=None)
     def _ncbi_taxon_label(self, id: str) -> str | None:
         """
         Get the label for an NCBI Taxonomy term.
