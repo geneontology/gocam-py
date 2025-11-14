@@ -182,7 +182,8 @@ class Indexer:
                 elif isinstance(
                     activity.enabled_by, EnabledByProteinComplexAssociation
                 ):
-                    all_enabled_by_genes.update(activity.enabled_by.members)
+                    if activity.enabled_by.members:
+                        all_enabled_by_genes.update(activity.enabled_by.members)
                 annoton_term_id_parts.append(activity.enabled_by.term)
 
             if activity.molecular_function:
