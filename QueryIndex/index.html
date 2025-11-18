@@ -262,6 +262,17 @@
 
 
 
+      QueryIndex : model_activity_enabled_by_genes
+
+
+
+
+
+        QueryIndex --&gt; "*" TermObject : model_activity_enabled_by_genes
+        click TermObject href "../TermObject/"
+
+
+
       QueryIndex : model_activity_enabled_by_rollup
 
 
@@ -600,6 +611,12 @@
 <td>direct</td>
 </tr>
 <tr>
+<td><a href="../model_activity_enabled_by_genes/">model_activity_enabled_by_genes</a></td>
+<td>* <br/> <a href="../TermObject/">TermObject</a></td>
+<td>All direct enabler genes and genes that are part of enabler complexes for all...</td>
+<td>direct</td>
+</tr>
+<tr>
 <td><a href="../model_activity_part_of_terms/">model_activity_part_of_terms</a></td>
 <td>* <br/> <a href="../TermObject/">TermObject</a></td>
 <td>All direct biological process terms for all activities</td>
@@ -928,9 +945,9 @@ attributes:
     annotations:
       closure_computed_over:
         tag: closure_computed_over
-        value: '[rdfs:subClassOf, BFO:0000051]'
+        value: '[rdfs:subClassOf, BFO:0000050]'
     description: The reflexive transitive closure of `model_activity_enabled_by_terms`,
-      over the is_a and has_part relationship type (e.g. complex to parts)
+      over the is_a and part_of relationship types
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -945,6 +962,18 @@ attributes:
       or slim.
     comments:
     - added for completion but may not be useful in practice
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: TermObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  model_activity_enabled_by_genes:
+    name: model_activity_enabled_by_genes
+    description: All direct enabler genes and genes that are part of enabler complexes
+      for all activities
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -1363,9 +1392,9 @@ attributes:
     annotations:
       closure_computed_over:
         tag: closure_computed_over
-        value: '[rdfs:subClassOf, BFO:0000051]'
+        value: '[rdfs:subClassOf, BFO:0000050]'
     description: The reflexive transitive closure of `model_activity_enabled_by_terms`,
-      over the is_a and has_part relationship type (e.g. complex to parts)
+      over the is_a and part_of relationship types
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_enabled_by_closure
@@ -1385,6 +1414,20 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_enabled_by_rollup
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: TermObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  model_activity_enabled_by_genes:
+    name: model_activity_enabled_by_genes
+    description: All direct enabler genes and genes that are part of enabler complexes
+      for all activities
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: model_activity_enabled_by_genes
     owner: QueryIndex
     domain_of:
     - QueryIndex
