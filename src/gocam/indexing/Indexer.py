@@ -5,7 +5,14 @@ from typing import Optional, List, Collection, Tuple, Set
 from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import PART_OF, IS_A
 
-from gocam.datamodel import Model, TermAssociation, PublicationObject, TermObject
+from gocam.datamodel import (
+    EnabledByGeneProductAssociation,
+    EnabledByProteinComplexAssociation,
+    Model,
+    PublicationObject,
+    TermAssociation,
+    TermObject,
+)
 from gocam.datamodel import QueryIndex
 import networkx as nx
 
@@ -113,7 +120,6 @@ class Indexer:
         ]
         return objs, closure
 
-
     def index_model(self, model: Model, reindex=False) -> None:
         """
         Index a GO-CAM model by computing statistics and term closures.
@@ -137,8 +143,9 @@ class Indexer:
         else:
             logger.info("Already have index")
 
-
-    def create_query_index(self, model: Model, qi: Optional[QueryIndex] = None) -> QueryIndex:
+    def create_query_index(
+        self, model: Model, qi: Optional[QueryIndex] = None
+    ) -> QueryIndex:
         """
         Create a QueryIndex for the given model.
 
@@ -155,14 +162,12 @@ class Indexer:
         all_refs = set()
         all_mfs = set()
         all_enabled_bys = set()
+        all_enabled_by_genes = set()
         all_parts_ofs = set()
         all_occurs_ins = set()
         all_has_inputs = set()
         all_annoton_terms = []
-        model_objects_by_id = {
-            obj.id: obj
-            for obj in model.objects or []
-        }
+        model_objects_by_id = {obj.id: obj for obj in model.objects or []}
 
         def _label(x):
             if x in model_objects_by_id and model_objects_by_id[x].label:
@@ -174,7 +179,9 @@ class Indexer:
 
             return x
 
-        def term_association_references(term_association: Optional[TermAssociation]) -> Set[str]:
+        def term_association_references(
+            term_association: Optional[TermAssociation],
+        ) -> Set[str]:
             """
             Extract references from a TermAssociation.
 
@@ -194,10 +201,19 @@ class Indexer:
             if activity.enabled_by:
                 all_refs.update(term_association_references(activity.enabled_by))
                 all_enabled_bys.add(activity.enabled_by.term)
+                if isinstance(activity.enabled_by, EnabledByGeneProductAssociation):
+                    all_enabled_by_genes.add(activity.enabled_by.term)
+                elif isinstance(
+                    activity.enabled_by, EnabledByProteinComplexAssociation
+                ):
+                    if activity.enabled_by.members:
+                        all_enabled_by_genes.update(activity.enabled_by.members)
                 annoton_term_id_parts.append(activity.enabled_by.term)
 
             if activity.molecular_function:
-                all_refs.update(term_association_references(activity.molecular_function))
+                all_refs.update(
+                    term_association_references(activity.molecular_function)
+                )
                 all_mfs.add(activity.molecular_function.term)
                 annoton_term_id_parts.append(activity.molecular_function.term)
 
@@ -243,9 +259,7 @@ class Indexer:
         qi.number_of_enabled_by_terms = len(all_enabled_bys)
         qi.number_of_causal_associations = len(all_causal_associations)
         all_refs = list(set(all_refs))
-        qi.flattened_references = [
-            PublicationObject(id=ref) for ref in all_refs
-        ]
+        qi.flattened_references = [PublicationObject(id=ref) for ref in all_refs]
         graph = self.model_to_digraph(model)
         # use nx to find the longest path and all SCCs
         if graph.number_of_nodes() > 0:
@@ -280,7 +294,6 @@ class Indexer:
                     result.append(t)
             return result
 
-
         mf_direct, mf_closure = self._get_closures(all_mfs)
         qi.model_activity_molecular_function_terms = mf_direct
         qi.model_activity_molecular_function_closure = mf_closure
@@ -290,9 +303,15 @@ class Indexer:
         for term in eb_direct:
             term.label = _label(term.id)
         for term in eb_closure:
-             term.label = _label(term.id)
+            term.label = _label(term.id)
         qi.model_activity_enabled_by_terms = eb_direct
         qi.model_activity_enabled_by_closure = eb_closure
+
+        qi.model_activity_enabled_by_genes = [
+            TermObject(id=gene, label=_label(gene))
+            for gene in all_enabled_by_genes
+            if gene and gene not in ("CHEBI:36080", "CHEBI:33695")
+        ]
 
         parts_ofs_direct, parts_ofs_closure = self._get_closures(all_parts_ofs)
         qi.model_activity_part_of_terms = parts_ofs_direct
@@ -316,9 +335,6 @@ class Indexer:
 
         return qi
 
-
-
-
     def model_to_digraph(self, model: Model) -> nx.DiGraph:
         """
         Convert a model to a directed graph where nodes are activities
@@ -338,4 +354,3 @@ class Indexer:
                     if ca.downstream_activity:
                         g.add_edge(ca.downstream_activity, a.id)
         return g
-
