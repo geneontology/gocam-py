@@ -1,6 +1,5 @@
 import logging
-from dataclasses import dataclass, field
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import Optional, List, Collection, Tuple, Set
 
 from oaklib import get_adapter
@@ -19,8 +18,6 @@ import networkx as nx
 
 logger = logging.getLogger(__name__)
 
-
-@dataclass
 class Indexer:
     """
     Indexes GO-CAM models for querying and analysis.
@@ -29,16 +26,17 @@ class Indexer:
     1. Index a GO-CAM model by computing statistics and closures
     2. Convert a model to a directed graph
     3. Get term closures for ontology terms
-
-    Note:
-        If needed, the go_adapter_descriptor and ncbi_taxon_adapter_descriptor fields should only be
-        set during initialization. Modifying them after initialization will have undefined behavior
-        due to internal caching.
     """
 
-    subsets: List[str] = field(default_factory=lambda: ["goslim_generic"])
-    go_adapter_descriptor: str = "sqlite:obo:go"
-    ncbi_taxon_adapter_descriptor: str = "sqlite:obo:ncbitaxon"
+    def __init__(self,
+        *,
+        subsets: list[str] | None = None,
+        go_adapter_descriptor: str = "sqlite:obo:go",
+        ncbi_taxon_adapter_descriptor: str = "sqlite:obo:ncbitaxon"
+    ):
+        self._subsets = subsets if subsets is not None else ["goslim_generic"]
+        self._go_adapter_descriptor = go_adapter_descriptor
+        self._ncbi_taxon_adapter_descriptor = ncbi_taxon_adapter_descriptor
 
     @cached_property
     def go_adapter(self):
@@ -48,7 +46,7 @@ class Indexer:
         Returns:
             An OboGraphInterface implementation for GO
         """
-        return get_adapter(self.go_adapter_descriptor)
+        return get_adapter(self._go_adapter_descriptor)
 
     @cached_property
     def ncbi_taxon_adapter(self):
@@ -58,11 +56,41 @@ class Indexer:
         Returns:
             An OboGraphInterface implementation for the NCBI Taxonomy database
         """
-        return get_adapter(self.ncbi_taxon_adapter_descriptor)
+        return get_adapter(self._ncbi_taxon_adapter_descriptor)
 
-    def _get_closures(
-        self, terms: Collection[str]
-    ) -> Tuple[List[TermObject], List[TermObject]]:
+    @cached_property
+    def subset_terms(self) -> set[str]:
+        """Get all terms that are members of the specified subsets.
+
+        Returns:
+            A set of term IDs that are members of the specified subsets.
+        """
+        subset_terms = set()
+        for s in self._subsets:
+            subset_terms.update(self.go_adapter.subset_members(s))
+        return subset_terms
+
+    @lru_cache(maxsize=None)
+    def _go_label(self, id: str) -> str | None:
+        """
+        Get the label for a GO term.
+
+        Args:
+            id: The GO term ID
+        """
+        return self.go_adapter.label(id)
+
+    @lru_cache(maxsize=None)
+    def _ncbi_taxon_label(self, id: str) -> str | None:
+        """
+        Get the label for an NCBI Taxonomy term.
+
+        Args:
+            id: The NCBI Taxonomy term ID
+        """
+        return self.ncbi_taxon_adapter.label(id)
+
+    def _get_closures(self, terms: Collection[str]) -> Tuple[List[TermObject], List[TermObject]]:
         """
         Get direct terms and their transitive closure.
 
@@ -81,18 +109,14 @@ class Indexer:
         objs = [
             TermObject(
                 id=t,
-                label=self.go_adapter.label(t),
-            )
-            for t in terms
-            if t is not None
+                label=self._go_label(t),
+            ) for t in terms if t is not None
         ]
         closure = [
             TermObject(
                 id=t,
-                label=self.go_adapter.label(t),
-            )
-            for t in ancs
-            if t is not None and not t.startswith("BFO:")
+                label=self._go_label(t),
+            ) for t in ancs if t is not None and not t.startswith("BFO:")
         ]
         return objs, closure
 
@@ -149,7 +173,7 @@ class Indexer:
             if x in model_objects_by_id and model_objects_by_id[x].label:
                 return model_objects_by_id[x].label
 
-            lbl = self.go_adapter.label(x)
+            lbl = self._go_label(x)
             if lbl:
                 return lbl
 
@@ -255,16 +279,12 @@ class Indexer:
             connected_components = list(nx.connected_components(undirected_graph))
             qi.number_of_strongly_connected_components = len(connected_components)
 
-        subset_terms = set()
-        for s in self.subsets:
-            subset_terms.update(set(self.go_adapter.subset_members(s)))
-
         def rollup(terms: Collection[TermObject]) -> List[TermObject]:
             """
             Filter terms to only those in the specified subsets.
             """
             # Use list comprehension instead of set comprehension to avoid hashability issues
-            filtered_terms = [t for t in terms if t.id in subset_terms]
+            filtered_terms = [t for t in terms if t.id in self.subset_terms]
             # Remove duplicates by id while preserving order
             seen_ids = set()
             result = []
@@ -311,7 +331,7 @@ class Indexer:
         qi.annoton_terms = all_annoton_terms
 
         if model.taxon:
-            qi.taxon_label = self.ncbi_taxon_adapter.label(model.taxon)
+            qi.taxon_label = self._ncbi_taxon_label(model.taxon)
 
         return qi
 
