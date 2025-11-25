@@ -227,6 +227,17 @@
 
 
 
+      QueryIndex : flattened_provided_by
+
+
+
+
+
+        QueryIndex --&gt; "*" Object : flattened_provided_by
+        click Object href "../Object/"
+
+
+
       QueryIndex : flattened_references
 
 
@@ -557,6 +568,12 @@
 <td>direct</td>
 </tr>
 <tr>
+<td><a href="../flattened_provided_by/">flattened_provided_by</a></td>
+<td>* <br/> <a href="../Object/">Object</a></td>
+<td>All provided_by values from the model across different levels combined in one...</td>
+<td>direct</td>
+</tr>
+<tr>
 <td><a href="../model_activity_molecular_function_terms/">model_activity_molecular_function_terms</a></td>
 <td>* <br/> <a href="../TermObject/">TermObject</a></td>
 <td>All MF terms for all activities</td>
@@ -846,6 +863,18 @@ attributes:
     domain_of:
     - QueryIndex
     range: PublicationObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  flattened_provided_by:
+    name: flattened_provided_by
+    description: All provided_by values from the model across different levels combined
+      in one place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: Object
     multivalued: true
     inlined: true
     inlined_as_list: true
@@ -1279,6 +1308,20 @@ attributes:
     domain_of:
     - QueryIndex
     range: PublicationObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  flattened_provided_by:
+    name: flattened_provided_by
+    description: All provided_by values from the model across different levels combined
+      in one place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: flattened_provided_by
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: Object
     multivalued: true
     inlined: true
     inlined_as_list: true
