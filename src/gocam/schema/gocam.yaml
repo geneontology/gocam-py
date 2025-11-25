@@ -457,7 +457,6 @@ classes:
 
   TermObject:
     description: An abstract class for all ontology term objects
-    abstract: true
     is_a: Object
 
   PublicationObject:
@@ -604,6 +603,11 @@ classes:
       flattened_references:
         description: All publication objects from the model across different levels combined in one place
         range: PublicationObject
+        multivalued: true
+        inlined_as_list: true
+      flattened_provided_by:
+        description: All provided_by values from the model across different levels combined in one place
+        range: Object
         multivalued: true
         inlined_as_list: true
       model_activity_molecular_function_terms:

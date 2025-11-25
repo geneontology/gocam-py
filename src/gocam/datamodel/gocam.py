@@ -705,7 +705,7 @@ class TermObject(Object):
     """
     An abstract class for all ontology term objects
     """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'abstract': True, 'from_schema': 'https://w3id.org/gocam'})
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
     id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'alias': 'id', 'domain_of': ['Model', 'Activity', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'alias': 'label', 'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
@@ -955,6 +955,7 @@ class QueryIndex(ConfiguredBaseModel):
     number_of_strongly_connected_components: Optional[int] = Field(default=None, description="""The number of distinct components that consist of activities that are connected (directly or indirectly) via causal connections. Most models will consist of a single SCC. Some models may consist of two or more \"islands\" where there is no connection from one island to another.""", json_schema_extra = { "linkml_meta": {'alias': 'number_of_strongly_connected_components',
          'domain_of': ['QueryIndex']} })
     flattened_references: Optional[list[PublicationObject]] = Field(default=None, description="""All publication objects from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'alias': 'flattened_references', 'domain_of': ['QueryIndex']} })
+    flattened_provided_by: Optional[list[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All provided_by values from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'alias': 'flattened_provided_by', 'domain_of': ['QueryIndex']} })
     model_activity_molecular_function_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All MF terms for all activities""", json_schema_extra = { "linkml_meta": {'alias': 'model_activity_molecular_function_terms',
          'domain_of': ['QueryIndex']} })
     model_activity_molecular_function_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The reflexive transitive closure of `model_activity_molecular_function_terms`, over the is_a relationship""", json_schema_extra = { "linkml_meta": {'alias': 'model_activity_molecular_function_closure',
