@@ -1,0 +1,12 @@
+- id: http://test1.example.org
+  label: Test Group 1
+- id: http://test2.example.org
+  label: Test Group 2
+- id: http://test3.example.org
+  label: Test Group 3
+- id: http://test4.example.org
+  label: Test Group 4
+- id: http://test5.example.org
+  label: Test Group 5
+- id: http://test6.example.org
+  label: Test Group 6

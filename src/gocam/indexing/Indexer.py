@@ -1,23 +1,67 @@
 import logging
+from collections.abc import Iterable
 from functools import cached_property, lru_cache
-from typing import Optional, List, Collection, Tuple, Set
+from typing import Collection, List, Optional, Tuple
 
+import networkx as nx
+import pystow
+import yaml
 from oaklib import get_adapter
-from oaklib.datamodels.vocabulary import PART_OF, IS_A
+from oaklib.datamodels.vocabulary import IS_A, PART_OF
 
 from gocam.datamodel import (
+    Activity,
+    Association,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     Model,
+    Object,
     PublicationObject,
-    TermAssociation,
+    QueryIndex,
     TermObject,
 )
-from gocam.datamodel import QueryIndex
-import networkx as nx
 
 logger = logging.getLogger(__name__)
 
+_PYSTOW_MODULE = pystow.module("gocam")
+_CURRENT_GROUPS_YAML_URL = "https://current.geneontology.org/metadata/groups.yaml"
+
+
+def _iter_association_references(
+    association: Association | None,
+) -> Iterable[str]:
+    """
+    Extract references from an Association.
+
+    Returns:
+        Iterable[str]: Iterable over reference strings extracted from the evidence of the Association.
+    """
+    if association is not None and association.evidence is not None:
+        for evidence in association.evidence:
+            if evidence.reference is not None:
+                yield evidence.reference
+
+
+def _iter_provided_bys(
+    item: Association | Model | Activity | None,
+) -> Iterable[str]:
+    """
+    Extract all provided_by strings from an item (Association, Model, or Activity) with provenances.
+
+    Returns:
+        Iterable[str]: Iterable over provided_by strings extracted from the item's provenances.
+    """
+    if item is not None and item.provenances is not None:
+        for prov in item.provenances:
+            if prov.provided_by is not None:
+                yield from prov.provided_by
+    # Also extract from evidence item provenances
+    if isinstance(item, Association) and item.evidence is not None:
+        for evidence in item.evidence:
+            if evidence.provenances is not None:
+                for prov in evidence.provenances:
+                    if prov.provided_by is not None:
+                        yield from prov.provided_by
 class Indexer:
     """
     Indexes GO-CAM models for querying and analysis.
@@ -28,14 +72,28 @@ class Indexer:
     3. Get term closures for ontology terms
     """
 
-    def __init__(self,
+    def __init__(
+        self,
         *,
         subsets: list[str] | None = None,
         go_adapter_descriptor: str = "sqlite:obo:go",
-        ncbi_taxon_adapter_descriptor: str = "sqlite:obo:ncbitaxon"
+        goc_groups_yaml_path: Optional[str] = None,
+        ncbi_taxon_adapter_descriptor: str = "sqlite:obo:ncbitaxon",
     ):
+        """
+        Initialize the Indexer.
+
+        Args:
+            subsets: List of GO subsets to use for rollup. Defaults to ["goslim_generic"].
+            go_adapter_descriptor: OAK adapter descriptor for GO ontology. Defaults to "sqlite:obo:go".
+            goc_groups_yaml_path: Optional path to a YAML file containing GOC group metadata.
+                If not provided, fetches from https://current.geneontology.org/metadata/groups.yaml.
+                The YAML file should be a list of group dictionaries, each with an "id" key and other metadata.
+            ncbi_taxon_adapter_descriptor: OAK adapter descriptor for NCBI Taxonomy. Defaults to "sqlite:obo:ncbitaxon".
+        """
         self._subsets = subsets if subsets is not None else ["goslim_generic"]
         self._go_adapter_descriptor = go_adapter_descriptor
+        self._goc_groups_yaml_path = goc_groups_yaml_path
         self._ncbi_taxon_adapter_descriptor = ncbi_taxon_adapter_descriptor
 
     @cached_property
@@ -57,6 +115,43 @@ class Indexer:
             An OboGraphInterface implementation for the NCBI Taxonomy database
         """
         return get_adapter(self._ncbi_taxon_adapter_descriptor)
+
+    @cached_property
+    def goc_groups(self) -> dict[str, dict]:
+        """
+        Get metadata about GOC (Gene Ontology Consortium) groups.
+
+        GOC groups are organizational units within the Gene Ontology Consortium,
+        each representing a contributing group or database. This property loads
+        metadata about these groups from a YAML file, either from a provided path
+        or by downloading from the GOC website and caching locally using pystow.
+
+        The returned dictionary maps group IDs (str) to their metadata (dict),
+        where each metadata dictionary contains fields such as 'label' and other
+        group attributes.
+
+        If the YAML file is unavailable (e.g., the specified path does not exist),
+        a FileNotFoundError is raised. If the YAML file is malformed, a
+        yaml.YAMLError is raised.
+
+        Caching behavior:
+            - The property is cached per Indexer instance via @cached_property.
+            - If downloading, the YAML file is cached locally using pystow.
+
+        Returns:
+            dict[str, dict]: Dictionary mapping group IDs to metadata dictionaries.
+
+        Raises:
+            FileNotFoundError: If the specified goc_groups_yaml_path doesn't exist.
+            yaml.YAMLError: If the YAML file is malformed.
+        """
+        if self._goc_groups_yaml_path is not None:
+            path = self._goc_groups_yaml_path
+        else:
+            path = _PYSTOW_MODULE.ensure(url=_CURRENT_GROUPS_YAML_URL)
+        with open(path) as f:
+            groups = yaml.safe_load(f)
+        return {group["id"]: group for group in groups}
 
     @cached_property
     def subset_terms(self) -> set[str]:
@@ -90,7 +185,9 @@ class Indexer:
         """
         return self.ncbi_taxon_adapter.label(id)
 
-    def _get_closures(self, terms: Collection[str]) -> Tuple[List[TermObject], List[TermObject]]:
+    def _get_closures(
+        self, terms: Collection[str]
+    ) -> Tuple[List[TermObject], List[TermObject]]:
         """
         Get direct terms and their transitive closure.
 
@@ -110,13 +207,17 @@ class Indexer:
             TermObject(
                 id=t,
                 label=self._go_label(t),
-            ) for t in terms if t is not None
+            )
+            for t in terms
+            if t is not None
         ]
         closure = [
             TermObject(
                 id=t,
                 label=self._go_label(t),
-            ) for t in ancs if t is not None and not t.startswith("BFO:")
+            )
+            for t in ancs
+            if t is not None and not t.startswith("BFO:")
         ]
         return objs, closure
 
@@ -160,6 +261,7 @@ class Indexer:
         qi.number_of_activities = len(model.activities or [])
         all_causal_associations = []
         all_refs = set()
+        all_provided_bys: set[str] = set()
         all_mfs = set()
         all_enabled_bys = set()
         all_enabled_by_genes = set()
@@ -179,27 +281,21 @@ class Indexer:
 
             return x
 
-        def term_association_references(
-            term_association: Optional[TermAssociation],
-        ) -> Set[str]:
-            """
-            Extract references from a TermAssociation.
-
-            Returns:
-                Set[str]: A set of reference strings extracted from the evidence of the TermAssociation.
-            """
-            refs = set()
-            if term_association and term_association.evidence:
-                refs = {e.reference for e in term_association.evidence if e.reference}
-            return refs
+        all_provided_bys.update(_iter_provided_bys(model))
 
         for activity in model.activities or []:
+            all_provided_bys.update(_iter_provided_bys(activity))
+
             annoton_term_id_parts = []
             if activity.causal_associations:
                 all_causal_associations.extend(activity.causal_associations)
+                for causal_association in activity.causal_associations:
+                    all_refs.update(_iter_association_references(causal_association))
+                    all_provided_bys.update(_iter_provided_bys(causal_association))
 
             if activity.enabled_by:
-                all_refs.update(term_association_references(activity.enabled_by))
+                all_refs.update(_iter_association_references(activity.enabled_by))
+                all_provided_bys.update(_iter_provided_bys(activity.enabled_by))
                 all_enabled_bys.add(activity.enabled_by.term)
                 if isinstance(activity.enabled_by, EnabledByGeneProductAssociation):
                     all_enabled_by_genes.add(activity.enabled_by.term)
@@ -212,38 +308,28 @@ class Indexer:
 
             if activity.molecular_function:
                 all_refs.update(
-                    term_association_references(activity.molecular_function)
+                    _iter_association_references(activity.molecular_function)
                 )
+                all_provided_bys.update(_iter_provided_bys(activity.molecular_function))
                 all_mfs.add(activity.molecular_function.term)
                 annoton_term_id_parts.append(activity.molecular_function.term)
 
             if activity.part_of:
-                # Handle both single and list cases
-                if isinstance(activity.part_of, list):
-                    for ta in activity.part_of:
-                        all_refs.update(term_association_references(ta))
-                        all_parts_ofs.add(ta.term)
-                        annoton_term_id_parts.append(ta.term)
-                else:
-                    all_refs.update(term_association_references(activity.part_of))
-                    all_parts_ofs.add(activity.part_of.term)
-                    annoton_term_id_parts.append(activity.part_of.term)
+                all_refs.update(_iter_association_references(activity.part_of))
+                all_provided_bys.update(_iter_provided_bys(activity.part_of))
+                all_parts_ofs.add(activity.part_of.term)
+                annoton_term_id_parts.append(activity.part_of.term)
 
             if activity.occurs_in:
-                # Handle both single and list cases
-                if isinstance(activity.occurs_in, list):
-                    for ta in activity.occurs_in:
-                        all_refs.update(term_association_references(ta))
-                        all_occurs_ins.add(ta.term)
-                        annoton_term_id_parts.append(ta.term)
-                else:
-                    all_refs.update(term_association_references(activity.occurs_in))
-                    all_occurs_ins.add(activity.occurs_in.term)
-                    annoton_term_id_parts.append(activity.occurs_in.term)
+                all_refs.update(_iter_association_references(activity.occurs_in))
+                all_provided_bys.update(_iter_provided_bys(activity.occurs_in))
+                all_occurs_ins.add(activity.occurs_in.term)
+                annoton_term_id_parts.append(activity.occurs_in.term)
 
             if activity.has_input:
                 for ta in activity.has_input:
-                    all_refs.update(term_association_references(ta))
+                    all_refs.update(_iter_association_references(ta))
+                    all_provided_bys.update(_iter_provided_bys(ta))
                     all_has_inputs.add(ta.term)
                     annoton_term_id_parts.append(ta.term)
 
@@ -258,8 +344,19 @@ class Indexer:
 
         qi.number_of_enabled_by_terms = len(all_enabled_bys)
         qi.number_of_causal_associations = len(all_causal_associations)
-        all_refs = list(set(all_refs))
         qi.flattened_references = [PublicationObject(id=ref) for ref in all_refs]
+        qi.flattened_provided_by = sorted(
+            [
+                Object(
+                    id=provided_by,
+                    label=self.goc_groups.get(provided_by, {}).get(
+                        "label", provided_by
+                    ),
+                )
+                for provided_by in all_provided_bys
+            ],
+            key=lambda x: x.label,
+        )
         graph = self.model_to_digraph(model)
         # use nx to find the longest path and all SCCs
         if graph.number_of_nodes() > 0:
