@@ -55,8 +55,13 @@ def _iter_provided_bys(
         for prov in item.provenances:
             if prov.provided_by is not None:
                 yield from prov.provided_by
-
-
+    # Also extract from evidence item provenances
+    if isinstance(item, Association) and item.evidence is not None:
+        for evidence in item.evidence:
+            if evidence.provenances is not None:
+                for prov in evidence.provenances:
+                    if prov.provided_by is not None:
+                        yield from prov.provided_by
 class Indexer:
     """
     Indexes GO-CAM models for querying and analysis.
