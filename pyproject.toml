@@ -16,6 +16,7 @@ dependencies = [
     "linkml-runtime>=1.1.24,<2",
     "prefixmaps>=0.2.6,<0.3",
     "pydantic>=2,<3",
+    "pystow>=0.7.11",
     "pyyaml>=6,<7",
     "requests>=2,<3",
 ]

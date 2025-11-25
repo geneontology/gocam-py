@@ -1,4 +1,5 @@
 """Test for the indexer module."""
+
 import pytest
 import networkx as nx
 from linkml_runtime.loaders import yaml_loader
@@ -7,12 +8,15 @@ from gocam.datamodel import Model, QueryIndex
 from gocam.indexing.Indexer import Indexer
 
 from tests import EXAMPLES_DIR
+from tests.test_indexing import INPUT_DIR
 
 
 @pytest.fixture
 def example_model():
     """Load an example model for testing."""
-    return yaml_loader.load(f"{EXAMPLES_DIR}/Model-663d668500002178.yaml", target_class=Model)
+    return yaml_loader.load(
+        f"{EXAMPLES_DIR}/Model-663d668500002178.yaml", target_class=Model
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -55,7 +59,9 @@ def test_index_model(example_model):
     assert isinstance(example_model.query_index, QueryIndex)
 
     # Check that basic stats were calculated
-    assert example_model.query_index.number_of_activities == len(example_model.activities)
+    assert example_model.query_index.number_of_activities == len(
+        example_model.activities
+    )
 
     # Check that causal associations were counted
     assert example_model.query_index.number_of_causal_associations > 0
@@ -143,79 +149,76 @@ def test_indexer_populates_taxon_label():
 
 def test_indexer_gets_labels_from_model_objects():
     """Test that the indexer uses labels from the model's `objects` field when available."""
-    model = Model.model_validate({
-        "id": "test",
-        "title": "Test Model",
-        "taxon": "NCBITaxon:9606",
-        "activities": [
-            {
-                "id": "act1",
-                "enabled_by": {
-                    "type": "EnabledByGeneProductAssociation",
-                    "term": "UniProtKB:00001",
-                }
-            },
-            {
-                "id": "act2",
-                "enabled_by": {
-                    "type": "EnabledByGeneProductAssociation",
-                    "term": "UniProtKB:00002",
-                }
-            }
-        ],
-        "objects": [
-            {
-                "id": "UniProtKB:00001",
-                "label": "Test Gene"
-            }
-        ]
-    })
+    model = Model.model_validate(
+        {
+            "id": "test",
+            "title": "Test Model",
+            "taxon": "NCBITaxon:9606",
+            "activities": [
+                {
+                    "id": "act1",
+                    "enabled_by": {
+                        "type": "EnabledByGeneProductAssociation",
+                        "term": "UniProtKB:00001",
+                    },
+                },
+                {
+                    "id": "act2",
+                    "enabled_by": {
+                        "type": "EnabledByGeneProductAssociation",
+                        "term": "UniProtKB:00002",
+                    },
+                },
+            ],
+            "objects": [{"id": "UniProtKB:00001", "label": "Test Gene"}],
+        }
+    )
     indexer = Indexer()
     indexer.index_model(model)
     assert model.query_index.model_activity_enabled_by_terms is not None
     assert len(model.query_index.model_activity_enabled_by_terms) == 2
-    assert {term.label for term in model.query_index.model_activity_enabled_by_terms} == {"Test Gene", "Test Term"}
+    assert {
+        term.label for term in model.query_index.model_activity_enabled_by_terms
+    } == {"Test Gene", "Test Term"}
 
 
 def test_indexer_adds_complex_members_to_model_activity_enabled_by_genes():
     """Test that the indexer adds complex members to model_activity_enabled_by_genes."""
-    model = Model.model_validate({
-        "id": "test",
-        "title": "Test Model",
-        "taxon": "NCBITaxon:9606",
-        "activities": [
-            {
-                "id": "act1",
-                "enabled_by": {
-                    "type": "EnabledByProteinComplexAssociation",
-                    "term": "GO:00001",
-                    "members": ["UniProtKB:00001", "UniProtKB:00002"]
+    model = Model.model_validate(
+        {
+            "id": "test",
+            "title": "Test Model",
+            "taxon": "NCBITaxon:9606",
+            "activities": [
+                {
+                    "id": "act1",
+                    "enabled_by": {
+                        "type": "EnabledByProteinComplexAssociation",
+                        "term": "GO:00001",
+                        "members": ["UniProtKB:00001", "UniProtKB:00002"],
+                    },
                 }
-            }
-        ],
-        "objects": [
-            {
-                "id": "GO:00001",
-                "label": "Test Complex"
-            },
-            {
-                "id": "UniProtKB:00001",
-                "label": "Test Gene"
-            },
-            {
-                "id": "UniProtKB:00002",
-                "label": "Test Gene 2"
-            }
-        ]
-    })
+            ],
+            "objects": [
+                {"id": "GO:00001", "label": "Test Complex"},
+                {"id": "UniProtKB:00001", "label": "Test Gene"},
+                {"id": "UniProtKB:00002", "label": "Test Gene 2"},
+            ],
+        }
+    )
     indexer = Indexer()
     indexer.index_model(model)
 
     # The indexer should have unpacked the two complex members into model_activity_enabled_by_genes
     assert model.query_index.model_activity_enabled_by_genes is not None
     assert len(model.query_index.model_activity_enabled_by_genes) == 2
-    assert {gene.id for gene in model.query_index.model_activity_enabled_by_genes} == {"UniProtKB:00001", "UniProtKB:00002"}
-    assert {gene.label for gene in model.query_index.model_activity_enabled_by_genes} == {"Test Gene", "Test Gene 2"}
+    assert {gene.id for gene in model.query_index.model_activity_enabled_by_genes} == {
+        "UniProtKB:00001",
+        "UniProtKB:00002",
+    }
+    assert {
+        gene.label for gene in model.query_index.model_activity_enabled_by_genes
+    } == {"Test Gene", "Test Gene 2"}
 
     # The original complex term should still be in model_activity_enabled_by_terms
     assert model.query_index.model_activity_enabled_by_terms is not None
@@ -223,3 +226,26 @@ def test_indexer_adds_complex_members_to_model_activity_enabled_by_genes():
     assert model.query_index.model_activity_enabled_by_terms[0].id == "GO:00001"
     assert model.query_index.model_activity_enabled_by_terms[0].label == "Test Complex"
 
+
+def test_indexer_populates_flattened_provided_by():
+    """Test that the indexer populates flattened_provided_by correctly."""
+    with open(
+        INPUT_DIR / "test_indexer_populates_flattened_provided_by_model.yaml"
+    ) as f:
+        model = yaml_loader.load(f, target_class=Model)
+
+    indexer = Indexer(
+        goc_groups_yaml_path=INPUT_DIR
+        / "test_indexer_populates_flattened_provided_by_groups.yaml"
+    )
+    indexer.index_model(model)
+
+    assert model.query_index.flattened_provided_by is not None
+    assert len(model.query_index.flattened_provided_by) == 5
+    assert {provider.label for provider in model.query_index.flattened_provided_by} == {
+        "Test Group 1",
+        "Test Group 2",
+        "Test Group 3",
+        "Test Group 4",
+        "Test Group 5",
+    }
