@@ -46,10 +46,10 @@ def _iter_provided_bys(
     item: Association | Model | Activity | None,
 ) -> Iterable[str]:
     """
-    Extract all provided_by from an item with provenances.
+    Extract all provided_by strings from an item (Association, Model, or Activity) with provenances.
 
     Returns:
-        Iterable[str]: Iterable over provided_by strings extracted from the Association.
+        Iterable[str]: Iterable over provided_by strings extracted from the item's provenances.
     """
     if item is not None and item.provenances is not None:
         for prov in item.provenances:
@@ -75,6 +75,17 @@ class Indexer:
         goc_groups_yaml_path: Optional[str] = None,
         ncbi_taxon_adapter_descriptor: str = "sqlite:obo:ncbitaxon",
     ):
+        """
+        Initialize the Indexer.
+
+        Args:
+            subsets: List of GO subsets to use for rollup. Defaults to ["goslim_generic"].
+            go_adapter_descriptor: OAK adapter descriptor for GO ontology. Defaults to "sqlite:obo:go".
+            goc_groups_yaml_path: Optional path to a YAML file containing GOC group metadata.
+                If not provided, fetches from https://current.geneontology.org/metadata/groups.yaml.
+                The YAML file should be a list of group dictionaries, each with an "id" key and other metadata.
+            ncbi_taxon_adapter_descriptor: OAK adapter descriptor for NCBI Taxonomy. Defaults to "sqlite:obo:ncbitaxon".
+        """
         self._subsets = subsets if subsets is not None else ["goslim_generic"]
         self._go_adapter_descriptor = go_adapter_descriptor
         self._goc_groups_yaml_path = goc_groups_yaml_path
@@ -102,7 +113,33 @@ class Indexer:
 
     @cached_property
     def goc_groups(self) -> dict[str, dict]:
-        """Get metadata about GOC groups."""
+        """
+        Get metadata about GOC (Gene Ontology Consortium) groups.
+
+        GOC groups are organizational units within the Gene Ontology Consortium,
+        each representing a contributing group or database. This property loads
+        metadata about these groups from a YAML file, either from a provided path
+        or by downloading from the GOC website and caching locally using pystow.
+
+        The returned dictionary maps group IDs (str) to their metadata (dict),
+        where each metadata dictionary contains fields such as 'label' and other
+        group attributes.
+
+        If the YAML file is unavailable (e.g., the specified path does not exist),
+        a FileNotFoundError is raised. If the YAML file is malformed, a
+        yaml.YAMLError is raised.
+
+        Caching behavior:
+            - The property is cached per Indexer instance via @cached_property.
+            - If downloading, the YAML file is cached locally using pystow.
+
+        Returns:
+            dict[str, dict]: Dictionary mapping group IDs to metadata dictionaries.
+
+        Raises:
+            FileNotFoundError: If the specified goc_groups_yaml_path doesn't exist.
+            yaml.YAMLError: If the YAML file is malformed.
+        """
         if self._goc_groups_yaml_path is not None:
             path = self._goc_groups_yaml_path
         else:
