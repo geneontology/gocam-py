@@ -2,10 +2,10 @@ import json
 
 import pytest
 import yaml
-from click.testing import CliRunner
+from typer.testing import CliRunner
 
 from gocam import __version__
-from gocam.cli import cli
+from gocam.cli import app
 from tests import EXAMPLES_DIR, INPUT_DIR
 
 
@@ -25,7 +25,7 @@ def api_mock(requests_mock):
 
 
 def test_fetch_yaml(runner, api_mock):
-    result = runner.invoke(cli, ["fetch", "--format", "yaml", "5b91dbd100002057"])
+    result = runner.invoke(app, ["fetch", "--format", "yaml", "5b91dbd100002057"])
     assert result.exit_code == 0
 
     parsed_output = yaml.safe_load(result.stdout)
@@ -33,7 +33,7 @@ def test_fetch_yaml(runner, api_mock):
 
 
 def test_fetch_json(runner, api_mock):
-    result = runner.invoke(cli, ["fetch", "--format", "json", "5b91dbd100002057"])
+    result = runner.invoke(app, ["fetch", "--format", "json", "5b91dbd100002057"])
     assert result.exit_code == 0
 
     parsed_output = json.loads(result.stdout)
@@ -41,7 +41,7 @@ def test_fetch_json(runner, api_mock):
 
 
 def test_version(runner):
-    result = runner.invoke(cli, ["--version"])
+    result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
     assert __version__ in result.stdout
 
@@ -49,7 +49,7 @@ def test_version(runner):
 @pytest.mark.parametrize("format", ["json", "yaml"])
 def test_convert_to_cx2_from_file(runner, format):
     result = runner.invoke(
-        cli,
+        app,
         [
             "convert",
             "-O",
@@ -66,7 +66,7 @@ def test_convert_to_cx2_from_file(runner, format):
 def test_convert_to_cx2_from_stdin(runner, format):
     with open(EXAMPLES_DIR / f"Model-663d668500002178.{format}") as f:
         result = runner.invoke(
-            cli, ["convert", "-O", "cx2", "-I", format], input=f.read()
+            app, ["convert", "-O", "cx2", "-I", format], input=f.read()
         )
     assert result.exit_code == 0
     cx2 = json.loads(result.stdout)
@@ -76,7 +76,7 @@ def test_convert_to_cx2_from_stdin(runner, format):
 def test_convert_to_cx2_to_file(runner, tmp_path):
     output_path = tmp_path / "test.cx2"
     result = runner.invoke(
-        cli,
+        app,
         [
             "convert",
             "-O",
