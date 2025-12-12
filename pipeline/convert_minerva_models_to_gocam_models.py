@@ -91,9 +91,9 @@ def process_minerva_model_file(
 
     Returns:
         tuple: A tuple indicating the result of the processing. Possible values are:
-            - (Result.SUCCESS, None): If the conversion was successful.
-            - (Result.FILTERED, FilterReason): If the model was filtered out, along with the reason.
-            - (Result.ERROR, ErrorReason): If there was an error, along with the reason.
+            - (ResultType.SUCCESS, None): If the conversion was successful.
+            - (ResultType.FILTERED, FilterReason): If the model was filtered out, along with the reason.
+            - (ResultType.ERROR, ErrorReason): If there was an error, along with the reason.
     """
     # Read Minerva model from JSON file
     try:
@@ -177,7 +177,7 @@ def print_summary(
     filtered_count = sum(len(v) for v in filtered_by_reason.values())
     error_count = sum(len(v) for v in error_by_reason.values())
 
-    tree = Tree(f"[bold]Processed {total_count} models [bold]")
+    tree = Tree(f"[bold]Processed {total_count} models[/bold]")
     if success_count > 0:
         tree.add(f"Successfully converted [b]{success_count}[/b] models", style="green")
 
