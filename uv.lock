@@ -496,6 +496,7 @@ dependencies = [
     { name = "pystow" },
     { name = "pyyaml" },
     { name = "requests" },
+    { name = "rich" },
     { name = "typer" },
 ]
 
@@ -534,6 +535,7 @@ requires-dist = [
     { name = "pystow", specifier = ">=0.7.11" },
     { name = "pyyaml", specifier = ">=6,<7" },
     { name = "requests", specifier = ">=2,<3" },
+    { name = "rich", specifier = ">=14.2.0" },
     { name = "typer", specifier = ">=0.9,<1" },
 ]
 provides-extras = ["cx2", "oaklib", "owl"]
