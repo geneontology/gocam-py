@@ -19,6 +19,7 @@ dependencies = [
     "pystow>=0.7.11",
     "pyyaml>=6,<7",
     "requests>=2,<3",
+    "rich>=14.2.0",
 ]
 
 [project.optional-dependencies]
