@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 """
-Minerva Model to GO-CAM Model Converter
+Convert Minerva models to GO-CAM models, filtering out models that are definitely not GO-CAM shaped.
+
+This script reads Minerva model JSON files from a specified input directory, converts them to
+GO-CAM models, and saves the converted models to an output directory. Models that do not meet very
+basic connectivity criteria are filtered out. At least one of the following conditions must be met:
+
+- The model has at least one activity with a direct causal association to another activity.
+- The model has at least one activity with an indirect association to another activity via
+  input and output associations to the same chemical entity.
+
+The models which pass the connectivity criteria are written to the output directory. They may or may
+not be True GO-CAM models. This output set is designed for QC analysis and further downstream
+filtering.
 """
 
 import json
@@ -15,6 +27,7 @@ from rich.tree import Tree
 from typing import Annotated, Literal, TypeAlias
 
 from gocam.translation import MinervaWrapper
+from gocam.datamodel import Activity, Model
 
 import typer
 
@@ -60,6 +73,53 @@ def setup_logger(verbose: int) -> None:
     else:
         level = logging.DEBUG
     logging.basicConfig(level=level, format="%(message)s", handlers=[RichHandler()])
+
+
+def activity_has_direct_causal_association(activity: Activity) -> bool:
+    """Check if the activity has at least one direct causal association to another activity.
+
+    Args:
+        activity: The activity object.
+
+    Returns:
+        bool: True if the activity has at least one direct causal association, False otherwise.
+    """
+    return bool(activity.causal_associations)
+
+
+def activity_has_indirect_chemical_association(
+    activity: Activity, model: Model
+) -> bool:
+    """Check if the activity has at least one indirect association to another activity via input
+    and output associations to the same chemical entity.
+
+    Args:
+        activity: The activity object.
+        model: The GO-CAM model object.
+
+    Returns:
+        bool: True if the activity has at least one indirect chemical association, False otherwise.
+    """
+    all_outputs = []
+    if activity.has_output:
+        all_outputs.extend(activity.has_output)
+    if activity.has_primary_output:
+        all_outputs.append(activity.has_primary_output)
+
+    for output in all_outputs:
+        for other_activity in model.activities or []:
+            if other_activity.id == activity.id:
+                continue
+
+            all_inputs = []
+            if other_activity.has_input:
+                all_inputs.extend(other_activity.has_input)
+            if other_activity.has_primary_input:
+                all_inputs.append(other_activity.has_primary_input)
+
+            if output.term in {inp.term for inp in all_inputs}:
+                return True
+    return False
 
 
 def minerva_model_uses_complement(minerva_model: dict) -> bool:
@@ -112,14 +172,18 @@ def process_minerva_model_file(
         )
     except Exception as e:
         logger.error(
-            f"Error converting Minerva model to GO-CAM model for {json_file}", exc_info=e
+            f"Error converting Minerva model to GO-CAM model for {json_file}",
+            exc_info=e,
         )
         return ResultType.ERROR, ErrorReason.CONVERSION_ERROR
 
     # Detect if there is at least one activity edge in the model. If not, skip writing the model.
     has_activity_edge = False
     for activity in gocam_model.activities or []:
-        if activity.causal_associations:
+        if activity_has_direct_causal_association(activity):
+            has_activity_edge = True
+            break
+        if activity_has_indirect_chemical_association(activity, gocam_model):
             has_activity_edge = True
             break
     if not has_activity_edge:
@@ -259,7 +323,7 @@ def main(
     ] = 0,
 ):
     """
-    Convert Minerva models to GO-CAM models
+    Convert Minerva models to GO-CAM models, with basic connectivity filtering.
     """
     setup_logger(verbose)
 
