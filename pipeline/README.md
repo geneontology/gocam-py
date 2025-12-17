@@ -13,7 +13,7 @@ Converts Minerva model JSON files to GO-CAM model format, doing basic filtering 
 **Filtering:**
 
 Models are filtered out and not written if they:
-- Have no activity edges (no causal associations between any activities)
+- Have no activity edges (no activities linked by causal associations or shared chemical inputs/outputs)
 - Use complement types
 
 **Outputs:**
