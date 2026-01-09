@@ -164,6 +164,9 @@ lint-fix-python:
 	$(RUN) ruff check --fix
 	$(RUN) ruff format
 
+type-check:
+	$(RUN) ty check
+
 check-config:
 ifndef LINKML_SCHEMA_NAME
 	$(error **Project not configured**:\n\n - See '.env.public'\n\n)
