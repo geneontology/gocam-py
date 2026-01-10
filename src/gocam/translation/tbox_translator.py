@@ -1,17 +1,15 @@
 from dataclasses import dataclass, field
-from typing import Iterator, Union, Iterable, Optional, Dict, List
+from typing import Iterator, Union, Iterable, Optional, Dict, List, Literal
 
-from mkdocs.commands.serve import serve
 from oaklib.datamodels.vocabulary import IN_TAXON, RDFS_LABEL, PART_OF, IS_A, HAS_PART, MOLECULAR_FUNCTION, HAS_OUTPUT
-from pyhornedowl.pyhornedowl import PyIndexedOntology
+from pyhornedowl import PyIndexedOntology
 
-from gocam.datamodel import Model, Activity, TermAssociation, BiologicalProcessAssociation, \
-    CellularAnatomicalEntityTermObject, CellularAnatomicalEntityAssociation, CellTypeAssociation, \
-    GrossAnatomyAssociation, EnabledByProteinComplexAssociation, EnabledByGeneProductAssociation, MoleculeAssociation, \
-    MolecularFunctionAssociation
+from gocam.datamodel import Model, Activity, BiologicalProcessAssociation, \
+    CellularAnatomicalEntityAssociation, CellTypeAssociation, \
+    GrossAnatomyAssociation, EnabledByProteinComplexAssociation, EnabledByGeneProductAssociation, MoleculeAssociation
 from gocam.translation.minerva_wrapper import OCCURS_IN, HAS_INPUT, HAS_PRIMARY_INPUT, HAS_PRIMARY_OUTPUT, ENABLED_BY
-import pyhornedowl
-from pyhornedowl.model import SubClassOf, ObjectSomeValuesFrom, IRI, Class, ObjectProperty, DeclareClass, \
+
+from pyhornedowl.model import SubClassOf, ObjectSomeValuesFrom, IRI, Class, ObjectProperty, \
     AnnotationAssertion, Annotation, SimpleLiteral
 import logging
 
@@ -21,6 +19,7 @@ HAPPENS_DURING = "RO:0002092"
 
 SIMPLE_AXIOM = Union[SubClassOf, AnnotationAssertion]
 
+SERIALIZATION = Literal["owl", "rdf", "ofn", "owx"]
 
 @dataclass
 class TBoxTranslator:
@@ -48,8 +47,9 @@ class TBoxTranslator:
             self._label_map = {}
         if id not in self._label_map:
             # note: preserves map from last iteration...
-            for term_obj in model.objects:
-                self._label_map[term_obj.id] = term_obj.label
+            if model.objects:
+                for term_obj in model.objects:
+                    self._label_map[term_obj.id] = term_obj.label or term_obj.id
         return self._label_map.get(id, id)
 
     def load_models(self, models: Iterable[Model]) -> None:
@@ -64,7 +64,7 @@ class TBoxTranslator:
             for axiom in self.translate_model_iter(model):
                 self.ontology.add_axiom(axiom)
 
-    def save_ontology(self, path: str, serialization : Optional[str] = None) -> None:
+    def save_ontology(self, path: str, serialization : SERIALIZATION | None = None) -> None:
         """
         Save the current ontology to a file.
 
@@ -84,9 +84,10 @@ class TBoxTranslator:
         """
         yield from self.add_annotation(model.id, RDFS_LABEL, model.title)
         yield from self.add_edge(model.id, IS_A, "gocam:Model")
-        for a in model.activities:
-            yield from self.translate_activity(model, a)
-            # yield from self.add_edge(a.id, PART_OF, model.id)
+        if model.activities:
+            for a in model.activities:
+                yield from self.translate_activity(model, a)
+                # yield from self.add_edge(a.id, PART_OF, model.id)
         taxon = model.taxon
         if taxon:
             yield from self.add_annotation(model.id, IN_TAXON, taxon)
@@ -94,7 +95,7 @@ class TBoxTranslator:
             logger.warning(f"Model {model.id} has no taxon")
 
     def translate_activity(self, model: Model, activity: Activity) -> Iterator[SIMPLE_AXIOM]:
-        if activity.molecular_function:
+        if activity.molecular_function and activity.molecular_function.term:
             mf_term_id = activity.molecular_function.term
             mf_label = self._label(model, mf_term_id)
         else:
@@ -104,14 +105,15 @@ class TBoxTranslator:
         yield from self.add_edge(activity.id, IS_A, "gocam:Activity")
 
         eb = activity.enabled_by
-        if eb:
+        if eb and eb.term:
             if isinstance(eb, EnabledByProteinComplexAssociation):
                 pc_id = self.make_id(model, eb.term, *eb.members)
                 yield from self.add_edge(activity.id, ENABLED_BY, pc_id)
-                member_labels = []
-                for m in eb.members:
-                    yield from self.add_edge(pc_id, HAS_PART, m)
-                    member_labels.append(self._label(model, m))
+                member_labels: list[str] = []
+                if eb.members:
+                    for m in eb.members:
+                        yield from self.add_edge(pc_id, HAS_PART, m)
+                        member_labels.append(self._label(model, m))
                 eb_label = f"{self._label(model, eb.term)}[{' '.join(member_labels)}]"
             elif isinstance(eb, EnabledByGeneProductAssociation):
                 yield from self.add_edge(activity.id, ENABLED_BY, eb.term)
@@ -124,7 +126,8 @@ class TBoxTranslator:
         if activity.causal_associations:
             for ca in activity.causal_associations:
                 predicate = ca.predicate
-                yield from self.add_edge(activity.id, predicate, ca.downstream_activity)
+                if predicate and ca.downstream_activity:
+                    yield from self.add_edge(activity.id, predicate, ca.downstream_activity)
         if activity.part_of:
             yield from self.translate_biological_process(model, activity.id, activity.part_of)
         else:
@@ -132,20 +135,14 @@ class TBoxTranslator:
         if activity.occurs_in:
             yield from self.translate_cellular_anatomical_entity(model, activity.id, activity.occurs_in)
         yield from self.translate_io(activity.id, activity.has_input, HAS_INPUT)
-        yield from self.translate_io(activity.id, [activity.has_primary_input], HAS_PRIMARY_INPUT)
+        yield from self.translate_io(activity.id, activity.has_primary_input, HAS_PRIMARY_INPUT)
         yield from self.translate_io(activity.id, activity.has_output, HAS_OUTPUT)
-        yield from self.translate_io(activity.id, [activity.has_primary_output], HAS_PRIMARY_OUTPUT)
-
-    def _process_part_of_root(self, model: Model, ta: Union[Activity, BiologicalProcessAssociation]) -> str:
-        if ta.part_of:
-            return self._process_part_of_root(model, ta.part_of)
-        elif isinstance(ta, Activity):
-            return ta.id
-        else:
-            return ta.term
+        yield from self.translate_io(activity.id, activity.has_primary_output, HAS_PRIMARY_OUTPUT)
 
 
     def translate_biological_process(self, model: Model, child: str, ta: BiologicalProcessAssociation) -> Iterator[SIMPLE_AXIOM]:
+        if not ta.term:
+            return
         bp_term_id = ta.term
         bp_id = self.make_id(model, bp_term_id)
         label = f"{self._label(model, bp_term_id)} in {self._label(model, model.id)}"
@@ -161,6 +158,8 @@ class TBoxTranslator:
             yield from self.add_edge(bp_id, HAPPENS_DURING, ta.happens_during)
 
     def translate_cellular_anatomical_entity(self, model: Model, child: str, ta: CellularAnatomicalEntityAssociation,) -> Iterator[SIMPLE_AXIOM]:
+        if not ta.term:
+            return
         cc_term_id = ta.term
         cc_id = self.make_id(model, cc_term_id)
         label = f"{self._label(model, cc_term_id)} in {self._label(model, model.id)}"
@@ -172,6 +171,8 @@ class TBoxTranslator:
             yield from self.translate_anatomical(model, cc_id, ta.part_of)
 
     def translate_anatomical(self, model: Model, child: str, ta: Union[CellTypeAssociation, GrossAnatomyAssociation]):
+        if not ta.term:
+            return
         anat_term_id = ta.term
         anat_id = self.make_id(model, anat_term_id)
         yield from self.add_edge(child, PART_OF, anat_id)
@@ -180,7 +181,11 @@ class TBoxTranslator:
             # recursive; predicate switches to
             yield from self.translate_anatomical(model, anat_id, ta.part_of)
 
-    def translate_io(self, subject: str, tas: Optional[List[MoleculeAssociation]], predicate: str) -> Iterator[SubClassOf]:
+    def translate_io(self, subject: str, tas: MoleculeAssociation | List[MoleculeAssociation] | None, predicate: str) -> Iterator[SubClassOf]:
+        if tas is None:
+            return
+        if isinstance(tas, MoleculeAssociation):
+            tas = [tas]
         if tas:
             for ta in tas:
                 if ta and ta.term and subject:
@@ -228,8 +233,8 @@ class TBoxTranslator:
     def get_predicate(self, id: str) -> ObjectProperty:
         return self.ontology.object_property(str(self.iri(id)))
 
-    def make_id(self, model: Model, *other_ids: str) -> str:
-        other_ids_flat = "_".join(other_ids)
+    def make_id(self, model: Model, *other_ids: str | None) -> str:
+        other_ids_flat = "_".join(oid for oid in other_ids if oid)
         return f"{model.id}_{other_ids_flat}"
 
 

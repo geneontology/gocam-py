@@ -11,7 +11,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Iterable
 from urllib.request import urlretrieve
 
 import typer
@@ -138,10 +138,13 @@ def fetch(
     if add_indexes:
         indexer = Indexer()
 
-    if not model_ids:
-        model_ids = wrapper.models_ids()
+    model_id_iter: Iterable[str]
+    if model_ids:
+        model_id_iter = model_ids
+    else:
+        model_id_iter = wrapper.models_ids()
 
-    for model_id in model_ids:
+    for model_id in model_id_iter:
         if as_minerva:
             model_dict = wrapper.fetch_minerva_object(model_id)
         else:
@@ -165,7 +168,8 @@ def convert(
         Literal["cx2", "owl"],
         typer.Option("--output-format", "-O", help="Output format"),
     ],
-    model: Annotated[typer.FileText, typer.Argument(help="Input model file")] = "-",
+    # Typer doesn't handle typing of '-' for stdin/stdout well, so we use ty:ignore here
+    model: Annotated[typer.FileText, typer.Argument(help="Input model file")] = "-",  # ty:ignore[invalid-parameter-default]
     input_format: Annotated[
         Optional[Literal["json", "yaml"]],
         typer.Option(
@@ -176,7 +180,7 @@ def convert(
     ] = None,
     output: Annotated[
         typer.FileTextWrite, typer.Option("--output", "-o", help="Output file")
-    ] = "-",
+    ] = "-",  # ty:ignore[invalid-parameter-default]
     dot_layout: Annotated[
         bool, typer.Option(help="Apply dot layout (requires Graphviz)")
     ] = False,

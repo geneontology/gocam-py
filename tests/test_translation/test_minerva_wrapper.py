@@ -36,6 +36,7 @@ def test_object(id):
     enabled_by_facts = [
         fact for fact in minerva_object["facts"] if fact["property"] == ENABLED_BY
     ]
+    assert model.activities is not None
     assert len(model.activities) == len(enabled_by_facts)
 
 
@@ -47,12 +48,13 @@ def test_protein_complex():
 
     protein_complex_activities = [
         a
-        for a in model.activities
+        for a in model.activities or []
         if isinstance(a.enabled_by, EnabledByProteinComplexAssociation)
     ]
     assert len(protein_complex_activities) == 1
 
     protein_complex_activity = protein_complex_activities[0]
+    assert isinstance(protein_complex_activity.enabled_by, EnabledByProteinComplexAssociation)
     assert protein_complex_activity.enabled_by.members == [
         "MGI:MGI:1929608",
         "MGI:MGI:103038",
@@ -67,7 +69,7 @@ def test_has_input_and_has_output():
 
     activities_with_input = []
     activities_with_output = []
-    for activity in model.activities:
+    for activity in (model.activities or []):
         if activity.has_input:
             activities_with_input.append(activity)
         if activity.has_output:
@@ -97,15 +99,15 @@ def test_has_input_issue_65():
     model = mw.minerva_object_to_model(minerva_object)
 
     # Find activities with inputs
-    activities_with_input = [a for a in model.activities if a.has_input is not None]
+    activities_with_input = [a for a in (model.activities or []) if a.has_input is not None]
 
     # Verify that all inputs are included, even protein inputs
     for activity in activities_with_input:
-        for input_assoc in activity.has_input:
+        for input_assoc in (activity.has_input or []):
             # Check if the input term is also the term of an enabled_by for any activity
             is_protein = any(
                 a.enabled_by.term == input_assoc.term
-                for a in model.activities
+                for a in (model.activities or [])
                 if a.enabled_by is not None
             )
             # If this test passes, it means we're no longer filtering at the core data model level
@@ -120,7 +122,7 @@ def test_multivalued_input_and_output():
     model = mw.minerva_object_to_model(minerva_object)
 
     cs_activity = next(
-        a for a in model.activities if a.molecular_function.term == "GO:0004108"
+        a for a in (model.activities or []) if a.molecular_function and a.molecular_function.term == "GO:0004108"
     )
     assert len(cs_activity.has_input) == 3
     assert len(cs_activity.has_output) == 2
@@ -133,7 +135,7 @@ def test_missing_enabled_by():
 
     # Find activities without an enabled_by association
     activities_without_enabled_by = [
-        a for a in model.activities if a.enabled_by is None
+        a for a in (model.activities or []) if a.enabled_by is None
     ]
 
     # Verify that there are no such activities
@@ -161,12 +163,12 @@ def test_provenance_on_evidence():
     model = mw.minerva_object_to_model(minerva_object)
 
     # assert that provenances of evidence has more than one contributor and provided_by
-    for activity in model.activities:
-        for association in activity.causal_associations:
-            for evidence in association.evidence:
-                for provenance in evidence.provenances:
-                    assert len(provenance.contributor) > 1
-                    assert len(provenance.provided_by) > 1
+    for activity in model.activities or []:
+        for association in activity.causal_associations or []:
+            for evidence in association.evidence or []:
+                for provenance in evidence.provenances or []:
+                    assert len(provenance.contributor or []) > 1
+                    assert len(provenance.provided_by or []) > 1
 
 
 def test_provenance_on_model():
@@ -179,13 +181,13 @@ def test_provenance_on_model():
     assert model.provenances is not None
     assert len(model.provenances) == 1
     provenance = model.provenances[0]
-    assert set(provenance.contributor) == {
+    assert set(provenance.contributor or []) == {
         "https://orcid.org/0000-0001-7646-0052",
         "https://orcid.org/0000-0001-8769-177X",
         "https://orcid.org/0000-0002-1706-4196",
         "https://orcid.org/0000-0003-1813-6857",
     }
-    assert set(provenance.provided_by) == {
+    assert set(provenance.provided_by or []) == {
         "http://geneontology.org",
         "http://www.wormbase.org",
         "https://www.uniprot.org",
@@ -200,7 +202,7 @@ def test_provenance_on_associations():
     mw = MinervaWrapper()
     model = mw.minerva_object_to_model(minerva_object)
 
-    for activity in model.activities:
+    for activity in model.activities or []:
         if activity.causal_associations is not None:
             for causal_assoc in activity.causal_associations:
                 assert causal_assoc.provenances is not None
@@ -244,7 +246,7 @@ def test_evidence_with_objects():
     model = mw.minerva_object_to_model(minerva_object)
 
     kinase_activity = next(
-        (a for a in model.activities if a.molecular_function.term == "GO:0004674"), None
+        (a for a in model.activities or [] if a.molecular_function and a.molecular_function.term == "GO:0004674"), None
     )
     assert kinase_activity is not None
     assert len(kinase_activity.enabled_by.evidence) == 1
@@ -296,7 +298,7 @@ def test_additional_taxa():
             "annotations": []
         }
     ]
-    
+
     minerva_object["facts"] = [
         {
             "subject": "gomodel:test123/activity1",
@@ -305,12 +307,13 @@ def test_additional_taxa():
             "annotations": []
         }
     ]
-    
+
     mw = MinervaWrapper()
     model = mw.minerva_object_to_model(minerva_object)
     
     # Verify that the model makes human the primary taxon and E. coli additional
     assert model.taxon == "NCBITaxon:9606"
+    assert model.additional_taxa is not None
     assert len(model.additional_taxa) == 1
     assert model.additional_taxa[0] == "NCBITaxon:562"
     
@@ -334,6 +337,7 @@ def test_additional_taxa():
     
     # When no hosts, the first taxon should be primary
     assert model.taxon == "NCBITaxon:562"
+    assert model.additional_taxa is not None
     assert len(model.additional_taxa) == 1
     assert model.additional_taxa[0] == "NCBITaxon:623"
 
@@ -366,5 +370,6 @@ def test_host_taxon_prioritization():
     
     # Verify the model prioritizes the host taxon as primary, even though it was added second
     assert model.taxon == "NCBITaxon:9606"
+    assert model.additional_taxa is not None
     assert len(model.additional_taxa) == 1
     assert model.additional_taxa[0] == "NCBITaxon:623"
