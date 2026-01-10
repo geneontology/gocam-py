@@ -523,6 +523,10 @@ dev = [
     { name = "schemasheets" },
     { name = "ty" },
 ]
+lint = [
+    { name = "ruff" },
+    { name = "ty" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -550,6 +554,10 @@ dev = [
     { name = "requests-mock", specifier = ">=1.12.1,<2" },
     { name = "ruff", specifier = ">=0.6.9,<0.7" },
     { name = "schemasheets", specifier = ">=0.1.14,<0.2" },
+    { name = "ty", specifier = ">=0.0.10" },
+]
+lint = [
+    { name = "ruff", specifier = ">=0.6.9,<0.7" },
     { name = "ty", specifier = ">=0.0.10" },
 ]
 
