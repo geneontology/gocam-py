@@ -230,14 +230,16 @@ def print_summary(
     """
     total_count = len(results)
     success_count = sum(1 for _, (result, _) in results if result == ResultType.SUCCESS)
-    filtered_by_reason: defaultdict[FilterReason, list[str]] = defaultdict(list)
-    error_by_reason: defaultdict[ErrorReason, list[str]] = defaultdict(list)
+    filtered_by_reason: defaultdict[str, list[str]] = defaultdict(list)
+    error_by_reason: defaultdict[str, list[str]] = defaultdict(list)
     for json_file, (result, reason) in results:
+        if reason is None:
+            continue
         model_id = json_file.stem
         if result == ResultType.FILTERED:
-            filtered_by_reason[reason].append(model_id)
+            filtered_by_reason[reason.value].append(model_id)
         elif result == ResultType.ERROR:
-            error_by_reason[reason].append(model_id)
+            error_by_reason[reason.value].append(model_id)
     filtered_count = sum(len(v) for v in filtered_by_reason.values())
     error_count = sum(len(v) for v in error_by_reason.values())
 
@@ -252,7 +254,7 @@ def print_summary(
         )
         for reason, ids in filtered_by_reason.items():
             reason_branch = filtered_branch.add(
-                f"{reason.value}: [b]{len(ids)}[/b] models"
+                f"{reason}: [b]{len(ids)}[/b] models"
             )
             for model_id in ids[:max_ids]:
                 reason_branch.add(model_id)
@@ -268,7 +270,7 @@ def print_summary(
         )
         for reason, ids in error_by_reason.items():
             reason_branch = error_branch.add(
-                f"{reason.value}: [b]{len(ids)}[/b] models"
+                f"{reason}: [b]{len(ids)}[/b] models"
             )
             for model_id in ids[:max_ids]:
                 reason_branch.add(model_id)

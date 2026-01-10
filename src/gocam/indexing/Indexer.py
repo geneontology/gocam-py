@@ -1,6 +1,7 @@
 import logging
 from collections.abc import Iterable
 from functools import cached_property, lru_cache
+from pathlib import Path
 from typing import Collection, List, Optional, Tuple
 
 import networkx as nx
@@ -77,7 +78,7 @@ class Indexer:
         *,
         subsets: list[str] | None = None,
         go_adapter_descriptor: str = "sqlite:obo:go",
-        goc_groups_yaml_path: Optional[str] = None,
+        goc_groups_yaml_path: Optional[str | Path] = None,
         ncbi_taxon_adapter_descriptor: str = "sqlite:obo:ncbitaxon",
     ):
         """
