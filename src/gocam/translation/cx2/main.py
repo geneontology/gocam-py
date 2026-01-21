@@ -79,7 +79,7 @@ def model_to_cx2(
         except ValueError:
             return curie
 
-    def _format_evidence_list(evidence_list: List[EvidenceItem]) -> str:
+    def _format_evidence_list(evidence_list: List[EvidenceItem] | None) -> str:
         """Format a list of evidence items as an HTML unordered list."""
         if evidence_list is None:
             return ""
@@ -130,6 +130,8 @@ def model_to_cx2(
         if not isinstance(associations, list):
             associations = [associations]
         for association in associations:
+            if association.term is None:
+                continue
             # Filter proteins at CX2 level (per issue #65)
             # Skip if the term is an INFORMATION_BIOMACROMOLECULE
             # We check if it's already in activity_nodes_by_enabled_by_id as a simple
@@ -176,8 +178,8 @@ def model_to_cx2(
     cx2_network.add_network_attribute("labels", [gocam.id], "list_of_string")
 
     # Add nodes for activities, labeled by the activity's enabled_by object
-    for activity in gocam.activities:
-        if activity.enabled_by is None:
+    for activity in gocam.activities or []:
+        if activity.enabled_by is None or activity.enabled_by.term is None:
             continue
 
         if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
@@ -201,7 +203,7 @@ def model_to_cx2(
             "type": node_type.value,
         }
 
-        if node_type == NodeType.COMPLEX and activity.enabled_by.members:
+        if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation) and activity.enabled_by.members:
             node_attributes["member"] = []
             for member in activity.enabled_by.members:
                 member_name = _get_object_label(member)
@@ -234,54 +236,56 @@ def model_to_cx2(
         activity_nodes_by_enabled_by_id[activity.enabled_by.term] = node
 
     # Add nodes for input/output molecules and create edges to activity nodes
-    for activity in gocam.activities:
-        _add_input_output_nodes(
-            activity.has_input, {"name": "has input", "represents": "RO:0002233"}
-        )
-        _add_input_output_nodes(
-            activity.has_output, {"name": "has output", "represents": "RO:0002234"}
-        )
-        _add_input_output_nodes(
-            activity.has_primary_input,
-            {"name": "has primary input", "represents": "RO:0004009"},
-        )
-        _add_input_output_nodes(
-            activity.has_primary_output,
-            {"name": "has primary output", "represents": "RO:0004008"},
-        )
+    if gocam.activities:
+        for activity in gocam.activities:
+            _add_input_output_nodes(
+                activity.has_input, {"name": "has input", "represents": "RO:0002233"}
+            )
+            _add_input_output_nodes(
+                activity.has_output, {"name": "has output", "represents": "RO:0002234"}
+            )
+            _add_input_output_nodes(
+                activity.has_primary_input,
+                {"name": "has primary input", "represents": "RO:0004009"},
+            )
+            _add_input_output_nodes(
+                activity.has_primary_output,
+                {"name": "has primary output", "represents": "RO:0004008"},
+            )
 
     # Add edges for causal associations between activity nodes
-    for activity in gocam.activities:
-        if activity.causal_associations is None:
-            continue
+    if gocam.activities:
+        for activity in gocam.activities:
+            if activity.causal_associations is None:
+                continue
 
-        for association in activity.causal_associations:
-            if association.downstream_activity in activity_nodes_by_activity_id:
-                relation_style = RELATIONS.get(association.predicate, None)
-                if relation_style is None:
-                    logger.debug(f"Unknown relation style for {association.predicate}")
-                name = (
-                    relation_style.label
-                    if relation_style is not None
-                    else association.predicate
-                )
-                edge_attributes = {
-                    "name": name,
-                    "represents": association.predicate,
-                }
-
-                if association.evidence:
-                    edge_attributes["Evidence"] = _format_evidence_list(
-                        association.evidence
+            for association in activity.causal_associations:
+                if association.downstream_activity in activity_nodes_by_activity_id:
+                    relation_style = RELATIONS.get(association.predicate, None)
+                    if relation_style is None:
+                        logger.debug(f"Unknown relation style for {association.predicate}")
+                    name = (
+                        relation_style.label
+                        if relation_style is not None
+                        else association.predicate
                     )
+                    edge_attributes = {
+                        "name": name,
+                        "represents": association.predicate,
+                    }
 
-                cx2_network.add_edge(
-                    source=activity_nodes_by_activity_id[activity.id],
-                    target=activity_nodes_by_activity_id[
-                        association.downstream_activity
-                    ],
-                    attributes=edge_attributes,
-                )
+                    if association.evidence:
+                        edge_attributes["Evidence"] = _format_evidence_list(
+                            association.evidence
+                        )
+
+                    cx2_network.add_edge(
+                        source=activity_nodes_by_activity_id[activity.id],
+                        target=activity_nodes_by_activity_id[
+                            association.downstream_activity
+                        ],
+                        attributes=edge_attributes,
+                    )
 
     # Set visual properties for the network
     cx2_network.set_visual_properties(VISUAL_PROPERTIES)

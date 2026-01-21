@@ -16,6 +16,7 @@ from gocam.datamodel import (
     EnabledByProteinComplexAssociation,
     EvidenceItem,
     Model,
+    ModelStateEnum,
     MolecularFunctionAssociation,
     MoleculeAssociation,
     Object,
@@ -256,6 +257,10 @@ class MinervaWrapper:
                 objects_by_id[type_id] = type_
                 term_id = type_id
 
+            if term_id is None:
+                logger.debug(f"Missing term for individual {individual_id}")
+                continue
+
             individual_to_term[individual_id] = term_id
             individual_to_annotations[individual_id] = _annotations(individual)
             individual_to_annotations_multivalued[individual_id] = (
@@ -451,22 +456,25 @@ class MinervaWrapper:
                 taxon = all_taxa[0]
                 additional_taxa = all_taxa[1:]
 
-        # Build model parameters
-        model_args = {
-            "id": id,
-            "title": annotations["title"],
-            "status": annotations.get("state", None),
-            "comments": annotations_mv.get("comment", None),
-            "date_modified": annotations.get("date", None),
-            "taxon": taxon,
-            "activities": activities,
-            "objects": objects,
-            "provenances": [provenance],
-        }
+        cam = Model(
+            id=id,
+            title=annotations["title"],
+            comments=annotations_mv.get("comment", None),
+            date_modified=annotations.get("date", None),
+            taxon=taxon,
+            activities=activities,
+            objects=objects,
+            provenances=[provenance],
+        )
 
-        # Only add additional_taxa if it has values
+        state_annotation = annotations.get("state", None)
+        if state_annotation:
+            try:
+                cam.status = ModelStateEnum(state_annotation)
+            except ValueError:
+                logger.warning(f"Invalid status value: {state_annotation}")
+
         if additional_taxa and len(additional_taxa) > 0:
-            model_args["additional_taxa"] = additional_taxa
+            cam.additional_taxa = additional_taxa
 
-        cam = Model(**model_args)
         return cam

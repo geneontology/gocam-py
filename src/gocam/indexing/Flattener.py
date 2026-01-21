@@ -32,7 +32,9 @@ class Flattener:
         Returns:
             ROW: A dictionary representing the flattened model.
         """
-        obj = {**model.model_dump(), **model.query_index.model_dump()}
+        obj = model.model_dump()
+        if model.query_index:
+            obj.update(model.query_index.model_dump())
 
         slip_keys = ["query_index"]
         row: ROW = {}
