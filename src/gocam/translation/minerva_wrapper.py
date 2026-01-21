@@ -41,6 +41,12 @@ def _normalize_property(prop: str) -> str:
     Normalize a property.
 
     Sometimes the JSON will use full URIs, sometimes just the local part
+
+    Args:
+        prop (str): The property to normalize
+
+    Returns:
+        str: The normalized property
     """
     if "/" in prop:
         return prop.split("/")[-1]
@@ -52,6 +58,12 @@ def _annotations(obj: Dict) -> Dict[str, str]:
     Extract annotations from an object (assumes single-valued).
 
     Annotations are lists of objects with keys "key" and "value".
+
+    Args:
+        obj (Dict): The object to extract annotations from
+
+    Returns:
+        Dict[str, str]: The extracted annotations
     """
     return {
         _normalize_property(a["key"]): a["value"] for a in obj.get("annotations", [])
@@ -63,6 +75,12 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
     Extract annotations from an object (assumes multi-valued).
 
     Annotations are lists of objects with keys "key" and "value".
+
+    Args:
+        obj (Dict): The object to extract annotations from
+
+    Returns:
+        Dict[str, List[str]]: The extracted annotations
     """
     anns = defaultdict(list)
     for a in obj.get("annotations", []):
@@ -73,7 +91,14 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
 
 
 def _provenance_from_fact(fact: Dict) -> ProvenanceInfo:
-    """Produce a ProvenanceInfo object from a fact object."""
+    """Produce a ProvenanceInfo object from a fact object.
+
+    Args:
+        fact (Dict): The fact object
+
+    Returns:
+        ProvenanceInfo: The produced ProvenanceInfo object
+    """
     annotations = _annotations(fact)
     annotations_mv = _annotations_multivalued(fact)
     return ProvenanceInfo(
@@ -84,6 +109,13 @@ def _provenance_from_fact(fact: Dict) -> ProvenanceInfo:
 
 
 def _setattr_with_warning(obj, attr, value):
+    """Set an attribute on an object, with a warning if it already exists.
+
+    Args:
+        obj: The object to set the attribute on
+        attr: The attribute to set
+        value: The value to set
+    """
     if getattr(obj, attr, None) is not None:
         logger.debug(
             f"Overwriting {attr} for {obj.id if hasattr(obj, 'id') else obj}"
@@ -119,8 +151,8 @@ class MinervaWrapper:
         This method fetches the list of all GO-CAM models from the index URL. For each model, the
         Minerva JSON object is fetched and converted to a Model object.
 
-        :return: Iterator over GO-CAM models
-        :rtype: Iterator[Model]
+        Returns:
+            Iterator[Model]: Iterator over GO-CAM models
         """
 
         for gocam_id in self.models_ids():
@@ -132,8 +164,8 @@ class MinervaWrapper:
         This method fetches the list of all GO-CAM models from the index URL and returns an
         iterator over the IDs of each model.
 
-        :return: Iterator over GO-CAM IDs
-        :rtype: Iterator[str]
+        Returns:
+            Iterator[str]: Iterator over GO-CAM IDs
         """
 
         response = self.session.get(self.gocam_index_url)
@@ -147,10 +179,11 @@ class MinervaWrapper:
     def fetch_minerva_object(self, gocam_id: str) -> Dict:
         """Fetch a Minerva JSON object for a given GO-CAM ID.
 
-        :param gocam_id: GO-CAM ID
-        :type gocam_id: str
-        :return: Minerva JSON object
-        :rtype: Dict
+        Args:
+            gocam_id (str): GO-CAM ID
+
+        Returns:
+            Dict: Minerva JSON object
         """
         if not gocam_id:
             raise ValueError(f"Missing GO-CAM ID: {gocam_id}")
@@ -163,10 +196,11 @@ class MinervaWrapper:
     def fetch_model(self, gocam_id: str) -> Model:
         """Fetch a GO-CAM Model for a given GO-CAM ID.
 
-        :param gocam_id: GO-CAM ID
-        :type gocam_id: str
-        :return: GO-CAM Model
-        :rtype: Model
+        Args:
+            gocam_id (str): GO-CAM ID
+
+        Returns:
+            Model: GO-CAM Model
         """
         minerva_object = self.fetch_minerva_object(gocam_id)
         return self.minerva_object_to_model(minerva_object)
@@ -176,10 +210,11 @@ class MinervaWrapper:
     def minerva_object_to_model(obj: Dict) -> Model:
         """Convert a Minerva JSON object to a GO-CAM Model.
 
-        :param obj: Minerva JSON object
-        :type obj: Dict
-        :return: GO-CAM Model
-        :rtype: Model
+        Args:
+            obj (dict): Minerva JSON object
+
+        Returns:
+            Model: GO-CAM Model
         """
         id = obj["id"]
 
