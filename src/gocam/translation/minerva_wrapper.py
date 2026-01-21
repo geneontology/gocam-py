@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import DefaultDict, Dict, Iterator, List, Optional, Tuple
 
 import requests
 import yaml
@@ -43,44 +43,44 @@ def _normalize_property(prop: str) -> str:
     Sometimes the JSON will use full URIs, sometimes just the local part
 
     Args:
-        prop (str): The property to normalize
+        prop: The property to normalize
 
     Returns:
-        str: The normalized property
+        The normalized property
     """
     if "/" in prop:
         return prop.split("/")[-1]
     return prop
 
 
-def _annotations(obj: Dict) -> Dict[str, str]:
+def _annotations(obj: dict) -> dict[str, str]:
     """
     Extract annotations from an object (assumes single-valued).
 
     Annotations are lists of objects with keys "key" and "value".
 
     Args:
-        obj (Dict): The object to extract annotations from
+        obj: The object to extract annotations from
 
     Returns:
-        Dict[str, str]: The extracted annotations
+        The extracted annotations
     """
     return {
         _normalize_property(a["key"]): a["value"] for a in obj.get("annotations", [])
     }
 
 
-def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
+def _annotations_multivalued(obj: dict) -> dict[str, list[str]]:
     """
     Extract annotations from an object (assumes multi-valued).
 
     Annotations are lists of objects with keys "key" and "value".
 
     Args:
-        obj (Dict): The object to extract annotations from
+        obj: The object to extract annotations from
 
     Returns:
-        Dict[str, List[str]]: The extracted annotations
+        The extracted annotations
     """
     anns = defaultdict(list)
     for a in obj.get("annotations", []):
@@ -90,11 +90,11 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
     return anns
 
 
-def _provenance_from_fact(fact: Dict) -> ProvenanceInfo:
+def _provenance_from_fact(fact: dict) -> ProvenanceInfo:
     """Produce a ProvenanceInfo object from a fact object.
 
     Args:
-        fact (Dict): The fact object
+        fact: The fact object
 
     Returns:
         ProvenanceInfo: The produced ProvenanceInfo object
@@ -151,8 +151,8 @@ class MinervaWrapper:
         This method fetches the list of all GO-CAM models from the index URL. For each model, the
         Minerva JSON object is fetched and converted to a Model object.
 
-        Returns:
-            Iterator[Model]: Iterator over GO-CAM models
+        Yields:
+            GO-CAM Model
         """
 
         for gocam_id in self.models_ids():
@@ -164,8 +164,8 @@ class MinervaWrapper:
         This method fetches the list of all GO-CAM models from the index URL and returns an
         iterator over the IDs of each model.
 
-        Returns:
-            Iterator[str]: Iterator over GO-CAM IDs
+        Yields:
+            GO-CAM ID
         """
 
         response = self.session.get(self.gocam_index_url)
@@ -176,14 +176,14 @@ class MinervaWrapper:
                 raise ValueError(f"Missing gocam in {model}")
             yield gocam.replace("http://model.geneontology.org/", "")
 
-    def fetch_minerva_object(self, gocam_id: str) -> Dict:
+    def fetch_minerva_object(self, gocam_id: str) -> dict:
         """Fetch a Minerva JSON object for a given GO-CAM ID.
 
         Args:
-            gocam_id (str): GO-CAM ID
+            gocam_id: GO-CAM ID
 
         Returns:
-            Dict: Minerva JSON object
+            Minerva JSON object
         """
         if not gocam_id:
             raise ValueError(f"Missing GO-CAM ID: {gocam_id}")
@@ -197,43 +197,43 @@ class MinervaWrapper:
         """Fetch a GO-CAM Model for a given GO-CAM ID.
 
         Args:
-            gocam_id (str): GO-CAM ID
+            gocam_id: GO-CAM ID
 
         Returns:
-            Model: GO-CAM Model
+            GO-CAM Model
         """
         minerva_object = self.fetch_minerva_object(gocam_id)
         return self.minerva_object_to_model(minerva_object)
 
 
     @staticmethod
-    def minerva_object_to_model(obj: Dict) -> Model:
+    def minerva_object_to_model(obj: dict) -> Model:
         """Convert a Minerva JSON object to a GO-CAM Model.
 
         Args:
-            obj (dict): Minerva JSON object
+            obj: Minerva JSON object
 
         Returns:
-            Model: GO-CAM Model
+            GO-CAM Model
         """
         id = obj["id"]
 
         # Bookkeeping variables
 
         # individual ID to "root" type / category, e.g Evidence, BP
-        individual_to_root_types: Dict[str, List[str]] = {}
-        individual_to_term: Dict[str, str] = {}
-        individual_to_annotations: Dict[str, Dict[str, str]] = {}
-        individual_to_annotations_multivalued: Dict[str, Dict[str, List[str]]] = {}
-        objects_by_id: Dict[str, Dict] = {}
-        activities: List[Activity] = []
-        activities_by_mf_id: DefaultDict[str, List[Activity]] = defaultdict(list)
-        facts_by_property: DefaultDict[str, List[Dict]] = defaultdict(list)
+        individual_to_root_types: dict[str, list[str]] = {}
+        individual_to_term: dict[str, str] = {}
+        individual_to_annotations: dict[str, dict[str, str]] = {}
+        individual_to_annotations_multivalued: dict[str, dict[str, list[str]]] = {}
+        objects_by_id: dict[str, dict] = {}
+        activities: list[Activity] = []
+        activities_by_mf_id: defaultdict[str, list[Activity]] = defaultdict(list)
+        facts_by_property: defaultdict[str, list[dict]] = defaultdict(list)
 
-        def _evidence_from_fact(fact: Dict) -> List[EvidenceItem]:
+        def _evidence_from_fact(fact: dict) -> list[EvidenceItem]:
             anns_mv = _annotations_multivalued(fact)
             evidence_inst_ids = anns_mv.get("evidence", [])
-            evs: List[EvidenceItem] = []
+            evs: list[EvidenceItem] = []
             for evidence_inst_id in evidence_inst_ids:
                 evidence_inst_annotations = individual_to_annotations.get(
                     evidence_inst_id, {}
@@ -241,7 +241,7 @@ class MinervaWrapper:
                 evidence_inst_annotations_multivalued = (
                     individual_to_annotations_multivalued.get(evidence_inst_id, {})
                 )
-                with_obj: Optional[str] = evidence_inst_annotations.get("with", None)
+                with_obj: str | None = evidence_inst_annotations.get("with", None)
                 if with_obj:
                     with_objs = [s.strip() for s in with_obj.split("|")]
                 else:
@@ -265,7 +265,7 @@ class MinervaWrapper:
         def _iter_activities_by_fact_subject(
             *,
             fact_property: str,
-        ) -> Iterator[Tuple[Activity, str, List[EvidenceItem], ProvenanceInfo]]:
+        ) -> Iterator[tuple[Activity, str, list[EvidenceItem], ProvenanceInfo]]:
             for fact in facts_by_property.get(fact_property, []):
                 subject, object_ = fact["subject"], fact["object"]
                 if object_ not in individual_to_term:
@@ -281,7 +281,7 @@ class MinervaWrapper:
             root_types = [x["id"] for x in individual.get("root-type", []) if x]
             individual_to_root_types[individual_id] = root_types
 
-            term_id: Optional[str] = None
+            term_id: str | None = None
             for type_ in individual.get("type", []):
                 if type_.get("type") == "complement":
                     # class expression representing NOT
@@ -448,7 +448,7 @@ class MinervaWrapper:
         annotations = _annotations(obj)
         annotations_mv = _annotations_multivalued(obj)
 
-        objects: List[Object] = []
+        objects: list[Object] = []
         for obj in objects_by_id.values():
             object_ = Object(id=obj["id"])
             if "label" in obj:
