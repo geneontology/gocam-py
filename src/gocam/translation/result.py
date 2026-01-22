@@ -27,7 +27,7 @@ class WarningType(str, Enum):
 
 @dataclass(frozen=True)
 class TranslationWarning:
-    """Represents a warning generated during the translation process
+    """Represents a warning generated during the translation process.
 
     Attributes:
         type: The type or category of the warning.
