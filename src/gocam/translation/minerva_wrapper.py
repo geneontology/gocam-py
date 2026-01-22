@@ -2,9 +2,9 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterator
 from dataclasses import dataclass, field
+from typing import Any
 
 import requests
-import yaml
 
 from gocam.datamodel import (
     Activity,
@@ -22,6 +22,7 @@ from gocam.datamodel import (
     Object,
     ProvenanceInfo,
 )
+from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
 from gocam.vocabulary.taxa import TaxonVocabulary
 
 ENABLED_BY = "RO:0002333"
@@ -108,21 +109,6 @@ def _provenance_from_fact(fact: dict) -> ProvenanceInfo:
     )
 
 
-def _setattr_with_warning(obj, attr, value):
-    """Set an attribute on an object, with a warning if it already exists.
-
-    Args:
-        obj: The object to set the attribute on
-        attr: The attribute to set
-        value: The value to set
-    """
-    if getattr(obj, attr, None) is not None:
-        logger.debug(
-            f"Overwriting {attr} for {obj.id if hasattr(obj, 'id') else obj}"
-        )
-    setattr(obj, attr, value)
-
-
 MOLECULAR_FUNCTION = "GO:0003674"
 BIOLOGICAL_PROCESS = "GO:0008150"
 CELLULAR_COMPONENT = "GO:0005575"
@@ -205,16 +191,15 @@ class MinervaWrapper:
         minerva_object = self.fetch_minerva_object(gocam_id)
         return self.minerva_object_to_model(minerva_object)
 
-
     @staticmethod
-    def minerva_object_to_model(obj: dict) -> Model:
+    def translate(obj: dict) -> TranslationResult[Model]:
         """Convert a Minerva JSON object to a GO-CAM Model.
 
         Args:
             obj: Minerva JSON object
 
         Returns:
-            GO-CAM Model
+            Object containing GO-CAM Model and any translation warnings
         """
         id = obj["id"]
 
@@ -229,6 +214,26 @@ class MinervaWrapper:
         activities: list[Activity] = []
         activities_by_mf_id: defaultdict[str, list[Activity]] = defaultdict(list)
         facts_by_property: defaultdict[str, list[dict]] = defaultdict(list)
+
+        translation_warnings: set[TranslationWarning] = set()
+
+        def _setattr_with_warning(obj: Activity, attr: str, value: Any):
+            """Set an attribute on an object, with a warning if it already exists.
+
+            Args:
+                obj: The Activity to set the attribute on
+                attr: The attribute to set
+                value: The value to set
+            """
+            if getattr(obj, attr, None) is not None:
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.ATTRIBUTE_OVERWRITE,
+                        message=f"Overwriting {attr} for {obj.id}",
+                        entity_id=obj.id,
+                    )
+                )
+            setattr(obj, attr, value)
 
         def _evidence_from_fact(fact: dict) -> list[EvidenceItem]:
             anns_mv = _annotations_multivalued(fact)
@@ -269,12 +274,19 @@ class MinervaWrapper:
             for fact in facts_by_property.get(fact_property, []):
                 subject, object_ = fact["subject"], fact["object"]
                 if object_ not in individual_to_term:
-                    logger.debug(f"Missing {object_} in {individual_to_term}")
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.MISSING_TERM,
+                            message=f"Missing term for object {object_} in fact",
+                            entity_id=object_,
+                        )
+                    )
                     continue
                 for activity in activities_by_mf_id.get(subject, []):
                     evs = _evidence_from_fact(fact)
                     provenance = _provenance_from_fact(fact)
-                    yield activity, object_, evs, provenance
+                    term = individual_to_term[object_]
+                    yield activity, term, evs, provenance
 
         for individual in obj["individuals"]:
             individual_id = individual["id"]
@@ -293,7 +305,13 @@ class MinervaWrapper:
                 term_id = type_id
 
             if term_id is None:
-                logger.debug(f"Missing term for individual {individual_id}")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for individual {individual_id}",
+                        entity_id=individual_id,
+                    )
+                )
                 continue
 
             individual_to_term[individual_id] = term_id
@@ -307,14 +325,32 @@ class MinervaWrapper:
 
         enabled_by_facts = facts_by_property.get(ENABLED_BY, [])
         if not enabled_by_facts:
-            logger.debug(f"Missing {ENABLED_BY} facts in {facts_by_property}")
+            translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.NO_ENABLED_BY_FACTS,
+                    message=f"No enabled_by ({ENABLED_BY}) facts found",
+                    entity_id=id,
+                )
+            )
         for fact in enabled_by_facts:
             subject, object_ = fact["subject"], fact["object"]
             if subject not in individual_to_term:
-                logger.debug(f"Missing {subject} in {individual_to_term}")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for subject {subject} in fact",
+                        entity_id=subject,
+                    )
+                )
                 continue
             if object_ not in individual_to_term:
-                logger.debug(f"Missing {object_} in {individual_to_term}")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {object_} in fact",
+                        entity_id=object_,
+                    )
+                )
                 continue
             gene_id = individual_to_term[object_]
             root_types = individual_to_root_types.get(object_, [])
@@ -341,7 +377,13 @@ class MinervaWrapper:
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
             else:
-                logger.debug(f"Unknown enabled_by type for {object_}; assuming gene product")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.UNKNOWN_ENABLED_BY_TYPE,
+                        message=f"Unknown enabled_by type for {object_}; assuming gene product",
+                        entity_id=object_,
+                    )
+                )
                 enabled_by_association = EnabledByGeneProductAssociation(
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
@@ -356,61 +398,61 @@ class MinervaWrapper:
             activities.append(activity)
             activities_by_mf_id[subject].append(activity)
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=PART_OF
         ):
             association = BiologicalProcessAssociation(
-                term=individual_to_term[individual], evidence=evs, provenances=[prov]
+                term=term, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "part_of", association)
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=OCCURS_IN
         ):
             association = CellularAnatomicalEntityAssociation(
-                term=individual_to_term[individual], evidence=evs, provenances=[prov]
+                term=term, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "occurs_in", association)
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
             if activity.has_input is None:
                 activity.has_input = []
             activity.has_input.append(
                 MoleculeAssociation(
-                    term=individual_to_term[individual],
+                    term=term,
                     evidence=evs,
                     provenances=[prov],
                 )
             )
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_INPUT
         ):
             association = MoleculeAssociation(
-                term=individual_to_term[individual], evidence=evs, provenances=[prov]
+                term=term, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_input", association)
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
             if activity.has_output is None:
                 activity.has_output = []
             activity.has_output.append(
                 MoleculeAssociation(
-                    term=individual_to_term[individual],
+                    term=term,
                     evidence=evs,
                     provenances=[prov],
                 )
             )
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_OUTPUT
         ):
             association = MoleculeAssociation(
-                term=individual_to_term[individual], evidence=evs, provenances=[prov]
+                term=term, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_output", association)
 
@@ -427,9 +469,21 @@ class MinervaWrapper:
                 if MOLECULAR_FUNCTION not in individual_to_root_types.get(object_, []):
                     continue
                 if len(subject_activities) > 1:
-                    logger.debug(f"Multiple activities for subject: {subject}")
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.MULTIPLE_ACTIVITIES,
+                            message=f"Multiple activities for subject {subject}",
+                            entity_id=subject,
+                        )
+                    )
                 if len(object_activities) > 1:
-                    logger.debug(f"Multiple activities for object: {object_}")
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.MULTIPLE_ACTIVITIES,
+                            message=f"Multiple activities for object {object_}",
+                            entity_id=object_,
+                        )
+                    )
 
                 subject_activity = subject_activities[0]
                 object_activity = object_activities[0]
@@ -507,9 +561,28 @@ class MinervaWrapper:
             try:
                 cam.status = ModelStateEnum(state_annotation)
             except ValueError:
-                logger.warning(f"Invalid status value: {state_annotation}")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.INVALID_MODEL_STATE,
+                        message=f"Invalid model state {state_annotation}",
+                        entity_id=id,
+                    )
+                )
 
         if additional_taxa and len(additional_taxa) > 0:
             cam.additional_taxa = additional_taxa
 
-        return cam
+        return TranslationResult(result=cam, warnings=list(translation_warnings))
+
+    @staticmethod
+    def minerva_object_to_model(obj: dict) -> Model:
+        """Convert a Minerva JSON object to a GO-CAM Model.
+
+        Args:
+            obj: Minerva JSON object
+
+        Returns:
+            GO-CAM Model
+        """
+        result = MinervaWrapper.translate(obj)
+        return result.result

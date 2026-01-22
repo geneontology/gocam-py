@@ -5,6 +5,7 @@ import pytest
 
 from gocam.datamodel import EnabledByProteinComplexAssociation
 from gocam.translation.minerva_wrapper import MinervaWrapper
+from gocam.translation.result import WarningType
 from tests import INPUT_DIR
 
 ENABLED_BY = "RO:0002333"
@@ -54,7 +55,9 @@ def test_protein_complex():
     assert len(protein_complex_activities) == 1
 
     protein_complex_activity = protein_complex_activities[0]
-    assert isinstance(protein_complex_activity.enabled_by, EnabledByProteinComplexAssociation)
+    assert isinstance(
+        protein_complex_activity.enabled_by, EnabledByProteinComplexAssociation
+    )
     assert protein_complex_activity.enabled_by.members == [
         "MGI:MGI:1929608",
         "MGI:MGI:103038",
@@ -69,7 +72,7 @@ def test_has_input_and_has_output():
 
     activities_with_input = []
     activities_with_output = []
-    for activity in (model.activities or []):
+    for activity in model.activities or []:
         if activity.has_input:
             activities_with_input.append(activity)
         if activity.has_output:
@@ -99,11 +102,13 @@ def test_has_input_issue_65():
     model = mw.minerva_object_to_model(minerva_object)
 
     # Find activities with inputs
-    activities_with_input = [a for a in (model.activities or []) if a.has_input is not None]
+    activities_with_input = [
+        a for a in (model.activities or []) if a.has_input is not None
+    ]
 
     # Verify that all inputs are included, even protein inputs
     for activity in activities_with_input:
-        for input_assoc in (activity.has_input or []):
+        for input_assoc in activity.has_input or []:
             # Check if the input term is also the term of an enabled_by for any activity
             is_protein = any(
                 a.enabled_by.term == input_assoc.term
@@ -122,10 +127,13 @@ def test_multivalued_input_and_output():
     model = mw.minerva_object_to_model(minerva_object)
 
     cs_activity = next(
-        a for a in (model.activities or []) if a.molecular_function and a.molecular_function.term == "GO:0004108"
+        a
+        for a in (model.activities or [])
+        if a.molecular_function and a.molecular_function.term == "GO:0004108"
     )
     assert len(cs_activity.has_input) == 3
     assert len(cs_activity.has_output) == 2
+
 
 def test_missing_enabled_by():
     """Test that activities without an enabled_by association are handled correctly."""
@@ -139,9 +147,9 @@ def test_missing_enabled_by():
     ]
 
     # Verify that there are no such activities
-    assert len(activities_without_enabled_by) == 0, (
-        "There should be no activities without an enabled_by association."
-    )
+    assert (
+        len(activities_without_enabled_by) == 0
+    ), "There should be no activities without an enabled_by association."
 
 
 def test_provenance_on_evidence():
@@ -246,7 +254,12 @@ def test_evidence_with_objects():
     model = mw.minerva_object_to_model(minerva_object)
 
     kinase_activity = next(
-        (a for a in model.activities or [] if a.molecular_function and a.molecular_function.term == "GO:0004674"), None
+        (
+            a
+            for a in model.activities or []
+            if a.molecular_function and a.molecular_function.term == "GO:0004674"
+        ),
+        None,
     )
     assert kinase_activity is not None
     assert len(kinase_activity.enabled_by.evidence) == 1
@@ -262,41 +275,50 @@ def test_additional_taxa():
     minerva_object = {
         "id": "gomodel:test123",
         "annotations": [
-            {
-                "key": "title",
-                "value": "Test model with multiple taxa"
-            },
+            {"key": "title", "value": "Test model with multiple taxa"},
             # First taxon annotation (Human)
             {
                 "key": "https://w3id.org/biolink/vocab/in_taxon",
                 "value": "NCBITaxon:9606",
-                "value-type": "IRI"
+                "value-type": "IRI",
             },
             # Second taxon annotation (E. coli)
             {
                 "key": "https://w3id.org/biolink/vocab/in_taxon",
                 "value": "NCBITaxon:562",
-                "value-type": "IRI"
-            }
+                "value-type": "IRI",
+            },
         ],
         "individuals": [],
-        "facts": []
+        "facts": [],
     }
-    
+
     # Add a minimal individual and fact to make it a valid model
     minerva_object["individuals"] = [
         {
             "id": "gomodel:test123/activity1",
-            "type": [{"type": "class", "id": "GO:0003674", "label": "molecular_function"}],
-            "root-type": [{"type": "class", "id": "GO:0003674", "label": "molecular_function"}],
-            "annotations": []
+            "type": [
+                {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+            ],
+            "root-type": [
+                {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+            ],
+            "annotations": [],
         },
         {
             "id": "gomodel:test123/protein1",
-            "type": [{"type": "class", "id": "UniProtKB:P12345", "label": "test protein"}],
-            "root-type": [{"type": "class", "id": "CHEBI:33695", "label": "information biomacromolecule"}],
-            "annotations": []
-        }
+            "type": [
+                {"type": "class", "id": "UniProtKB:P12345", "label": "test protein"}
+            ],
+            "root-type": [
+                {
+                    "type": "class",
+                    "id": "CHEBI:33695",
+                    "label": "information biomacromolecule",
+                }
+            ],
+            "annotations": [],
+        },
     ]
 
     minerva_object["facts"] = [
@@ -304,37 +326,34 @@ def test_additional_taxa():
             "subject": "gomodel:test123/activity1",
             "property": "RO:0002333",
             "object": "gomodel:test123/protein1",
-            "annotations": []
+            "annotations": [],
         }
     ]
 
     mw = MinervaWrapper()
     model = mw.minerva_object_to_model(minerva_object)
-    
+
     # Verify that the model makes human the primary taxon and E. coli additional
     assert model.taxon == "NCBITaxon:9606"
     assert model.additional_taxa is not None
     assert len(model.additional_taxa) == 1
     assert model.additional_taxa[0] == "NCBITaxon:562"
-    
+
     # Test with two non-host taxa
     minerva_object["annotations"] = [
+        {"key": "title", "value": "Test model with multiple taxa"},
         {
-            "key": "title",
-            "value": "Test model with multiple taxa"
+            "key": "https://w3id.org/biolink/vocab/in_taxon",
+            "value": "NCBITaxon:562",  # E. coli (not a host)
         },
         {
             "key": "https://w3id.org/biolink/vocab/in_taxon",
-            "value": "NCBITaxon:562"    # E. coli (not a host)
+            "value": "NCBITaxon:623",  # Shigella (not a host)
         },
-        {
-            "key": "https://w3id.org/biolink/vocab/in_taxon",
-            "value": "NCBITaxon:623"    # Shigella (not a host)
-        }
     ]
-    
+
     model = mw.minerva_object_to_model(minerva_object)
-    
+
     # When no hosts, the first taxon should be primary
     assert model.taxon == "NCBITaxon:562"
     assert model.additional_taxa is not None
@@ -345,31 +364,109 @@ def test_additional_taxa():
 def test_host_taxon_prioritization():
     """Test that host taxa are properly prioritized when multiple taxa are present."""
     minerva_object = load_minerva_object("6348a65d00000661")
-    
+
     # First, ensure we're working with a fresh copy with no taxon annotations
-    minerva_object["annotations"] = [ann for ann in minerva_object["annotations"] 
-                               if ann.get("key") != "https://w3id.org/biolink/vocab/in_taxon" 
-                               and ann.get("key") != "in_taxon"]
-    
+    minerva_object["annotations"] = [
+        ann
+        for ann in minerva_object["annotations"]
+        if ann.get("key") != "https://w3id.org/biolink/vocab/in_taxon"
+        and ann.get("key") != "in_taxon"
+    ]
+
     # Add taxon annotations: one host and one pathogen (in non-host-first order)
-    minerva_object["annotations"].extend([
-        {
-            "key": "https://w3id.org/biolink/vocab/in_taxon", 
-            "value": "NCBITaxon:623",    # Shigella (pathogen)
-            "value-type": "IRI"
-        },
-        {
-            "key": "https://w3id.org/biolink/vocab/in_taxon",
-            "value": "NCBITaxon:9606",   # Human (host)
-            "value-type": "IRI"
-        }
-    ])
-    
+    minerva_object["annotations"].extend(
+        [
+            {
+                "key": "https://w3id.org/biolink/vocab/in_taxon",
+                "value": "NCBITaxon:623",  # Shigella (pathogen)
+                "value-type": "IRI",
+            },
+            {
+                "key": "https://w3id.org/biolink/vocab/in_taxon",
+                "value": "NCBITaxon:9606",  # Human (host)
+                "value-type": "IRI",
+            },
+        ]
+    )
+
     mw = MinervaWrapper()
     model = mw.minerva_object_to_model(minerva_object)
-    
+
     # Verify the model prioritizes the host taxon as primary, even though it was added second
     assert model.taxon == "NCBITaxon:9606"
     assert model.additional_taxa is not None
     assert len(model.additional_taxa) == 1
     assert model.additional_taxa[0] == "NCBITaxon:623"
+
+
+def test_translation_warning_missing_term():
+    """Test that a warning is generated for missing terms during translation."""
+    minerva_object = load_minerva_object("663d668500002178")
+
+    # Introduce a fact with a missing term
+    minerva_object["facts"].append(
+        {
+            "subject": "gomodel:663d668500002178/subject_missing_term",
+            "property": "RO:0002333",
+            "object": "gomodel:663d668500002178/object_missing_term",
+            "annotations": [],
+        }
+    )
+
+    translation_result = MinervaWrapper.translate(minerva_object)
+
+    # Check that a warning for the missing term was generated
+    warnings = translation_result.warnings
+    assert len(warnings) == 1
+    assert warnings[0].type == WarningType.MISSING_TERM
+    assert "Missing term for subject" in warnings[0].message
+    assert warnings[0].entity_id == "gomodel:663d668500002178/subject_missing_term"
+
+
+def test_translation_warning_no_enabled_by_facts():
+    """Test that a warning is generated for activities with no enabled_by facts."""
+    minerva_object = {
+        "id": "gomodel:test_no_enabled_by",
+        "annotations": [
+            {"key": "title", "value": "Test model with activity missing enabled_by"}
+        ],
+        "individuals": [
+            {
+                "id": "gomodel:test_no_enabled_by/activity_no_enabled_by",
+                "type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "annotations": [],
+            }
+        ],
+        "facts": [],
+    }
+
+    translation_result = MinervaWrapper.translate(minerva_object)
+
+    # Check that a warning for no enabled_by facts was generated
+    warnings = translation_result.warnings
+    assert len(warnings) == 1
+    assert warnings[0].type == WarningType.NO_ENABLED_BY_FACTS
+    assert "No enabled_by (RO:0002333) facts" in warnings[0].message
+    assert warnings[0].entity_id == "gomodel:test_no_enabled_by"
+
+
+def test_translation_warning_invalid_model_state():
+    """Test that a warning is generated for an invalid model state."""
+    minerva_object = load_minerva_object("663d668500002178")
+    for annotation in minerva_object["annotations"]:
+        if annotation["key"] == "state":
+            annotation["value"] = "invalid_state_for_testing"
+
+    translation_result = MinervaWrapper.translate(minerva_object)
+
+    # Check that a warning for invalid model state was generated
+    warnings = translation_result.warnings
+    assert len(warnings) == 1
+    assert warnings[0].type == WarningType.INVALID_MODEL_STATE
+    assert "invalid_state_for_testing" in warnings[0].message
+    assert warnings[0].entity_id == "gomodel:663d668500002178"
