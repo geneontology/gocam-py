@@ -1,10 +1,10 @@
 import logging
 from collections import defaultdict
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import DefaultDict, Dict, Iterator, List, Optional, Tuple
+from typing import Any
 
 import requests
-import yaml
 
 from gocam.datamodel import (
     Activity,
@@ -22,6 +22,7 @@ from gocam.datamodel import (
     Object,
     ProvenanceInfo,
 )
+from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
 from gocam.vocabulary.taxa import TaxonVocabulary
 
 ENABLED_BY = "RO:0002333"
@@ -41,28 +42,46 @@ def _normalize_property(prop: str) -> str:
     Normalize a property.
 
     Sometimes the JSON will use full URIs, sometimes just the local part
+
+    Args:
+        prop: The property to normalize
+
+    Returns:
+        The normalized property
     """
     if "/" in prop:
         return prop.split("/")[-1]
     return prop
 
 
-def _annotations(obj: Dict) -> Dict[str, str]:
+def _annotations(obj: dict) -> dict[str, str]:
     """
     Extract annotations from an object (assumes single-valued).
 
     Annotations are lists of objects with keys "key" and "value".
+
+    Args:
+        obj: The object to extract annotations from
+
+    Returns:
+        The extracted annotations
     """
     return {
         _normalize_property(a["key"]): a["value"] for a in obj.get("annotations", [])
     }
 
 
-def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
+def _annotations_multivalued(obj: dict) -> dict[str, list[str]]:
     """
     Extract annotations from an object (assumes multi-valued).
 
     Annotations are lists of objects with keys "key" and "value".
+
+    Args:
+        obj: The object to extract annotations from
+
+    Returns:
+        The extracted annotations
     """
     anns = defaultdict(list)
     for a in obj.get("annotations", []):
@@ -72,8 +91,15 @@ def _annotations_multivalued(obj: Dict) -> Dict[str, List[str]]:
     return anns
 
 
-def _provenance_from_fact(fact: Dict) -> ProvenanceInfo:
-    """Produce a ProvenanceInfo object from a fact object."""
+def _provenance_from_fact(fact: dict) -> ProvenanceInfo:
+    """Produce a ProvenanceInfo object from a fact object.
+
+    Args:
+        fact: The fact object
+
+    Returns:
+        ProvenanceInfo: The produced ProvenanceInfo object
+    """
     annotations = _annotations(fact)
     annotations_mv = _annotations_multivalued(fact)
     return ProvenanceInfo(
@@ -81,14 +107,6 @@ def _provenance_from_fact(fact: Dict) -> ProvenanceInfo:
         date=annotations.get("date", None),
         provided_by=annotations_mv.get("providedBy"),
     )
-
-
-def _setattr_with_warning(obj, attr, value):
-    if getattr(obj, attr, None) is not None:
-        logger.debug(
-            f"Overwriting {attr} for {obj.id if hasattr(obj, 'id') else obj}"
-        )
-    setattr(obj, attr, value)
 
 
 MOLECULAR_FUNCTION = "GO:0003674"
@@ -119,8 +137,8 @@ class MinervaWrapper:
         This method fetches the list of all GO-CAM models from the index URL. For each model, the
         Minerva JSON object is fetched and converted to a Model object.
 
-        :return: Iterator over GO-CAM models
-        :rtype: Iterator[Model]
+        Yields:
+            GO-CAM Model
         """
 
         for gocam_id in self.models_ids():
@@ -132,8 +150,8 @@ class MinervaWrapper:
         This method fetches the list of all GO-CAM models from the index URL and returns an
         iterator over the IDs of each model.
 
-        :return: Iterator over GO-CAM IDs
-        :rtype: Iterator[str]
+        Yields:
+            GO-CAM ID
         """
 
         response = self.session.get(self.gocam_index_url)
@@ -144,13 +162,14 @@ class MinervaWrapper:
                 raise ValueError(f"Missing gocam in {model}")
             yield gocam.replace("http://model.geneontology.org/", "")
 
-    def fetch_minerva_object(self, gocam_id: str) -> Dict:
+    def fetch_minerva_object(self, gocam_id: str) -> dict:
         """Fetch a Minerva JSON object for a given GO-CAM ID.
 
-        :param gocam_id: GO-CAM ID
-        :type gocam_id: str
-        :return: Minerva JSON object
-        :rtype: Dict
+        Args:
+            gocam_id: GO-CAM ID
+
+        Returns:
+            Minerva JSON object
         """
         if not gocam_id:
             raise ValueError(f"Missing GO-CAM ID: {gocam_id}")
@@ -163,42 +182,63 @@ class MinervaWrapper:
     def fetch_model(self, gocam_id: str) -> Model:
         """Fetch a GO-CAM Model for a given GO-CAM ID.
 
-        :param gocam_id: GO-CAM ID
-        :type gocam_id: str
-        :return: GO-CAM Model
-        :rtype: Model
+        Args:
+            gocam_id: GO-CAM ID
+
+        Returns:
+            GO-CAM Model
         """
         minerva_object = self.fetch_minerva_object(gocam_id)
         return self.minerva_object_to_model(minerva_object)
 
-
     @staticmethod
-    def minerva_object_to_model(obj: Dict) -> Model:
+    def translate(obj: dict) -> TranslationResult[Model]:
         """Convert a Minerva JSON object to a GO-CAM Model.
 
-        :param obj: Minerva JSON object
-        :type obj: Dict
-        :return: GO-CAM Model
-        :rtype: Model
+        Args:
+            obj: Minerva JSON object
+
+        Returns:
+            Object containing GO-CAM Model and any translation warnings
         """
         id = obj["id"]
 
         # Bookkeeping variables
 
         # individual ID to "root" type / category, e.g Evidence, BP
-        individual_to_root_types: Dict[str, List[str]] = {}
-        individual_to_term: Dict[str, str] = {}
-        individual_to_annotations: Dict[str, Dict[str, str]] = {}
-        individual_to_annotations_multivalued: Dict[str, Dict[str, List[str]]] = {}
-        objects_by_id: Dict[str, Dict] = {}
-        activities: List[Activity] = []
-        activities_by_mf_id: DefaultDict[str, List[Activity]] = defaultdict(list)
-        facts_by_property: DefaultDict[str, List[Dict]] = defaultdict(list)
+        individual_to_root_types: dict[str, list[str]] = {}
+        individual_to_term: dict[str, str] = {}
+        individual_to_annotations: dict[str, dict[str, str]] = {}
+        individual_to_annotations_multivalued: dict[str, dict[str, list[str]]] = {}
+        objects_by_id: dict[str, dict] = {}
+        activities: list[Activity] = []
+        activities_by_mf_id: defaultdict[str, list[Activity]] = defaultdict(list)
+        facts_by_property: defaultdict[str, list[dict]] = defaultdict(list)
 
-        def _evidence_from_fact(fact: Dict) -> List[EvidenceItem]:
+        translation_warnings: set[TranslationWarning] = set()
+
+        def _setattr_with_warning(obj: Activity, attr: str, value: Any):
+            """Set an attribute on an object, with a warning if it already exists.
+
+            Args:
+                obj: The Activity to set the attribute on
+                attr: The attribute to set
+                value: The value to set
+            """
+            if getattr(obj, attr, None) is not None:
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.ATTRIBUTE_OVERWRITE,
+                        message=f"Overwriting {attr} for {obj.id}",
+                        entity_id=obj.id,
+                    )
+                )
+            setattr(obj, attr, value)
+
+        def _evidence_from_fact(fact: dict) -> list[EvidenceItem]:
             anns_mv = _annotations_multivalued(fact)
             evidence_inst_ids = anns_mv.get("evidence", [])
-            evs: List[EvidenceItem] = []
+            evs: list[EvidenceItem] = []
             for evidence_inst_id in evidence_inst_ids:
                 evidence_inst_annotations = individual_to_annotations.get(
                     evidence_inst_id, {}
@@ -206,7 +246,7 @@ class MinervaWrapper:
                 evidence_inst_annotations_multivalued = (
                     individual_to_annotations_multivalued.get(evidence_inst_id, {})
                 )
-                with_obj: Optional[str] = evidence_inst_annotations.get("with", None)
+                with_obj: str | None = evidence_inst_annotations.get("with", None)
                 if with_obj:
                     with_objs = [s.strip() for s in with_obj.split("|")]
                 else:
@@ -230,23 +270,30 @@ class MinervaWrapper:
         def _iter_activities_by_fact_subject(
             *,
             fact_property: str,
-        ) -> Iterator[Tuple[Activity, str, List[EvidenceItem], ProvenanceInfo]]:
+        ) -> Iterator[tuple[Activity, str, list[EvidenceItem], ProvenanceInfo]]:
             for fact in facts_by_property.get(fact_property, []):
                 subject, object_ = fact["subject"], fact["object"]
                 if object_ not in individual_to_term:
-                    logger.debug(f"Missing {object_} in {individual_to_term}")
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.MISSING_TERM,
+                            message=f"Missing term for object {object_} in fact",
+                            entity_id=object_,
+                        )
+                    )
                     continue
                 for activity in activities_by_mf_id.get(subject, []):
                     evs = _evidence_from_fact(fact)
                     provenance = _provenance_from_fact(fact)
-                    yield activity, object_, evs, provenance
+                    term = individual_to_term[object_]
+                    yield activity, term, evs, provenance
 
         for individual in obj["individuals"]:
             individual_id = individual["id"]
             root_types = [x["id"] for x in individual.get("root-type", []) if x]
             individual_to_root_types[individual_id] = root_types
 
-            term_id: Optional[str] = None
+            term_id: str | None = None
             for type_ in individual.get("type", []):
                 if type_.get("type") == "complement":
                     # class expression representing NOT
@@ -258,7 +305,13 @@ class MinervaWrapper:
                 term_id = type_id
 
             if term_id is None:
-                logger.debug(f"Missing term for individual {individual_id}")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for individual {individual_id}",
+                        entity_id=individual_id,
+                    )
+                )
                 continue
 
             individual_to_term[individual_id] = term_id
@@ -272,14 +325,32 @@ class MinervaWrapper:
 
         enabled_by_facts = facts_by_property.get(ENABLED_BY, [])
         if not enabled_by_facts:
-            logger.debug(f"Missing {ENABLED_BY} facts in {facts_by_property}")
+            translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.NO_ENABLED_BY_FACTS,
+                    message=f"No enabled_by ({ENABLED_BY}) facts found",
+                    entity_id=id,
+                )
+            )
         for fact in enabled_by_facts:
             subject, object_ = fact["subject"], fact["object"]
             if subject not in individual_to_term:
-                logger.debug(f"Missing {subject} in {individual_to_term}")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for subject {subject} in fact",
+                        entity_id=subject,
+                    )
+                )
                 continue
             if object_ not in individual_to_term:
-                logger.debug(f"Missing {object_} in {individual_to_term}")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {object_} in fact",
+                        entity_id=object_,
+                    )
+                )
                 continue
             gene_id = individual_to_term[object_]
             root_types = individual_to_root_types.get(object_, [])
@@ -306,7 +377,13 @@ class MinervaWrapper:
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
             else:
-                logger.debug(f"Unknown enabled_by type for {object_}; assuming gene product")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.UNKNOWN_ENABLED_BY_TYPE,
+                        message=f"Unknown enabled_by type for {object_}; assuming gene product",
+                        entity_id=object_,
+                    )
+                )
                 enabled_by_association = EnabledByGeneProductAssociation(
                     term=gene_id, evidence=evs, provenances=[prov]
                 )
@@ -321,61 +398,61 @@ class MinervaWrapper:
             activities.append(activity)
             activities_by_mf_id[subject].append(activity)
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=PART_OF
         ):
             association = BiologicalProcessAssociation(
-                term=individual_to_term[individual], evidence=evs, provenances=[prov]
+                term=term, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "part_of", association)
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=OCCURS_IN
         ):
             association = CellularAnatomicalEntityAssociation(
-                term=individual_to_term[individual], evidence=evs, provenances=[prov]
+                term=term, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "occurs_in", association)
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
             if activity.has_input is None:
                 activity.has_input = []
             activity.has_input.append(
                 MoleculeAssociation(
-                    term=individual_to_term[individual],
+                    term=term,
                     evidence=evs,
                     provenances=[prov],
                 )
             )
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_INPUT
         ):
             association = MoleculeAssociation(
-                term=individual_to_term[individual], evidence=evs, provenances=[prov]
+                term=term, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_input", association)
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
             if activity.has_output is None:
                 activity.has_output = []
             activity.has_output.append(
                 MoleculeAssociation(
-                    term=individual_to_term[individual],
+                    term=term,
                     evidence=evs,
                     provenances=[prov],
                 )
             )
 
-        for activity, individual, evs, prov in _iter_activities_by_fact_subject(
+        for activity, term, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_OUTPUT
         ):
             association = MoleculeAssociation(
-                term=individual_to_term[individual], evidence=evs, provenances=[prov]
+                term=term, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_output", association)
 
@@ -392,9 +469,21 @@ class MinervaWrapper:
                 if MOLECULAR_FUNCTION not in individual_to_root_types.get(object_, []):
                     continue
                 if len(subject_activities) > 1:
-                    logger.debug(f"Multiple activities for subject: {subject}")
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.MULTIPLE_ACTIVITIES,
+                            message=f"Multiple activities for subject {subject}",
+                            entity_id=subject,
+                        )
+                    )
                 if len(object_activities) > 1:
-                    logger.debug(f"Multiple activities for object: {object_}")
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.MULTIPLE_ACTIVITIES,
+                            message=f"Multiple activities for object {object_}",
+                            entity_id=object_,
+                        )
+                    )
 
                 subject_activity = subject_activities[0]
                 object_activity = object_activities[0]
@@ -413,7 +502,7 @@ class MinervaWrapper:
         annotations = _annotations(obj)
         annotations_mv = _annotations_multivalued(obj)
 
-        objects: List[Object] = []
+        objects: list[Object] = []
         for obj in objects_by_id.values():
             object_ = Object(id=obj["id"])
             if "label" in obj:
@@ -472,9 +561,28 @@ class MinervaWrapper:
             try:
                 cam.status = ModelStateEnum(state_annotation)
             except ValueError:
-                logger.warning(f"Invalid status value: {state_annotation}")
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.INVALID_MODEL_STATE,
+                        message=f"Invalid model state {state_annotation}",
+                        entity_id=id,
+                    )
+                )
 
         if additional_taxa and len(additional_taxa) > 0:
             cam.additional_taxa = additional_taxa
 
-        return cam
+        return TranslationResult(result=cam, warnings=list(translation_warnings))
+
+    @staticmethod
+    def minerva_object_to_model(obj: dict) -> Model:
+        """Convert a Minerva JSON object to a GO-CAM Model.
+
+        Args:
+            obj: Minerva JSON object
+
+        Returns:
+            GO-CAM Model
+        """
+        result = MinervaWrapper.translate(obj)
+        return result.result
