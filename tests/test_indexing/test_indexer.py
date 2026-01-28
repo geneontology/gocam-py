@@ -1,12 +1,11 @@
 """Test for the indexer module."""
 
-import pytest
 import networkx as nx
+import pytest
 import yaml
 
 from gocam.datamodel import Model, QueryIndex
 from gocam.indexing.Indexer import Indexer
-
 from tests import EXAMPLES_DIR
 from tests.test_indexing import INPUT_DIR
 
@@ -14,9 +13,7 @@ from tests.test_indexing import INPUT_DIR
 @pytest.fixture
 def example_model() -> Model:
     """Load an example model for testing."""
-    with open(
-        f"{EXAMPLES_DIR}/Model-663d668500002178.yaml", "r"
-    ) as f:
+    with open(f"{EXAMPLES_DIR}/Model-663d668500002178.yaml", "r") as f:
         data = yaml.safe_load(f)
     return Model.model_validate(data)
 
@@ -44,6 +41,25 @@ def mock_oaklib_adapters(monkeypatch):
 
     monkeypatch.setattr(Indexer, "go_adapter", MockGoAdapter())
     monkeypatch.setattr(Indexer, "ncbi_taxon_adapter", MockNcbiTaxonAdapter())
+
+
+@pytest.fixture(autouse=True)
+def mock_current_groups_yaml(requests_mock):
+    groups_yaml = """
+- label: 'Mock Group A'
+  id: http://example.org/groupA
+  shorthand: A
+- label: 'Mock Group B'
+  id: http://example.org/groupB
+  shorthand: B
+  parent_group: A
+- label: 'Mock Group C'
+  id: http://example.org/groupC
+  shorthand: C
+"""
+    requests_mock.get(
+        "https://current.geneontology.org/metadata/groups.yaml", text=groups_yaml
+    )
 
 
 def test_index_model(example_model: Model):
