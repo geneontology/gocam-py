@@ -1,9 +1,10 @@
 """
 Shared pytest fixtures for all tests.
 """
+from pathlib import Path
+
 import pytest
 import yaml
-from pathlib import Path
 
 from gocam.datamodel import Model
 from gocam.translation.networkx.model_network_translator import ModelNetworkTranslator
