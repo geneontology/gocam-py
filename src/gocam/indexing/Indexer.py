@@ -63,6 +63,8 @@ def _iter_provided_bys(
                 for prov in evidence.provenances:
                     if prov.provided_by is not None:
                         yield from prov.provided_by
+
+
 class Indexer:
     """
     Indexes GO-CAM models for querying and analysis.
@@ -149,7 +151,9 @@ class Indexer:
         if self._goc_groups_yaml_path is not None:
             path = self._goc_groups_yaml_path
         else:
-            path = _PYSTOW_MODULE.ensure(url=_CURRENT_GROUPS_YAML_URL)
+            path = _PYSTOW_MODULE.ensure(
+                url=_CURRENT_GROUPS_YAML_URL, download_kwargs={"backend": "requests"}
+            )
         with open(path) as f:
             groups = yaml.safe_load(f)
         return {group["id"]: group for group in groups}
