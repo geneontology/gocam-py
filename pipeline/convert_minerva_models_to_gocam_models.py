@@ -17,187 +17,30 @@ filtering.
 
 import json
 import logging
-from abc import ABC, abstractmethod
-from collections import defaultdict
-from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
 from typing import Annotated
 
 import typer
-from rich import print
-from rich.logging import RichHandler
+from _common import (
+    ErrorReason,
+    ErrorResult,
+    FilteredResult,
+    FilterReason,
+    PipelineResult,
+    ResultSummary,
+    SuccessResult,
+    get_json_files,
+    model_to_graph,
+    setup_logger,
+)
 from rich.progress import track
-from rich.tree import Tree
 
 from gocam.datamodel import Activity, Model
-from gocam.translation import MinervaWrapper, TranslationWarning
+from gocam.translation import MinervaWrapper
 
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
-
-
-class FilterReason(str, Enum):
-    NO_ACTIVITY_EDGE = "No activity edge"
-    USES_COMPLEMENT = "Uses complement"
-
-
-class ErrorReason(str, Enum):
-    READ_ERROR = "Read error"
-    CONVERSION_ERROR = "Conversion error"
-    WRITE_ERROR = "Write error"
-
-
-class ProcessingResult(ABC):
-    """Base class for processing results."""
-
-    @property
-    @abstractmethod
-    def status(self) -> str:
-        """Return the status string for this result."""
-        pass
-
-
-@dataclass(frozen=True)
-class SuccessResult(ProcessingResult):
-    """Result for successful conversion."""
-
-    warnings: list[TranslationWarning]
-
-    @property
-    def status(self) -> str:
-        return "success"
-
-
-@dataclass(frozen=True)
-class FilteredResult(ProcessingResult):
-    """Result for models filtered out during conversion."""
-
-    reason: FilterReason
-
-    @property
-    def status(self) -> str:
-        return "filtered"
-
-
-@dataclass(frozen=True)
-class ErrorResult(ProcessingResult):
-    """Result for models that failed to convert."""
-
-    reason: ErrorReason
-    details: str | None = None
-
-    @property
-    def status(self) -> str:
-        return "error"
-
-
-class ResultSummary:
-    """Helper class to track and summarize processing results."""
-
-    def __init__(self, max_ids: int = 5):
-        """Initialize the result summary.
-
-        Args:
-            max_ids: Maximum number of model IDs to display per reason in the summary.
-        """
-        self._max_ids = max_ids
-        self._total_count = 0
-        self._success_count = 0
-        self._success_with_warnings_count = 0
-        self._filtered_count = 0
-        self._error_count = 0
-        self._filtered_count_by_reason: defaultdict[str, int] = defaultdict(int)
-        self._filtered_ids_by_reason: defaultdict[str, list[str]] = defaultdict(list)
-        self._error_count_by_reason: defaultdict[str, int] = defaultdict(int)
-        self._error_ids_by_reason: defaultdict[str, list[str]] = defaultdict(list)
-
-    def add_result(self, model_id: str, result: ProcessingResult) -> None:
-        """Add a processing result to the summary.
-
-        Args:
-            model_id: The ID of the model that was processed.
-            result: The processing result.
-        """
-        self._total_count += 1
-        match result:
-            case SuccessResult(warnings=warnings):
-                self._success_count += 1
-                if warnings:
-                    self._success_with_warnings_count += 1
-            case FilteredResult(reason=reason):
-                self._filtered_count += 1
-                self._filtered_count_by_reason[reason.value] += 1
-                if len(self._filtered_ids_by_reason[reason.value]) < self._max_ids:
-                    self._filtered_ids_by_reason[reason.value].append(model_id)
-            case ErrorResult(reason=reason):
-                self._error_count += 1
-                self._error_count_by_reason[reason.value] += 1
-                if len(self._error_ids_by_reason[reason.value]) < self._max_ids:
-                    self._error_ids_by_reason[reason.value].append(model_id)
-
-    def print(self):
-        """Print the result summary as a tree to the console."""
-
-        def handle_reasons(
-            parent_node: Tree, counts: dict[str, int], ids: dict[str, list[str]]
-        ) -> None:
-            for reason, total in counts.items():
-                reason_branch = parent_node.add(f"{reason}: [b]{total}[/b] models")
-                id_list = ids.get(reason, [])
-                for model_id in id_list:
-                    reason_branch.add(model_id)
-                if total > self._max_ids:
-                    reason_branch.add(f"... and {total - self._max_ids} more.")
-
-        tree = Tree(f"[bold]Processed {self._total_count} models[/bold]")
-        if self._success_count > 0:
-            success_branch = tree.add(
-                f"Successfully converted [b]{self._success_count}[/b] models",
-                style="green",
-            )
-            if self._success_with_warnings_count > 0:
-                success_branch.add(
-                    f"With conversion warnings: [b]{self._success_with_warnings_count}[/b] models"
-                )
-
-        if self._filtered_count > 0:
-            filtered_branch = tree.add(
-                f"Filtered out [b]{self._filtered_count}[/b] models for the following reasons:",
-                style="yellow",
-            )
-            handle_reasons(
-                filtered_branch,
-                self._filtered_count_by_reason,
-                self._filtered_ids_by_reason,
-            )
-
-        if self._error_count > 0:
-            error_branch = tree.add(
-                f"Failed to convert [b]{self._error_count}[/b] models for the following reasons:",
-                style="red",
-            )
-            handle_reasons(
-                error_branch, self._error_count_by_reason, self._error_ids_by_reason
-            )
-
-        print(tree)
-
-
-def setup_logger(verbose: int) -> None:
-    """Set up the logger with the specified verbosity level.
-
-    Args:
-        verbose (int): Verbosity level (0: WARNING, 1: INFO, 2: DEBUG)
-    """
-    if verbose == 0:
-        level = logging.WARNING
-    elif verbose == 1:
-        level = logging.INFO
-    else:
-        level = logging.DEBUG
-    logging.basicConfig(level=level, format="%(message)s", handlers=[RichHandler()])
 
 
 def activity_has_direct_causal_association(activity: Activity) -> bool:
@@ -266,7 +109,7 @@ def minerva_model_uses_complement(minerva_model: dict) -> bool:
 def process_minerva_model_file(
     json_file: Path,
     output_dir: Path | None,
-) -> ProcessingResult:
+) -> PipelineResult:
     """Process a single Minerva model JSON file and convert it to a GO-CAM model.
 
     Args:
@@ -293,6 +136,7 @@ def process_minerva_model_file(
     try:
         translation_result = MinervaWrapper.translate(minerva_model)
         gocam_model = translation_result.result
+        translation_warnings = [w.message for w in translation_result.warnings]
         logger.debug(
             f"Successfully converted Minerva model to GO-CAM model for {json_file}"
         )
@@ -304,14 +148,8 @@ def process_minerva_model_file(
         return ErrorResult(reason=ErrorReason.CONVERSION_ERROR, details=str(e))
 
     # Detect if there is at least one activity edge in the model. If not, skip writing the model.
-    has_activity_edge = False
-    for activity in gocam_model.activities or []:
-        if activity_has_direct_causal_association(activity):
-            has_activity_edge = True
-            break
-        if activity_has_indirect_chemical_association(activity, gocam_model):
-            has_activity_edge = True
-            break
+    graph = model_to_graph(gocam_model)
+    has_activity_edge = graph.number_of_edges() > 0
     if not has_activity_edge:
         logger.info(f"GO-CAM model {gocam_model.id} has no activity edges; skipping.")
         return FilteredResult(reason=FilterReason.NO_ACTIVITY_EDGE)
@@ -328,7 +166,7 @@ def process_minerva_model_file(
         logger.info(
             f"Dry run enabled; skipping write for GO-CAM model {gocam_model.id}"
         )
-        return SuccessResult(warnings=translation_result.warnings)
+        return SuccessResult(warnings=translation_warnings)
 
     # Write GO-CAM model to output directory
     output_file = output_dir / json_file.name
@@ -342,34 +180,7 @@ def process_minerva_model_file(
         return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
     # If we reach here, the conversion and writing were successful
-    return SuccessResult(warnings=translation_result.warnings)
-
-
-def write_result_to_report(
-    report_file: typer.FileTextWrite, model_id: str, result: ProcessingResult
-) -> None:
-    """Write the processing result to the provided report file.
-
-    Args:
-        report_file: The report file to write to.
-        model_id: The ID of the model that was processed.
-        result: The processing result.
-    """
-    report_entry: dict[str, str | list[str]] = {
-        "model": model_id,
-        "result": result.status,
-    }
-    match result:
-        case SuccessResult(warnings):
-            if warnings:
-                report_entry["warnings"] = [w.message for w in warnings]
-        case FilteredResult(reason):
-            report_entry["reason"] = reason.value
-        case ErrorResult(reason, details):
-            report_entry["reason"] = reason.value
-            if details:
-                report_entry["details"] = details
-    report_file.write(json.dumps(report_entry) + "\n")
+    return SuccessResult(warnings=translation_warnings)
 
 
 @app.command()
@@ -439,13 +250,8 @@ def main(
             "Report file should have a .jsonl extension for JSON Lines format."
         )
 
-    # Get list of JSON files in the input directory, excluding hidden files, and sort them
-    # for consistent processing order. Apply limit if specified.
-    json_files = sorted(
-        f for f in input_dir.glob("*.json") if not f.name.startswith(".")
-    )
-    if limit > 0:
-        json_files = json_files[:limit]
+    # Get list of JSON files in the input directory
+    json_files = get_json_files(input_dir, limit=limit)
 
     # If no JSON files found, log a warning and exit
     if not json_files:
@@ -462,7 +268,7 @@ def main(
         model_id = json_file.stem
         result_summary.add_result(model_id, result)
         if report_file:
-            write_result_to_report(report_file, model_id, result)
+            result.write_to_file(report_file, model_id)
 
     # Print result
     result_summary.print()
