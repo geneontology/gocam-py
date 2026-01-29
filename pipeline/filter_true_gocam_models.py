@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Filter a collection of models and by whether they pass the True GO-CAM model criteria.
+Filter a collection of models by whether they pass the True GO-CAM model criteria.
 
 A True GO-CAM model is defined as a production GO-CAM model that is pathway-like, meaning it
 contains at least three activities connected in sequence. The connection can be either a direct
