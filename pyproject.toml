@@ -50,7 +50,7 @@ exclude = ["pipeline/"]
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
-[tool.pytest]
+[tool.pytest.ini_options]
 addopts = [
     "--import-mode=importlib"
 ]
