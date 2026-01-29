@@ -109,6 +109,8 @@ def model_to_graph(model: Model) -> nx.DiGraph:
         if activity.enabled_by is None:
             continue
 
+        graph.add_node(activity.id)
+
         for causal_assoc in activity.causal_associations or []:
             downstream_activity_id = causal_assoc.downstream_activity
             if downstream_activity_id:
