@@ -1,22 +1,21 @@
 """Test for the indexer module."""
 
-import pytest
 import networkx as nx
-from linkml_runtime.loaders import yaml_loader
+import pytest
+import yaml
 
 from gocam.datamodel import Model, QueryIndex
 from gocam.indexing.Indexer import Indexer
-
 from tests import EXAMPLES_DIR
 from tests.test_indexing import INPUT_DIR
 
 
 @pytest.fixture
-def example_model():
+def example_model() -> Model:
     """Load an example model for testing."""
-    return yaml_loader.load(
-        f"{EXAMPLES_DIR}/Model-663d668500002178.yaml", target_class=Model
-    )
+    with open(f"{EXAMPLES_DIR}/Model-663d668500002178.yaml", "r") as f:
+        data = yaml.safe_load(f)
+    return Model.model_validate(data)
 
 
 @pytest.fixture(autouse=True)
@@ -44,7 +43,26 @@ def mock_oaklib_adapters(monkeypatch):
     monkeypatch.setattr(Indexer, "ncbi_taxon_adapter", MockNcbiTaxonAdapter())
 
 
-def test_index_model(example_model):
+@pytest.fixture(autouse=True)
+def mock_current_groups_yaml(requests_mock):
+    groups_yaml = """
+- label: 'Mock Group A'
+  id: http://example.org/groupA
+  shorthand: A
+- label: 'Mock Group B'
+  id: http://example.org/groupB
+  shorthand: B
+  parent_group: A
+- label: 'Mock Group C'
+  id: http://example.org/groupC
+  shorthand: C
+"""
+    requests_mock.get(
+        "https://current.geneontology.org/metadata/groups.yaml", text=groups_yaml
+    )
+
+
+def test_index_model(example_model: Model):
     """Test that a model can be indexed."""
     indexer = Indexer()
 
@@ -81,7 +99,7 @@ def test_index_model(example_model):
     indexer.index_model(example_model, reindex=True)
 
 
-def test_model_to_digraph(example_model):
+def test_model_to_digraph(example_model: Model):
     """Test converting a model to a directed graph."""
     indexer = Indexer()
     graph = indexer.model_to_digraph(example_model)
@@ -92,7 +110,7 @@ def test_model_to_digraph(example_model):
     assert graph.number_of_edges() > 0
 
     # Verify edges correspond to causal associations
-    for activity in example_model.activities:
+    for activity in example_model.activities or []:
         if activity.causal_associations:
             for ca in activity.causal_associations:
                 # Check that the edge exists from downstream activity to this activity id
@@ -144,6 +162,7 @@ def test_indexer_populates_taxon_label():
     model = Model(id="test", title="Test Model", taxon="NCBITaxon:9606")
     indexer = Indexer()
     indexer.index_model(model)
+    assert model.query_index is not None
     assert model.query_index.taxon_label == "Human"  # From our mock adapter
 
 
@@ -175,6 +194,7 @@ def test_indexer_gets_labels_from_model_objects():
     )
     indexer = Indexer()
     indexer.index_model(model)
+    assert model.query_index is not None
     assert model.query_index.model_activity_enabled_by_terms is not None
     assert len(model.query_index.model_activity_enabled_by_terms) == 2
     assert {
@@ -210,6 +230,7 @@ def test_indexer_adds_complex_members_to_model_activity_enabled_by_genes():
     indexer.index_model(model)
 
     # The indexer should have unpacked the two complex members into model_activity_enabled_by_genes
+    assert model.query_index is not None
     assert model.query_index.model_activity_enabled_by_genes is not None
     assert len(model.query_index.model_activity_enabled_by_genes) == 2
     assert {gene.id for gene in model.query_index.model_activity_enabled_by_genes} == {
@@ -232,7 +253,7 @@ def test_indexer_populates_flattened_provided_by():
     with open(
         INPUT_DIR / "test_indexer_populates_flattened_provided_by_model.yaml"
     ) as f:
-        model = yaml_loader.load(f, target_class=Model)
+        model = Model.model_validate(yaml.safe_load(f))
 
     indexer = Indexer(
         goc_groups_yaml_path=INPUT_DIR
@@ -240,6 +261,7 @@ def test_indexer_populates_flattened_provided_by():
     )
     indexer.index_model(model)
 
+    assert model.query_index is not None
     assert model.query_index.flattened_provided_by is not None
     assert len(model.query_index.flattened_provided_by) == 5
     assert {provider.label for provider in model.query_index.flattened_provided_by} == {

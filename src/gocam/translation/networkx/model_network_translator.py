@@ -74,6 +74,8 @@ class ModelNetworkTranslator(GraphTranslator):
                 continue
                 
             for causal_assoc in activity.causal_associations:
+                if not causal_assoc.downstream_activity:
+                    continue
                 target_gene = activity_to_gene.get(causal_assoc.downstream_activity)
                 if not target_gene:
                     continue
@@ -107,15 +109,17 @@ class ModelNetworkTranslator(GraphTranslator):
         Returns:
             Dictionary of node attributes
         """
-        attrs = {
-            'gene_product': activity.enabled_by.term,
+        attrs: dict[str, str] = {
             'model_id': model.id
         }
+
+        if activity.enabled_by and activity.enabled_by.term:
+            attrs['gene_product'] = activity.enabled_by.term
         
         # Add gene product label if available
         if model.objects:
             for obj in model.objects:
-                if obj.id == activity.enabled_by.term and obj.label:
+                if activity.enabled_by and obj.id == activity.enabled_by.term and obj.label:
                     attrs['label'] = obj.label
                     break
         
@@ -142,7 +146,7 @@ class ModelNetworkTranslator(GraphTranslator):
         Returns:
             Dictionary of edge attributes with GO term information
         """
-        attrs = {
+        attrs: dict[str, Any] = {
             'source_gene': source_gene,
             'target_gene': target_gene,
             'model_id': model.id
@@ -180,7 +184,7 @@ class ModelNetworkTranslator(GraphTranslator):
         
         return attrs
     
-    def _find_activity_by_id(self, activity_id: str, model: Model) -> Optional[Activity]:
+    def _find_activity_by_id(self, activity_id: str | None, model: Model) -> Optional[Activity]:
         """
         Find an activity by its ID in the model.
         
@@ -191,6 +195,8 @@ class ModelNetworkTranslator(GraphTranslator):
         Returns:
             Activity object if found, None otherwise
         """
+        if not activity_id:
+            return None
         for activity in model.activities or []:
             if activity.id == activity_id:
                 return activity
@@ -282,14 +288,14 @@ class ModelNetworkTranslator(GraphTranslator):
             if key in merged:
                 # Convert to list if not already
                 if not isinstance(merged[key], list):
-                    merged[key] = [merged[key]]
+                    merged[key] = [merged[key]]  # ty:ignore[invalid-assignment]
                 if not isinstance(value, list):
                     value = [value]
                 
                 # Extend the list with new values, avoiding duplicates
                 for v in value:
                     if v not in merged[key]:
-                        merged[key].append(v)
+                        merged[key].append(v)  # ty:ignore[possibly-missing-attribute]
             else:
                 merged[key] = value
                 
@@ -344,22 +350,26 @@ class ModelNetworkTranslator(GraphTranslator):
             if len(models_list) == 1:
                 # Single model metadata
                 model = models_list[0]
-                result["graph"]["model_info"] = {
-                    "id": model.id,
-                    "title": model.title,
-                    "taxon": model.taxon,
-                    "status": model.status
-                }
-            else:
-                # Multiple models metadata
-                result["graph"]["models_info"] = [
-                    {
+                result["graph"] = {
+                    "model_info": {
                         "id": model.id,
                         "title": model.title,
                         "taxon": model.taxon,
                         "status": model.status
                     }
-                    for model in models_list
-                ]
+                }
+            else:
+                # Multiple models metadata
+                result["graph"] = {
+                    "models_info": [
+                        {
+                            "id": model.id,
+                            "title": model.title,
+                            "taxon": model.taxon,
+                            "status": model.status
+                        }
+                        for model in models_list
+                    ]
+                }
         
         return result
