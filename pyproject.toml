@@ -52,6 +52,9 @@ source = "uv-dynamic-versioning"
 
 [tool.pytest.ini_options]
 addopts = [
+    # With the default import mode, pytest will add the root of the project to sys.path. This would
+    # potentially allow code in `src` to import code from `pipeline` -- which we want to avoid.
+    # Using `importlib` more closely mimics how the code will be run when installed as a package.
     "--import-mode=importlib"
 ]
 markers = [
