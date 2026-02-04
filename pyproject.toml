@@ -40,15 +40,23 @@ dev = [
     "mkdocs-mermaid2-plugin>=1.1.1",
     "pytest>=8.2.2,<10",
     "requests-mock>=1.12.1,<2",
-    "ruff>=0.6.9,<0.15",
-    "schemasheets>=0.1.14,<0.5",
-    "ty>=0.0.10",
+    "ruff==0.14.14",
+    "ty==0.0.14",
 ]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["pipeline/"]
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
 [tool.pytest.ini_options]
+addopts = [
+    # With the default import mode, pytest will add the root of the project to sys.path. This would
+    # potentially allow code in `src` to import code from `pipeline` -- which we want to avoid.
+    # Using `importlib` more closely mimics how the code will be run when installed as a package.
+    "--import-mode=importlib"
+]
 markers = [
     "integration"
 ]

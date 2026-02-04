@@ -1,17 +1,46 @@
-from dataclasses import dataclass, field
-from typing import Iterator, Union, Iterable, Optional, Dict, List, Literal
-
-from oaklib.datamodels.vocabulary import IN_TAXON, RDFS_LABEL, PART_OF, IS_A, HAS_PART, MOLECULAR_FUNCTION, HAS_OUTPUT
-from pyhornedowl import PyIndexedOntology
-
-from gocam.datamodel import Model, Activity, BiologicalProcessAssociation, \
-    CellularAnatomicalEntityAssociation, CellTypeAssociation, \
-    GrossAnatomyAssociation, EnabledByProteinComplexAssociation, EnabledByGeneProductAssociation, MoleculeAssociation
-from gocam.translation.minerva_wrapper import OCCURS_IN, HAS_INPUT, HAS_PRIMARY_INPUT, HAS_PRIMARY_OUTPUT, ENABLED_BY
-
-from pyhornedowl.model import SubClassOf, ObjectSomeValuesFrom, IRI, Class, ObjectProperty, \
-    AnnotationAssertion, Annotation, SimpleLiteral
 import logging
+from dataclasses import dataclass, field
+from typing import Dict, Iterable, Iterator, List, Literal, Optional, Union
+
+from oaklib.datamodels.vocabulary import (
+    HAS_OUTPUT,
+    HAS_PART,
+    IN_TAXON,
+    IS_A,
+    MOLECULAR_FUNCTION,
+    PART_OF,
+    RDFS_LABEL,
+)
+from pyhornedowl import PyIndexedOntology
+from pyhornedowl.model import (
+    IRI,
+    Annotation,
+    AnnotationAssertion,
+    Class,
+    ObjectProperty,
+    ObjectSomeValuesFrom,
+    SimpleLiteral,
+    SubClassOf,
+)
+
+from gocam.datamodel import (
+    Activity,
+    BiologicalProcessAssociation,
+    CellTypeAssociation,
+    CellularAnatomicalEntityAssociation,
+    EnabledByGeneProductAssociation,
+    EnabledByProteinComplexAssociation,
+    GrossAnatomyAssociation,
+    Model,
+    MoleculeAssociation,
+)
+from gocam.translation.minerva_wrapper import (
+    ENABLED_BY,
+    HAS_INPUT,
+    HAS_PRIMARY_INPUT,
+    HAS_PRIMARY_OUTPUT,
+    OCCURS_IN,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +136,7 @@ class TBoxTranslator:
         eb = activity.enabled_by
         if eb and eb.term:
             if isinstance(eb, EnabledByProteinComplexAssociation):
-                pc_id = self.make_id(model, eb.term, *eb.members)
+                pc_id = self.make_id(model, eb.term, *(eb.members or []))
                 yield from self.add_edge(activity.id, ENABLED_BY, pc_id)
                 member_labels: list[str] = []
                 if eb.members:
