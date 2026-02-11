@@ -191,7 +191,7 @@ def main(
             file_okay=True,
             dir_okay=False,
             readable=True,
-            help="YAML file defining GO-CAM groups. If not provided, group information will be fetched from `current.geneontology.org`.",
+            help="YAML file defining GOC groups. If not provided, group information will be fetched from `current.geneontology.org`.",
         ),
     ] = None,
     verbose: Annotated[
