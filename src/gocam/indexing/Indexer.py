@@ -87,6 +87,9 @@ def _iter_model_provenances(model: Model) -> Iterable[ProvenanceInfo]:
     """
     if model.provenances:
         yield from model.provenances
+    for activity in model.activities or []:
+        if activity.provenances:
+            yield from activity.provenances
     for association in _iter_model_associations(model):
         yield from _iter_association_provenances(association)
 
