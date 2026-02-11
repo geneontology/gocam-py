@@ -270,6 +270,19 @@
 
 
 
+      QueryIndex : flattened_contributors
+
+      QueryIndex : flattened_evidence_terms
+
+
+
+
+
+        QueryIndex --&gt; "*" EvidenceTermObject : flattened_evidence_terms
+        click EvidenceTermObject href "../EvidenceTermObject/"
+
+
+
       QueryIndex : flattened_provided_by
 
 
@@ -617,6 +630,18 @@
 <td>direct</td>
 </tr>
 <tr>
+<td><a href="../flattened_contributors/">flattened_contributors</a></td>
+<td>* <br/> <a href="../String/">String</a></td>
+<td>All contributor values from the model across different levels combined in one...</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../flattened_evidence_terms/">flattened_evidence_terms</a></td>
+<td>* <br/> <a href="../EvidenceTermObject/">EvidenceTermObject</a></td>
+<td>All evidence term objects from the model across different levels combined in ...</td>
+<td>direct</td>
+</tr>
+<tr>
 <td><a href="../model_activity_molecular_function_terms/">model_activity_molecular_function_terms</a></td>
 <td>* <br/> <a href="../TermObject/">TermObject</a></td>
 <td>All MF terms for all activities</td>
@@ -918,6 +943,30 @@ attributes:
     domain_of:
     - QueryIndex
     range: Object
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  flattened_contributors:
+    name: flattened_contributors
+    description: All contributor values from the model across different levels combined
+      in one place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: string
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  flattened_evidence_terms:
+    name: flattened_evidence_terms
+    description: All evidence term objects from the model across different levels
+      combined in one place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: EvidenceTermObject
     multivalued: true
     inlined: true
     inlined_as_list: true
@@ -1365,6 +1414,34 @@ attributes:
     domain_of:
     - QueryIndex
     range: Object
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  flattened_contributors:
+    name: flattened_contributors
+    description: All contributor values from the model across different levels combined
+      in one place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: flattened_contributors
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: string
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  flattened_evidence_terms:
+    name: flattened_evidence_terms
+    description: All evidence term objects from the model across different levels
+      combined in one place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: flattened_evidence_terms
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: EvidenceTermObject
     multivalued: true
     inlined: true
     inlined_as_list: true
