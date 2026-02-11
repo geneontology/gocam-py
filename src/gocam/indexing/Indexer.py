@@ -11,12 +11,14 @@ from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import IS_A, PART_OF
 
 from gocam.datamodel import (
-    Activity,
     Association,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
+    EvidenceItem,
+    EvidenceTermObject,
     Model,
     Object,
+    ProvenanceInfo,
     PublicationObject,
     QueryIndex,
     TermObject,
@@ -28,41 +30,83 @@ _PYSTOW_MODULE = pystow.module("gocam")
 _CURRENT_GROUPS_YAML_URL = "https://current.geneontology.org/metadata/groups.yaml"
 
 
-def _iter_association_references(
+def _iter_association_provenances(
     association: Association | None,
-) -> Iterable[str]:
+) -> Iterable[ProvenanceInfo]:
     """
-    Extract references from an Association.
+    Extract all ProvenanceInfo objects from an Association and its evidence.
 
     Returns:
-        Iterable[str]: Iterable over reference strings extracted from the evidence of the Association.
+        Iterable[ProvenanceInfo]: Iterable over ProvenanceInfo objects extracted from the association and its evidence.
     """
-    if association is not None and association.evidence is not None:
+    if association is None:
+        return
+    if association.provenances:
+        yield from association.provenances
+    if association.evidence:
         for evidence in association.evidence:
-            if evidence.reference is not None:
-                yield evidence.reference
+            if evidence.provenances:
+                yield from evidence.provenances
 
 
-def _iter_provided_bys(
-    item: Association | Model | Activity | None,
-) -> Iterable[str]:
+def _iter_model_associations(model: Model) -> Iterable[Association]:
     """
-    Extract all provided_by strings from an item (Association, Model, or Activity) with provenances.
+    Extract all Association objects from a Model.
 
     Returns:
-        Iterable[str]: Iterable over provided_by strings extracted from the item's provenances.
+        Iterable[Association]: Iterable over Association objects extracted from the model's activities.
     """
-    if item is not None and item.provenances is not None:
-        for prov in item.provenances:
-            if prov.provided_by is not None:
-                yield from prov.provided_by
-    # Also extract from evidence item provenances
-    if isinstance(item, Association) and item.evidence is not None:
-        for evidence in item.evidence:
-            if evidence.provenances is not None:
-                for prov in evidence.provenances:
-                    if prov.provided_by is not None:
-                        yield from prov.provided_by
+    for activity in model.activities or []:
+        if activity.enabled_by:
+            yield activity.enabled_by
+        if activity.molecular_function:
+            yield activity.molecular_function
+        if activity.part_of:
+            yield activity.part_of
+        if activity.occurs_in:
+            yield activity.occurs_in
+        if activity.has_primary_input:
+            yield activity.has_primary_input
+        for has_input in activity.has_input or []:
+            yield has_input
+        if activity.has_primary_output:
+            yield activity.has_primary_output
+        for has_output in activity.has_output or []:
+            yield has_output
+        for causal_association in activity.causal_associations or []:
+            yield causal_association
+
+
+def _iter_model_provenances(model: Model) -> Iterable[ProvenanceInfo]:
+    """
+    Extract all ProvenanceInfo objects from a Model.
+
+    Returns:
+        Iterable[ProvenanceInfo]: Iterable over ProvenanceInfo objects extracted from the model,
+            its activities, and all associations within those activities.
+    """
+    if model.provenances:
+        yield from model.provenances
+    for activity in model.activities or []:
+        if activity.provenances:
+            yield from activity.provenances
+    for association in _iter_model_associations(model):
+        yield from _iter_association_provenances(association)
+
+
+def _iter_model_evidence(model: Model) -> Iterable[EvidenceItem]:
+    """
+    Extract all EvidenceItem objects from a Model.
+
+    Args:
+        model: The GO-CAM model to extract evidence from.
+
+    Returns:
+        Iterable[EvidenceItem]: Iterable over EvidenceItem objects extracted from the model's associations.
+    """
+    for association in _iter_model_associations(model):
+        if association.evidence:
+            yield from association.evidence
 
 
 class Indexer:
@@ -176,7 +220,10 @@ class Indexer:
         Get the label for a GO term.
 
         Args:
-            id: The GO term ID
+            id: The GO term ID.
+
+        Returns:
+            Optional[str]: The label for the GO term, or None if not found.
         """
         return self.go_adapter.label(id)
 
@@ -186,7 +233,10 @@ class Indexer:
         Get the label for an NCBI Taxonomy term.
 
         Args:
-            id: The NCBI Taxonomy term ID
+            id: The NCBI Taxonomy term ID.
+
+        Returns:
+            Optional[str]: The label for the NCBI Taxonomy term, or None if not found.
         """
         return self.ncbi_taxon_adapter.label(id)
 
@@ -255,9 +305,12 @@ class Indexer:
         """
         Create a QueryIndex for the given model.
 
-        :param model:
-        :param qi: existing QueryIndex to populate, or None to create a new one
-        :return:
+        Args:
+            model: The GO-CAM model to create a query index for.
+            qi: Optional existing QueryIndex to populate. If None, a new one is created.
+
+        Returns:
+            QueryIndex: The populated QueryIndex object.
         """
         if qi is None:
             qi = QueryIndex()
@@ -265,8 +318,6 @@ class Indexer:
         qi = model.query_index
         qi.number_of_activities = len(model.activities or [])
         all_causal_associations = []
-        all_refs = set()
-        all_provided_bys: set[str] = set()
         all_mfs = set()
         all_enabled_bys = set()
         all_enabled_by_genes = set()
@@ -286,21 +337,12 @@ class Indexer:
 
             return x
 
-        all_provided_bys.update(_iter_provided_bys(model))
-
         for activity in model.activities or []:
-            all_provided_bys.update(_iter_provided_bys(activity))
-
             annoton_term_id_parts = []
             if activity.causal_associations:
                 all_causal_associations.extend(activity.causal_associations)
-                for causal_association in activity.causal_associations:
-                    all_refs.update(_iter_association_references(causal_association))
-                    all_provided_bys.update(_iter_provided_bys(causal_association))
 
             if activity.enabled_by:
-                all_refs.update(_iter_association_references(activity.enabled_by))
-                all_provided_bys.update(_iter_provided_bys(activity.enabled_by))
                 all_enabled_bys.add(activity.enabled_by.term)
                 if isinstance(activity.enabled_by, EnabledByGeneProductAssociation):
                     all_enabled_by_genes.add(activity.enabled_by.term)
@@ -312,29 +354,19 @@ class Indexer:
                 annoton_term_id_parts.append(activity.enabled_by.term)
 
             if activity.molecular_function:
-                all_refs.update(
-                    _iter_association_references(activity.molecular_function)
-                )
-                all_provided_bys.update(_iter_provided_bys(activity.molecular_function))
                 all_mfs.add(activity.molecular_function.term)
                 annoton_term_id_parts.append(activity.molecular_function.term)
 
             if activity.part_of:
-                all_refs.update(_iter_association_references(activity.part_of))
-                all_provided_bys.update(_iter_provided_bys(activity.part_of))
                 all_parts_ofs.add(activity.part_of.term)
                 annoton_term_id_parts.append(activity.part_of.term)
 
             if activity.occurs_in:
-                all_refs.update(_iter_association_references(activity.occurs_in))
-                all_provided_bys.update(_iter_provided_bys(activity.occurs_in))
                 all_occurs_ins.add(activity.occurs_in.term)
                 annoton_term_id_parts.append(activity.occurs_in.term)
 
             if activity.has_input:
                 for ta in activity.has_input:
-                    all_refs.update(_iter_association_references(ta))
-                    all_provided_bys.update(_iter_provided_bys(ta))
                     all_has_inputs.add(ta.term)
                     annoton_term_id_parts.append(ta.term)
 
@@ -349,7 +381,14 @@ class Indexer:
 
         qi.number_of_enabled_by_terms = len(all_enabled_bys)
         qi.number_of_causal_associations = len(all_causal_associations)
-        qi.flattened_references = [PublicationObject(id=ref) for ref in all_refs]
+
+        all_provided_bys = set()
+        all_contributors = set()
+        for prov in _iter_model_provenances(model):
+            if prov.provided_by:
+                all_provided_bys.update(prov.provided_by)
+            if prov.contributor:
+                all_contributors.update(prov.contributor)
         qi.flattened_provided_by = sorted(
             [
                 Object(
@@ -362,6 +401,21 @@ class Indexer:
             ],
             key=lambda x: x.label,
         )
+        qi.flattened_contributors = sorted(all_contributors)
+
+        all_refs = set()
+        all_evidence_terms = set()
+        for evidence in _iter_model_evidence(model):
+            if evidence.term:
+                all_evidence_terms.add(evidence.term)
+            if evidence.reference:
+                all_refs.add(evidence.reference)
+        qi.flattened_references = [PublicationObject(id=ref) for ref in all_refs]
+        qi.flattened_evidence_terms = [
+            EvidenceTermObject(id=term, label=_label(term))
+            for term in sorted(all_evidence_terms)
+        ]
+
         graph = self.model_to_digraph(model)
         # use nx to find the longest path and all SCCs
         if graph.number_of_nodes() > 0:

@@ -32,12 +32,15 @@ def setup_logger(verbose: int) -> None:
     logging.basicConfig(level=level, format="%(message)s", handlers=[RichHandler()])
 
 
-def get_json_files(input_dir: Path, *, limit: int | None = None) -> list[Path]:
+def get_json_files(
+    input_dir: Path, *, limit: int | None = None, raise_on_empty: bool = True
+) -> list[Path]:
     """Get a sorted list of JSON files in the input directory, excluding hidden files.
 
     Args:
         input_dir: Directory to search for JSON files.
         limit: Optional limit on the number of files to return. If None or 0, no limit is applied.
+        raise_on_empty: If True, raise a ValueError if no JSON files are found.
 
     Returns:
         List of JSON file paths.
@@ -47,6 +50,8 @@ def get_json_files(input_dir: Path, *, limit: int | None = None) -> list[Path]:
         for file in input_dir.iterdir()
         if file.is_file() and file.suffix == ".json" and not file.name.startswith(".")
     )
+    if not files and raise_on_empty:
+        raise ValueError(f"No JSON files found in directory: {input_dir}")
     if limit is not None and limit > 0:
         files = files[:limit]
     return files

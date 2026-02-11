@@ -253,11 +253,6 @@ def main(
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
 
-    # If no JSON files found, log a warning and exit
-    if not json_files:
-        logger.warning(f"No JSON files found in the specified directory: {input_dir}")
-        raise typer.Exit(code=1)
-
     # Process each JSON file
     result_summary = ResultSummary()
     for json_file in track(
