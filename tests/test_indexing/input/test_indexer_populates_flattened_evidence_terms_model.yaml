@@ -1,0 +1,103 @@
+---
+id: gomodel:00000000000000000
+title: test_indexer_populates_flattened_provided_by_model
+comments:
+  - A test model to verify that the flattened provided_by field is populated from various provenances in the model.
+taxon: NCBITaxon:10090
+activities:
+  - id: gomodel:00000000000000000/6197061700002326
+    enabled_by:
+      type: EnabledByGeneProductAssociation
+      evidence:
+        - term: ECO:0000001
+          reference: PMID:9556621
+          with_objects:
+            - UniProtKB:O14944
+          provenances:
+            - contributor:
+                - https://example.org/0001
+              date: '2021-12-01'
+              provided_by:
+                - http://example.org
+      provenances:
+        - contributor:
+            - https://example.org/0001
+          date: '2021-12-01'
+          provided_by:
+            - http://test1.example.org
+      term: MGI:MGI:107508
+    molecular_function:
+      type: MolecularFunctionAssociation
+      term: GO:0048018
+    occurs_in:
+      type: CellularAnatomicalEntityAssociation
+      evidence:
+        - term: ECO:0000001
+          reference: PMID:9556621
+          with_objects:
+            - UniProtKB:O14944
+          provenances:
+            - contributor:
+                - https://example.org/0001
+              date: '2022-01-14'
+              provided_by:
+                - http://example.org
+      provenances:
+        - contributor:
+            - https://example.org/0001
+          date: '2022-01-14'
+          provided_by:
+            - http://example.org
+      term: GO:0005615
+    part_of:
+      type: BiologicalProcessAssociation
+      evidence:
+        - term: ECO:0000002
+          reference: PMID:9556621
+          with_objects:
+            - UniProtKB:O14944
+          provenances:
+            - contributor:
+                - https://example.org/0001
+              date: '2021-12-01'
+              provided_by:
+                - http://example.org
+      provenances:
+        - contributor:
+            - https://example.org/0001
+          date: '2021-12-01'
+          provided_by:
+            - http://example.org
+      term: GO:0038138
+    causal_associations:
+      - type: CausalAssociation
+        evidence:
+          - term: ECO:0000001
+            reference: PMID:9556621
+            with_objects:
+              - UniProtKB:O14944
+            provenances:
+              - contributor:
+                  - https://example.org/0001
+                date: '2021-12-01'
+                provided_by:
+                  - http://example.org
+        provenances:
+          - contributor:
+              - https://example.org/0001
+            date: '2023-03-16'
+            provided_by:
+              - http://example.org
+        predicate: RO:0002629
+        downstream_activity: gomodel:00000000000000000/6197061700002322
+objects:
+  - id: ECO:0000001
+    label: 'Test Evidence 1'
+  - id: ECO:0000002
+    label: 'Test Evidence 2'
+provenances:
+  - contributor:
+      - https://example.org/0001
+    date: '2023-03-16'
+    provided_by:
+      - http://example.org
