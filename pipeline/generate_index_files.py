@@ -220,6 +220,7 @@ def main(
                 model = Model.model_validate_json(f.read())
         except Exception:
             logger.exception(f"Error reading model from {json_file}")
+            continue
 
         indexer.index_model(model)
         if model.query_index is None:
