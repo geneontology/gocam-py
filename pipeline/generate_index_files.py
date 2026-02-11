@@ -172,6 +172,28 @@ def main(
             help="If set, model processing will be performed but no files will be written.",
         ),
     ] = False,
+    go_adapater_descriptor: Annotated[
+        str,
+        typer.Option(
+            help="OAK adapter descriptor for GO. See: https://incatools.github.io/ontology-access-kit/packages/selectors.html#ontology-adapter-selectors",
+        ),
+    ] = "sqlite:obo:go",
+    ncbi_taxon_adapter_descriptor: Annotated[
+        str,
+        typer.Option(
+            help="OAK adapter descriptor for the NCBITaxon ontology. See: https://incatools.github.io/ontology-access-kit/packages/selectors.html#ontology-adapter-selectors",
+        ),
+    ] = "sqlite:obo:ncbitaxon",
+    goc_groups_yaml: Annotated[
+        Path | None,
+        typer.Option(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="YAML file defining GO-CAM groups. If not provided, group information will be fetched from `current.geneontology.org`.",
+        ),
+    ] = None,
     verbose: Annotated[
         int,
         typer.Option(
@@ -203,7 +225,11 @@ def main(
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
 
-    indexer = Indexer()
+    indexer = Indexer(
+        go_adapter_descriptor=go_adapater_descriptor,
+        ncbi_taxon_adapter_descriptor=ncbi_taxon_adapter_descriptor,
+        goc_groups_yaml_path=goc_groups_yaml,
+    )
 
     reports = [
         ContributorIndexReport("contributor_index.json"),
