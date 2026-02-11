@@ -235,7 +235,7 @@ def main(
                     f"Error processing model {json_file} for report {report.file_name}"
                 )
 
-    if output_dir:
+    if output_dir and not dry_run:
         for report in reports:
             try:
                 report.write(output_dir)
