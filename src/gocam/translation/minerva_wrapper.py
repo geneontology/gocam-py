@@ -9,7 +9,9 @@ import requests
 from gocam.datamodel import (
     Activity,
     BiologicalProcessAssociation,
+    BiologicalProcessPhaseAssociation,
     CausalAssociation,
+    CellTypeAssociation,
     CellularAnatomicalEntityAssociation,
     EnabledByAssociation,
     EnabledByGeneProductAssociation,
@@ -34,6 +36,7 @@ HAS_INPUT = "RO:0002233"
 HAS_OUTPUT = "RO:0002234"
 HAS_PRIMARY_INPUT = "RO:0004009"
 HAS_PRIMARY_OUTPUT = "RO:0004008"
+HAPPENS_DURING = "RO:0002092"
 
 logger = logging.getLogger(__name__)
 
@@ -90,24 +93,6 @@ def _annotations_multivalued(obj: dict) -> dict[str, list[str]]:
         value = a["value"]
         anns[key].append(value)
     return anns
-
-
-def _provenance_from_fact(fact: dict) -> ProvenanceInfo:
-    """Produce a ProvenanceInfo object from a fact object.
-
-    Args:
-        fact: The fact object
-
-    Returns:
-        ProvenanceInfo: The produced ProvenanceInfo object
-    """
-    annotations = _annotations(fact)
-    annotations_mv = _annotations_multivalued(fact)
-    return ProvenanceInfo(
-        contributor=annotations_mv.get("contributor"),
-        date=annotations.get("date", None),
-        provided_by=annotations_mv.get("providedBy"),
-    )
 
 
 MOLECULAR_FUNCTION = "GO:0003674"
@@ -193,7 +178,7 @@ class MinervaWrapper:
         return self.minerva_object_to_model(minerva_object)
 
     @staticmethod
-    def translate(obj: dict) -> TranslationResult[Model]:
+    def translate(minerva_obj: dict) -> TranslationResult[Model]:
         """Convert a Minerva JSON object to a GO-CAM Model.
 
         Args:
@@ -202,7 +187,7 @@ class MinervaWrapper:
         Returns:
             Object containing GO-CAM Model and any translation warnings
         """
-        id = obj["id"]
+        id = minerva_obj["id"]
 
         # Bookkeeping variables
 
@@ -215,6 +200,9 @@ class MinervaWrapper:
         activities: list[Activity] = []
         activities_by_mf_id: defaultdict[str, list[Activity]] = defaultdict(list)
         facts_by_property: defaultdict[str, list[dict]] = defaultdict(list)
+        facts_by_subject_property: defaultdict[tuple[str, str], list[dict]] = (
+            defaultdict(list)
+        )
 
         translation_warnings: set[TranslationWarning] = set()
 
@@ -236,9 +224,12 @@ class MinervaWrapper:
                 )
             setattr(obj, attr, value)
 
-        def _evidence_from_fact(fact: dict) -> list[EvidenceItem]:
-            anns_mv = _annotations_multivalued(fact)
-            evidence_inst_ids = anns_mv.get("evidence", [])
+        def _process_fact(fact: dict) -> tuple[list[EvidenceItem], ProvenanceInfo]:
+            """Process a fact to extract evidence and provenance information."""
+            annotations = _annotations(fact)
+            annotations_mv = _annotations_multivalued(fact)
+
+            evidence_inst_ids = annotations_mv.get("evidence", [])
             evs: list[EvidenceItem] = []
             for evidence_inst_id in evidence_inst_ids:
                 evidence_inst_annotations = individual_to_annotations.get(
@@ -266,7 +257,13 @@ class MinervaWrapper:
                     provenances=[prov],
                 )
                 evs.append(ev)
-            return evs
+
+            prov = ProvenanceInfo(
+                contributor=annotations_mv.get("contributor"),
+                date=annotations.get("date", None),
+                provided_by=annotations_mv.get("providedBy"),
+            )
+            return evs, prov
 
         def _iter_activities_by_fact_subject(
             *,
@@ -284,12 +281,10 @@ class MinervaWrapper:
                     )
                     continue
                 for activity in activities_by_mf_id.get(subject, []):
-                    evs = _evidence_from_fact(fact)
-                    provenance = _provenance_from_fact(fact)
-                    term = individual_to_term[object_]
-                    yield activity, term, evs, provenance
+                    evs, provenance = _process_fact(fact)
+                    yield activity, object_, evs, provenance
 
-        for individual in obj["individuals"]:
+        for individual in minerva_obj["individuals"]:
             individual_id = individual["id"]
             root_types = [x["id"] for x in individual.get("root-type", []) if x]
             individual_to_root_types[individual_id] = root_types
@@ -321,8 +316,9 @@ class MinervaWrapper:
                 _annotations_multivalued(individual)
             )
 
-        for fact in obj["facts"]:
+        for fact in minerva_obj["facts"]:
             facts_by_property[fact["property"]].append(fact)
+            facts_by_subject_property[(fact["subject"], fact["property"])].append(fact)
 
         enabled_by_facts = facts_by_property.get(ENABLED_BY, [])
         if not enabled_by_facts:
@@ -333,8 +329,8 @@ class MinervaWrapper:
                     entity_id=id,
                 )
             )
-        for fact in enabled_by_facts:
-            subject, object_ = fact["subject"], fact["object"]
+        for enabled_by_fact in enabled_by_facts:
+            subject, object_ = enabled_by_fact["subject"], enabled_by_fact["object"]
             if subject not in individual_to_term:
                 translation_warnings.add(
                     TranslationWarning(
@@ -356,19 +352,18 @@ class MinervaWrapper:
             gene_id = individual_to_term[object_]
             root_types = individual_to_root_types.get(object_, [])
 
-            evs = _evidence_from_fact(fact)
-            prov = _provenance_from_fact(fact)
+            evs, prov = _process_fact(enabled_by_fact)
             enabled_by_association: EnabledByAssociation
             if PROTEIN_CONTAINING_COMPLEX in root_types:
                 member_associations: list[ProteinComplexMemberAssociation] = []
-                for fact in facts_by_property.get(HAS_PART, []):
-                    if fact["subject"] != object_:
-                        continue
+                has_part_facts = facts_by_subject_property.get((object_, HAS_PART), [])
+                for has_part_fact in has_part_facts:
+                    member_evs, member_prov = _process_fact(has_part_fact)
                     member_associations.append(
                         ProteinComplexMemberAssociation(
-                            term=individual_to_term[fact["object"]],
-                            evidence=_evidence_from_fact(fact),
-                            provenances=[_provenance_from_fact(fact)],
+                            term=individual_to_term[has_part_fact["object"]],
+                            evidence=member_evs,
+                            provenances=[member_prov],
                         )
                     )
                 enabled_by_association = EnabledByProteinComplexAssociation(
@@ -403,61 +398,116 @@ class MinervaWrapper:
             activities.append(activity)
             activities_by_mf_id[subject].append(activity)
 
-        for activity, term, evs, prov in _iter_activities_by_fact_subject(
+        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=PART_OF
         ):
             association = BiologicalProcessAssociation(
-                term=term, evidence=evs, provenances=[prov]
+                term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
+
+            happens_during_facts = facts_by_subject_property.get(
+                (object_, HAPPENS_DURING), []
+            )
+            for happens_during_fact in happens_during_facts:
+                evs, prov = _process_fact(happens_during_fact)
+                if association.happens_during is not None:
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.ATTRIBUTE_OVERWRITE,
+                            message=f"Overwriting part_of.happens_during for {activity.id}",
+                            entity_id=activity.id,
+                        )
+                    )
+                association.happens_during = BiologicalProcessPhaseAssociation(
+                    term=individual_to_term.get(happens_during_fact["object"], None),
+                    evidence=evs,
+                    provenances=[prov],
+                )
+
+            part_of_facts = facts_by_subject_property.get((object_, PART_OF), [])
+            for part_of_fact in part_of_facts:
+                evs, prov = _process_fact(part_of_fact)
+                if association.part_of is not None:
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.ATTRIBUTE_OVERWRITE,
+                            message=f"Overwriting part_of.part_of for {activity.id}",
+                            entity_id=activity.id,
+                        )
+                    )
+                association.part_of = BiologicalProcessAssociation(
+                    term=individual_to_term.get(part_of_fact["object"], None),
+                    evidence=evs,
+                    provenances=[prov],
+                )
+
             _setattr_with_warning(activity, "part_of", association)
 
-        for activity, term, evs, prov in _iter_activities_by_fact_subject(
+        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=OCCURS_IN
         ):
             association = CellularAnatomicalEntityAssociation(
-                term=term, evidence=evs, provenances=[prov]
+                term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
+
+            part_of_facts = facts_by_subject_property.get((object_, PART_OF), [])
+            for part_of_fact in part_of_facts:
+                evs, prov = _process_fact(part_of_fact)
+                if association.part_of is not None:
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.ATTRIBUTE_OVERWRITE,
+                            message=f"Overwriting occurs_in.part_of for {activity.id}",
+                            entity_id=activity.id,
+                        )
+                    )
+                association.part_of = CellTypeAssociation(
+                    term=individual_to_term.get(part_of_fact["object"], None),
+                    evidence=evs,
+                    provenances=[prov],
+                )
+
             _setattr_with_warning(activity, "occurs_in", association)
 
-        for activity, term, evs, prov in _iter_activities_by_fact_subject(
+        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
         ):
             if activity.has_input is None:
                 activity.has_input = []
             activity.has_input.append(
                 MoleculeAssociation(
-                    term=term,
+                    term=individual_to_term[object_],
                     evidence=evs,
                     provenances=[prov],
                 )
             )
 
-        for activity, term, evs, prov in _iter_activities_by_fact_subject(
+        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_INPUT
         ):
             association = MoleculeAssociation(
-                term=term, evidence=evs, provenances=[prov]
+                term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_input", association)
 
-        for activity, term, evs, prov in _iter_activities_by_fact_subject(
+        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_OUTPUT
         ):
             if activity.has_output is None:
                 activity.has_output = []
             activity.has_output.append(
                 MoleculeAssociation(
-                    term=term,
+                    term=individual_to_term[object_],
                     evidence=evs,
                     provenances=[prov],
                 )
             )
 
-        for activity, term, evs, prov in _iter_activities_by_fact_subject(
+        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_OUTPUT
         ):
             association = MoleculeAssociation(
-                term=term, evidence=evs, provenances=[prov]
+                term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_output", association)
 
@@ -492,8 +542,7 @@ class MinervaWrapper:
 
                 subject_activity = subject_activities[0]
                 object_activity = object_activities[0]
-                evs = _evidence_from_fact(fact)
-                provenance = _provenance_from_fact(fact)
+                evs, provenance = _process_fact(fact)
                 rel = CausalAssociation(
                     predicate=fact_property,
                     downstream_activity=object_activity.id,
@@ -504,8 +553,8 @@ class MinervaWrapper:
                     subject_activity.causal_associations = []
                 subject_activity.causal_associations.append(rel)
 
-        annotations = _annotations(obj)
-        annotations_mv = _annotations_multivalued(obj)
+        annotations = _annotations(minerva_obj)
+        annotations_mv = _annotations_multivalued(minerva_obj)
 
         objects: list[Object] = []
         for obj in objects_by_id.values():

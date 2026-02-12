@@ -291,6 +291,24 @@ activities:
       provided_by:
       - http://www.wormbase.org
     term: GO:0002225
+    part_of:
+      type: BiologicalProcessAssociation
+      evidence:
+      - term: ECO:0000315
+        reference: PMID:22470487
+        provenances:
+        - contributor:
+          - https://orcid.org/0000-0002-3013-9906
+          date: '2018-11-13'
+          provided_by:
+          - http://www.wormbase.org
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0002-3013-9906
+        date: '2018-11-13'
+        provided_by:
+        - http://www.wormbase.org
+      term: GO:0140367
   causal_associations:
   - type: CausalAssociation
     evidence:

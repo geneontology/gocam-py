@@ -123,6 +123,24 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0001680
+    part_of:
+      type: BiologicalProcessAssociation
+      evidence:
+      - term: ECO:0000314
+        reference: PMID:32075755
+        provenances:
+        - contributor:
+          - https://orcid.org/0000-0001-7299-6685
+          date: '2023-03-01'
+          provided_by:
+          - https://www.uniprot.org
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+      term: GO:0072344
 - id: gomodel:63f809ec00000701/63f809ec00000735
   enabled_by:
     type: EnabledByGeneProductAssociation
@@ -163,6 +181,24 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0042780
+    part_of:
+      type: BiologicalProcessAssociation
+      evidence:
+      - term: ECO:0000314
+        reference: PMID:32075755
+        provenances:
+        - contributor:
+          - https://orcid.org/0000-0001-7299-6685
+          date: '2023-03-01'
+          provided_by:
+          - https://www.uniprot.org
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+      term: GO:0072344
   has_input:
   - type: MoleculeAssociation
     evidence:
