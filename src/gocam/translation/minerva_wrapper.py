@@ -364,7 +364,7 @@ class MinervaWrapper:
                     member_evs, member_prov = _process_fact(has_part_fact)
                     member_associations.append(
                         ProteinComplexMemberAssociation(
-                            term=individual_to_term[has_part_fact["object"]],
+                            term=individual_to_term.get(has_part_fact["object"]),
                             evidence=member_evs,
                             provenances=[member_prov],
                         )

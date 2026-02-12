@@ -206,7 +206,9 @@ class TBoxTranslator:
         else:
             yield from self.add_edge(bp_id, PART_OF, model.id)
         if ta.happens_during:
-            yield from self.add_edge(bp_id, HAPPENS_DURING, ta.happens_during)
+            yield from self.add_edge(
+                bp_id, HAPPENS_DURING, ta.happens_during.term or ""
+            )
 
     def translate_cellular_anatomical_entity(
         self,
