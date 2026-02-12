@@ -59,6 +59,9 @@ def _iter_model_associations(model: Model) -> Iterable[Association]:
     for activity in model.activities or []:
         if activity.enabled_by:
             yield activity.enabled_by
+            if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
+                if activity.enabled_by.members:
+                    yield from activity.enabled_by.members
         if activity.molecular_function:
             yield activity.molecular_function
         if activity.part_of:
@@ -350,7 +353,9 @@ class Indexer:
                     activity.enabled_by, EnabledByProteinComplexAssociation
                 ):
                     if activity.enabled_by.members:
-                        all_enabled_by_genes.update(activity.enabled_by.members)
+                        all_enabled_by_genes.update(
+                            member.term for member in activity.enabled_by.members
+                        )
                 annoton_term_id_parts.append(activity.enabled_by.term)
 
             if activity.molecular_function:

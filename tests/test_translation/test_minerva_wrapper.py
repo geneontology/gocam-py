@@ -58,7 +58,7 @@ def test_protein_complex():
     assert isinstance(
         protein_complex_activity.enabled_by, EnabledByProteinComplexAssociation
     )
-    assert protein_complex_activity.enabled_by.members == [
+    assert [m.term for m in protein_complex_activity.enabled_by.members or []] == [
         "MGI:MGI:1929608",
         "MGI:MGI:103038",
     ]
@@ -147,9 +147,9 @@ def test_missing_enabled_by():
     ]
 
     # Verify that there are no such activities
-    assert (
-        len(activities_without_enabled_by) == 0
-    ), "There should be no activities without an enabled_by association."
+    assert len(activities_without_enabled_by) == 0, (
+        "There should be no activities without an enabled_by association."
+    )
 
 
 def test_provenance_on_evidence():

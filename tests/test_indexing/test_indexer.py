@@ -215,7 +215,10 @@ def test_indexer_adds_complex_members_to_model_activity_enabled_by_genes():
                     "enabled_by": {
                         "type": "EnabledByProteinComplexAssociation",
                         "term": "GO:00001",
-                        "members": ["UniProtKB:00001", "UniProtKB:00002"],
+                        "members": [
+                            {"term": "UniProtKB:00001"},
+                            {"term": "UniProtKB:00002"},
+                        ],
                     },
                 }
             ],

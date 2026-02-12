@@ -20,6 +20,7 @@ from gocam.datamodel import (
     MolecularFunctionAssociation,
     MoleculeAssociation,
     Object,
+    ProteinComplexMemberAssocation,
     ProvenanceInfo,
 )
 from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
@@ -359,18 +360,22 @@ class MinervaWrapper:
             prov = _provenance_from_fact(fact)
             enabled_by_association: EnabledByAssociation
             if PROTEIN_CONTAINING_COMPLEX in root_types:
-                has_part_facts = [
-                    fact
-                    for fact in facts_by_property.get(HAS_PART, [])
-                    if fact["subject"] == object_
-                ]
-                members = [
-                    individual_to_term[fact["object"]]
-                    for fact in has_part_facts
-                    if fact["object"] in individual_to_term
-                ]
+                member_associations: list[ProteinComplexMemberAssocation] = []
+                for fact in facts_by_property.get(HAS_PART, []):
+                    if fact["subject"] != object_:
+                        continue
+                    member_associations.append(
+                        ProteinComplexMemberAssocation(
+                            term=individual_to_term[fact["object"]],
+                            evidence=_evidence_from_fact(fact),
+                            provenances=[_provenance_from_fact(fact)],
+                        )
+                    )
                 enabled_by_association = EnabledByProteinComplexAssociation(
-                    term=gene_id, members=members, evidence=evs, provenances=[prov]
+                    term=gene_id,
+                    members=member_associations,
+                    evidence=evs,
+                    provenances=[prov],
                 )
             elif INFORMATION_BIOMACROMOLECULE in root_types:
                 enabled_by_association = EnabledByGeneProductAssociation(
