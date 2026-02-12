@@ -338,7 +338,7 @@ classes:
     attributes:
       members:
         description: Associations between the complex and its members.
-        range: ProteinComplexMemberAssocation
+        range: ProteinComplexMemberAssociation
         multivalued: true
     slot_usage:
       term:
@@ -350,7 +350,7 @@ classes:
           - value: ComplexPortal:CPX-969
             description: The human Caspase-2 complex
 
-  ProteinComplexMemberAssocation:
+  ProteinComplexMemberAssociation:
     description: An association between a protein complex and one of its members.
     is_a: TermAssociation
     slot_usage:

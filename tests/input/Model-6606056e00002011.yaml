@@ -27,7 +27,7 @@ activities:
       - https://www.uniprot.org
     term: GO:0019815
     members:
-    - type: ProteinComplexMemberAssocation
+    - type: ProteinComplexMemberAssociation
       evidence:
       - term: ECO:0000314
         reference: PMID:35981043
@@ -44,7 +44,7 @@ activities:
         provided_by:
         - https://www.uniprot.org
       term: UniProtKB:P40259
-    - type: ProteinComplexMemberAssocation
+    - type: ProteinComplexMemberAssociation
       evidence:
       - term: ECO:0000314
         reference: PMID:35981043
