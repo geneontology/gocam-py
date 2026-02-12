@@ -395,8 +395,8 @@ classes:
     is_a: TermAssociation
     attributes:
       happens_during:
-        description: Optional extension describing where the BP takes place
-        range: PhaseTermObject
+        description: Optional extension describing the phase during which the BP takes place
+        range: BiologicalProcessPhaseAssociation
       part_of:
         description: Optional extension allowing hierarchical nesting of BPs
         range: BiologicalProcessAssociation
@@ -404,6 +404,13 @@ classes:
     slot_usage:
       term:
         range: BiologicalProcessTermObject
+
+  BiologicalProcessPhaseAssociation:
+    description: An association between a biological process and a phase term
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        range: PhaseTermObject
 
   CellularAnatomicalEntityAssociation:
     description: An association between an activity and a cellular anatomical entity term
