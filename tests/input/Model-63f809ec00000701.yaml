@@ -6,46 +6,6 @@ taxon: NCBITaxon:9606
 status: production
 date_modified: '2023-06-08'
 activities:
-- id: gomodel:63f809ec00000701/63f809ec00000742
-  enabled_by:
-    type: EnabledByGeneProductAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:32075755
-      provenances:
-      - contributor:
-        - https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-        provided_by:
-        - https://www.uniprot.org
-    provenances:
-    - contributor:
-      - https://orcid.org/0000-0001-7299-6685
-      date: '2023-03-01'
-      provided_by:
-      - https://www.uniprot.org
-    term: UniProtKB:Q96Q11
-  molecular_function:
-    type: MolecularFunctionAssociation
-    term: GO:0004810
-  part_of:
-    type: BiologicalProcessAssociation
-    evidence:
-    - term: ECO:0000314
-      reference: PMID:32075755
-      provenances:
-      - contributor:
-        - https://orcid.org/0000-0001-7299-6685
-        date: '2023-03-01'
-        provided_by:
-        - https://www.uniprot.org
-    provenances:
-    - contributor:
-      - https://orcid.org/0000-0001-7299-6685
-      date: '2023-03-01'
-      provided_by:
-      - https://www.uniprot.org
-    term: GO:0001680
 - id: gomodel:63f809ec00000701/63f809ec00000726
   enabled_by:
     type: EnabledByGeneProductAssociation
@@ -123,6 +83,46 @@ activities:
       - https://www.uniprot.org
     predicate: RO:0002629
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000735
+- id: gomodel:63f809ec00000701/63f809ec00000742
+  enabled_by:
+    type: EnabledByGeneProductAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:32075755
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
+    term: UniProtKB:Q96Q11
+  molecular_function:
+    type: MolecularFunctionAssociation
+    term: GO:0004810
+  part_of:
+    type: BiologicalProcessAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:32075755
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7299-6685
+        date: '2023-03-01'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7299-6685
+      date: '2023-03-01'
+      provided_by:
+      - https://www.uniprot.org
+    term: GO:0001680
 - id: gomodel:63f809ec00000701/63f809ec00000735
   enabled_by:
     type: EnabledByGeneProductAssociation
@@ -318,7 +318,7 @@ objects:
   label: ANKZF1 Hsap
   type: gocam:Object
 - id: GO:0072344
-  label: rescue of stalled ribosome
+  label: rescue of stalled cytosolic ribosome
   type: gocam:Object
 - id: ECO:0000314
   label: direct assay evidence used in manual assertion

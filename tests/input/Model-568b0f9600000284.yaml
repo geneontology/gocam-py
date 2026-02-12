@@ -4,7 +4,7 @@ title: Antibacterial innate immune response in the intestine via MAPK cascade (C
   elegans)
 taxon: NCBITaxon:6239
 status: production
-date_modified: '2023-03-16'
+date_modified: '2025-12-11'
 comments:
 - 'Automated change 2023-03-16: RO:0002212 replaced by RO:0002630'
 - 'Automated change 2023-03-16: RO:0002213 replaced by RO:0002629'
@@ -115,21 +115,21 @@ activities:
   occurs_in:
     type: CellularAnatomicalEntityAssociation
     evidence:
-    - term: ECO:0000307
-      reference: GO_REF:0000015
+    - term: ECO:0000255
+      reference: PMID:17096597
       provenances:
       - contributor:
         - https://orcid.org/0000-0002-1706-4196
-        date: '2021-11-29'
+        date: '2025-12-03'
         provided_by:
         - http://www.wormbase.org
     provenances:
     - contributor:
       - https://orcid.org/0000-0002-1706-4196
-      date: '2021-11-29'
+      date: '2025-12-03'
       provided_by:
       - http://www.wormbase.org
-    term: GO:0110165
+    term: GO:0005615
   part_of:
     type: BiologicalProcessAssociation
     evidence:
@@ -1031,14 +1031,17 @@ objects:
 - id: ECO:0000270
   label: expression pattern evidence used in manual assertion
   type: gocam:Object
-- id: GO:0110165
-  label: cellular anatomical structure
+- id: GO:0005615
+  label: extracellular space
+  type: gocam:Object
+- id: ECO:0000255
+  label: match to sequence model evidence used in manual assertion
   type: gocam:Object
 provenances:
 - contributor:
   - https://orcid.org/0000-0002-1706-4196
   - https://orcid.org/0000-0002-3013-9906
-  date: '2023-03-16'
+  date: '2025-12-11'
   provided_by:
   - http://www.wormbase.org
 
