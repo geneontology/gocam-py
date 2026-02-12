@@ -417,10 +417,22 @@ def test_translation_warning_missing_term():
 
     # Check that a warning for the missing term was generated
     warnings = translation_result.warnings
-    assert len(warnings) == 1
-    assert warnings[0].type == WarningType.MISSING_TERM
-    assert "Missing term for subject" in warnings[0].message
-    assert warnings[0].entity_id == "gomodel:663d668500002178/subject_missing_term"
+    assert len(warnings) == 2
+    missing_term_warning = next(
+        (w for w in warnings if w.type == WarningType.MISSING_TERM), None
+    )
+    assert missing_term_warning is not None
+    assert "Missing term for subject" in missing_term_warning.message
+    assert (
+        missing_term_warning.entity_id
+        == "gomodel:663d668500002178/subject_missing_term"
+    )
+
+    # A second warning should be generated for an unhandled fact due to the missing term
+    unhandled_fact_warning = next(
+        (w for w in warnings if w.type == WarningType.UNHANDLED_FACT), None
+    )
+    assert unhandled_fact_warning is not None
 
 
 def test_translation_warning_no_enabled_by_facts():

@@ -203,6 +203,7 @@ class MinervaWrapper:
         facts_by_subject_property: defaultdict[tuple[str, str], list[dict]] = (
             defaultdict(list)
         )
+        processed_facts: set[tuple[str, str, str]] = set()
 
         translation_warnings: set[TranslationWarning] = set()
 
@@ -226,6 +227,8 @@ class MinervaWrapper:
 
         def _process_fact(fact: dict) -> tuple[list[EvidenceItem], ProvenanceInfo]:
             """Process a fact to extract evidence and provenance information."""
+            processed_facts.add((fact["subject"], fact["property"], fact["object"]))
+
             annotations = _annotations(fact)
             annotations_mv = _annotations_multivalued(fact)
 
@@ -599,6 +602,19 @@ class MinervaWrapper:
                 taxon = all_taxa[0]
                 additional_taxa = all_taxa[1:]
 
+        num_processed_facts = len(processed_facts)
+        num_facts = len(minerva_obj["facts"])
+        if num_processed_facts < num_facts:
+            for fact in minerva_obj["facts"]:
+                fact_tuple = (fact["subject"], fact["property"], fact["object"])
+                if fact_tuple not in processed_facts:
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.UNHANDLED_FACT,
+                            message=f"Unhandled fact: {fact_tuple}",
+                            entity_id=id,
+                        )
+                    )
         cam = Model(
             id=id,
             title=annotations["title"],
