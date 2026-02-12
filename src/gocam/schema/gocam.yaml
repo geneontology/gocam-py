@@ -337,8 +337,8 @@ classes:
     is_a: EnabledByAssociation
     attributes:
       members:
-        description: The gene products that are part of the complex
-        range: GeneProductTermObject
+        description: Associations between the complex and its members.
+        range: ProteinComplexMemberAssocation
         multivalued: true
     slot_usage:
       term:
@@ -349,6 +349,13 @@ classes:
               If this is the value of `term`, then members *must* be specified.
           - value: ComplexPortal:CPX-969
             description: The human Caspase-2 complex
+
+  ProteinComplexMemberAssocation:
+    description: An association between a protein complex and one of its members.
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        range: GeneProductTermObject
 
   CausalAssociation:
     description: A causal association between two activities

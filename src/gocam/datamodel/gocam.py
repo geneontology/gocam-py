@@ -457,7 +457,7 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
                                  'name': 'term',
                                  'range': 'ProteinComplexTermObject'}}})
 
-    members: Optional[list[str]] = Field(default=[], description="""The gene products that are part of the complex""", json_schema_extra = { "linkml_meta": {'domain_of': ['EnabledByProteinComplexAssociation']} })
+    members: Optional[list[ProteinComplexMemberAssocation]] = Field(default=[], description="""Associations between the complex and its members.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EnabledByProteinComplexAssociation']} })
     term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation'],
          'examples': [{'description': 'The generic GO entry for a protein complex. If '
                                       'this is the value of `term`, then members '
@@ -499,6 +499,23 @@ class TermAssociation(Association):
 
     term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
     type: Literal["TermAssociation"] = Field(default="TermAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
+                      "languages, it isn't necessary to populate this, it is "
+                      'auto-populated from the object class.'],
+         'designates_type': True,
+         'domain_of': ['Association', 'Object']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+
+
+class ProteinComplexMemberAssocation(TermAssociation):
+    """
+    An association between a protein complex and one of its members.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
+         'slot_usage': {'term': {'name': 'term', 'range': 'GeneProductTermObject'}}})
+
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    type: Literal["ProteinComplexMemberAssocation"] = Field(default="ProteinComplexMemberAssocation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
@@ -929,6 +946,7 @@ EnabledByGeneProductAssociation.model_rebuild()
 EnabledByProteinComplexAssociation.model_rebuild()
 CausalAssociation.model_rebuild()
 TermAssociation.model_rebuild()
+ProteinComplexMemberAssocation.model_rebuild()
 MolecularFunctionAssociation.model_rebuild()
 BiologicalProcessAssociation.model_rebuild()
 CellularAnatomicalEntityAssociation.model_rebuild()
