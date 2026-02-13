@@ -156,7 +156,6 @@ activities:
     term: GO:0043495
   occurs_in:
     type: CellularAnatomicalEntityAssociation
-    evidence: []
     provenances:
     - contributor:
       - https://orcid.org/0000-0001-6330-7526
@@ -166,7 +165,6 @@ activities:
     term: GO:0005886
   part_of:
     type: BiologicalProcessAssociation
-    evidence: []
     provenances:
     - contributor:
       - https://orcid.org/0000-0001-6330-7526
@@ -216,7 +214,6 @@ activities:
     predicate: RO:0002629
     downstream_activity: gomodel:663d668500002178/663d668500002205
   - type: CausalAssociation
-    evidence: []
     provenances:
     - contributor:
       - https://orcid.org/0000-0001-6330-7526
@@ -320,7 +317,6 @@ activities:
     term: GO:1904679
   has_input:
   - type: MoleculeAssociation
-    evidence: []
     provenances:
     - contributor:
       - https://orcid.org/0000-0001-6330-7526
@@ -546,7 +542,6 @@ activities:
     term: GO:0032958
   causal_associations:
   - type: CausalAssociation
-    evidence: []
     provenances:
     - contributor:
       - https://orcid.org/0000-0001-6330-7526
@@ -1079,7 +1074,6 @@ activities:
     term: GO:0006661
   has_input:
   - type: MoleculeAssociation
-    evidence: []
     provenances:
     - contributor:
       - https://orcid.org/0000-0001-6330-7526
@@ -1088,7 +1082,6 @@ activities:
       - http://www.pombase.org
     term: CHEBI:17268
   - type: MoleculeAssociation
-    evidence: []
     provenances:
     - contributor:
       - https://orcid.org/0000-0001-6330-7526

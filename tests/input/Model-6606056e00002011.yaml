@@ -27,8 +27,40 @@ activities:
       - https://www.uniprot.org
     term: GO:0019815
     members:
-    - UniProtKB:P40259
-    - UniProtKB:P11912
+    - type: ProteinComplexMemberAssociation
+      evidence:
+      - term: ECO:0000314
+        reference: PMID:35981043
+        provenances:
+        - contributor:
+          - https://orcid.org/0000-0001-7646-0052
+          date: '2024-05-07'
+          provided_by:
+          - https://www.uniprot.org
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+        provided_by:
+        - https://www.uniprot.org
+      term: UniProtKB:P40259
+    - type: ProteinComplexMemberAssociation
+      evidence:
+      - term: ECO:0000314
+        reference: PMID:35981043
+        provenances:
+        - contributor:
+          - https://orcid.org/0000-0001-7646-0052
+          date: '2024-05-07'
+          provided_by:
+          - https://www.uniprot.org
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+        provided_by:
+        - https://www.uniprot.org
+      term: UniProtKB:P11912
   molecular_function:
     type: MolecularFunctionAssociation
     term: GO:0004888

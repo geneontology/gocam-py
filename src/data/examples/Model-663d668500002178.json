@@ -222,7 +222,6 @@
       },
       "occurs_in": {
         "type": "CellularAnatomicalEntityAssociation",
-        "evidence": [],
         "provenances": [
           {
             "contributor": [
@@ -238,7 +237,6 @@
       },
       "part_of": {
         "type": "BiologicalProcessAssociation",
-        "evidence": [],
         "provenances": [
           {
             "contributor": [
@@ -327,7 +325,6 @@
         },
         {
           "type": "CausalAssociation",
-          "evidence": [],
           "provenances": [
             {
               "contributor": [
@@ -509,7 +506,6 @@
       "has_input": [
         {
           "type": "MoleculeAssociation",
-          "evidence": [],
           "provenances": [
             {
               "contributor": [
@@ -902,7 +898,6 @@
       "causal_associations": [
         {
           "type": "CausalAssociation",
-          "evidence": [],
           "provenances": [
             {
               "contributor": [
@@ -1815,7 +1810,6 @@
       "has_input": [
         {
           "type": "MoleculeAssociation",
-          "evidence": [],
           "provenances": [
             {
               "contributor": [
@@ -1831,7 +1825,6 @@
         },
         {
           "type": "MoleculeAssociation",
-          "evidence": [],
           "provenances": [
             {
               "contributor": [

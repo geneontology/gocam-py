@@ -203,10 +203,13 @@ def model_to_cx2(
             "type": node_type.value,
         }
 
-        if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation) and activity.enabled_by.members:
+        if (
+            isinstance(activity.enabled_by, EnabledByProteinComplexAssociation)
+            and activity.enabled_by.members
+        ):
             node_attributes["member"] = []
             for member in activity.enabled_by.members:
-                member_name = _get_object_label(member)
+                member_name = _get_object_label(member.term)
                 if (
                     validate_iquery_gene_symbol_pattern
                     and IQUERY_GENE_SYMBOL_PATTERN.match(member_name) is None
@@ -263,7 +266,9 @@ def model_to_cx2(
                 if association.downstream_activity in activity_nodes_by_activity_id:
                     relation_style = RELATIONS.get(association.predicate, None)
                     if relation_style is None:
-                        logger.debug(f"Unknown relation style for {association.predicate}")
+                        logger.debug(
+                            f"Unknown relation style for {association.predicate}"
+                        )
                     name = (
                         relation_style.label
                         if relation_style is not None
