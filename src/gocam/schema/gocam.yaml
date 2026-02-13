@@ -355,6 +355,7 @@ classes:
     is_a: TermAssociation
     slot_usage:
       term:
+        description: The member gene product that is part of the protein complex.
         range: GeneProductTermObject
 
   CausalAssociation:
@@ -410,6 +411,7 @@ classes:
     is_a: TermAssociation
     slot_usage:
       term:
+        description: The phase ontology term associated with the biological process (not the relation type)
         range: PhaseTermObject
 
   CellularAnatomicalEntityAssociation:
