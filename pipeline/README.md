@@ -9,7 +9,7 @@ local development environment to run them. Use `uv` to install the necessary dep
 
 ```bash
 uv sync --all-extras
-````
+```
 
 ## convert_minerva_models_to_gocam_models.py
 
