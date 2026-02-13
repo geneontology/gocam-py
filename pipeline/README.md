@@ -95,12 +95,12 @@ querying and indexing.
 **Inputs:**
 
 - `--input-dir`: Directory containing GO-CAM model JSON files
-- `--output-dir`: Directory to save updated GO-CAM model files (required unless using `--dry-run`)
+- `--output-dir`: Directory to save indexed GO-CAM model files (required unless using `--dry-run`)
 
 **Options:**
 
-- `--report-file`: JSON Lines file to write a detailed report of the results
-- `--dry-run`: Perform processing without writing output files
+- `--report-file`: JSON Lines file to write a detailed report of the indexing results
+- `--dry-run`: Perform indexing without writing output files
 - `--go-adapter-descriptor`: OAK adapter descriptor for GO (default: `sqlite:obo:go`)
 - `--ncbi-taxon-adapter-descriptor`: OAK adapter descriptor for NCBITaxon (default:
   `sqlite:obo:ncbitaxon`)

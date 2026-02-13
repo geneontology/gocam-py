@@ -72,7 +72,7 @@ def main(
             file_okay=False,
             dir_okay=True,
             readable=True,
-            help="Directory containing Minerva model JSON files.",
+            help="Directory containing GO-CAM model JSON files.",
         ),
     ],
     output_dir: Annotated[
@@ -82,19 +82,19 @@ def main(
             file_okay=False,
             dir_okay=True,
             writable=True,
-            help="Directory to save converted GO-CAM model files. Required unless --dry-run is used.",
+            help="Directory to save indexed GO-CAM model files. Required unless --dry-run is used.",
         ),
     ] = None,
     report_file: Annotated[
         typer.FileTextWrite | None,
         typer.Option(
-            help="JSON Lines file to write a detailed report of the conversion results.",
+            help="JSON Lines file to write a detailed report of the indexing results.",
         ),
     ] = None,
     dry_run: Annotated[
         bool,
         typer.Option(
-            help="If set, the conversion will be performed but no files will be written.",
+            help="If set, the indexing will be performed but no files will be written.",
         ),
     ] = False,
     go_adapter_descriptor: Annotated[
