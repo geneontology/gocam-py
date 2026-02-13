@@ -11,11 +11,20 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
-from _common import get_json_files, setup_logger
+from _common import (
+    ErrorReason,
+    ErrorResult,
+    PipelineResult,
+    ResultSummary,
+    SuccessResult,
+    get_json_files,
+    setup_logger,
+)
+from rich import print
 from rich.progress import track
+from rich.tree import Tree
 
 from gocam.datamodel import Model
-from gocam.indexing.Indexer import Indexer
 
 app = typer.Typer()
 
@@ -144,6 +153,38 @@ class TaxonIndexReport(IndexReport):
             self.add(taxon, model)
 
 
+def process_gocam_model_file(
+    json_file: Path, reports: list[IndexReport]
+) -> PipelineResult:
+    """Process an indexed GO-CAM model file to update the index reports.
+
+    Args:
+        json_file: The path to the GO-CAM model JSON file.
+        reports: A list of IndexReport instances to update based on the model.
+
+    Returns:
+        PipelineResult: A result object indicating success or failure of the processing.
+    """
+    try:
+        with open(json_file, "r") as f:
+            indexed_model = Model.model_validate_json(f.read())
+    except Exception as e:
+        return ErrorResult(
+            reason=ErrorReason.READ_ERROR,
+            details=str(e),
+        )
+
+    warnings = []
+    for report in reports:
+        try:
+            report.process_model(indexed_model)
+        except Exception as e:
+            warnings.append(
+                f"Error while processing {json_file.stem} for report {report.file_name}: {e}"
+            )
+    return SuccessResult(warnings=warnings)
+
+
 @app.command()
 def main(
     input_dir: Annotated[
@@ -153,7 +194,7 @@ def main(
             file_okay=False,
             dir_okay=True,
             readable=True,
-            help="Directory containing GO-CAM model JSON files.",
+            help="Directory containing indexed GO-CAM model JSON files.",
         ),
     ],
     output_dir: Annotated[
@@ -166,34 +207,18 @@ def main(
             help="Directory to save generated index files. Required unless --dry-run is used.",
         ),
     ] = None,
+    report_file: Annotated[
+        typer.FileTextWrite | None,
+        typer.Option(
+            help="JSON Lines file to write a detailed report of the report generation results.",
+        ),
+    ] = None,
     dry_run: Annotated[
         bool,
         typer.Option(
             help="If set, model processing will be performed but no files will be written.",
         ),
     ] = False,
-    go_adapater_descriptor: Annotated[
-        str,
-        typer.Option(
-            help="OAK adapter descriptor for GO. See: https://incatools.github.io/ontology-access-kit/packages/selectors.html#ontology-adapter-selectors",
-        ),
-    ] = "sqlite:obo:go",
-    ncbi_taxon_adapter_descriptor: Annotated[
-        str,
-        typer.Option(
-            help="OAK adapter descriptor for the NCBITaxon ontology. See: https://incatools.github.io/ontology-access-kit/packages/selectors.html#ontology-adapter-selectors",
-        ),
-    ] = "sqlite:obo:ncbitaxon",
-    goc_groups_yaml: Annotated[
-        Path | None,
-        typer.Option(
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
-            help="YAML file defining GOC groups. If not provided, group information will be fetched from `current.geneontology.org`.",
-        ),
-    ] = None,
     verbose: Annotated[
         int,
         typer.Option(
@@ -225,12 +250,6 @@ def main(
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
 
-    indexer = Indexer(
-        go_adapter_descriptor=go_adapater_descriptor,
-        ncbi_taxon_adapter_descriptor=ncbi_taxon_adapter_descriptor,
-        goc_groups_yaml_path=goc_groups_yaml,
-    )
-
     reports = [
         ContributorIndexReport("contributor_index.json"),
         EntityIndexReport("entity_index.json"),
@@ -240,33 +259,41 @@ def main(
         TaxonIndexReport("taxon_index.json"),
     ]
 
+    result_summary = ResultSummary()
     for json_file in track(json_files, description="Generating index files..."):
-        try:
-            with open(json_file, "r") as f:
-                model = Model.model_validate_json(f.read())
-        except Exception:
-            logger.exception(f"Error reading model from {json_file}")
-            continue
+        result = process_gocam_model_file(json_file, reports)
+        result_summary.add_result(json_file.stem, result)
+        if report_file:
+            result.write_to_file(report_file, json_file.stem)
 
-        indexer.index_model(model)
-        if model.query_index is None:
-            logger.error(f"Model {json_file} has no query index after indexing.")
-            continue
+    # Print processing results summary
+    result_summary.print()
 
-        for report in reports:
-            try:
-                report.process_model(model)
-            except Exception:
-                logger.exception(
-                    f"Error processing model {json_file} for report {report.file_name}"
-                )
-
+    # Write index files and print summary of results
     if output_dir and not dry_run:
+        tree = Tree(f"[b]Wrote {len(reports)} index files[/b]")
+        success_branch: Tree | None = None
+        empty_branch: Tree | None = None
+        error_branch: Tree | None = None
         for report in reports:
             try:
                 report.write(output_dir)
-            except Exception:
-                logger.exception(f"Error writing index file {report.file_name}")
+                if success_branch is None:
+                    success_branch = tree.add("Successful indexes", style="green")
+                success_branch.add(
+                    f"{report.file_name}: [b]{len(report.index)}[/b] keys"
+                )
+            except EmptyIndexError:
+                if empty_branch is None:
+                    empty_branch = tree.add(
+                        "Empty indexes (not written)", style="yellow"
+                    )
+                empty_branch.add(f"{report.file_name}: [b]0[/b] keys")
+            except Exception as e:
+                if error_branch is None:
+                    error_branch = tree.add("Indexes with errors", style="red")
+                error_branch.add(f"{report.file_name} (Error: {e})")
+        print(tree)
 
 
 if __name__ == "__main__":

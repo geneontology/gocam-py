@@ -35,6 +35,7 @@ gocam = "gocam.cli:app"
 
 [dependency-groups]
 dev = [
+    "glom>=25.12.0",
     "linkml>=1.3.5,<2",
     "mkdocs-material>=8.2.8,<10",
     "mkdocs-mermaid2-plugin>=1.1.1",
