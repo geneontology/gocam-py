@@ -321,7 +321,7 @@
 <tr>
 <td><a href="../term/">term</a></td>
 <td>0..1 <br/> <a href="../PhaseTermObject/">PhaseTermObject</a></td>
-<td>The ontology term that describes the nature of the association</td>
+<td>The phase ontology term associated with the biological process (not the relat...</td>
 <td><a href="../TermAssociation/">TermAssociation</a></td>
 </tr>
 <tr>
@@ -398,6 +398,8 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
+    description: The phase ontology term associated with the biological process (not
+      the relation type)
     range: PhaseTermObject
 
 </code></pre>
@@ -411,11 +413,14 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
+    description: The phase ontology term associated with the biological process (not
+      the relation type)
     range: PhaseTermObject
 attributes:
   term:
     name: term
-    description: The ontology term that describes the nature of the association
+    description: The phase ontology term associated with the biological process (not
+      the relation type)
     from_schema: https://w3id.org/gocam
     alias: term
     owner: BiologicalProcessPhaseAssociation

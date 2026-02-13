@@ -321,7 +321,7 @@
 <tr>
 <td><a href="../term/">term</a></td>
 <td>0..1 <br/> <a href="../GeneProductTermObject/">GeneProductTermObject</a></td>
-<td>The ontology term that describes the nature of the association</td>
+<td>The member gene product that is part of the protein complex</td>
 <td><a href="../TermAssociation/">TermAssociation</a></td>
 </tr>
 <tr>
@@ -398,6 +398,7 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
+    description: The member gene product that is part of the protein complex.
     range: GeneProductTermObject
 
 </code></pre>
@@ -411,11 +412,12 @@ is_a: TermAssociation
 slot_usage:
   term:
     name: term
+    description: The member gene product that is part of the protein complex.
     range: GeneProductTermObject
 attributes:
   term:
     name: term
-    description: The ontology term that describes the nature of the association
+    description: The member gene product that is part of the protein complex.
     from_schema: https://w3id.org/gocam
     alias: term
     owner: ProteinComplexMemberAssociation
