@@ -74,7 +74,9 @@ class TBoxTranslator:
             ref = pm.get("prefix_reference")
             self.ontology.add_prefix_mapping(p, ref)
 
-    def _label(self, model: Model, id: str) -> str:
+    def _label(self, model: Model, id: str | None) -> str:
+        if id is None:
+            return "UNKNOWN"
         if not self._label_map:
             self._label_map = {}
         if id not in self._label_map:
@@ -150,8 +152,8 @@ class TBoxTranslator:
                 member_labels: list[str] = []
                 if eb.members:
                     for m in eb.members:
-                        yield from self.add_edge(pc_id, HAS_PART, m.term or "")
-                        member_labels.append(self._label(model, m.term or ""))
+                        yield from self.add_edge(pc_id, HAS_PART, m.term)
+                        member_labels.append(self._label(model, m.term))
                 eb_label = f"{self._label(model, eb.term)}[{' '.join(member_labels)}]"
             elif isinstance(eb, EnabledByGeneProductAssociation):
                 yield from self.add_edge(activity.id, ENABLED_BY, eb.term)
@@ -206,9 +208,7 @@ class TBoxTranslator:
         else:
             yield from self.add_edge(bp_id, PART_OF, model.id)
         if ta.happens_during:
-            yield from self.add_edge(
-                bp_id, HAPPENS_DURING, ta.happens_during.term or ""
-            )
+            yield from self.add_edge(bp_id, HAPPENS_DURING, ta.happens_during.term)
 
     def translate_cellular_anatomical_entity(
         self,
@@ -272,8 +272,13 @@ class TBoxTranslator:
         yield AnnotationAssertion(self.iri(subject), ann)
 
     def add_edge(
-        self, subject: str, predicate: str, object: str
+        self, subject: str, predicate: str, object: str | None
     ) -> Iterator[SubClassOf]:
+        if not object:
+            logger.warning(
+                f"Cannot add edge with empty object for subject {subject} and predicate {predicate}"
+            )
+            return
         if predicate == IS_A:
             yield SubClassOf(self.get_class(subject), self.get_class(object))
         else:
