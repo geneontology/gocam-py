@@ -158,7 +158,7 @@ def main(
 
     # Write search documents to output file if not a dry run
     if not dry_run and output is not None:
-        search_docs.sort(key=lambda m: m["date_modified"], reverse=True)
+        search_docs.sort(key=lambda m: m.get("date_modified") or "", reverse=True)
         try:
             json.dump(search_docs, output)
         except Exception:
