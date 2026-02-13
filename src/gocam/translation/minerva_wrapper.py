@@ -361,10 +361,21 @@ class MinervaWrapper:
                 member_associations: list[ProteinComplexMemberAssociation] = []
                 has_part_facts = facts_by_subject_property.get((object_, HAS_PART), [])
                 for has_part_fact in has_part_facts:
+                    member_object = has_part_fact["object"]
+                    member_term = individual_to_term.get(member_object)
+                    if member_term is None:
+                        translation_warnings.add(
+                            TranslationWarning(
+                                type=WarningType.MISSING_TERM,
+                                message=f"Missing term for object {member_object} in has_part fact",
+                                entity_id=member_object,
+                            )
+                        )
+                        continue
                     member_evs, member_prov = _process_fact(has_part_fact)
                     member_associations.append(
                         ProteinComplexMemberAssociation(
-                            term=individual_to_term.get(has_part_fact["object"]),
+                            term=member_term,
                             evidence=member_evs,
                             provenances=[member_prov],
                         )
