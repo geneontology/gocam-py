@@ -56,7 +56,7 @@ def process_gocam_model_file(
     if output_dir is not None:
         try:
             with open(output_dir / json_file.name, "w") as f:
-                f.write(model.model_dump_json())
+                f.write(model.model_dump_json(exclude_none=True))
         except Exception as e:
             return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
