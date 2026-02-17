@@ -298,6 +298,7 @@ def process_gocam_model_file(
     stats_by_model.number_of_causal_relations = calculated_aggregate_values_by_model.number_of_causal_associations
     stats_by_model.number_of_activities = calculated_aggregate_values_by_model.number_of_activities
     stats_by_model.number_of_unique_references = len(stats_by_model.set_references)
+    stats_by_model.number_of_unique_pmid = _count_pmids(stats_by_model.set_references)
 
     stats_by_model.number_of_gene_product_activities = len(stats_by_model.set_gene_product_association_activity)
     stats_by_model.number_of_protein_complex_association_activities = len(stats_by_model.set_protein_complex_association_activity)
