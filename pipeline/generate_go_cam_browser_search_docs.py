@@ -18,7 +18,7 @@ from _common import (
     get_json_files,
     setup_logger,
 )
-from glom import glom
+from glom import Iter, glom
 from rich.progress import track
 
 from gocam.datamodel import Model
@@ -40,7 +40,7 @@ spec = {
     "number_of_strongly_connected_components": "query_index.number_of_strongly_connected_components",
     "enabled_by_gene_labels": (
         "query_index.model_activity_enabled_by_genes",
-        [("label", remove_species_code_suffix)],
+        Iter("label").filter().map(remove_species_code_suffix).all(),
     ),
     "enabled_by_gene_ids": ("query_index.model_activity_enabled_by_genes", ["id"]),
     "occurs_in_rollup": ("query_index.model_activity_occurs_in_rollup", ["label"]),
