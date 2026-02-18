@@ -131,7 +131,9 @@ def test_multivalued_input_and_output():
         for a in (model.activities or [])
         if a.molecular_function and a.molecular_function.term == "GO:0004108"
     )
+    assert cs_activity.has_input is not None
     assert len(cs_activity.has_input) == 3
+    assert cs_activity.has_output is not None
     assert len(cs_activity.has_output) == 2
 
 
@@ -262,9 +264,12 @@ def test_evidence_with_objects():
         None,
     )
     assert kinase_activity is not None
+    assert kinase_activity.enabled_by is not None
+    assert kinase_activity.enabled_by.evidence is not None
     assert len(kinase_activity.enabled_by.evidence) == 1
 
     evidence = kinase_activity.enabled_by.evidence[0]
+    assert evidence.with_objects is not None
     assert len(evidence.with_objects) == 2
     assert all(re.match(r"^[A-Z]+:[A-Z0-9]+$", obj) for obj in evidence.with_objects)
 
