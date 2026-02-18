@@ -8,6 +8,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
+from typing import Any
 
 import networkx as nx
 from rich import print
@@ -139,6 +140,7 @@ class FilterReason(str, Enum):
 class ErrorReason(str, Enum):
     READ_ERROR = "Read error"
     CONVERSION_ERROR = "Conversion error"
+    INDEXING_ERROR = "Indexing error"
     WRITE_ERROR = "Write error"
 
 
@@ -180,6 +182,7 @@ class PipelineResult(ABC):
 class SuccessResult(PipelineResult):
     """Result for successful processing."""
 
+    data: Any = None
     warnings: list[str] = field(default_factory=list)
 
     @property
