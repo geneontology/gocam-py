@@ -112,9 +112,9 @@ def test_model_to_digraph(example_model: Model):
     for activity in example_model.activities or []:
         if activity.causal_associations:
             for ca in activity.causal_associations:
-                # Check that the edge exists from downstream activity to this activity id
+                # Check that the edge exists from this activity id to downstream activity
                 if ca.downstream_activity:
-                    assert graph.has_edge(ca.downstream_activity, activity.id)
+                    assert graph.has_edge(activity.id, ca.downstream_activity)
 
 
 def test_get_closures():
