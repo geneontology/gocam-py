@@ -50,6 +50,7 @@ SIMPLE_AXIOM = Union[SubClassOf, AnnotationAssertion]
 
 SERIALIZATION = Literal["owl", "rdf", "ofn", "owx"]
 
+
 @dataclass
 class TBoxTranslator:
     """
@@ -58,6 +59,7 @@ class TBoxTranslator:
     This translation is intended to capture faithfully OWL-level semantics of
     GO-CAM objects.
     """
+
     ontology: PyIndexedOntology = field(default_factory=lambda: PyIndexedOntology())
     _label_map: Optional[Dict[str, str]] = None
 
@@ -65,13 +67,16 @@ class TBoxTranslator:
         self.ontology = PyIndexedOntology()
         self.ontology.prefix_mapping.add_default_prefix_names()
         from gocam.datamodel.gocam import linkml_meta
+
         prefixes = linkml_meta.root["prefixes"]
         for pm in prefixes.values():
             p = pm.get("prefix_prefix")
             ref = pm.get("prefix_reference")
             self.ontology.add_prefix_mapping(p, ref)
 
-    def _label(self, model: Model, id: str) -> str:
+    def _label(self, model: Model, id: str | None) -> str:
+        if id is None:
+            return "UNKNOWN"
         if not self._label_map:
             self._label_map = {}
         if id not in self._label_map:
@@ -93,7 +98,9 @@ class TBoxTranslator:
             for axiom in self.translate_model_iter(model):
                 self.ontology.add_axiom(axiom)
 
-    def save_ontology(self, path: str, serialization : SERIALIZATION | None = None) -> None:
+    def save_ontology(
+        self, path: str, serialization: SERIALIZATION | None = None
+    ) -> None:
         """
         Save the current ontology to a file.
 
@@ -123,7 +130,9 @@ class TBoxTranslator:
         else:
             logger.warning(f"Model {model.id} has no taxon")
 
-    def translate_activity(self, model: Model, activity: Activity) -> Iterator[SIMPLE_AXIOM]:
+    def translate_activity(
+        self, model: Model, activity: Activity
+    ) -> Iterator[SIMPLE_AXIOM]:
         if activity.molecular_function and activity.molecular_function.term:
             mf_term_id = activity.molecular_function.term
             mf_label = self._label(model, mf_term_id)
@@ -136,13 +145,15 @@ class TBoxTranslator:
         eb = activity.enabled_by
         if eb and eb.term:
             if isinstance(eb, EnabledByProteinComplexAssociation):
-                pc_id = self.make_id(model, eb.term, *(eb.members or []))
+                pc_id = self.make_id(
+                    model, eb.term, *(m.term for m in (eb.members or []))
+                )
                 yield from self.add_edge(activity.id, ENABLED_BY, pc_id)
                 member_labels: list[str] = []
                 if eb.members:
                     for m in eb.members:
-                        yield from self.add_edge(pc_id, HAS_PART, m)
-                        member_labels.append(self._label(model, m))
+                        yield from self.add_edge(pc_id, HAS_PART, m.term)
+                        member_labels.append(self._label(model, m.term))
                 eb_label = f"{self._label(model, eb.term)}[{' '.join(member_labels)}]"
             elif isinstance(eb, EnabledByGeneProductAssociation):
                 yield from self.add_edge(activity.id, ENABLED_BY, eb.term)
@@ -151,25 +162,38 @@ class TBoxTranslator:
                 raise NotImplementedError(f"Cannot handle {eb}")
         else:
             eb_label = "UNKNOWN"
-        yield from self.add_annotation(activity.id, RDFS_LABEL, f"{eb_label} ({mf_label})")
+        yield from self.add_annotation(
+            activity.id, RDFS_LABEL, f"{eb_label} ({mf_label})"
+        )
         if activity.causal_associations:
             for ca in activity.causal_associations:
                 predicate = ca.predicate
                 if predicate and ca.downstream_activity:
-                    yield from self.add_edge(activity.id, predicate, ca.downstream_activity)
+                    yield from self.add_edge(
+                        activity.id, predicate, ca.downstream_activity
+                    )
         if activity.part_of:
-            yield from self.translate_biological_process(model, activity.id, activity.part_of)
+            yield from self.translate_biological_process(
+                model, activity.id, activity.part_of
+            )
         else:
             yield from self.add_edge(activity.id, PART_OF, model.id)
         if activity.occurs_in:
-            yield from self.translate_cellular_anatomical_entity(model, activity.id, activity.occurs_in)
+            yield from self.translate_cellular_anatomical_entity(
+                model, activity.id, activity.occurs_in
+            )
         yield from self.translate_io(activity.id, activity.has_input, HAS_INPUT)
-        yield from self.translate_io(activity.id, activity.has_primary_input, HAS_PRIMARY_INPUT)
+        yield from self.translate_io(
+            activity.id, activity.has_primary_input, HAS_PRIMARY_INPUT
+        )
         yield from self.translate_io(activity.id, activity.has_output, HAS_OUTPUT)
-        yield from self.translate_io(activity.id, activity.has_primary_output, HAS_PRIMARY_OUTPUT)
+        yield from self.translate_io(
+            activity.id, activity.has_primary_output, HAS_PRIMARY_OUTPUT
+        )
 
-
-    def translate_biological_process(self, model: Model, child: str, ta: BiologicalProcessAssociation) -> Iterator[SIMPLE_AXIOM]:
+    def translate_biological_process(
+        self, model: Model, child: str, ta: BiologicalProcessAssociation
+    ) -> Iterator[SIMPLE_AXIOM]:
         if not ta.term:
             return
         bp_term_id = ta.term
@@ -184,9 +208,14 @@ class TBoxTranslator:
         else:
             yield from self.add_edge(bp_id, PART_OF, model.id)
         if ta.happens_during:
-            yield from self.add_edge(bp_id, HAPPENS_DURING, ta.happens_during)
+            yield from self.add_edge(bp_id, HAPPENS_DURING, ta.happens_during.term)
 
-    def translate_cellular_anatomical_entity(self, model: Model, child: str, ta: CellularAnatomicalEntityAssociation,) -> Iterator[SIMPLE_AXIOM]:
+    def translate_cellular_anatomical_entity(
+        self,
+        model: Model,
+        child: str,
+        ta: CellularAnatomicalEntityAssociation,
+    ) -> Iterator[SIMPLE_AXIOM]:
         if not ta.term:
             return
         cc_term_id = ta.term
@@ -199,7 +228,12 @@ class TBoxTranslator:
             # recursive; predicate switches to
             yield from self.translate_anatomical(model, cc_id, ta.part_of)
 
-    def translate_anatomical(self, model: Model, child: str, ta: Union[CellTypeAssociation, GrossAnatomyAssociation]):
+    def translate_anatomical(
+        self,
+        model: Model,
+        child: str,
+        ta: Union[CellTypeAssociation, GrossAnatomyAssociation],
+    ):
         if not ta.term:
             return
         anat_term_id = ta.term
@@ -210,7 +244,12 @@ class TBoxTranslator:
             # recursive; predicate switches to
             yield from self.translate_anatomical(model, anat_id, ta.part_of)
 
-    def translate_io(self, subject: str, tas: MoleculeAssociation | List[MoleculeAssociation] | None, predicate: str) -> Iterator[SubClassOf]:
+    def translate_io(
+        self,
+        subject: str,
+        tas: MoleculeAssociation | List[MoleculeAssociation] | None,
+        predicate: str,
+    ) -> Iterator[SubClassOf]:
         if tas is None:
             return
         if isinstance(tas, MoleculeAssociation):
@@ -220,7 +259,9 @@ class TBoxTranslator:
                 if ta and ta.term and subject:
                     yield from self.add_edge(subject, predicate, ta.term)
 
-    def add_annotation(self, subject: str, predicate: str, object: str) -> Iterator[AnnotationAssertion]:
+    def add_annotation(
+        self, subject: str, predicate: str, object: str
+    ) -> Iterator[AnnotationAssertion]:
         p_iri = self.iri(predicate)
         ap = self.ontology.annotation_property(str(p_iri))
         lv = SimpleLiteral(object)
@@ -230,13 +271,23 @@ class TBoxTranslator:
         )
         yield AnnotationAssertion(self.iri(subject), ann)
 
-    def add_edge(self, subject: str, predicate: str, object: str) -> Iterator[SubClassOf]:
+    def add_edge(
+        self, subject: str, predicate: str, object: str | None
+    ) -> Iterator[SubClassOf]:
+        if not object:
+            logger.warning(
+                f"Cannot add edge with empty object for subject {subject} and predicate {predicate}"
+            )
+            return
         if predicate == IS_A:
             yield SubClassOf(self.get_class(subject), self.get_class(object))
         else:
-            yield SubClassOf(self.get_class(subject),
-                             ObjectSomeValuesFrom(self.get_predicate(predicate),
-                                                  self.get_class(object)))
+            yield SubClassOf(
+                self.get_class(subject),
+                ObjectSomeValuesFrom(
+                    self.get_predicate(predicate), self.get_class(object)
+                ),
+            )
 
     def iri(self, id: str) -> IRI:
         if "/" in id:
@@ -246,7 +297,9 @@ class TBoxTranslator:
         except ValueError as e:
             if ":" not in id:
                 id = f"TEMP:{id}"
-                logger.warning(f"Assuming {id} is a CURIE, but it does not contain a prefix")
+                logger.warning(
+                    f"Assuming {id} is a CURIE, but it does not contain a prefix"
+                )
             id_parts = id.split(":")
             pfx = id_parts[0]
             self.ontology.add_prefix_mapping(pfx, f"http://identifiers.org/{pfx}:")
@@ -265,6 +318,3 @@ class TBoxTranslator:
     def make_id(self, model: Model, *other_ids: str | None) -> str:
         other_ids_flat = "_".join(oid for oid in other_ids if oid)
         return f"{model.id}_{other_ids_flat}"
-
-
-

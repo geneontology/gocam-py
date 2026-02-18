@@ -59,20 +59,37 @@ def _iter_model_associations(model: Model) -> Iterable[Association]:
     for activity in model.activities or []:
         if activity.enabled_by:
             yield activity.enabled_by
+            if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
+                if activity.enabled_by.members:
+                    yield from activity.enabled_by.members
+
         if activity.molecular_function:
             yield activity.molecular_function
+
         if activity.part_of:
             yield activity.part_of
+            if activity.part_of.happens_during:
+                yield activity.part_of.happens_during
+            if activity.part_of.part_of:
+                yield activity.part_of.part_of
+
         if activity.occurs_in:
             yield activity.occurs_in
+            if activity.occurs_in.part_of:
+                yield activity.occurs_in.part_of
+
         if activity.has_primary_input:
             yield activity.has_primary_input
+
         for has_input in activity.has_input or []:
             yield has_input
+
         if activity.has_primary_output:
             yield activity.has_primary_output
+
         for has_output in activity.has_output or []:
             yield has_output
+
         for causal_association in activity.causal_associations or []:
             yield causal_association
 
@@ -350,7 +367,9 @@ class Indexer:
                     activity.enabled_by, EnabledByProteinComplexAssociation
                 ):
                     if activity.enabled_by.members:
-                        all_enabled_by_genes.update(activity.enabled_by.members)
+                        all_enabled_by_genes.update(
+                            member.term for member in activity.enabled_by.members
+                        )
                 annoton_term_id_parts.append(activity.enabled_by.term)
 
             if activity.molecular_function:

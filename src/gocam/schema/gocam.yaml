@@ -337,8 +337,8 @@ classes:
     is_a: EnabledByAssociation
     attributes:
       members:
-        description: The gene products that are part of the complex
-        range: GeneProductTermObject
+        description: Associations between the complex and its members.
+        range: ProteinComplexMemberAssociation
         multivalued: true
     slot_usage:
       term:
@@ -349,6 +349,14 @@ classes:
               If this is the value of `term`, then members *must* be specified.
           - value: ComplexPortal:CPX-969
             description: The human Caspase-2 complex
+
+  ProteinComplexMemberAssociation:
+    description: An association between a protein complex and one of its members.
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        description: The member gene product that is part of the protein complex.
+        range: GeneProductTermObject
 
   CausalAssociation:
     description: A causal association between two activities
@@ -388,8 +396,8 @@ classes:
     is_a: TermAssociation
     attributes:
       happens_during:
-        description: Optional extension describing where the BP takes place
-        range: PhaseTermObject
+        description: Optional extension describing the phase during which the BP takes place
+        range: BiologicalProcessPhaseAssociation
       part_of:
         description: Optional extension allowing hierarchical nesting of BPs
         range: BiologicalProcessAssociation
@@ -397,6 +405,14 @@ classes:
     slot_usage:
       term:
         range: BiologicalProcessTermObject
+
+  BiologicalProcessPhaseAssociation:
+    description: An association between a biological process and a phase term
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        description: The phase ontology term associated with the biological process (not the relation type)
+        range: PhaseTermObject
 
   CellularAnatomicalEntityAssociation:
     description: An association between an activity and a cellular anatomical entity term
