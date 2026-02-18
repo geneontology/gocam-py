@@ -277,8 +277,8 @@
 
 
 
-        BiologicalProcessAssociation --&gt; "0..1" PhaseTermObject : happens_during
-        click PhaseTermObject href "../PhaseTermObject/"
+        BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessPhaseAssociation : happens_during
+        click BiologicalProcessPhaseAssociation href "../BiologicalProcessPhaseAssociation/"
 
 
 
@@ -342,8 +342,8 @@
 <tbody>
 <tr>
 <td><a href="../happens_during/">happens_during</a></td>
-<td>0..1 <br/> <a href="../PhaseTermObject/">PhaseTermObject</a></td>
-<td>Optional extension describing where the BP takes place</td>
+<td>0..1 <br/> <a href="../BiologicalProcessPhaseAssociation/">BiologicalProcessPhaseAssociation</a></td>
+<td>Optional extension describing the phase during which the BP takes place</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -442,12 +442,13 @@ slot_usage:
 attributes:
   happens_during:
     name: happens_during
-    description: Optional extension describing where the BP takes place
+    description: Optional extension describing the phase during which the BP takes
+      place
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
     - BiologicalProcessAssociation
-    range: PhaseTermObject
+    range: BiologicalProcessPhaseAssociation
   part_of:
     name: part_of
     description: Optional extension allowing hierarchical nesting of BPs
@@ -476,14 +477,15 @@ slot_usage:
 attributes:
   happens_during:
     name: happens_during
-    description: Optional extension describing where the BP takes place
+    description: Optional extension describing the phase during which the BP takes
+      place
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: happens_during
     owner: BiologicalProcessAssociation
     domain_of:
     - BiologicalProcessAssociation
-    range: PhaseTermObject
+    range: BiologicalProcessPhaseAssociation
   part_of:
     name: part_of
     description: Optional extension allowing hierarchical nesting of BPs

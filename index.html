@@ -522,6 +522,10 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <td>An association between an activity and a biological process term</td>
 </tr>
 <tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="BiologicalProcessPhaseAssociation/">BiologicalProcessPhaseAssociation</a></td>
+<td>An association between a biological process and a phase term</td>
+</tr>
+<tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="CellTypeAssociation/">CellTypeAssociation</a></td>
 <td>An association between an activity and a cell type term</td>
 </tr>
@@ -540,6 +544,10 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="MoleculeAssociation/">MoleculeAssociation</a></td>
 <td>An association between an activity and a molecule term</td>
+</tr>
+<tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ProteinComplexMemberAssociation/">ProteinComplexMemberAssociation</a></td>
+<td>An association between a protein complex and one of its members</td>
 </tr>
 <tr>
 <td><a href="EvidenceItem/">EvidenceItem</a></td>
@@ -710,7 +718,7 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 </tr>
 <tr>
 <td><a href="happens_during/">happens_during</a></td>
-<td>Optional extension describing where the BP takes place</td>
+<td>Optional extension describing the phase during which the BP takes place</td>
 </tr>
 <tr>
 <td><a href="has_input/">has_input</a></td>
@@ -746,7 +754,7 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 </tr>
 <tr>
 <td><a href="members/">members</a></td>
-<td>The gene products that are part of the complex</td>
+<td>Associations between the complex and its members</td>
 </tr>
 <tr>
 <td><a href="model_activity_enabled_by_closure/">model_activity_enabled_by_closure</a></td>

@@ -299,8 +299,8 @@
 
 
 
-        EnabledByProteinComplexAssociation --&gt; "*" GeneProductTermObject : members
-        click GeneProductTermObject href "../GeneProductTermObject/"
+        EnabledByProteinComplexAssociation --&gt; "*" ProteinComplexMemberAssociation : members
+        click ProteinComplexMemberAssociation href "../ProteinComplexMemberAssociation/"
 
 
 
@@ -353,8 +353,8 @@
 <tbody>
 <tr>
 <td><a href="../members/">members</a></td>
-<td>* <br/> <a href="../GeneProductTermObject/">GeneProductTermObject</a></td>
-<td>The gene products that are part of the complex</td>
+<td>* <br/> <a href="../ProteinComplexMemberAssociation/">ProteinComplexMemberAssociation</a></td>
+<td>Associations between the complex and its members</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -463,12 +463,12 @@ slot_usage:
 attributes:
   members:
     name: members
-    description: The gene products that are part of the complex
+    description: Associations between the complex and its members.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
     - EnabledByProteinComplexAssociation
-    range: GeneProductTermObject
+    range: ProteinComplexMemberAssociation
     multivalued: true
 rules:
 - preconditions:
@@ -515,14 +515,14 @@ slot_usage:
 attributes:
   members:
     name: members
-    description: The gene products that are part of the complex
+    description: Associations between the complex and its members.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: members
     owner: EnabledByProteinComplexAssociation
     domain_of:
     - EnabledByProteinComplexAssociation
-    range: GeneProductTermObject
+    range: ProteinComplexMemberAssociation
     multivalued: true
   term:
     name: term

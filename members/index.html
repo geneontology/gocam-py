@@ -384,7 +384,7 @@
 
 
 <h1 id="slot-members">Slot: members</h1>
-<p><em>The gene products that are part of the complex</em></p>
+<p><em>Associations between the complex and its members.</em></p>
 <p>URI: <a href="https://w3id.org/gocam/members">gocam:members</a>
 Alias: members</p>
 <!-- no inheritance hierarchy -->
@@ -409,7 +409,7 @@ Alias: members</p>
 <h2 id="properties">Properties</h2>
 <ul>
 <li>
-<p>Range: <a href="../GeneProductTermObject/">GeneProductTermObject</a></p>
+<p>Range: <a href="../ProteinComplexMemberAssociation/">ProteinComplexMemberAssociation</a></p>
 </li>
 <li>
 <p>Multivalued: True</p>
@@ -443,14 +443,14 @@ Alias: members</p>
 <details>
 
 <pre><code class="language-yaml">name: members
-description: The gene products that are part of the complex
+description: Associations between the complex and its members.
 from_schema: https://w3id.org/gocam
 rank: 1000
 alias: members
 owner: EnabledByProteinComplexAssociation
 domain_of:
 - EnabledByProteinComplexAssociation
-range: GeneProductTermObject
+range: ProteinComplexMemberAssociation
 multivalued: true
 
 </code></pre>

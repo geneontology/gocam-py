@@ -384,7 +384,7 @@
 
 
 <h1 id="slot-happens_during">Slot: happens_during</h1>
-<p><em>Optional extension describing where the BP takes place</em></p>
+<p><em>Optional extension describing the phase during which the BP takes place</em></p>
 <p>URI: <a href="https://w3id.org/gocam/happens_during">gocam:happens_during</a>
 Alias: happens_during</p>
 <!-- no inheritance hierarchy -->
@@ -408,7 +408,7 @@ Alias: happens_during</p>
 </table>
 <h2 id="properties">Properties</h2>
 <ul>
-<li>Range: <a href="../PhaseTermObject/">PhaseTermObject</a></li>
+<li>Range: <a href="../BiologicalProcessPhaseAssociation/">BiologicalProcessPhaseAssociation</a></li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
 <h3 id="schema-source">Schema Source</h3>
@@ -438,14 +438,14 @@ Alias: happens_during</p>
 <details>
 
 <pre><code class="language-yaml">name: happens_during
-description: Optional extension describing where the BP takes place
+description: Optional extension describing the phase during which the BP takes place
 from_schema: https://w3id.org/gocam
 rank: 1000
 alias: happens_during
 owner: BiologicalProcessAssociation
 domain_of:
 - BiologicalProcessAssociation
-range: PhaseTermObject
+range: BiologicalProcessPhaseAssociation
 
 </code></pre>
 
