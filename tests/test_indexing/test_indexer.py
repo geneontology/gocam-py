@@ -5,7 +5,7 @@ import pytest
 import yaml
 
 from gocam.datamodel import Model, QueryIndex
-from gocam.indexing.Indexer import Indexer
+from gocam.indexing.Indexer import Indexer, model_to_digraph
 from tests import EXAMPLES_DIR
 from tests.test_indexing import INPUT_DIR
 
@@ -101,8 +101,7 @@ def test_index_model(example_model: Model):
 
 def test_model_to_digraph(example_model: Model):
     """Test converting a model to a directed graph."""
-    indexer = Indexer()
-    graph = indexer.model_to_digraph(example_model)
+    graph = model_to_digraph(example_model)
 
     # Verify the graph structure
     assert isinstance(graph, nx.DiGraph)
@@ -152,7 +151,7 @@ def test_indexer_with_empty_model():
     assert model.query_index.flattened_references == []
 
     # Graph should be empty
-    graph = indexer.model_to_digraph(model)
+    graph = model_to_digraph(model)
     assert graph.number_of_nodes() == 0
     assert graph.number_of_edges() == 0
 

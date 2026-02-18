@@ -23,12 +23,12 @@ from _common import (
     ResultSummary,
     SuccessResult,
     get_json_files,
-    model_to_graph,
     setup_logger,
 )
 from rich.progress import track
 
 from gocam.datamodel import Model, ModelStateEnum
+from gocam.indexing.Indexer import model_to_digraph
 
 app = typer.Typer()
 
@@ -47,7 +47,7 @@ def is_model_pathway_like(model: Model) -> bool:
         True if the model is pathway-like, False otherwise.
     """
 
-    graph = model_to_graph(model)
+    graph = model_to_digraph(model)
     for node in graph.nodes():
         for other_node in graph.nodes():
             if node != other_node:
