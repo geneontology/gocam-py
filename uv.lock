@@ -1942,7 +1942,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/6d/f5/59f3375b12172651c
 
 [[package]]
 name = "pystow"
-version = "0.7.26"
+version = "0.7.23"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -1950,9 +1950,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/be/df/2872c691b5f6ee97d732f73dacc98ec7f31b6854694837afd8b988d6ff0e/pystow-0.7.26.tar.gz", hash = "sha256:bfc60b95e5a2b139f2732651921c63195c04de18180ecd81600a5f3a9d8a6c7e", size = 50480, upload-time = "2026-02-18T13:59:54.823Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/51/97/7b99406d23c5ff8d5ca2886ce81899963dc7111438e21f900dd32c744a7f/pystow-0.7.23.tar.gz", hash = "sha256:d240007167b76622bd6c25eac01d11599023893f6174862eb260338b80eabc68", size = 49684, upload-time = "2026-02-06T12:54:32.457Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/d9/e3253f192649e6640605593ad1cbc38727d2d8ad7b7de9bbcde0dcc77cbb/pystow-0.7.26-py3-none-any.whl", hash = "sha256:6777078fdf6ef2ca6f440fc9a4804ecbe3a2e56c377e4324bce006d061532be9", size = 57528, upload-time = "2026-02-18T13:59:56.386Z" },
+    { url = "https://files.pythonhosted.org/packages/af/b0/0e6bcdf5ff9837b95b7a3abd74b4a0bb01353ee8f0854dcdd6aa3fce4ce3/pystow-0.7.23-py3-none-any.whl", hash = "sha256:af548a856de6f48f65e2928c0dfefec0a92782bbe599d7e0084dfbbc053a2c99", size = 56651, upload-time = "2026-02-06T12:54:34.08Z" },
 ]
 
 [[package]]
