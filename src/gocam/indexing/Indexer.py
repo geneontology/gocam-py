@@ -522,7 +522,7 @@ def all_activity_inputs(activity: Activity) -> list[MoleculeAssociation]:
     Returns:
         List of all molecule associations that are inputs to the activity.
     """
-    inputs = activity.has_input or []
+    inputs: list[MoleculeAssociation] = list(activity.has_input or [])
     if activity.has_primary_input:
         inputs.append(activity.has_primary_input)
     return inputs
@@ -537,7 +537,7 @@ def all_activity_outputs(activity: Activity) -> list[MoleculeAssociation]:
     Returns:
         List of all molecule associations that are outputs of the activity.
     """
-    outputs = activity.has_output or []
+    outputs: list[MoleculeAssociation] = list(activity.has_output or [])
     if activity.has_primary_output:
         outputs.append(activity.has_primary_output)
     return outputs
