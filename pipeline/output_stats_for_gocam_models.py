@@ -64,9 +64,9 @@ class ModelStats(ConfiguredBaseModel):
 
     set_activities: Set[str] = set()  #= Field(default_factory=set)
     set_enabled_by_gene_product: Set[str] = set()
-    list_enabled_by_gene_product: List[str] = []
+    list_enabled_by_gene_product: List[str] | None = []  
     set_references: Set[str] = set()
-    list_causal_relations: List[str] = []
+    list_causal_relations: List[str] | None = []  
     set_gene_product_association_activity: Set[str] = set()
     set_protein_complex_association_activity: Set[str] = set()
     set_protein_complex_in_activity_term: Set[str] = set()
@@ -88,7 +88,7 @@ class ContributorProviderStats(ConfiguredBaseModel):
     set_models: Set[str] = set()
     set_activities: Set[str] = set()
     set_enabled_by_gene_product: Set[str] = set()
-    list_enabled_by_gene_product: List[str] = []
+    list_enabled_by_gene_product: List[str]| None = []  
     set_references: Set[str] = set()
     set_causal_relations: Set[str] = set()
     set_gene_product_association_activity: Set[str] = set()
@@ -127,7 +127,7 @@ class AggregateInfo(ConfiguredBaseModel):
     set_protein_complex_association_activity: Set[str] = set()
     set_protein_complex_in_activity_term: Set[str] = set()
     set_protein_complex_genes: Set[str] = set()
-    list_model_details: List[ModelDetails] = []
+    list_model_details: List[ModelDetails] | None = []
 
 
 ProcessingResult: TypeAlias = (
@@ -175,7 +175,8 @@ def _update_entity_evidence_stats(
             entity_info.set_protein_complex_in_activity_term.add(activity.enabled_by.term)
         if activity.enabled_by.members:
             for member in activity.enabled_by.members:
-                entity_info.set_protein_complex_genes.add(member)
+                if member.term:
+                    entity_info.set_protein_complex_genes.add(member.term)
     entity_info.set_activities.add(activity.id)
     entity_info.set_references.add(evidence_reference)
     entity_info.set_models.add(gocam_model_id)
@@ -252,9 +253,10 @@ def process_gocam_model_file(
                     model_aggregate.set_protein_complex_in_activity_term.add(activity.enabled_by.term)
                 if activity.enabled_by.members:
                     for member in activity.enabled_by.members:
-                        stats_by_model.set_protein_complex_genes.add(member)
-                        model_aggregate.set_protein_complex_genes.add(member)
-                        stats_by_model.number_of_genes += 1
+                        if member.term:
+                            stats_by_model.set_protein_complex_genes.add(member.term)
+                            model_aggregate.set_protein_complex_genes.add(member.term)
+                            stats_by_model.number_of_genes += 1
 
             if activity.enabled_by is not None and activity.enabled_by.evidence:
                 for evidence in activity.enabled_by.evidence:
