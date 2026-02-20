@@ -290,7 +290,11 @@ class MinervaWrapper:
                     evs, provenance = _process_fact(fact)
                     yield activity, object_, evs, provenance
 
-        def _create_molecule_node(individual_id: str) -> MoleculeNode:
+        def _add_molecule_node(individual_id: str) -> None:
+            if individual_id in molecule_nodes_by_id:
+                # Molecule node already exists, nothing to do
+                return
+
             if individual_id not in individual_to_term:
                 translation_warnings.add(
                     TranslationWarning(
@@ -299,10 +303,13 @@ class MinervaWrapper:
                         entity_id=individual_id,
                     )
                 )
+                return
+
             molecule_node = MoleculeNode(
                 id=individual_id,
                 term=individual_to_term[individual_id],
             )
+
             for located_in_fact in facts_by_subject_property.get(
                 (individual_id, LOCATED_IN), []
             ):
@@ -320,7 +327,8 @@ class MinervaWrapper:
                     evidence=evs,
                     provenances=[prov],
                 )
-            return molecule_node
+
+            molecule_nodes_by_id[individual_id] = molecule_node
 
         for individual in minerva_obj["individuals"]:
             individual_id = individual["id"]
@@ -523,8 +531,7 @@ class MinervaWrapper:
         ):
             if activity.has_input is None:
                 activity.has_input = []
-            if object_ not in molecule_nodes_by_id:
-                molecule_nodes_by_id[object_] = _create_molecule_node(object_)
+            _add_molecule_node(object_)
             activity.has_input.append(
                 MoleculeAssociation(molecule=object_, evidence=evs, provenances=[prov])
             )
@@ -532,8 +539,7 @@ class MinervaWrapper:
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_INPUT
         ):
-            if object_ not in molecule_nodes_by_id:
-                molecule_nodes_by_id[object_] = _create_molecule_node(object_)
+            _add_molecule_node(object_)
             association = MoleculeAssociation(
                 molecule=object_, evidence=evs, provenances=[prov]
             )
@@ -544,8 +550,7 @@ class MinervaWrapper:
         ):
             if activity.has_output is None:
                 activity.has_output = []
-            if object_ not in molecule_nodes_by_id:
-                molecule_nodes_by_id[object_] = _create_molecule_node(object_)
+            _add_molecule_node(object_)
             activity.has_output.append(
                 MoleculeAssociation(molecule=object_, evidence=evs, provenances=[prov])
             )
@@ -553,8 +558,7 @@ class MinervaWrapper:
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_OUTPUT
         ):
-            if object_ not in molecule_nodes_by_id:
-                molecule_nodes_by_id[object_] = _create_molecule_node(object_)
+            _add_molecule_node(object_)
             association = MoleculeAssociation(
                 molecule=object_, evidence=evs, provenances=[prov]
             )
