@@ -332,7 +332,7 @@ class MoleculeNode(ConfiguredBaseModel):
                                       '(GO:0004549)',
                        'value': 'gomodel:63f809ec00000701/63f809ec00000733'}],
          'id_prefixes': ['gocam']} })
-    term: Optional[str] = Field(default=None, description="""The molecule term associated with the molecule node""", json_schema_extra = { "linkml_meta": {'alias': 'term',
+    term: str = Field(default=..., description="""The molecule term associated with the molecule node""", json_schema_extra = { "linkml_meta": {'alias': 'term',
          'domain_of': ['MoleculeNode',
                        'EvidenceItem',
                        'EnabledByAssociation',

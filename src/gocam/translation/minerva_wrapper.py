@@ -291,9 +291,17 @@ class MinervaWrapper:
                     yield activity, object_, evs, provenance
 
         def _create_molecule_node(individual_id: str) -> MoleculeNode:
+            if individual_id not in individual_to_term:
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for individual {individual_id} when creating molecule node",
+                        entity_id=individual_id,
+                    )
+                )
             molecule_node = MoleculeNode(
                 id=individual_id,
-                term=individual_to_term.get(individual_id, None),
+                term=individual_to_term[individual_id],
             )
             for located_in_fact in facts_by_subject_property.get(
                 (individual_id, LOCATED_IN), []

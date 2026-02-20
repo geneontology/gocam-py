@@ -252,6 +252,7 @@ classes:
       term:
         description: The molecule term associated with the molecule node
         range: MoleculeTermObject
+        required: true
       located_in:
         description: The cellular location in which the molecule is located
         range: CellularAnatomicalEntityAssociation
