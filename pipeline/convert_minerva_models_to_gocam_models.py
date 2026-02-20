@@ -14,7 +14,6 @@ The models which pass the connectivity criteria are written to the output direct
 not be True GO-CAM models. This output set is designed for QC analysis and further downstream
 filtering.
 """
-
 import json
 import logging
 from pathlib import Path
@@ -30,13 +29,13 @@ from _common import (
     ResultSummary,
     SuccessResult,
     get_json_files,
-    model_to_graph,
     setup_logger,
 )
 from rich.progress import track
 
 from gocam.datamodel import Activity, Model
 from gocam.translation import MinervaWrapper
+from gocam.utils import model_to_digraph
 
 app = typer.Typer()
 
@@ -148,7 +147,7 @@ def process_minerva_model_file(
         return ErrorResult(reason=ErrorReason.CONVERSION_ERROR, details=str(e))
 
     # Detect if there is at least one activity edge in the model. If not, skip writing the model.
-    graph = model_to_graph(gocam_model)
+    graph = model_to_digraph(gocam_model)
     has_activity_edge = graph.number_of_edges() > 0
     if not has_activity_edge:
         logger.info(f"GO-CAM model {gocam_model.id} has no activity edges; skipping.")

@@ -604,9 +604,10 @@ classes:
         # equals_expression: "len(../activities/enabled_by)"
         range: integer
       number_of_causal_associations:
-        description: Total number of causal association edges connecting activities in a model.
-        todos:
-          - decide what to do about "implicit" causal associations, i.e provides_input_for
+        description: Total number of causal association edges connecting activities in a model. This
+          includes both explicit causal associations (e.g. "directly positively regulates") between
+          activities and implicit causal associations between activities with shared input/output
+          chemical entities.
         range: integer
       length_of_longest_causal_association_path:
         description: The maximum number of hops along activities along the direction of causal flow in a model.

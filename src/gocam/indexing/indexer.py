@@ -23,6 +23,7 @@ from gocam.datamodel import (
     QueryIndex,
     TermObject,
 )
+from gocam.utils import model_to_digraph
 
 logger = logging.getLogger(__name__)
 
@@ -356,8 +357,6 @@ class Indexer:
 
         for activity in model.activities or []:
             annoton_term_id_parts = []
-            if activity.causal_associations:
-                all_causal_associations.extend(activity.causal_associations)
 
             if activity.enabled_by:
                 all_enabled_bys.add(activity.enabled_by.term)
@@ -398,8 +397,10 @@ class Indexer:
                 )
                 all_annoton_terms.append(annoton_term)
 
+        graph = model_to_digraph(model)
+
         qi.number_of_enabled_by_terms = len(all_enabled_bys)
-        qi.number_of_causal_associations = len(all_causal_associations)
+        qi.number_of_causal_associations = graph.number_of_edges()
 
         all_provided_bys = set()
         all_contributors = set()
@@ -435,7 +436,6 @@ class Indexer:
             for term in sorted(all_evidence_terms)
         ]
 
-        graph = self.model_to_digraph(model)
         # use nx to find the longest path and all SCCs
         if graph.number_of_nodes() > 0:
             # Find the longest path length
@@ -509,23 +509,3 @@ class Indexer:
             qi.taxon_label = self._ncbi_taxon_label(model.taxon)
 
         return qi
-
-    def model_to_digraph(self, model: Model) -> nx.DiGraph:
-        """
-        Convert a model to a directed graph where nodes are activities
-        and edges represent causal relationships between activities.
-
-        Args:
-            model: The GO-CAM model to convert
-
-        Returns:
-            A directed graph (DiGraph) where nodes are activity IDs and edges represent
-            causal relationships from source to target activities
-        """
-        g = nx.DiGraph()
-        for a in model.activities or []:
-            if a.causal_associations:
-                for ca in a.causal_associations:
-                    if ca.downstream_activity:
-                        g.add_edge(ca.downstream_activity, a.id)
-        return g
