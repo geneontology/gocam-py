@@ -121,7 +121,7 @@ activities:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
-    term: UniProtKB:P07948
+    molecule: gomodel:6606056e00002011/662af8fa00002864
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -280,7 +280,7 @@ activities:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
-    term: UniProtKB:P21854
+    molecule: gomodel:6606056e00002011/662af8fa00002875
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -377,6 +377,11 @@ activities:
       - https://www.uniprot.org
     predicate: RO:0002629
     downstream_activity: gomodel:6606056e00002011/6606056e00002049
+molecules:
+- id: gomodel:6606056e00002011/662af8fa00002875
+  term: UniProtKB:P21854
+- id: gomodel:6606056e00002011/662af8fa00002864
+  term: UniProtKB:P07948
 objects:
 - id: GO:0005615
   label: extracellular space

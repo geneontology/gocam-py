@@ -17,6 +17,7 @@ from gocam.datamodel import (
     EvidenceItem,
     EvidenceTermObject,
     Model,
+    MoleculeNode,
     Object,
     ProvenanceInfo,
     PublicationObject,
@@ -335,7 +336,6 @@ class Indexer:
         model.query_index = qi
         qi = model.query_index
         qi.number_of_activities = len(model.activities or [])
-        all_causal_associations = []
         all_mfs = set()
         all_enabled_bys = set()
         all_enabled_by_genes = set()
@@ -354,6 +354,10 @@ class Indexer:
                 return lbl
 
             return x
+
+        molecule_nodes_by_id: dict[str, MoleculeNode] = {
+            node.id: node for node in model.molecules or []
+        }
 
         for activity in model.activities or []:
             annoton_term_id_parts = []
@@ -385,8 +389,10 @@ class Indexer:
 
             if activity.has_input:
                 for ta in activity.has_input:
-                    all_has_inputs.add(ta.term)
-                    annoton_term_id_parts.append(ta.term)
+                    if ta.molecule and ta.molecule in molecule_nodes_by_id:
+                        input_molecule = molecule_nodes_by_id[ta.molecule]
+                        all_has_inputs.add(input_molecule.term)
+                        annoton_term_id_parts.append(input_molecule.term)
 
             if activity.enabled_by:
                 annoton_term_id_parts = filter(None, annoton_term_id_parts)

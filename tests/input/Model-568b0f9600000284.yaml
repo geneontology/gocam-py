@@ -403,7 +403,7 @@ activities:
       date: '2020-10-28'
       provided_by:
       - http://www.wormbase.org
-    term: WB:WBGene00004055
+    molecule: gomodel:568b0f9600000284/5f46c3b700003606
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -499,7 +499,7 @@ activities:
       date: '2020-10-28'
       provided_by:
       - http://www.wormbase.org
-    term: WB:WBGene00000223
+    molecule: gomodel:568b0f9600000284/5f46c3b700003602
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -594,7 +594,7 @@ activities:
       date: '2020-10-28'
       provided_by:
       - http://www.wormbase.org
-    term: WB:WBGene00004758
+    molecule: gomodel:568b0f9600000284/5f46c3b700003608
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -710,7 +710,7 @@ activities:
       date: '2020-10-28'
       provided_by:
       - http://www.wormbase.org
-    term: WB:WBGene00004055
+    molecule: gomodel:568b0f9600000284/5f46c3b700003610
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -937,6 +937,15 @@ activities:
       - http://www.wormbase.org
     predicate: RO:0002629
     downstream_activity: gomodel:568b0f9600000284/580685bd00000135
+molecules:
+- id: gomodel:568b0f9600000284/5f46c3b700003608
+  term: WB:WBGene00004758
+- id: gomodel:568b0f9600000284/5f46c3b700003610
+  term: WB:WBGene00004055
+- id: gomodel:568b0f9600000284/5f46c3b700003606
+  term: WB:WBGene00004055
+- id: gomodel:568b0f9600000284/5f46c3b700003602
+  term: WB:WBGene00000223
 objects:
 - id: WB:WBGene00006599
   label: tpa-1 Cele

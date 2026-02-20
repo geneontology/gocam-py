@@ -21,6 +21,7 @@ from gocam.datamodel import (
     ModelStateEnum,
     MolecularFunctionAssociation,
     MoleculeAssociation,
+    MoleculeNode,
     Object,
     ProteinComplexMemberAssociation,
     ProvenanceInfo,
@@ -37,6 +38,7 @@ HAS_OUTPUT = "RO:0002234"
 HAS_PRIMARY_INPUT = "RO:0004009"
 HAS_PRIMARY_OUTPUT = "RO:0004008"
 HAPPENS_DURING = "RO:0002092"
+LOCATED_IN = "RO:0001025"
 
 logger = logging.getLogger(__name__)
 
@@ -199,6 +201,7 @@ class MinervaWrapper:
         objects_by_id: dict[str, dict] = {}
         activities: list[Activity] = []
         activities_by_mf_id: defaultdict[str, list[Activity]] = defaultdict(list)
+        molecule_nodes_by_id: dict[str, MoleculeNode] = {}
         facts_by_property: defaultdict[str, list[dict]] = defaultdict(list)
         facts_by_subject_property: defaultdict[tuple[str, str], list[dict]] = (
             defaultdict(list)
@@ -286,6 +289,30 @@ class MinervaWrapper:
                 for activity in activities_by_mf_id.get(subject, []):
                     evs, provenance = _process_fact(fact)
                     yield activity, object_, evs, provenance
+
+        def _create_molecule_node(individual_id: str) -> MoleculeNode:
+            molecule_node = MoleculeNode(
+                id=individual_id,
+                term=individual_to_term.get(individual_id, None),
+            )
+            for located_in_fact in facts_by_subject_property.get(
+                (individual_id, LOCATED_IN), []
+            ):
+                evs, prov = _process_fact(located_in_fact)
+                if molecule_node.located_in is not None:
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.ATTRIBUTE_OVERWRITE,
+                            message=f"Overwriting located_in for molecule {individual_id}",
+                            entity_id=individual_id,
+                        )
+                    )
+                molecule_node.located_in = CellularAnatomicalEntityAssociation(
+                    term=individual_to_term.get(located_in_fact["object"], None),
+                    evidence=evs,
+                    provenances=[prov],
+                )
+            return molecule_node
 
         for individual in minerva_obj["individuals"]:
             individual_id = individual["id"]
@@ -488,19 +515,19 @@ class MinervaWrapper:
         ):
             if activity.has_input is None:
                 activity.has_input = []
+            if object_ not in molecule_nodes_by_id:
+                molecule_nodes_by_id[object_] = _create_molecule_node(object_)
             activity.has_input.append(
-                MoleculeAssociation(
-                    term=individual_to_term[object_],
-                    evidence=evs,
-                    provenances=[prov],
-                )
+                MoleculeAssociation(molecule=object_, evidence=evs, provenances=[prov])
             )
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_INPUT
         ):
+            if object_ not in molecule_nodes_by_id:
+                molecule_nodes_by_id[object_] = _create_molecule_node(object_)
             association = MoleculeAssociation(
-                term=individual_to_term[object_], evidence=evs, provenances=[prov]
+                molecule=object_, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_input", association)
 
@@ -509,19 +536,19 @@ class MinervaWrapper:
         ):
             if activity.has_output is None:
                 activity.has_output = []
+            if object_ not in molecule_nodes_by_id:
+                molecule_nodes_by_id[object_] = _create_molecule_node(object_)
             activity.has_output.append(
-                MoleculeAssociation(
-                    term=individual_to_term[object_],
-                    evidence=evs,
-                    provenances=[prov],
-                )
+                MoleculeAssociation(molecule=object_, evidence=evs, provenances=[prov])
             )
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_PRIMARY_OUTPUT
         ):
+            if object_ not in molecule_nodes_by_id:
+                molecule_nodes_by_id[object_] = _create_molecule_node(object_)
             association = MoleculeAssociation(
-                term=individual_to_term[object_], evidence=evs, provenances=[prov]
+                molecule=object_, evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "has_primary_output", association)
 
@@ -633,6 +660,7 @@ class MinervaWrapper:
             date_modified=annotations.get("date", None),
             taxon=taxon,
             activities=activities,
+            molecules=list(molecule_nodes_by_id.values()),
             objects=objects,
             provenances=[provenance],
         )

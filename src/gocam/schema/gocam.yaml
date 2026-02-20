@@ -86,9 +86,14 @@ classes:
               required: true
     attributes:
       id:
-        description: The identifier of the model. Should be in gocam namespace.
+        description: The identifier of the model.
         identifier: true
         range: uriorcurie
+        id_prefixes:
+          - gomodel
+        examples:
+          - value: gomodel:63f809ec00000701
+            description: A model representing tRNA repair and recycling
       title:
         description: The human-readable descriptive title of the model
         required: true
@@ -122,6 +127,11 @@ classes:
         range: Activity
         inlined_as_list: true
         multivalued: true
+      molecules:
+        description: All of the molecule nodes that are part of the model.
+        range: MoleculeNode
+        inlined_as_list: true
+        multivalued: true
       objects:
         description: All of the objects that are part of the model. This includes terms as well as
           publications and database objects like gene. This is not strictly part of the data managed by the model,
@@ -151,16 +161,16 @@ classes:
       - annoton
     attributes:
       id:
-        description: Identifier of the activity unit. Should be in gocam namespace.
+        description: Identifier of the activity unit.
         identifier: true
         range: uriorcurie
         comments:
           - Typically does not need to be exposed to end-user, this exists to allow activity flows
         id_prefixes:
-          - gocam
+          - gomodel
         examples:
-          - value: gomodel:63f809ec00000701
-            description: A model representing tRNA repair and recycling
+          - value: gomodel:63f809ec00000701/63f809ec00000706
+            description: A activity of the model representing alpha-aminoacyl-tRNA binding enabled by NEMF
       enabled_by:
         description: The gene product or complex that carries out the activity
         range: EnabledByAssociation
@@ -223,6 +233,29 @@ classes:
         range: ProvenanceInfo
         inlined_as_list: true
         multivalued: true
+
+  MoleculeNode:
+    description: An individual molecule or chemical entity in a causal model, representing a
+      specific occurrence of a molecule that participates in activities as an input or output and
+      may be localized to a particular cellular location.
+    attributes:
+      id:
+        description: Identifier of the molecule node.
+        identifier: true
+        range: uriorcurie
+        id_prefixes:
+          - gocam
+        examples:
+          - value: gomodel:63f809ec00000701/63f809ec00000733
+            description: A molecule node of the model representing tRNA precursor (CHEBI:10668) that
+              is an input to tRNA-specific ribonuclease activity (GO:0004549)
+      term:
+        description: The molecule term associated with the molecule node
+        range: MoleculeTermObject
+      located_in:
+        description: The cellular location in which the molecule is located
+        range: CellularAnatomicalEntityAssociation
+        inlined: true
 
   EvidenceItem:
     description: An individual piece of evidence that is associated with an assertion in a model
@@ -451,11 +484,11 @@ classes:
         range: GrossAnatomicalStructureTermObject
 
   MoleculeAssociation:
-    description: An association between an activity and a molecule term
-    is_a: TermAssociation
-    slot_usage:
-      term:
-        range: MoleculeTermObject
+    description: An association between an activity and a molecule node
+    is_a: Association
+    attributes:
+      molecule:
+        range: MoleculeNode
 
   Object:
     description: An abstract class for all identified objects in a model
