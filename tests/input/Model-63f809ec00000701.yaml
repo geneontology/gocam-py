@@ -63,7 +63,7 @@ activities:
       date: '2023-03-01'
       provided_by:
       - https://www.uniprot.org
-    term: CHEBI:10668
+    molecule: gomodel:63f809ec00000701/63f809ec00000733
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -216,7 +216,7 @@ activities:
       date: '2023-03-01'
       provided_by:
       - https://www.uniprot.org
-    term: CHEBI:10668
+    molecule: gomodel:63f809ec00000701/63f809ec00000733
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -311,7 +311,7 @@ activities:
       date: '2023-03-01'
       provided_by:
       - https://www.uniprot.org
-    term: CHEBI:17732
+    molecule: gomodel:63f809ec00000701/63f809ec00000710
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -331,6 +331,11 @@ activities:
       - https://www.uniprot.org
     predicate: RO:0002304
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000726
+molecules:
+- id: gomodel:63f809ec00000701/63f809ec00000733
+  term: CHEBI:10668
+- id: gomodel:63f809ec00000701/63f809ec00000710
+  term: CHEBI:17732
 objects:
 - id: GO:1904678
   label: alpha-aminoacyl-tRNA binding

@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from gocam.datamodel import EnabledByProteinComplexAssociation
+from gocam.datamodel import Activity, EnabledByProteinComplexAssociation, MoleculeNode
 from gocam.translation.minerva_wrapper import MinervaWrapper
 from gocam.translation.result import WarningType
 from tests import INPUT_DIR
@@ -70,8 +70,8 @@ def test_has_input_and_has_output():
     mw = MinervaWrapper()
     model = mw.minerva_object_to_model(minerva_object)
 
-    activities_with_input = []
-    activities_with_output = []
+    activities_with_input: list[Activity] = []
+    activities_with_output: list[Activity] = []
     for activity in model.activities or []:
         if activity.has_input:
             activities_with_input.append(activity)
@@ -83,14 +83,22 @@ def test_has_input_and_has_output():
     assert len(activities_with_output) == 7
 
     # Verify that one activity has uric acid as an input
+    uric_acid_molecule = next(
+        m for m in model.molecules or [] if m.term == "CHEBI:27226"
+    )
     uric_acid_input_activities = [
-        a for a in activities_with_input if a.has_input[0].term == "CHEBI:27226"
+        a
+        for a in activities_with_input
+        if a.has_input and a.has_input[0].molecule == uric_acid_molecule.id
     ]
     assert len(uric_acid_input_activities) == 1
 
     # Verify that three activities have urea as an output
+    urea_molecule = next(m for m in model.molecules or [] if m.term == "CHEBI:16199")
     urea_output_activities = [
-        a for a in activities_with_output if a.has_output[0].term == "CHEBI:16199"
+        a
+        for a in activities_with_output
+        if a.has_output and a.has_output[0].molecule == urea_molecule.id
     ]
     assert len(urea_output_activities) == 3
 
@@ -110,8 +118,15 @@ def test_has_input_issue_65():
     for activity in activities_with_input:
         for input_assoc in activity.has_input or []:
             # Check if the input term is also the term of an enabled_by for any activity
+            if input_assoc.molecule is None or not model.molecules:
+                continue
+            input_molecule = next(
+                (m for m in model.molecules if m.id == input_assoc.molecule), None
+            )
+            if input_molecule is None:
+                continue
             is_protein = any(
-                a.enabled_by.term == input_assoc.term
+                a.enabled_by.term == input_molecule.term
                 for a in (model.activities or [])
                 if a.enabled_by is not None
             )
