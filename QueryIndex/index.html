@@ -894,9 +894,9 @@ attributes:
   number_of_causal_associations:
     name: number_of_causal_associations
     description: Total number of causal association edges connecting activities in
-      a model.
-    todos:
-    - decide what to do about "implicit" causal associations, i.e provides_input_for
+      a model. This includes both explicit causal associations (e.g. "directly positively
+      regulates") between activities and implicit causal associations between activities
+      with shared input/output chemical entities.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -1355,9 +1355,9 @@ attributes:
   number_of_causal_associations:
     name: number_of_causal_associations
     description: Total number of causal association edges connecting activities in
-      a model.
-    todos:
-    - decide what to do about "implicit" causal associations, i.e provides_input_for
+      a model. This includes both explicit causal associations (e.g. "directly positively
+      regulates") between activities and implicit causal associations between activities
+      with shared input/output chemical entities.
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: number_of_causal_associations
