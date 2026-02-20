@@ -244,7 +244,7 @@ classes:
         identifier: true
         range: uriorcurie
         id_prefixes:
-          - gocam
+          - gomodel
         examples:
           - value: gomodel:63f809ec00000701/63f809ec00000733
             description: A molecule node of the model representing tRNA precursor (CHEBI:10668) that
@@ -489,6 +489,7 @@ classes:
     is_a: Association
     attributes:
       molecule:
+        description: The molecule node that is associated with this activity
         range: MoleculeNode
 
   Object:
