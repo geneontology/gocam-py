@@ -34,8 +34,8 @@ from _common import (
 from rich.progress import track
 
 from gocam.datamodel import Activity, Model
-from gocam.indexing.indexer import model_to_digraph
 from gocam.translation import MinervaWrapper
+from gocam.utils import model_to_digraph
 
 app = typer.Typer()
 

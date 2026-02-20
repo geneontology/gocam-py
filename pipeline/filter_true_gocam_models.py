@@ -28,7 +28,7 @@ from _common import (
 from rich.progress import track
 
 from gocam.datamodel import Model, ModelStateEnum
-from gocam.indexing.indexer import model_to_digraph
+from gocam.utils import model_to_digraph
 
 app = typer.Typer()
 

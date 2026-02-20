@@ -1,5 +1,4 @@
 import logging
-from collections import defaultdict
 from collections.abc import Iterable
 from functools import cached_property, lru_cache
 from pathlib import Path
@@ -12,20 +11,19 @@ from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import IS_A, PART_OF
 
 from gocam.datamodel import (
-    Activity,
     Association,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     EvidenceItem,
     EvidenceTermObject,
     Model,
-    MoleculeAssociation,
     Object,
     ProvenanceInfo,
     PublicationObject,
     QueryIndex,
     TermObject,
 )
+from gocam.utils import model_to_digraph
 
 logger = logging.getLogger(__name__)
 
@@ -511,74 +509,3 @@ class Indexer:
             qi.taxon_label = self._ncbi_taxon_label(model.taxon)
 
         return qi
-
-
-def all_activity_inputs(activity: Activity) -> list[MoleculeAssociation]:
-    """Get all inputs for an activity, including primary input if present.
-
-    Args:
-        activity: The activity to get inputs for.
-
-    Returns:
-        List of all molecule associations that are inputs to the activity.
-    """
-    inputs: list[MoleculeAssociation] = list(activity.has_input or [])
-    if activity.has_primary_input:
-        inputs.append(activity.has_primary_input)
-    return inputs
-
-
-def all_activity_outputs(activity: Activity) -> list[MoleculeAssociation]:
-    """Get all outputs for an activity, including primary output if present.
-
-    Args:
-        activity: The activity to get outputs for.
-
-    Returns:
-        List of all molecule associations that are outputs of the activity.
-    """
-    outputs: list[MoleculeAssociation] = list(activity.has_output or [])
-    if activity.has_primary_output:
-        outputs.append(activity.has_primary_output)
-    return outputs
-
-
-def model_to_digraph(model: Model) -> nx.DiGraph:
-    """Convert a Model to a NetworkX directed graph.
-
-    Nodes are added for activities with an 'enabled_by' property. Edges are added based on:
-    - Causal associations between activities.
-    - Outputs of one activity serving as inputs to another activity.
-
-    Args:
-        model: The model to convert.
-
-    Returns:
-        A directed graph representation of the model.
-    """
-    graph = nx.DiGraph()
-
-    activities_by_input: dict[str, list[str]] = defaultdict(list)
-    for activity in model.activities or []:
-        for input_ in all_activity_inputs(activity):
-            if input_.term:
-                activities_by_input[input_.term].append(activity.id)
-
-    for activity in model.activities or []:
-        if activity.enabled_by is None:
-            continue
-
-        graph.add_node(activity.id)
-
-        for causal_assoc in activity.causal_associations or []:
-            downstream_activity_id = causal_assoc.downstream_activity
-            if downstream_activity_id:
-                graph.add_edge(activity.id, downstream_activity_id)
-
-        for output in all_activity_outputs(activity):
-            if output.term:
-                for downstream_activity_id in activities_by_input.get(output.term, []):
-                    if downstream_activity_id != activity.id:
-                        graph.add_edge(activity.id, downstream_activity_id)
-
-    return graph
