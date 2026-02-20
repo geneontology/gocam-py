@@ -5,7 +5,7 @@ import pytest
 import yaml
 
 from gocam.datamodel import Model, QueryIndex
-from gocam.indexing.Indexer import Indexer, model_to_digraph
+from gocam.indexing.indexer import Indexer, model_to_digraph
 from tests import EXAMPLES_DIR
 from tests.test_indexing import INPUT_DIR
 
