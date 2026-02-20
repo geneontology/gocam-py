@@ -11,7 +11,7 @@ from tests import EXAMPLES_DIR, INPUT_DIR
 
 @pytest.fixture
 def runner():
-    return CliRunner(mix_stderr=False)
+    return CliRunner()
 
 
 @pytest.fixture

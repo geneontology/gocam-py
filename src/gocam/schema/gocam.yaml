@@ -10,9 +10,9 @@ description: |-
   
   Each [Models](Model.md) has associated metadata slots. Some slots such as [id](id.md), [title](title.md),
   and [status](status.md) are *required*.
-  
+
 imports:
- - linkml:types
+  - linkml:types
 
 prefixes:
   pav: http://purl.org/pav/
@@ -55,17 +55,17 @@ slots:
     description: A generic slot for ontology terms
     range: TermObject
     slot_uri: gocam:term
-    
+
   provenances:
     description: A generic slot for provenance information
     range: ProvenanceInfo
     slot_uri: gocam:provenances
     multivalued: true
-    
+
   part_of:
     description: A generic slot for part-of relationships
     slot_uri: gocam:part_of
-    
+
 see_also:
   - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7012280/
   - https://docs.google.com/presentation/d/1ja0Vkw0AoENJ58emM77dGnqPtY1nfIJMeyVnObBxIxI/edit#slide=id.p8
@@ -117,8 +117,8 @@ classes:
         description: All of the activities that are part of the model
         comments:
           - this slot is conditionally required. It is optional for models in development state (because
-              a curator may need to instantiate a Model before populating it with activities), but is
-              required for production models. See the associated rule.
+            a curator may need to instantiate a Model before populating it with activities), but is
+            required for production models. See the associated rule.
         range: Activity
         inlined_as_list: true
         multivalued: true
@@ -139,13 +139,13 @@ classes:
           statistics and retrieval indices.
         comments:
           - This is typically not populated in the primary transactional store (OLTP processing), because
-              the values will be redundant with the primary edited components of the model. It is intended
-              to be populated in batch *after* editing, and then used for generating reports, or for
-              indexing in web applications.
+            the values will be redundant with the primary edited components of the model. It is intended
+            to be populated in batch *after* editing, and then used for generating reports, or for
+            indexing in web applications.
         range: QueryIndex
 
   Activity:
-    description: An individual activity in a causal model, representing the individual molecular 
+    description: An individual activity in a causal model, representing the individual molecular
       activity of a single gene product or complex in the context of a particular model
     aliases:
       - annoton
@@ -213,8 +213,8 @@ classes:
         description: The causal associations that flow out of this activity
         comments:
           - All activities in a model must be connected to at least one other activity. If a an activity
-              has no outgoing activities (i.e the value of this slot is empty) then it is a terminal
-              activity in the model. If an activity has no incoming activities, it is an initial activity.
+            has no outgoing activities (i.e the value of this slot is empty) then it is a terminal
+            activity in the model. If an activity has no incoming activities, it is an initial activity.
         range: CausalAssociation
         inlined_as_list: true
         multivalued: true
@@ -265,7 +265,7 @@ classes:
         description: The type of association.
         comments:
           - when instantiating Association objects in Python and other languages, it isn't
-              necessary to populate this, it is auto-populated from the object class.
+            necessary to populate this, it is auto-populated from the object class.
         designates_type: true
       evidence:
         description: The set of evidence items that support the association.
@@ -284,7 +284,7 @@ classes:
         that carry out that activity.
     comments:
       - Note that this is an abstract class, and should ot be instantiated
-          directly, instead instantiate a subclass depending on what kind of entity enables the association
+        directly, instead instantiate a subclass depending on what kind of entity enables the association
     is_a: Association
     abstract: true
     attributes:
@@ -300,12 +300,12 @@ classes:
         description: A "term" that is an entity database object representing an individual gene product.
         comments:
           - In the context of the GO workflow, the allowed values for this field come from the GPI file
-              from an authoritative source. For example, the authoritative source for human is the EBI GOA
-              group, and the GPI for this group consists of UniProtKB IDs (for proteins) and RNA Central
-              IDs (for RNA gene products)
+            from an authoritative source. For example, the authoritative source for human is the EBI GOA
+            group, and the GPI for this group consists of UniProtKB IDs (for proteins) and RNA Central
+            IDs (for RNA gene products)
           - A gene identifier may be provided as a value here (if the authoritative GPI allows it). Note
-              that the *interpretation* of the gene ID in the context of a GO-CAM model is the (spliceform
-              and proteoform agnostic) *product* of that gene.
+            that the *interpretation* of the gene ID in the context of a GO-CAM model is the (spliceform
+            and proteoform agnostic) *product* of that gene.
         range: GeneProductTermObject
         examples:
           - value: UniProtKB:Q96Q11
@@ -319,11 +319,11 @@ classes:
       an individual member of the complex, but instead the function is an emergent property of the complex.
     comments:
       - Protein complexes can be specified either by *pre-composition* or *post-composition*. For pre-composition,
-          a species-specific named protein complex (such as an entry in ComplexPortal) can be specified, in
-          which case the value of `members` is *implicit*. For post-composition, the placeholder term "GO:0032991"
-          can be used, in which case `members` must be *explicitly* specified. An intermediate case is when
-          a named class in GO that is a subclass of "GO:0032991" is used. In this case, `members` should still
-          be specified, as this may only be partially specified by the GO class.
+        a species-specific named protein complex (such as an entry in ComplexPortal) can be specified, in
+        which case the value of `members` is *implicit*. For post-composition, the placeholder term "GO:0032991"
+        can be used, in which case `members` must be *explicitly* specified. An intermediate case is when
+        a named class in GO that is a subclass of "GO:0032991" is used. In this case, `members` should still
+        be specified, as this may only be partially specified by the GO class.
     rules:
       - title: members must be specified when the generic GO complex is specified
         preconditions:
@@ -337,8 +337,8 @@ classes:
     is_a: EnabledByAssociation
     attributes:
       members:
-        description: The gene products that are part of the complex
-        range: GeneProductTermObject
+        description: Associations between the complex and its members.
+        range: ProteinComplexMemberAssociation
         multivalued: true
     slot_usage:
       term:
@@ -349,6 +349,14 @@ classes:
               If this is the value of `term`, then members *must* be specified.
           - value: ComplexPortal:CPX-969
             description: The human Caspase-2 complex
+
+  ProteinComplexMemberAssociation:
+    description: An association between a protein complex and one of its members.
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        description: The member gene product that is part of the protein complex.
+        range: GeneProductTermObject
 
   CausalAssociation:
     description: A causal association between two activities
@@ -365,7 +373,7 @@ classes:
 
   TermAssociation:
     description: An association between an activity and a term, potentially with extensions.
-      This is an abstract class for grouping purposes, it should not be directly instantiated, 
+      This is an abstract class for grouping purposes, it should not be directly instantiated,
       instead a subclass should be instantiated.
     is_a: Association
     abstract: true
@@ -388,8 +396,8 @@ classes:
     is_a: TermAssociation
     attributes:
       happens_during:
-        description: Optional extension describing where the BP takes place
-        range: PhaseTermObject
+        description: Optional extension describing the phase during which the BP takes place
+        range: BiologicalProcessPhaseAssociation
       part_of:
         description: Optional extension allowing hierarchical nesting of BPs
         range: BiologicalProcessAssociation
@@ -397,6 +405,14 @@ classes:
     slot_usage:
       term:
         range: BiologicalProcessTermObject
+
+  BiologicalProcessPhaseAssociation:
+    description: An association between a biological process and a phase term
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        description: The phase ontology term associated with the biological process (not the relation type)
+        range: PhaseTermObject
 
   CellularAnatomicalEntityAssociation:
     description: An association between an activity and a cellular anatomical entity term
@@ -608,6 +624,16 @@ classes:
       flattened_provided_by:
         description: All provided_by values from the model across different levels combined in one place
         range: Object
+        multivalued: true
+        inlined_as_list: true
+      flattened_contributors:
+        description: All contributor values from the model across different levels combined in one place
+        range: string
+        multivalued: true
+        inlined_as_list: true
+      flattened_evidence_terms:
+        description: All evidence term objects from the model across different levels combined in one place
+        range: EvidenceTermObject
         multivalued: true
         inlined_as_list: true
       model_activity_molecular_function_terms:

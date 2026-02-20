@@ -58,7 +58,7 @@ def test_protein_complex():
     assert isinstance(
         protein_complex_activity.enabled_by, EnabledByProteinComplexAssociation
     )
-    assert protein_complex_activity.enabled_by.members == [
+    assert [m.term for m in protein_complex_activity.enabled_by.members or []] == [
         "MGI:MGI:1929608",
         "MGI:MGI:103038",
     ]
@@ -131,7 +131,9 @@ def test_multivalued_input_and_output():
         for a in (model.activities or [])
         if a.molecular_function and a.molecular_function.term == "GO:0004108"
     )
+    assert cs_activity.has_input is not None
     assert len(cs_activity.has_input) == 3
+    assert cs_activity.has_output is not None
     assert len(cs_activity.has_output) == 2
 
 
@@ -147,9 +149,9 @@ def test_missing_enabled_by():
     ]
 
     # Verify that there are no such activities
-    assert (
-        len(activities_without_enabled_by) == 0
-    ), "There should be no activities without an enabled_by association."
+    assert len(activities_without_enabled_by) == 0, (
+        "There should be no activities without an enabled_by association."
+    )
 
 
 def test_provenance_on_evidence():
@@ -262,9 +264,12 @@ def test_evidence_with_objects():
         None,
     )
     assert kinase_activity is not None
+    assert kinase_activity.enabled_by is not None
+    assert kinase_activity.enabled_by.evidence is not None
     assert len(kinase_activity.enabled_by.evidence) == 1
 
     evidence = kinase_activity.enabled_by.evidence[0]
+    assert evidence.with_objects is not None
     assert len(evidence.with_objects) == 2
     assert all(re.match(r"^[A-Z]+:[A-Z0-9]+$", obj) for obj in evidence.with_objects)
 
@@ -417,10 +422,22 @@ def test_translation_warning_missing_term():
 
     # Check that a warning for the missing term was generated
     warnings = translation_result.warnings
-    assert len(warnings) == 1
-    assert warnings[0].type == WarningType.MISSING_TERM
-    assert "Missing term for subject" in warnings[0].message
-    assert warnings[0].entity_id == "gomodel:663d668500002178/subject_missing_term"
+    assert len(warnings) == 2
+    missing_term_warning = next(
+        (w for w in warnings if w.type == WarningType.MISSING_TERM), None
+    )
+    assert missing_term_warning is not None
+    assert "Missing term for subject" in missing_term_warning.message
+    assert (
+        missing_term_warning.entity_id
+        == "gomodel:663d668500002178/subject_missing_term"
+    )
+
+    # A second warning should be generated for an unhandled fact due to the missing term
+    unhandled_fact_warning = next(
+        (w for w in warnings if w.type == WarningType.UNHANDLED_FACT), None
+    )
+    assert unhandled_fact_warning is not None
 
 
 def test_translation_warning_no_enabled_by_facts():

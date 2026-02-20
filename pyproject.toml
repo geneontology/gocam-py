@@ -35,20 +35,29 @@ gocam = "gocam.cli:app"
 
 [dependency-groups]
 dev = [
+    "glom>=25.12.0",
     "linkml>=1.3.5,<2",
     "mkdocs-material>=8.2.8,<10",
     "mkdocs-mermaid2-plugin>=1.1.1",
     "pytest>=8.2.2,<10",
     "requests-mock>=1.12.1,<2",
-    "ruff>=0.6.9,<0.15",
-    "schemasheets>=0.1.14,<0.5",
-    "ty>=0.0.10",
+    "ruff==0.15.1",
+    "ty==0.0.17",
 ]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["pipeline/"]
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
 [tool.pytest.ini_options]
+addopts = [
+    # With the default import mode, pytest will add the root of the project to sys.path. This would
+    # potentially allow code in `src` to import code from `pipeline` -- which we want to avoid.
+    # Using `importlib` more closely mimics how the code will be run when installed as a package.
+    "--import-mode=importlib"
+]
 markers = [
     "integration"
 ]
@@ -63,4 +72,8 @@ exclude = [
 select = ["E4", "E7", "E9", "F", "I"]
 
 [tool.ty.src]
-exclude = ["notebooks/", "project/"]
+exclude = [
+    "notebooks/",
+    "project/",
+    "src/gocam/datamodel/gocam.py"
+]

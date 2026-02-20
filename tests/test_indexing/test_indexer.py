@@ -215,7 +215,10 @@ def test_indexer_adds_complex_members_to_model_activity_enabled_by_genes():
                     "enabled_by": {
                         "type": "EnabledByProteinComplexAssociation",
                         "term": "GO:00001",
-                        "members": ["UniProtKB:00001", "UniProtKB:00002"],
+                        "members": [
+                            {"term": "UniProtKB:00001"},
+                            {"term": "UniProtKB:00002"},
+                        ],
                     },
                 }
             ],
@@ -270,4 +273,56 @@ def test_indexer_populates_flattened_provided_by():
         "Test Group 3",
         "Test Group 4",
         "Test Group 5",
+    }
+
+
+def test_indexer_populates_flattened_contributors():
+    """Test that the indexer populates flattened_contributors correctly."""
+    with open(
+        INPUT_DIR / "test_indexer_populates_flattened_contributors_model.yaml"
+    ) as f:
+        model = Model.model_validate(yaml.safe_load(f))
+
+    indexer = Indexer()
+    indexer.index_model(model)
+
+    assert model.query_index is not None
+    assert model.query_index.flattened_contributors is not None
+    assert len(model.query_index.flattened_contributors) == 8
+    assert {
+        contributor for contributor in model.query_index.flattened_contributors
+    } == {
+        "https://example.org/0000-0000-0000-0001",
+        "https://example.org/0000-0000-0000-0002",
+        "https://example.org/0000-0000-0000-0003",
+        "https://example.org/0000-0000-0000-0004",
+        "https://example.org/0000-0000-0000-0005",
+        "https://example.org/0000-0000-0000-0006",
+        "https://example.org/0000-0000-0000-0007",
+        "https://example.org/0000-0000-0000-0008",
+    }
+
+
+def test_indexer_populates_flattened_evidence_terms():
+    """Test that the indexer populates flattened_evidence_terms correctly."""
+    with open(
+        INPUT_DIR / "test_indexer_populates_flattened_evidence_terms_model.yaml"
+    ) as f:
+        model = Model.model_validate(yaml.safe_load(f))
+
+    indexer = Indexer()
+    indexer.index_model(model)
+
+    assert model.query_index is not None
+    assert model.query_index.flattened_evidence_terms is not None
+    assert len(model.query_index.flattened_evidence_terms) == 2
+    assert {evidence.id for evidence in model.query_index.flattened_evidence_terms} == {
+        "ECO:0000001",
+        "ECO:0000002",
+    }
+    assert {
+        evidence.label for evidence in model.query_index.flattened_evidence_terms
+    } == {
+        "Test Evidence 1",
+        "Test Evidence 2",
     }
