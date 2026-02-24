@@ -56,7 +56,8 @@ class ErrorReason(str, Enum):
     WRITE_ERROR = "Write error"
 
 
-class ModelStats(ConfiguredBaseModel):
+class GocamStats(ConfiguredBaseModel):
+    number_of_models: int = 0
     number_of_activitiy_units: int = 0
     number_of_activity_units_enabled_by_gene_product: int = 0
     number_of_activity_units_enabled_by_protein_complex: int = 0
@@ -64,51 +65,6 @@ class ModelStats(ConfiguredBaseModel):
     number_of_unique_protein_complex_genes: int = 0
     number_of_unique_gene_product_and_protein_complex_gene_enablers: int = 0
     number_of_genes: int = 0
-    number_of_unique_references: int = 0
-    number_of_unique_pmid: int = 0
-    number_of_causal_relations: int = 0
-    number_of_inputs: int = 0
-    number_of_chemical_inputs: int = 0
-    number_of_other_inputs: int = 0
-    number_of_unique_chemical_inputs: int = 0
-    number_of_unique_other_inputs: int = 0
-    number_of_outputs: int = 0
-    number_of_chemical_outputs: int = 0
-    number_of_other_outputs: int = 0    
-    number_of_unique_chemical_outputs: int = 0
-    number_of_unique_other_outputs: int = 0    
-    number_of_go_terms: int = 0
-    number_of_unique_go_terms: int = 0    
-    
-    
-
-    set_activities: Set[str] = set()  #= Field(default_factory=set)
-    set_enabled_by_gene_product: Set[str] = set()
-    set_protein_complex_genes: Set[str] = set()
-    list_enabled_by_gene_product: List[str] | None = []  
-    set_references: Set[str] = set()
-    list_causal_relations: List[str] | None = []  
-    set_gene_product_association_activity: Set[str] = set()
-    set_protein_complex_association_activity: Set[str] = set()
-    set_activity_unit_gene_product_enablers: Set[str] = set()
-    set_activity_unit_protein_complex_enablers: Set[str] = set()
-    set_protein_complex_in_activity_term: Set[str] = set()
-    list_has_input_term:List[str] | None = [] # Covers both has_input and has primary_input
-    set_has_input_term:List[str] | None = []
-    list_has_output_term:List[str] | None = [] # Covers both has_output and has primary_output
-    set_has_output_term:List[str] | None = []
-    list_go_terms:List[str] | None = []
-
-
-class ContributorProviderStats(ConfiguredBaseModel):
-    number_of_models: int = 0
-    number_of_activitiy_units: int = 0
-    number_of_unique_activity_units_enabled_by_gene_product_association: int = 0
-    number_of_unique_activity_units_enabled_by_protein_complex_association: int = 0
-    number_of_unique_gene_product_enablers: int = 0
-    number_of_unique_member_protein_complex_genes: int = 0
-    number_of_unique_gene_product_and_protein_complex_gene_enablers: int = 0  
-
     number_of_unique_references: int = 0
     number_of_unique_pmid: int = 0
     number_of_causal_relations: int = 0
@@ -120,27 +76,26 @@ class ContributorProviderStats(ConfiguredBaseModel):
     number_of_unique_other_inputs: int = 0
     number_of_outputs: int = 0
     number_of_chemical_outputs: int = 0
-    number_of_other_outputs: int = 0    
+    number_of_other_outputs: int = 0
     number_of_unique_chemical_outputs: int = 0
-    number_of_unique_other_outputs: int = 0  
+    number_of_unique_other_outputs: int = 0
     number_of_go_terms: int = 0
-    number_of_unique_go_terms: int = 0            
+    number_of_unique_go_terms: int = 0
 
     set_models: Set[str] = set()
     set_activities: Set[str] = set()
     set_enabled_by_gene_product: Set[str] = set()
-    list_enabled_by_gene_product: List[str]| None = []  
+    set_protein_complex_genes: Set[str] = set()
+    list_enabled_by_gene_product: List[str] | None = []
     set_references: Set[str] = set()
     set_causal_relations: Set[str] = set()
+    list_causal_relations: List[str] | None = []
     set_activity_unit_gene_product_enablers: Set[str] = set()
     set_activity_unit_protein_complex_enablers: Set[str] = set()
     set_protein_complex_in_activity_term: Set[str] = set()
-    set_protein_complex_genes: Set[str] = set()
-    list_has_input_term:List[str] | None = [] # Covers both has_input and has primary_input
-    set_has_input_term:List[str] | None = []
-    list_has_output_term:List[str] | None = [] # Covers both has_output and has primary_output
-    set_has_output_term:List[str] | None = []
-    list_go_terms:List[str] | None = []
+    list_has_input_term: List[str] | None = []  # Covers both has_input and has primary_input
+    list_has_output_term: List[str] | None = []  # Covers both has_output and has primary_output
+    list_go_terms: List[str] | None = []
 
 class ModelDetails(ConfiguredBaseModel):
     file_name: str = ""
@@ -187,11 +142,9 @@ class AggregateInfo(ConfiguredBaseModel):
     set_protein_complex_in_activity_term: Set[str] = set()
     set_protein_complex_genes: Set[str] = set()
     list_model_details: List[ModelDetails] | None = []
-    list_has_input_term:List[str] | None = [] # Covers both has_input and has primary_input
-    set_has_input_term:List[str] | None = []
-    list_has_output_term:List[str] | None = [] # Covers both has_output and has primary_output
-    set_has_output_term:List[str] | None = []
-    list_go_terms:List[str] | None = []
+    list_has_input_term: List[str] | None = []  # Covers both has_input and has primary_input
+    list_has_output_term: List[str] | None = []  # Covers both has_output and has primary_output
+    list_go_terms: List[str] | None = []
 
 
 ProcessingResult: TypeAlias = (
@@ -224,11 +177,34 @@ def count_chebis(terms: Collection[str]) -> int:
     return count_type_in_collection(terms, "chebi")
     
 def count_type_in_collection(string_col: Collection[str], prefix: str) -> int:
-    return sum(1 for ent in string_col if ent.lower().startswith(prefix))        
+    return sum(1 for ent in string_col if ent.lower().startswith(prefix))
 
 
-def _update_entity_evidence_stats(
-    entity_info: ContributorProviderStats,
+def compute_molecule_and_term_counts(stats: GocamStats | AggregateInfo) -> None:
+    """Compute input/output/GO-term counts from the raw term lists on a stats object."""
+    # Inputs
+    stats.number_of_inputs = len(stats.list_has_input_term)
+    stats.number_of_chemical_inputs = count_chebis(stats.list_has_input_term)
+    unique_inputs = set(stats.list_has_input_term)
+    stats.number_of_unique_chemical_inputs = count_chebis(unique_inputs)
+    stats.number_of_other_inputs = stats.number_of_inputs - stats.number_of_chemical_inputs
+    stats.number_of_unique_other_inputs = len(unique_inputs) - stats.number_of_unique_chemical_inputs
+
+    # Outputs
+    stats.number_of_outputs = len(stats.list_has_output_term)
+    stats.number_of_chemical_outputs = count_chebis(stats.list_has_output_term)
+    unique_outputs = set(stats.list_has_output_term)
+    stats.number_of_unique_chemical_outputs = count_chebis(unique_outputs)
+    stats.number_of_other_outputs = stats.number_of_outputs - stats.number_of_chemical_outputs
+    stats.number_of_unique_other_outputs = len(unique_outputs) - stats.number_of_unique_chemical_outputs
+
+    # GO terms
+    stats.number_of_go_terms = len(stats.list_go_terms)
+    stats.number_of_unique_go_terms = len(set(stats.list_go_terms))
+
+
+def _update_entity_gene_stats(
+    entity_info: GocamStats,
     activity,
     gocam_model_id: str,
 ) -> None:
@@ -238,6 +214,7 @@ def _update_entity_evidence_stats(
         if activity.enabled_by.term:
             entity_info.list_enabled_by_gene_product.append(activity.enabled_by.term)
             entity_info.set_enabled_by_gene_product.add(activity.enabled_by.term)
+            entity_info.number_of_genes += 1
     if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
         entity_info.set_activity_unit_protein_complex_enablers.add(activity.id)
         if activity.enabled_by.term:
@@ -246,6 +223,7 @@ def _update_entity_evidence_stats(
             for member in activity.enabled_by.members:
                 if member.term:
                     entity_info.set_protein_complex_genes.add(member.term)
+                    entity_info.number_of_genes += 1
     entity_info.set_activities.add(activity.id)
     entity_info.set_models.add(gocam_model_id)
 
@@ -285,10 +263,10 @@ def _iter_activity_associations(activity) -> list[Association]:
 
 def _collect_references(
     gocam_model: Model,
-    stats_by_model: ModelStats,
+    stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
-    contributor_lookup: Dict[str, ContributorProviderStats],
-    provider_lookup: Dict[str, ContributorProviderStats],
+    contributor_lookup: Dict[str, GocamStats],
+    provider_lookup: Dict[str, GocamStats],
 ) -> None:
     """Collect reference objects from all evidence items in the model.
 
@@ -317,23 +295,23 @@ def _collect_references(
                         if provenance.contributor:
                             for contributor in provenance.contributor:
                                 contributor_info = contributor_lookup.setdefault(
-                                    contributor, ContributorProviderStats()
+                                    contributor, GocamStats()
                                 )
                                 contributor_info.set_references.add(ref)
                         if provenance.provided_by:
                             for provider in provenance.provided_by:
                                 provider_info = provider_lookup.setdefault(
-                                    provider, ContributorProviderStats()
+                                    provider, GocamStats()
                                 )
                                 provider_info.set_references.add(ref)
 
 
 def _collect_molecule_terms(
     activity,
-    stats_by_model: ModelStats,
+    stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
-    contributor_lookup: Dict[str, ContributorProviderStats],
-    provider_lookup: Dict[str, ContributorProviderStats],
+    contributor_lookup: Dict[str, GocamStats],
+    provider_lookup: Dict[str, GocamStats],
 ) -> None:
     """Collect molecule input/output terms from MoleculeAssociation objects.
 
@@ -362,13 +340,13 @@ def _collect_molecule_terms(
                 if provenance.contributor:
                     for contributor in provenance.contributor:
                         contributor_info = contributor_lookup.setdefault(
-                            contributor, ContributorProviderStats()
+                            contributor, GocamStats()
                         )
                         contributor_info.list_has_input_term.append(ma.term)
                 if provenance.provided_by:
                     for provider in provenance.provided_by:
                         provider_info = provider_lookup.setdefault(
-                            provider, ContributorProviderStats()
+                            provider, GocamStats()
                         )
                         provider_info.list_has_input_term.append(ma.term)
 
@@ -387,23 +365,23 @@ def _collect_molecule_terms(
                 if provenance.contributor:
                     for contributor in provenance.contributor:
                         contributor_info = contributor_lookup.setdefault(
-                            contributor, ContributorProviderStats()
+                            contributor, GocamStats()
                         )
                         contributor_info.list_has_output_term.append(ma.term)
                 if provenance.provided_by:
                     for provider in provenance.provided_by:
                         provider_info = provider_lookup.setdefault(
-                            provider, ContributorProviderStats()
+                            provider, GocamStats()
                         )
                         provider_info.list_has_output_term.append(ma.term)
 
 
 def _collect_terms(
     activity,
-    stats_by_model: ModelStats,
+    stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
-    contributor_lookup: Dict[str, ContributorProviderStats],
-    provider_lookup: Dict[str, ContributorProviderStats],
+    contributor_lookup: Dict[str, GocamStats],
+    provider_lookup: Dict[str, GocamStats],
 ) -> None:
     """Collect GO terms from all objects within an activity.
 
@@ -438,13 +416,13 @@ def _collect_terms(
                     if provenance.contributor:
                         for contributor in provenance.contributor:
                             contributor_info = contributor_lookup.setdefault(
-                                contributor, ContributorProviderStats()
+                                contributor, GocamStats()
                             )
                             contributor_info.list_go_terms.append(term)
                     if provenance.provided_by:
                         for provider in provenance.provided_by:
                             provider_info = provider_lookup.setdefault(
-                                provider, ContributorProviderStats()
+                                provider, GocamStats()
                             )
                             provider_info.list_go_terms.append(term)
 
@@ -466,8 +444,8 @@ def process_gocam_model_file(
     json_file: Path,
     output_dir: Path | None,
     model_aggregate : AggregateInfo,
-    contributor_lookup : Dict[str, ContributorProviderStats],
-    provider_lookup: Dict[str, ContributorProviderStats]
+    contributor_lookup : Dict[str, GocamStats],
+    provider_lookup: Dict[str, GocamStats]
 ) -> ProcessingResult:
     """Process a single GOCAM model JSON file and output statistics information about the model.
 
@@ -502,12 +480,13 @@ def process_gocam_model_file(
     calculated_aggregate_values_by_model = gocam_model.query_index
 
     # Detailed model statistics information
-    stats_by_model = ModelStats()
+    stats_by_model = GocamStats()
     model_details = ModelDetails()
     model_details.file_name = json_file.name
     model_details.model_id = gocam_model.id
     model_details.model_name = gocam_model.title
     model_aggregate.list_model_details.append(model_details)
+    stats_by_model.number_of_models = 1
 
     if gocam_model.activities:
         for activity in gocam_model.activities:
@@ -542,14 +521,14 @@ def process_gocam_model_file(
                 for provenance in activity.enabled_by.provenances:
                     if provenance.contributor:
                         for contributor in provenance.contributor:
-                            contributor_info = contributor_lookup.setdefault(contributor, ContributorProviderStats())
-                            _update_entity_evidence_stats(
+                            contributor_info = contributor_lookup.setdefault(contributor, GocamStats())
+                            _update_entity_gene_stats(
                                 contributor_info, activity, gocam_model.id,
                             )
                     if provenance.provided_by:
                         for provider in provenance.provided_by:
-                            provider_info = provider_lookup.setdefault(provider, ContributorProviderStats())
-                            _update_entity_evidence_stats(
+                            provider_info = provider_lookup.setdefault(provider, GocamStats())
+                            _update_entity_gene_stats(
                                 provider_info, activity, gocam_model.id,
                             )
 
@@ -557,16 +536,17 @@ def process_gocam_model_file(
             if activity.causal_associations:
                 for causal_association in activity.causal_associations:
                     stats_by_model.list_causal_relations.append(activity.id)
+                    stats_by_model.set_causal_relations.add(activity.id)
                     if causal_association.provenances:
                         for provenance in causal_association.provenances:
                             if provenance.contributor:
                                 for contributor in provenance.contributor:
-                                    contributor_info = contributor_lookup.setdefault(contributor, ContributorProviderStats())
+                                    contributor_info = contributor_lookup.setdefault(contributor, GocamStats())
                                     contributor_info.set_causal_relations.add(activity.id)
                                     contributor_info.number_of_causal_relations += 1
                             if provenance.provided_by:
                                 for provider in provenance.provided_by:
-                                    provider_info = provider_lookup.setdefault(provider, ContributorProviderStats())
+                                    provider_info = provider_lookup.setdefault(provider, GocamStats())
                                     provider_info.set_causal_relations.add(activity.id)
                                     provider_info.number_of_causal_relations += 1
                                     
@@ -580,7 +560,8 @@ def process_gocam_model_file(
     _collect_references(gocam_model, stats_by_model, model_aggregate, contributor_lookup, provider_lookup)
 
     #Set fields, counts and sort data for current model
-    stats_by_model.number_of_causal_relations = calculated_aggregate_values_by_model.number_of_causal_associations
+    stats_by_model.number_of_causal_relations = len(stats_by_model.list_causal_relations)
+    stats_by_model.number_of_unique_causal_relations = len(stats_by_model.set_causal_relations)
     stats_by_model.number_of_activitiy_units = calculated_aggregate_values_by_model.number_of_activities
     stats_by_model.number_of_unique_references = len(stats_by_model.set_references)
     stats_by_model.number_of_unique_pmid = _count_pmids(stats_by_model.set_references)
@@ -592,22 +573,7 @@ def process_gocam_model_file(
     stats_by_model.number_of_unique_protein_complex_genes = len(stats_by_model.set_protein_complex_genes)
     stats_by_model.number_of_unique_gene_product_and_protein_complex_gene_enablers =  len(stats_by_model.set_enabled_by_gene_product.union(stats_by_model.set_protein_complex_genes))
     stats_by_model.list_enabled_by_gene_product.sort()
-    
-    stats_by_model.number_of_inputs = len(stats_by_model.list_has_input_term)
-    stats_by_model.number_of_chemical_inputs = count_chebis(stats_by_model.list_has_input_term)
-    unique_has_input = set(stats_by_model.list_has_input_term)
-    stats_by_model.number_of_unique_chemical_inputs = count_chebis(unique_has_input)
-    stats_by_model.number_of_other_inputs = stats_by_model.number_of_inputs - stats_by_model.number_of_chemical_inputs
-    stats_by_model.number_of_unique_other_inputs = len(unique_has_input) -  stats_by_model.number_of_unique_chemical_inputs
-    stats_by_model.number_of_outputs = len(stats_by_model.list_has_output_term)
-    stats_by_model.number_of_chemical_outputs = count_chebis(stats_by_model.list_has_output_term)
-    unique_has_output = set(stats_by_model.list_has_output_term)
-    stats_by_model.number_of_unique_chemical_outputs = count_chebis(unique_has_output)
-    stats_by_model.number_of_other_outputs = stats_by_model.number_of_inputs - stats_by_model.number_of_chemical_outputs
-    stats_by_model.number_of_unique_other_outputs = len(unique_has_output) -  stats_by_model.number_of_unique_chemical_outputs    
-    
-    stats_by_model.number_of_go_terms = len(stats_by_model.list_go_terms)
-    stats_by_model.number_of_unique_go_terms = len(set(stats_by_model.list_go_terms))
+    compute_molecule_and_term_counts(stats_by_model)
 
 
     #Update aggregate model data
@@ -642,7 +608,7 @@ def process_gocam_model_file(
         stats_by_model_json = stats_by_model.model_dump_json(exclude_none=True)
         with open(stats_by_model_output_file, "w") as f:
             f.write(stats_by_model_json)
-        logger.info(f"Successfully wrote GO-CAM dertailed_model_stats to {stats_by_model_output_file}")
+        logger.info(f"Successfully wrote GO-CAM detailed_model_stats to {stats_by_model_output_file}")
 
     except Exception as e:
         logger.error(f"An exception has occurred: {e}")
@@ -686,7 +652,7 @@ def create_filename_from_url(url, replacement='_'):
 def output_entity_results(
     output_dir: Path | None,
     entity_label: str,
-    entity_lookup : Dict[str, ContributorProviderStats],
+    entity_lookup : Dict[str, GocamStats],
     entity_sub_dir: str,
     entity_agg_file_name: str,
 )-> None:
@@ -700,35 +666,21 @@ def output_entity_results(
         #Set numbers
         details.number_of_models = len(details.set_models)
         details.number_of_unique_gene_product_enablers = len(details.set_enabled_by_gene_product)
-        details.number_of_unique_member_protein_complex_genes = len(details.set_protein_complex_genes)
+        details.number_of_unique_protein_complex_genes = len(details.set_protein_complex_genes)
         details.number_of_unique_gene_product_and_protein_complex_gene_enablers = len(details.set_enabled_by_gene_product.union(details.set_protein_complex_genes))
         details.number_of_unique_references = len(details.set_references)
         details.number_of_activitiy_units = len(details.set_activities)
-        details.number_of_unique_activity_units_enabled_by_gene_product_association = len(details.set_activity_unit_gene_product_enablers)
-        details.number_of_unique_activity_units_enabled_by_protein_complex_association = len(details.set_activity_unit_protein_complex_enablers)
+        details.number_of_activity_units_enabled_by_gene_product = len(details.set_activity_unit_gene_product_enablers)
+        details.number_of_activity_units_enabled_by_protein_complex = len(details.set_activity_unit_protein_complex_enablers)
         details.number_of_unique_causal_relations = len(details.set_causal_relations)
-        details.number_of_inputs = len(details.list_has_input_term)
-        details.number_of_chemical_inputs = count_chebis(details.list_has_input_term)
-        unique_has_input = set(details.list_has_input_term)
-        details.number_of_unique_chemical_inputs = count_chebis(unique_has_input)
-        details.number_of_other_inputs = details.number_of_inputs - details.number_of_chemical_inputs
-        details.number_of_unique_other_inputs = len(unique_has_input) -  details.number_of_unique_chemical_inputs
-        details.number_of_outputs = len(details.list_has_output_term)
-        details.number_of_chemical_outputs = count_chebis(details.list_has_output_term)
-        unique_has_output = set(details.list_has_output_term)
-        details.number_of_unique_chemical_outputs = count_chebis(unique_has_output)
-        details.number_of_other_outputs = details.number_of_outputs - details.number_of_chemical_outputs
-        details.number_of_unique_other_outputs = len(unique_has_output) -  details.number_of_unique_chemical_outputs    
-        
-        details.number_of_go_terms = len(details.list_go_terms)
-        details.number_of_unique_go_terms = len(set(details.list_go_terms))                
+        compute_molecule_and_term_counts(details)                
 
         #Sort lists
         details.list_enabled_by_gene_product.sort()
         details.number_of_unique_pmid = _count_pmids(details.set_references)
 
 
-        entity_agg.number_of_genes = entity_agg.number_of_genes + len(details.list_enabled_by_gene_product)
+        entity_agg.number_of_genes = entity_agg.number_of_genes + details.number_of_genes
         entity_agg.number_of_causal_relations = entity_agg.number_of_causal_relations + details.number_of_causal_relations
         entity_agg.set_activities.update(details.set_activities)
         entity_agg.set_enabled_by_gene_product.update(details.set_enabled_by_gene_product)
@@ -740,25 +692,7 @@ def output_entity_results(
         entity_agg.list_has_input_term.extend(details.list_has_input_term)
         entity_agg.list_has_output_term.extend(details.list_has_output_term)
         entity_agg.list_go_terms.extend(details.list_go_terms)
-        
-        
-        
-        
-        entity_agg.number_of_inputs = len(entity_agg.list_has_input_term)
-        entity_agg.number_of_chemical_inputs = count_chebis(entity_agg.list_has_input_term)
-        unique_has_input = set(entity_agg.list_has_input_term)
-        entity_agg.number_of_unique_chemical_inputs = count_chebis(unique_has_input)
-        entity_agg.number_of_other_inputs = entity_agg.number_of_inputs - entity_agg.number_of_chemical_inputs
-        entity_agg.number_of_unique_other_inputs = len(unique_has_input) -  entity_agg.number_of_unique_chemical_inputs           
-        entity_agg.number_of_outputs = len(entity_agg.list_has_output_term)
-        entity_agg.number_of_chemical_outputs = count_chebis(entity_agg.list_has_output_term)
-        unique_has_output = set(entity_agg.list_has_output_term)
-        entity_agg.number_of_unique_chemical_outputs = count_chebis(unique_has_output)
-        entity_agg.number_of_other_outputs = entity_agg.number_of_outputs - entity_agg.number_of_chemical_outputs
-        entity_agg.number_of_unique_other_outputs = len(unique_has_output) -  entity_agg.number_of_unique_chemical_outputs    
-        
-        entity_agg.number_of_go_terms = len(entity_agg.list_go_terms)
-        entity_agg.number_of_unique_go_terms = len(set(entity_agg.list_go_terms))                
+        compute_molecule_and_term_counts(entity_agg)                
 
         if output_dir is not None:
             stats_by_entity_subdir = entity_sub_dir
@@ -811,8 +745,8 @@ def output_summary(
     results: list[tuple[Path, ProcessingResult]],
     output_dir: Path | None,
     model_aggregate: AggregateInfo,
-    contributor_lookup : Dict[str, ContributorProviderStats],
-    provider_lookup: Dict[str, ContributorProviderStats],
+    contributor_lookup : Dict[str, GocamStats],
+    provider_lookup: Dict[str, GocamStats],
 ) -> None:
     """Output a summary of the processing results.
 
@@ -830,23 +764,8 @@ def output_summary(
     model_aggregate.number_of_unique_protein_complex_terms = len(model_aggregate.set_protein_complex_in_activity_term)
     model_aggregate.number_of_unique_member_protein_complex_genes = len(model_aggregate.set_protein_complex_genes)
     model_aggregate.number_of_unique_gene_product_and_protein_complex_gene_enablers = len(model_aggregate.set_enabled_by_gene_product.union(model_aggregate.set_protein_complex_genes))
-    model_aggregate.number_of_inputs = len(model_aggregate.list_has_input_term)
-    model_aggregate.number_of_chemical_inputs = count_chebis(model_aggregate.list_has_input_term)
-    unique_has_input = set(model_aggregate.list_has_input_term)
-    model_aggregate.number_of_unique_chemical_inputs = count_chebis(unique_has_input)
-    model_aggregate.number_of_other_inputs = model_aggregate.number_of_inputs - model_aggregate.number_of_chemical_inputs
-    model_aggregate.number_of_unique_other_inputs = len(unique_has_input) -  model_aggregate.number_of_unique_chemical_inputs
-    model_aggregate.number_of_outputs = len(model_aggregate.list_has_output_term)
-    model_aggregate.number_of_chemical_outputs = count_chebis(model_aggregate.list_has_output_term)
-    unique_has_output = set(model_aggregate.list_has_output_term)
-    model_aggregate.number_of_unique_chemical_outputs = count_chebis(unique_has_output)
-    model_aggregate.number_of_other_outputs = model_aggregate.number_of_inputs - model_aggregate.number_of_chemical_outputs
-    model_aggregate.number_of_unique_other_outputs = len(unique_has_output) -  model_aggregate.number_of_unique_chemical_outputs    
-    model_aggregate.number_of_go_terms = len(model_aggregate.list_go_terms)
-    model_aggregate.number_of_unique_go_terms = len(set(model_aggregate.list_go_terms))         
-    
-    
-    
+    compute_molecule_and_term_counts(model_aggregate)
+
     if model_aggregate.total_number_of_entities_processed != 0:
         model_aggregate.average_number_of_unique_gene_product_enablers_for_entity = round(model_aggregate.number_of_unique_gene_product_enablers /  model_aggregate.total_number_of_entities_processed, 2)
 
@@ -950,8 +869,8 @@ def main(
     # Process each JSON file
     results: list[tuple[Path, ProcessingResult]] = []
     model_aggregate = AggregateInfo()
-    contributor_lookup : Dict[str, ContributorProviderStats] = {}
-    provider_lookup : Dict[str, ContributorProviderStats] = {}
+    contributor_lookup : Dict[str, GocamStats] = {}
+    provider_lookup : Dict[str, GocamStats] = {}
 
     for json_file in track(
         json_files, description="Processing GO-CAM models and calculating statistics..."
