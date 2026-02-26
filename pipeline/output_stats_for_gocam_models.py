@@ -57,8 +57,9 @@ class ErrorReason(str, Enum):
 
 
 class GocamStats(ConfiguredBaseModel):
+    uri: str | None = None    
     number_of_models: int = 0
-    number_of_activitiy_units: int = 0
+    number_of_activity_units: int = 0
     number_of_activity_units_enabled_by_gene_product: int = 0
     number_of_activity_units_enabled_by_protein_complex: int = 0
     number_of_unique_gene_product_enablers: int = 0
@@ -96,6 +97,7 @@ class GocamStats(ConfiguredBaseModel):
     list_has_input_term: List[str] | None = []  # Covers both has_input and has primary_input
     list_has_output_term: List[str] | None = []  # Covers both has_output and has primary_output
     list_go_terms: List[str] | None = []
+
 
 class ModelDetails(ConfiguredBaseModel):
     file_name: str = ""
@@ -425,7 +427,7 @@ def _collect_terms(
                                 provider, GocamStats()
                             )
                             provider_info.list_go_terms.append(term)
-
+               
         # Recurse into all fields of this Pydantic model
         for field_name in type(obj).model_fields:
             value = getattr(obj, field_name, None)
@@ -562,7 +564,7 @@ def process_gocam_model_file(
     #Set fields, counts and sort data for current model
     stats_by_model.number_of_causal_relations = len(stats_by_model.list_causal_relations)
     stats_by_model.number_of_unique_causal_relations = len(stats_by_model.set_causal_relations)
-    stats_by_model.number_of_activitiy_units = calculated_aggregate_values_by_model.number_of_activities
+    stats_by_model.number_of_activity_units = calculated_aggregate_values_by_model.number_of_activities
     stats_by_model.number_of_unique_references = len(stats_by_model.set_references)
     stats_by_model.number_of_unique_pmid = _count_pmids(stats_by_model.set_references)
 
@@ -664,12 +666,13 @@ def output_entity_results(
     for entity, details in entity_lookup.items():
         logger.debug(f"Processing contributor: {entity}")
         #Set numbers
+        details.uri = entity
         details.number_of_models = len(details.set_models)
         details.number_of_unique_gene_product_enablers = len(details.set_enabled_by_gene_product)
         details.number_of_unique_protein_complex_genes = len(details.set_protein_complex_genes)
         details.number_of_unique_gene_product_and_protein_complex_gene_enablers = len(details.set_enabled_by_gene_product.union(details.set_protein_complex_genes))
         details.number_of_unique_references = len(details.set_references)
-        details.number_of_activitiy_units = len(details.set_activities)
+        details.number_of_activity_units = len(details.set_activities)
         details.number_of_activity_units_enabled_by_gene_product = len(details.set_activity_unit_gene_product_enablers)
         details.number_of_activity_units_enabled_by_protein_complex = len(details.set_activity_unit_protein_complex_enablers)
         details.number_of_unique_causal_relations = len(details.set_causal_relations)
