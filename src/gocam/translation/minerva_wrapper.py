@@ -9,7 +9,6 @@ import requests
 from gocam.datamodel import (
     Activity,
     BiologicalProcessAssociation,
-    BiologicalProcessPhaseAssociation,
     CausalAssociation,
     CellTypeAssociation,
     CellularAnatomicalEntityAssociation,
@@ -22,6 +21,7 @@ from gocam.datamodel import (
     MolecularFunctionAssociation,
     MoleculeAssociation,
     Object,
+    PhaseAssociation,
     ProteinComplexMemberAssociation,
     ProvenanceInfo,
 )
@@ -432,7 +432,7 @@ class MinervaWrapper:
                             entity_id=activity.id,
                         )
                     )
-                association.happens_during = BiologicalProcessPhaseAssociation(
+                association.happens_during = PhaseAssociation(
                     term=individual_to_term.get(happens_during_fact["object"], None),
                     evidence=evs,
                     provenances=[prov],
@@ -482,6 +482,14 @@ class MinervaWrapper:
                 )
 
             _setattr_with_warning(activity, "occurs_in", association)
+
+        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
+            fact_property=HAPPENS_DURING
+        ):
+            association = PhaseAssociation(
+                term=individual_to_term[object_], evidence=evs, provenances=[prov]
+            )
+            _setattr_with_warning(activity, "happens_during", association)
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
             fact_property=HAS_INPUT
