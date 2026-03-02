@@ -543,19 +543,21 @@ attributes:
   id:
     name: id
     id_prefixes:
-    - gocam
-    description: Identifier of the activity unit. Should be in gocam namespace.
+    - gomodel
+    description: Identifier of the activity unit.
     comments:
     - Typically does not need to be exposed to end-user, this exists to allow activity
       flows
     examples:
-    - value: gomodel:63f809ec00000701
-      description: A model representing tRNA repair and recycling
+    - value: gomodel:63f809ec00000701/63f809ec00000706
+      description: A activity of the model representing alpha-aminoacyl-tRNA binding
+        enabled by NEMF
     from_schema: https://w3id.org/gocam
     identifier: true
     domain_of:
     - Model
     - Activity
+    - MoleculeNode
     - Object
     range: uriorcurie
     required: true
@@ -698,14 +700,15 @@ attributes:
   id:
     name: id
     id_prefixes:
-    - gocam
-    description: Identifier of the activity unit. Should be in gocam namespace.
+    - gomodel
+    description: Identifier of the activity unit.
     comments:
     - Typically does not need to be exposed to end-user, this exists to allow activity
       flows
     examples:
-    - value: gomodel:63f809ec00000701
-      description: A model representing tRNA repair and recycling
+    - value: gomodel:63f809ec00000701/63f809ec00000706
+      description: A activity of the model representing alpha-aminoacyl-tRNA binding
+        enabled by NEMF
     from_schema: https://w3id.org/gocam
     identifier: true
     alias: id
@@ -713,6 +716,7 @@ attributes:
     domain_of:
     - Model
     - Activity
+    - MoleculeNode
     - Object
     range: uriorcurie
     required: true

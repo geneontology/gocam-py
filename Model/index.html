@@ -289,6 +289,17 @@
 
       Model : id
 
+      Model : molecules
+
+
+
+
+
+        Model --&gt; "*" MoleculeNode : molecules
+        click MoleculeNode href "../MoleculeNode/"
+
+
+
       Model : objects
 
 
@@ -409,6 +420,12 @@
 <td>direct</td>
 </tr>
 <tr>
+<td><a href="../molecules/">molecules</a></td>
+<td>* <br/> <a href="../MoleculeNode/">MoleculeNode</a></td>
+<td>All of the molecule nodes that are part of the model</td>
+<td>direct</td>
+</tr>
+<tr>
 <td><a href="../objects/">objects</a></td>
 <td>* <br/> <a href="../Object/">Object</a></td>
 <td>All of the objects that are part of the model</td>
@@ -483,13 +500,19 @@ from_schema: https://w3id.org/gocam
 attributes:
   id:
     name: id
-    description: The identifier of the model. Should be in gocam namespace.
+    id_prefixes:
+    - gomodel
+    description: The identifier of the model.
+    examples:
+    - value: gomodel:63f809ec00000701
+      description: A model representing tRNA repair and recycling
     from_schema: https://w3id.org/gocam
     rank: 1000
     identifier: true
     domain_of:
     - Model
     - Activity
+    - MoleculeNode
     - Object
     range: uriorcurie
     required: true
@@ -564,6 +587,17 @@ attributes:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  molecules:
+    name: molecules
+    description: All of the molecule nodes that are part of the model.
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - Model
+    range: MoleculeNode
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
   objects:
     name: objects
     description: All of the objects that are part of the model. This includes terms
@@ -629,7 +663,12 @@ from_schema: https://w3id.org/gocam
 attributes:
   id:
     name: id
-    description: The identifier of the model. Should be in gocam namespace.
+    id_prefixes:
+    - gomodel
+    description: The identifier of the model.
+    examples:
+    - value: gomodel:63f809ec00000701
+      description: A model representing tRNA repair and recycling
     from_schema: https://w3id.org/gocam
     rank: 1000
     identifier: true
@@ -638,6 +677,7 @@ attributes:
     domain_of:
     - Model
     - Activity
+    - MoleculeNode
     - Object
     range: uriorcurie
   title:
@@ -725,6 +765,18 @@ attributes:
     domain_of:
     - Model
     range: Activity
+    multivalued: true
+    inlined_as_list: true
+  molecules:
+    name: molecules
+    description: All of the molecule nodes that are part of the model.
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: molecules
+    owner: Model
+    domain_of:
+    - Model
+    range: MoleculeNode
     multivalued: true
     inlined_as_list: true
   objects:

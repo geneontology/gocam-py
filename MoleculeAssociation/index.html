@@ -252,13 +252,13 @@
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
 <h1 id="class-moleculeassociation">Class: MoleculeAssociation</h1>
-<p><em>An association between an activity and a molecule term</em></p>
+<p><em>An association between an activity and a molecule node</em></p>
 <p>URI: <a href="https://w3id.org/gocam/MoleculeAssociation">gocam:MoleculeAssociation</a></p>
 <div class="mermaid"> classDiagram
     class MoleculeAssociation
     click MoleculeAssociation href "../MoleculeAssociation/"
-      TermAssociation &lt;|-- MoleculeAssociation
-        click TermAssociation href "../TermAssociation/"
+      Association &lt;|-- MoleculeAssociation
+        click Association href "../Association/"
 
       MoleculeAssociation : evidence
 
@@ -268,6 +268,17 @@
 
         MoleculeAssociation --&gt; "*" EvidenceItem : evidence
         click EvidenceItem href "../EvidenceItem/"
+
+
+
+      MoleculeAssociation : molecule
+
+
+
+
+
+        MoleculeAssociation --&gt; "0..1" MoleculeNode : molecule
+        click MoleculeNode href "../MoleculeNode/"
 
 
 
@@ -282,17 +293,6 @@
 
 
 
-      MoleculeAssociation : term
-
-
-
-
-
-        MoleculeAssociation --&gt; "0..1" MoleculeTermObject : term
-        click MoleculeTermObject href "../MoleculeTermObject/"
-
-
-
       MoleculeAssociation : type
 
 
@@ -300,10 +300,7 @@
 <h2 id="inheritance">Inheritance</h2>
 <ul>
 <li><a href="../Association/">Association</a><ul>
-<li><a href="../TermAssociation/">TermAssociation</a><ul>
 <li><strong>MoleculeAssociation</strong></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -319,10 +316,10 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="../term/">term</a></td>
-<td>0..1 <br/> <a href="../MoleculeTermObject/">MoleculeTermObject</a></td>
-<td>The ontology term that describes the nature of the association</td>
-<td><a href="../TermAssociation/">TermAssociation</a></td>
+<td><a href="../molecule/">molecule</a></td>
+<td>0..1 <br/> <a href="../MoleculeNode/">MoleculeNode</a></td>
+<td>The molecule node that is associated with this activity</td>
+<td>direct</td>
 </tr>
 <tr>
 <td><a href="../type/">type</a></td>
@@ -410,38 +407,38 @@
 <h3 id="direct">Direct</h3>
 <details>
 <pre><code class="language-yaml">name: MoleculeAssociation
-description: An association between an activity and a molecule term
+description: An association between an activity and a molecule node
 from_schema: https://w3id.org/gocam
-is_a: TermAssociation
-slot_usage:
-  term:
-    name: term
-    range: MoleculeTermObject
+is_a: Association
+attributes:
+  molecule:
+    name: molecule
+    description: The molecule node that is associated with this activity
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - MoleculeAssociation
+    range: MoleculeNode
 
 </code></pre>
 </details>
 <h3 id="induced">Induced</h3>
 <details>
 <pre><code class="language-yaml">name: MoleculeAssociation
-description: An association between an activity and a molecule term
+description: An association between an activity and a molecule node
 from_schema: https://w3id.org/gocam
-is_a: TermAssociation
-slot_usage:
-  term:
-    name: term
-    range: MoleculeTermObject
+is_a: Association
 attributes:
-  term:
-    name: term
-    description: The ontology term that describes the nature of the association
+  molecule:
+    name: molecule
+    description: The molecule node that is associated with this activity
     from_schema: https://w3id.org/gocam
-    alias: term
+    rank: 1000
+    alias: molecule
     owner: MoleculeAssociation
     domain_of:
-    - EvidenceItem
-    - EnabledByAssociation
-    - TermAssociation
-    range: MoleculeTermObject
+    - MoleculeAssociation
+    range: MoleculeNode
   type:
     name: type
     description: The type of association.

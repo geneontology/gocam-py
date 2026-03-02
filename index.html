@@ -514,6 +514,10 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <td>An association between an activity and a protein complex, where the complex c...</td>
 </tr>
 <tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="MoleculeAssociation/">MoleculeAssociation</a></td>
+<td>An association between an activity and a molecule node</td>
+</tr>
+<tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="TermAssociation/">TermAssociation</a></td>
 <td>An association between an activity and a term, potentially with extensions</td>
 </tr>
@@ -542,10 +546,6 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <td>An association between an activity and a molecular function term</td>
 </tr>
 <tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="MoleculeAssociation/">MoleculeAssociation</a></td>
-<td>An association between an activity and a molecule term</td>
-</tr>
-<tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ProteinComplexMemberAssociation/">ProteinComplexMemberAssociation</a></td>
 <td>An association between a protein complex and one of its members</td>
 </tr>
@@ -556,6 +556,10 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <tr>
 <td><a href="Model/">Model</a></td>
 <td>A model of a biological program consisting of a set of causally connected act...</td>
+</tr>
+<tr>
+<td><a href="MoleculeNode/">MoleculeNode</a></td>
+<td>An individual molecule or chemical entity in a causal model, representing a s...</td>
 </tr>
 <tr>
 <td><a href="Object/">Object</a></td>
@@ -753,6 +757,10 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <td>The maximum number of hops along activities along the direction of causal flo...</td>
 </tr>
 <tr>
+<td><a href="located_in/">located_in</a></td>
+<td>The cellular location in which the molecule is located</td>
+</tr>
+<tr>
 <td><a href="members/">members</a></td>
 <td>Associations between the complex and its members</td>
 </tr>
@@ -835,6 +843,14 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <tr>
 <td><a href="molecular_function/">molecular_function</a></td>
 <td>The molecular function that is carried out by the gene product or complex</td>
+</tr>
+<tr>
+<td><a href="molecule/">molecule</a></td>
+<td>The molecule node that is associated with this activity</td>
+</tr>
+<tr>
+<td><a href="molecules/">molecules</a></td>
+<td>All of the molecule nodes that are part of the model</td>
 </tr>
 <tr>
 <td><a href="number_of_activities/">number_of_activities</a></td>

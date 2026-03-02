@@ -269,8 +269,6 @@
         click CellTypeAssociation href "../CellTypeAssociation/"
       TermAssociation &lt;|-- GrossAnatomyAssociation
         click GrossAnatomyAssociation href "../GrossAnatomyAssociation/"
-      TermAssociation &lt;|-- MoleculeAssociation
-        click MoleculeAssociation href "../MoleculeAssociation/"
 
 
       TermAssociation : evidence
@@ -321,7 +319,6 @@
 <li><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></li>
 <li><a href="../CellTypeAssociation/">CellTypeAssociation</a></li>
 <li><a href="../GrossAnatomyAssociation/">GrossAnatomyAssociation</a></li>
-<li><a href="../MoleculeAssociation/">MoleculeAssociation</a></li>
 </ul>
 </li>
 </ul>
@@ -405,6 +402,7 @@ attributes:
     description: The ontology term that describes the nature of the association
     from_schema: https://w3id.org/gocam
     domain_of:
+    - MoleculeNode
     - EvidenceItem
     - EnabledByAssociation
     - TermAssociation
@@ -429,6 +427,7 @@ attributes:
     alias: term
     owner: TermAssociation
     domain_of:
+    - MoleculeNode
     - EvidenceItem
     - EnabledByAssociation
     - TermAssociation
