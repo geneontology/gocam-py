@@ -256,8 +256,8 @@ class TBoxTranslator:
             tas = [tas]
         if tas:
             for ta in tas:
-                if ta and ta.term and subject:
-                    yield from self.add_edge(subject, predicate, ta.term)
+                if ta and ta.molecule and subject:
+                    yield from self.add_edge(subject, predicate, ta.molecule)
 
     def add_annotation(
         self, subject: str, predicate: str, object: str
@@ -310,7 +310,7 @@ class TBoxTranslator:
 
     def get_class(self, id: str) -> Class:
         iri = self.iri(id)
-        return self.ontology.clazz(str(iri))
+        return self.ontology.class_(str(iri))
 
     def get_predicate(self, id: str) -> ObjectProperty:
         return self.ontology.object_property(str(self.iri(id)))

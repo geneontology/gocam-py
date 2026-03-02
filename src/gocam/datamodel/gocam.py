@@ -251,7 +251,10 @@ class Model(ConfiguredBaseModel):
                                                                      'name': 'status'}}},
                     'title': 'Production rules must have at least one activity'}]})
 
-    id: str = Field(default=..., description="""The identifier of the model. Should be in gocam namespace.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., description="""The identifier of the model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object'],
+         'examples': [{'description': 'A model representing tRNA repair and recycling',
+                       'value': 'gomodel:63f809ec00000701'}],
+         'id_prefixes': ['gomodel']} })
     title: str = Field(default=..., description="""The human-readable descriptive title of the model""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model'], 'slot_uri': 'dct:title'} })
     taxon: Optional[str] = Field(default=None, description="""The primary taxon that the model is about""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
     additional_taxa: Optional[list[str]] = Field(default=[], description="""Additional taxa that the model is about""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
@@ -263,6 +266,7 @@ class Model(ConfiguredBaseModel):
                       'a Model before populating it with activities), but is required '
                       'for production models. See the associated rule.'],
          'domain_of': ['Model']} })
+    molecules: Optional[list[MoleculeNode]] = Field(default=[], description="""All of the molecule nodes that are part of the model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
     objects: Optional[list[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
     provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""Model-level provenance information""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
     query_index: Optional[QueryIndex] = Field(default=None, description="""An optional object that contains the results of indexing a model with various summary statistics and retrieval indices.""", json_schema_extra = { "linkml_meta": {'comments': ['This is typically not populated in the primary transactional '
@@ -279,12 +283,13 @@ class Activity(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'aliases': ['annoton'], 'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., description="""Identifier of the activity unit. Should be in gocam namespace.""", json_schema_extra = { "linkml_meta": {'comments': ['Typically does not need to be exposed to end-user, this exists '
+    id: str = Field(default=..., description="""Identifier of the activity unit.""", json_schema_extra = { "linkml_meta": {'comments': ['Typically does not need to be exposed to end-user, this exists '
                       'to allow activity flows'],
-         'domain_of': ['Model', 'Activity', 'Object'],
-         'examples': [{'description': 'A model representing tRNA repair and recycling',
-                       'value': 'gomodel:63f809ec00000701'}],
-         'id_prefixes': ['gocam']} })
+         'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object'],
+         'examples': [{'description': 'A activity of the model representing '
+                                      'alpha-aminoacyl-tRNA binding enabled by NEMF',
+                       'value': 'gomodel:63f809ec00000701/63f809ec00000706'}],
+         'id_prefixes': ['gomodel']} })
     enabled_by: Optional[Union[EnabledByAssociation,EnabledByGeneProductAssociation,EnabledByProteinComplexAssociation]] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'recommended': True} })
     molecular_function: Optional[MolecularFunctionAssociation] = Field(default=None, description="""The molecular function that is carried out by the gene product or complex""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
          'recommended': True,
@@ -313,6 +318,26 @@ class Activity(ConfiguredBaseModel):
     provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""Provenance information for the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
+class MoleculeNode(ConfiguredBaseModel):
+    """
+    An individual molecule or chemical entity in a causal model, representing a specific occurrence of a molecule that participates in activities as an input or output and may be localized to a particular cellular location.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
+
+    id: str = Field(default=..., description="""Identifier of the molecule node.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object'],
+         'examples': [{'description': 'A molecule node of the model representing tRNA '
+                                      'precursor (CHEBI:10668) that is an input to '
+                                      'tRNA-specific ribonuclease activity '
+                                      '(GO:0004549)',
+                       'value': 'gomodel:63f809ec00000701/63f809ec00000733'}],
+         'id_prefixes': ['gomodel']} })
+    term: str = Field(default=..., description="""The molecule term associated with the molecule node""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
+    located_in: Optional[CellularAnatomicalEntityAssociation] = Field(default=None, description="""The cellular location in which the molecule is located""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode']} })
+
+
 class EvidenceItem(ConfiguredBaseModel):
     """
     An individual piece of evidence that is associated with an assertion in a model
@@ -322,7 +347,10 @@ class EvidenceItem(ConfiguredBaseModel):
     term: Optional[str] = Field(default=None, description="""The ECO term representing the type of evidence""", json_schema_extra = { "linkml_meta": {'bindings': [{'binds_value_of': 'id',
                        'obligation_level': 'REQUIRED',
                        'range': 'EvidenceCodeEnum'}],
-         'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation'],
+         'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation'],
          'examples': [{'description': 'direct assay evidence used in manual assertion '
                                       '(IDA)',
                        'value': 'ECO:0000314'}],
@@ -358,7 +386,10 @@ class EnabledByAssociation(Association):
                       'on what kind of entity enables the association'],
          'from_schema': 'https://w3id.org/gocam'})
 
-    term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["EnabledByAssociation"] = Field(default="EnabledByAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -410,7 +441,10 @@ class EnabledByGeneProductAssociation(EnabledByAssociation):
                       'authoritative GPI allows it). Note that the *interpretation* of '
                       'the gene ID in the context of a GO-CAM model is the (spliceform '
                       'and proteoform agnostic) *product* of that gene.'],
-         'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation'],
+         'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation'],
          'examples': [{'description': 'The protein product of the Homo sapiens TRNT1 '
                                       'gene',
                        'value': 'UniProtKB:Q96Q11'},
@@ -459,7 +493,10 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
                                  'range': 'ProteinComplexTermObject'}}})
 
     members: Optional[list[ProteinComplexMemberAssociation]] = Field(default=[], description="""Associations between the complex and its members.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EnabledByProteinComplexAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation'],
+    term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation'],
          'examples': [{'description': 'The generic GO entry for a protein complex. If '
                                       'this is the value of `term`, then members '
                                       '*must* be specified.',
@@ -498,7 +535,10 @@ class TermAssociation(Association):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'abstract': True, 'from_schema': 'https://w3id.org/gocam'})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["TermAssociation"] = Field(default="TermAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -518,7 +558,10 @@ class ProteinComplexMemberAssociation(TermAssociation):
                                  'name': 'term',
                                  'range': 'GeneProductTermObject'}}})
 
-    term: Optional[str] = Field(default=None, description="""The member gene product that is part of the protein complex.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The member gene product that is part of the protein complex.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["ProteinComplexMemberAssociation"] = Field(default="ProteinComplexMemberAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -537,7 +580,10 @@ class MolecularFunctionAssociation(TermAssociation):
                                  'range': 'MolecularFunctionTermObject'}},
          'todos': ['account for non-MF activity types in Reactome (MolecularEvent)']})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["MolecularFunctionAssociation"] = Field(default="MolecularFunctionAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -561,7 +607,10 @@ class BiologicalProcessAssociation(TermAssociation):
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["BiologicalProcessAssociation"] = Field(default="BiologicalProcessAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -582,7 +631,10 @@ class PhaseAssociation(TermAssociation):
                                  'name': 'term',
                                  'range': 'PhaseTermObject'}}})
 
-    term: Optional[str] = Field(default=None, description="""The phase ontology term associated with the biological process (not the relation type)""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The phase ontology term associated with the biological process (not the relation type)""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["PhaseAssociation"] = Field(default="PhaseAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -611,7 +663,10 @@ class CellularAnatomicalEntityAssociation(TermAssociation):
     term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'bindings': [{'binds_value_of': 'id',
                        'obligation_level': 'REQUIRED',
                        'range': 'CellularAnatomicalEntityEnum'}],
-         'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+         'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["CellularAnatomicalEntityAssociation"] = Field(default="CellularAnatomicalEntityAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -633,7 +688,10 @@ class CellTypeAssociation(TermAssociation):
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["CellTypeAssociation"] = Field(default="CellTypeAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -656,7 +714,10 @@ class GrossAnatomyAssociation(TermAssociation):
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["GrossAnatomyAssociation"] = Field(default="GrossAnatomyAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -666,14 +727,13 @@ class GrossAnatomyAssociation(TermAssociation):
     provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
-class MoleculeAssociation(TermAssociation):
+class MoleculeAssociation(Association):
     """
-    An association between an activity and a molecule term
+    An association between an activity and a molecule node
     """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
-         'slot_usage': {'term': {'name': 'term', 'range': 'MoleculeTermObject'}}})
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    molecule: Optional[str] = Field(default=None, description="""The molecule node that is associated with this activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeAssociation']} })
     type: Literal["MoleculeAssociation"] = Field(default="MoleculeAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
@@ -689,7 +749,7 @@ class Object(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/Object","gocam:Object"] = Field(default="gocam:Object", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -701,7 +761,7 @@ class TermObject(Object):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/TermObject","gocam:TermObject"] = Field(default="gocam:TermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -716,7 +776,7 @@ class PublicationObject(Object):
 
     abstract_text: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PublicationObject']} })
     full_text: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PublicationObject']} })
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/PublicationObject","gocam:PublicationObject"] = Field(default="gocam:PublicationObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -728,7 +788,7 @@ class EvidenceTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['ECO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/EvidenceTermObject","gocam:EvidenceTermObject"] = Field(default="gocam:EvidenceTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -740,7 +800,7 @@ class MolecularFunctionTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['GO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/MolecularFunctionTermObject","gocam:MolecularFunctionTermObject"] = Field(default="gocam:MolecularFunctionTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -752,7 +812,7 @@ class BiologicalProcessTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['GO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/BiologicalProcessTermObject","gocam:BiologicalProcessTermObject"] = Field(default="gocam:BiologicalProcessTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -764,7 +824,7 @@ class CellularAnatomicalEntityTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['GO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/CellularAnatomicalEntityTermObject","gocam:CellularAnatomicalEntityTermObject"] = Field(default="gocam:CellularAnatomicalEntityTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -776,7 +836,7 @@ class MoleculeTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['CHEBI', 'UniProtKB']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/MoleculeTermObject","gocam:MoleculeTermObject"] = Field(default="gocam:MoleculeTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -789,7 +849,7 @@ class CellTypeTermObject(TermObject):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
          'id_prefixes': ['CL', 'PO', 'FAO', 'DDANAT']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/CellTypeTermObject","gocam:CellTypeTermObject"] = Field(default="gocam:CellTypeTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -802,7 +862,7 @@ class GrossAnatomicalStructureTermObject(TermObject):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
          'id_prefixes': ['UBERON', 'PO', 'FAO', 'DDANAT']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/GrossAnatomicalStructureTermObject","gocam:GrossAnatomicalStructureTermObject"] = Field(default="gocam:GrossAnatomicalStructureTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -814,7 +874,7 @@ class PhaseTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['GO', 'UBERON', 'PO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/PhaseTermObject","gocam:PhaseTermObject"] = Field(default="gocam:PhaseTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -826,7 +886,7 @@ class InformationBiomacromoleculeTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'abstract': True, 'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/InformationBiomacromoleculeTermObject","gocam:InformationBiomacromoleculeTermObject"] = Field(default="gocam:InformationBiomacromoleculeTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -838,7 +898,7 @@ class GeneProductTermObject(InformationBiomacromoleculeTermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/GeneProductTermObject","gocam:GeneProductTermObject"] = Field(default="gocam:GeneProductTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -850,7 +910,7 @@ class ProteinComplexTermObject(InformationBiomacromoleculeTermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/ProteinComplexTermObject","gocam:ProteinComplexTermObject"] = Field(default="gocam:ProteinComplexTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -862,7 +922,7 @@ class TaxonTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['NCBITaxon']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/TaxonTermObject","gocam:TaxonTermObject"] = Field(default="gocam:TaxonTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -874,7 +934,7 @@ class PredicateTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['RO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/PredicateTermObject","gocam:PredicateTermObject"] = Field(default="gocam:PredicateTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -962,6 +1022,7 @@ class QueryIndex(ConfiguredBaseModel):
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
 Model.model_rebuild()
 Activity.model_rebuild()
+MoleculeNode.model_rebuild()
 EvidenceItem.model_rebuild()
 Association.model_rebuild()
 EnabledByAssociation.model_rebuild()

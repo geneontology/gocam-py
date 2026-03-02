@@ -13,6 +13,7 @@ from gocam.datamodel import (
     EvidenceItem,
     Model,
     MoleculeAssociation,
+    MoleculeNode,
     TermAssociation,
 )
 from gocam.translation.cx2.style import (
@@ -65,6 +66,10 @@ def model_to_cx2(
                 object_labels[obj.id] = remove_species_code_suffix(obj.label)
             else:
                 object_labels[obj.id] = obj.id
+
+    molecule_nodes_by_id: dict[str, MoleculeNode] = {
+        node.id: node for node in gocam.molecules or []
+    }
 
     # Internal helper functions that access internal state
     @cache
@@ -130,31 +135,40 @@ def model_to_cx2(
         if not isinstance(associations, list):
             associations = [associations]
         for association in associations:
-            if association.term is None:
+            if association.molecule is None:
+                continue
+            molecule = molecule_nodes_by_id.get(association.molecule)
+            if molecule is None:
+                logger.warning(
+                    f"Association molecule {association.molecule} not found in model.molecules: skipping"
+                )
                 continue
             # Filter proteins at CX2 level (per issue #65)
             # Skip if the term is an INFORMATION_BIOMACROMOLECULE
             # We check if it's already in activity_nodes_by_enabled_by_id as a simple
             # proxy for identifying proteins/gene products
             if (
-                association.term in activity_nodes_by_enabled_by_id
+                molecule.term in activity_nodes_by_enabled_by_id
                 and "has input" in edge_attributes["name"]
             ):
                 continue
 
-            if association.term in activity_nodes_by_enabled_by_id:
-                target = activity_nodes_by_enabled_by_id[association.term]
-            elif association.term in input_output_nodes:
-                target = input_output_nodes[association.term]
+            if molecule.term in activity_nodes_by_enabled_by_id:
+                target = activity_nodes_by_enabled_by_id[molecule.term]
+            elif molecule.id in input_output_nodes:
+                target = input_output_nodes[molecule.id]
             else:
+                label = _get_object_label(molecule.term)
+                if molecule.located_in is not None:
+                    location_label = _get_object_label(molecule.located_in.term)
+                    label += f" located in {location_label}"
                 node_attributes = {
-                    "name": _get_object_label(association.term),
-                    "represents": association.term,
+                    "name": label,
+                    "represents": molecule.term,
                     "type": NodeType.MOLECULE.value,
                 }
-
                 target = cx2_network.add_node(attributes=node_attributes)
-                input_output_nodes[association.term] = target
+                input_output_nodes[molecule.id] = target
 
             edge_attributes["Evidence"] = _format_evidence_list(association.evidence)
 

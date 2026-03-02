@@ -90,8 +90,8 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
     activities_by_input: dict[str, list[str]] = defaultdict(list)
     for activity in model.activities or []:
         for input_ in all_activity_inputs(activity):
-            if input_.term:
-                activities_by_input[input_.term].append(activity.id)
+            if input_.molecule:
+                activities_by_input[input_.molecule].append(activity.id)
 
     for activity in model.activities or []:
         if activity.enabled_by is None:
@@ -105,8 +105,10 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
                 graph.add_edge(activity.id, downstream_activity_id)
 
         for output in all_activity_outputs(activity):
-            if output.term:
-                for downstream_activity_id in activities_by_input.get(output.term, []):
+            if output.molecule:
+                for downstream_activity_id in activities_by_input.get(
+                    output.molecule, []
+                ):
                     if downstream_activity_id != activity.id:
                         graph.add_edge(activity.id, downstream_activity_id)
 
