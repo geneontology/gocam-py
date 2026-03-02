@@ -322,23 +322,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Identifier and Mapping Information">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#schema-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -384,7 +367,6 @@
 
 
 <h1 id="slot-happens_during">Slot: happens_during</h1>
-<p><em>Optional extension describing the phase during which the BP takes place</em></p>
 <p>URI: <a href="https://w3id.org/gocam/happens_during">gocam:happens_during</a>
 Alias: happens_during</p>
 <!-- no inheritance hierarchy -->
@@ -400,6 +382,11 @@ Alias: happens_during</p>
 </thead>
 <tbody>
 <tr>
+<td><a href="../Activity/">Activity</a></td>
+<td>An individual activity in a causal model, representing the individual molecul...</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
 <td>An association between an activity and a biological process term</td>
 <td>no</td>
@@ -408,13 +395,9 @@ Alias: happens_during</p>
 </table>
 <h2 id="properties">Properties</h2>
 <ul>
-<li>Range: <a href="../BiologicalProcessPhaseAssociation/">BiologicalProcessPhaseAssociation</a></li>
+<li>Range: <a href="../String/">String</a></li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
 <h2 id="mappings">Mappings</h2>
 <table>
 <thead>
@@ -438,14 +421,11 @@ Alias: happens_during</p>
 <details>
 
 <pre><code class="language-yaml">name: happens_during
-description: Optional extension describing the phase during which the BP takes place
-from_schema: https://w3id.org/gocam
-rank: 1000
 alias: happens_during
-owner: BiologicalProcessAssociation
 domain_of:
+- Activity
 - BiologicalProcessAssociation
-range: BiologicalProcessPhaseAssociation
+range: string
 
 </code></pre>
 

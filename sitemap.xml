@@ -17,10 +17,6 @@
          <lastmod>2026-03-02</lastmod>
     </url>
     <url>
-         <loc>https://geneontology.github.io/gocam-py/BiologicalProcessPhaseAssociation/</loc>
-         <lastmod>2026-03-02</lastmod>
-    </url>
-    <url>
          <loc>https://geneontology.github.io/gocam-py/BiologicalProcessTermObject/</loc>
          <lastmod>2026-03-02</lastmod>
     </url>
@@ -182,6 +178,10 @@
     </url>
     <url>
          <loc>https://geneontology.github.io/gocam-py/Objectidentifier/</loc>
+         <lastmod>2026-03-02</lastmod>
+    </url>
+    <url>
+         <loc>https://geneontology.github.io/gocam-py/PhaseAssociation/</loc>
          <lastmod>2026-03-02</lastmod>
     </url>
     <url>

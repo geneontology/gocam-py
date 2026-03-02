@@ -277,8 +277,8 @@
 
 
 
-        BiologicalProcessAssociation --&gt; "0..1" BiologicalProcessPhaseAssociation : happens_during
-        click BiologicalProcessPhaseAssociation href "../BiologicalProcessPhaseAssociation/"
+        BiologicalProcessAssociation --&gt; "0..1" PhaseAssociation : happens_during
+        click PhaseAssociation href "../PhaseAssociation/"
 
 
 
@@ -342,7 +342,7 @@
 <tbody>
 <tr>
 <td><a href="../happens_during/">happens_during</a></td>
-<td>0..1 <br/> <a href="../BiologicalProcessPhaseAssociation/">BiologicalProcessPhaseAssociation</a></td>
+<td>0..1 <br/> <a href="../PhaseAssociation/">PhaseAssociation</a></td>
 <td>Optional extension describing the phase during which the BP takes place</td>
 <td>direct</td>
 </tr>
@@ -445,10 +445,10 @@ attributes:
     description: Optional extension describing the phase during which the BP takes
       place
     from_schema: https://w3id.org/gocam
-    rank: 1000
     domain_of:
+    - Activity
     - BiologicalProcessAssociation
-    range: BiologicalProcessPhaseAssociation
+    range: PhaseAssociation
   part_of:
     name: part_of
     description: Optional extension allowing hierarchical nesting of BPs
@@ -480,12 +480,12 @@ attributes:
     description: Optional extension describing the phase during which the BP takes
       place
     from_schema: https://w3id.org/gocam
-    rank: 1000
     alias: happens_during
     owner: BiologicalProcessAssociation
     domain_of:
+    - Activity
     - BiologicalProcessAssociation
-    range: BiologicalProcessPhaseAssociation
+    range: PhaseAssociation
   part_of:
     name: part_of
     description: Optional extension allowing hierarchical nesting of BPs

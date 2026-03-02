@@ -279,6 +279,17 @@
 
 
 
+      Activity : happens_during
+
+
+
+
+
+        Activity --&gt; "0..1" PhaseAssociation : happens_during
+        click PhaseAssociation href "../PhaseAssociation/"
+
+
+
       Activity : has_input
 
 
@@ -411,6 +422,12 @@
 <td><a href="../part_of/">part_of</a></td>
 <td>0..1 <em>recommended</em> <br/> <a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
 <td>The larger biological process in which the activity is a part</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../happens_during/">happens_during</a></td>
+<td>0..1 <br/> <a href="../PhaseAssociation/">PhaseAssociation</a></td>
+<td>The phase during which the activity takes place</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -607,6 +624,16 @@ attributes:
     range: BiologicalProcessAssociation
     recommended: true
     inlined: true
+  happens_during:
+    name: happens_during
+    description: The phase during which the activity takes place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - Activity
+    - BiologicalProcessAssociation
+    range: PhaseAssociation
+    inlined: true
   has_input:
     name: has_input
     description: The input molecules that are directly consumed by the activity
@@ -773,6 +800,18 @@ attributes:
     - GrossAnatomyAssociation
     range: BiologicalProcessAssociation
     recommended: true
+    inlined: true
+  happens_during:
+    name: happens_during
+    description: The phase during which the activity takes place
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: happens_during
+    owner: Activity
+    domain_of:
+    - Activity
+    - BiologicalProcessAssociation
+    range: PhaseAssociation
     inlined: true
   has_input:
     name: has_input
