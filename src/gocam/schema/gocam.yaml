@@ -193,6 +193,10 @@ classes:
         range: BiologicalProcessAssociation
         inlined: true
         recommended: true
+      happens_during:
+        description: The phase during which the activity takes place
+        range: PhaseAssociation
+        inlined: true
       has_input:
         description: The input molecules that are directly consumed by the activity
         todos:
@@ -431,7 +435,7 @@ classes:
     attributes:
       happens_during:
         description: Optional extension describing the phase during which the BP takes place
-        range: BiologicalProcessPhaseAssociation
+        range: PhaseAssociation
       part_of:
         description: Optional extension allowing hierarchical nesting of BPs
         range: BiologicalProcessAssociation
@@ -440,8 +444,8 @@ classes:
       term:
         range: BiologicalProcessTermObject
 
-  BiologicalProcessPhaseAssociation:
-    description: An association between a biological process and a phase term
+  PhaseAssociation:
+    description: An association between an activity or biological process and a phase term
     is_a: TermAssociation
     slot_usage:
       term:

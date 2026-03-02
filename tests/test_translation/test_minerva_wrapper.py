@@ -502,3 +502,70 @@ def test_translation_warning_invalid_model_state():
     assert warnings[0].type == WarningType.INVALID_MODEL_STATE
     assert "invalid_state_for_testing" in warnings[0].message
     assert warnings[0].entity_id == "gomodel:663d668500002178"
+
+
+def test_happens_during():
+    """Test that the happens_during slot on Activity instances is populated correctly."""
+    minerva_object = {
+        "id": "gomodel:test_happens_during",
+        "annotations": [{"key": "title", "value": "Test model with happens_during"}],
+        "individuals": [
+            {
+                "id": "gomodel:test_happens_during/activity1",
+                "type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "annotations": [],
+            },
+            {
+                "id": "gomodel:test_happens_during/protein1",
+                "type": [
+                    {"type": "class", "id": "UniProtKB:P12345", "label": "test protein"}
+                ],
+                "root-type": [
+                    {
+                        "type": "class",
+                        "id": "CHEBI:33695",
+                        "label": "information biomacromolecule",
+                    }
+                ],
+                "annotations": [],
+            },
+            {
+                "id": "gomodel:test_happens_during/phase1",
+                "type": [
+                    {"type": "class", "id": "GO:0005132", "label": "cell cycle phase"}
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0044848", "label": "biological phase"}
+                ],
+                "annotations": [],
+            },
+        ],
+        "facts": [
+            {
+                "subject": "gomodel:test_happens_during/activity1",
+                "property": "RO:0002333",  # enabled_by
+                "object": "gomodel:test_happens_during/protein1",
+                "annotations": [],
+            },
+            {
+                "subject": "gomodel:test_happens_during/activity1",
+                "property": "RO:0002092",  # happens_during
+                "object": "gomodel:test_happens_during/phase1",
+                "annotations": [],
+            },
+        ],
+    }
+
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    assert model.activities is not None
+    assert len(model.activities) == 1
+    activity = model.activities[0]
+    assert activity.happens_during is not None
+    assert activity.happens_during.term == "GO:0005132"

@@ -80,6 +80,9 @@ def _iter_model_associations(model: Model) -> Iterable[Association]:
             if activity.occurs_in.part_of:
                 yield activity.occurs_in.part_of
 
+        if activity.happens_during:
+            yield activity.happens_during
+
         if activity.has_primary_input:
             yield activity.has_primary_input
 

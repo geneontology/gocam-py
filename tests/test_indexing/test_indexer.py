@@ -315,14 +315,16 @@ def test_indexer_populates_flattened_evidence_terms():
 
     assert model.query_index is not None
     assert model.query_index.flattened_evidence_terms is not None
-    assert len(model.query_index.flattened_evidence_terms) == 2
+    assert len(model.query_index.flattened_evidence_terms) == 3
     assert {evidence.id for evidence in model.query_index.flattened_evidence_terms} == {
         "ECO:0000001",
         "ECO:0000002",
+        "ECO:0000003",
     }
     assert {
         evidence.label for evidence in model.query_index.flattened_evidence_terms
     } == {
         "Test Evidence 1",
         "Test Evidence 2",
+        "Test Evidence 3",
     }
