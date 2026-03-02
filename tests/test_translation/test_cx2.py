@@ -1,6 +1,6 @@
-import pytest
 from ndex2.cx2 import CX2Network, RawCX2NetworkFactory
 
+from gocam.datamodel import MoleculeNode
 from gocam.translation.cx2 import model_to_cx2
 
 
@@ -13,7 +13,7 @@ def test_model_to_cx2(get_model):
 
     node_aspect = next((aspect for aspect in cx2 if "nodes" in aspect), None)
     assert node_aspect is not None
-    assert len(node_aspect["nodes"]) == 13, "Incorrect number of nodes in CX2"
+    assert len(node_aspect["nodes"]) == 14, "Incorrect number of nodes in CX2"
 
     edge_aspect = next((aspect for aspect in cx2 if "edges" in aspect), None)
     assert edge_aspect is not None
@@ -29,7 +29,7 @@ def test_load_cx2_to_ndex(get_model):
     cx2_network = factory.get_cx2network(cx2)
 
     assert isinstance(cx2_network, CX2Network)
-    assert len(cx2_network.get_nodes()) == 13, "Incorrect number of nodes in CX2"
+    assert len(cx2_network.get_nodes()) == 14, "Incorrect number of nodes in CX2"
     assert len(cx2_network.get_edges()) == 21, "Incorrect number of edges in CX2"
 
 
@@ -127,8 +127,13 @@ def test_issue_65_protein_inputs_filtered(get_model):
             if activity.has_input is None:
                 activity.has_input = []
 
+            molecule_node = MoleculeNode(
+                id="gomodel:63f809ec00000701/test-protein",
+                term=other_activity.enabled_by.term,
+            )
+            model.molecules.append(molecule_node)
             activity.has_input.append(
-                MoleculeAssociation(term=other_activity.enabled_by.term, evidence=[])
+                MoleculeAssociation(molecule=molecule_node.id, evidence=[])
             )
             activities_with_protein_inputs.append(activity)
             break
