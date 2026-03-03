@@ -27,7 +27,11 @@ cx2 = [
     "ndex2>=3.9.0,<4",
     "networkx[extra]>=3,<4",
 ]
-oaklib = ["oaklib"]
+oaklib = [
+    "oaklib",
+    # Workaround for https://github.com/INCATools/ontology-access-kit/issues/852
+    "setuptools<82.0.0; python_version < '3.12'"
+]
 owl = ["py-horned-owl"]
 
 [project.scripts]
@@ -36,7 +40,7 @@ gocam = "gocam.cli:app"
 [dependency-groups]
 dev = [
     "glom>=25.12.0",
-    "linkml>=1.3.5,<2",
+    "linkml>=1.10.0,<2",
     "mkdocs-material>=8.2.8,<10",
     "mkdocs-mermaid2-plugin>=1.1.1",
     "pytest>=8.2.2,<10",

@@ -918,21 +918,20 @@ enums:
       relationship_types:
         - rdfs:subClassOf
 
-  PhaseEnum:
-    description: A term from either the phase branch of GO or the phase branch of an anatomy ontology
-    include:
-      - reachable_from:
-          source_nodes:
-            - GO:0044848 # biological phase
-          is_direct: false
-          relationship_types:
-            - rdfs:subClassOf
-      - reachable_from:
-          source_nodes:
-            - UBERON:0000105 # life cycle stage
-          is_direct: false
-          relationship_types:
-            - rdfs:subClassOf
-
-
-
+# This enum is not currently used, but it causes issues for `gen-doc` in linkml 1.10.0.
+# See: https://github.com/linkml/linkml/issues/3242
+#  PhaseEnum:
+#    description: A term from either the phase branch of GO or the phase branch of an anatomy ontology
+#    include:
+#      - reachable_from:
+#          source_nodes:
+#            - GO:0044848 # biological phase
+#          is_direct: false
+#          relationship_types:
+#            - rdfs:subClassOf
+#      - reachable_from:
+#          source_nodes:
+#            - UBERON:0000105 # life cycle stage
+#          is_direct: false
+#          relationship_types:
+#            - rdfs:subClassOf
