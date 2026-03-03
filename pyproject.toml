@@ -27,7 +27,11 @@ cx2 = [
     "ndex2>=3.9.0,<4",
     "networkx[extra]>=3,<4",
 ]
-oaklib = ["oaklib"]
+oaklib = [
+    "oaklib",
+    # Workaround for https://github.com/INCATools/ontology-access-kit/issues/852
+    "setuptools<82.0.0; python_version < '3.12'"
+]
 owl = ["py-horned-owl"]
 
 [project.scripts]
