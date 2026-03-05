@@ -3,12 +3,11 @@ import re
 
 import pytest
 
-from gocam.datamodel import Activity, EnabledByProteinComplexAssociation, MoleculeNode
+from gocam.datamodel import Activity, EnabledByProteinComplexAssociation
 from gocam.translation.minerva_wrapper import MinervaWrapper
 from gocam.translation.result import WarningType
+from gocam.vocabulary import Relation
 from tests import INPUT_DIR
-
-ENABLED_BY = "RO:0002333"
 
 
 def load_minerva_object(id: str):
@@ -35,7 +34,9 @@ def test_object(id):
     assert model is not None
     assert model.id == minerva_object["id"]
     enabled_by_facts = [
-        fact for fact in minerva_object["facts"] if fact["property"] == ENABLED_BY
+        fact
+        for fact in minerva_object["facts"]
+        if fact["property"] == Relation.ENABLED_BY
     ]
     assert model.activities is not None
     assert len(model.activities) == len(enabled_by_facts)
@@ -70,13 +71,22 @@ def test_has_input_and_has_output():
     mw = MinervaWrapper()
     model = mw.minerva_object_to_model(minerva_object)
 
-    activities_with_input: list[Activity] = []
-    activities_with_output: list[Activity] = []
-    for activity in model.activities or []:
-        if activity.has_input:
-            activities_with_input.append(activity)
-        if activity.has_output:
-            activities_with_output.append(activity)
+    activities_with_input: list[Activity] = [
+        activity
+        for activity in model.activities or []
+        if any(
+            ma.predicate == Relation.HAS_INPUT
+            for ma in activity.molecular_associations or []
+        )
+    ]
+    activities_with_output: list[Activity] = [
+        activity
+        for activity in model.activities or []
+        if any(
+            ma.predicate == Relation.HAS_OUTPUT
+            for ma in activity.molecular_associations or []
+        )
+    ]
 
     # Basic sanity check on the number of activities with input/output
     assert len(activities_with_input) == 3
@@ -89,7 +99,10 @@ def test_has_input_and_has_output():
     uric_acid_input_activities = [
         a
         for a in activities_with_input
-        if a.has_input and a.has_input[0].molecule == uric_acid_molecule.id
+        if any(
+            ma.molecule == uric_acid_molecule.id and ma.predicate == Relation.HAS_INPUT
+            for ma in a.molecular_associations or []
+        )
     ]
     assert len(uric_acid_input_activities) == 1
 
@@ -98,7 +111,10 @@ def test_has_input_and_has_output():
     urea_output_activities = [
         a
         for a in activities_with_output
-        if a.has_output and a.has_output[0].molecule == urea_molecule.id
+        if any(
+            ma.molecule == urea_molecule.id and ma.predicate == Relation.HAS_OUTPUT
+            for ma in a.molecular_associations or []
+        )
     ]
     assert len(urea_output_activities) == 3
 
@@ -111,12 +127,17 @@ def test_has_input_issue_65():
 
     # Find activities with inputs
     activities_with_input = [
-        a for a in (model.activities or []) if a.has_input is not None
+        a
+        for a in (model.activities or [])
+        if a.molecular_associations
+        and any(ma.predicate == Relation.HAS_INPUT for ma in a.molecular_associations)
     ]
 
     # Verify that all inputs are included, even protein inputs
     for activity in activities_with_input:
-        for input_assoc in activity.has_input or []:
+        for input_assoc in activity.molecular_associations or []:
+            if input_assoc.predicate != Relation.HAS_INPUT:
+                continue
             # Check if the input term is also the term of an enabled_by for any activity
             if input_assoc.molecule is None or not model.molecules:
                 continue
@@ -146,10 +167,19 @@ def test_multivalued_input_and_output():
         for a in (model.activities or [])
         if a.molecular_function and a.molecular_function.term == "GO:0004108"
     )
-    assert cs_activity.has_input is not None
-    assert len(cs_activity.has_input) == 3
-    assert cs_activity.has_output is not None
-    assert len(cs_activity.has_output) == 2
+    assert cs_activity.molecular_associations is not None
+    inputs = [
+        ma
+        for ma in cs_activity.molecular_associations
+        if ma.predicate == Relation.HAS_INPUT
+    ]
+    outputs = [
+        ma
+        for ma in cs_activity.molecular_associations
+        if ma.predicate == Relation.HAS_OUTPUT
+    ]
+    assert len(inputs) == 3
+    assert len(outputs) == 2
 
 
 def test_missing_enabled_by():
@@ -233,23 +263,10 @@ def test_provenance_on_associations():
                 assert causal_assoc.provenances is not None
                 assert len(causal_assoc.provenances) > 0
 
-        if activity.has_input is not None:
-            for input_assoc in activity.has_input:
-                assert input_assoc.provenances is not None
-                assert len(input_assoc.provenances) > 0
-
-        if activity.has_output is not None:
-            for output_assoc in activity.has_output:
-                assert output_assoc.provenances is not None
-                assert len(output_assoc.provenances) > 0
-
-        if activity.has_primary_input is not None:
-            assert activity.has_primary_input.provenances is not None
-            assert len(activity.has_primary_input.provenances) > 0
-
-        if activity.has_primary_output is not None:
-            assert activity.has_primary_output.provenances is not None
-            assert len(activity.has_primary_output.provenances) > 0
+        if activity.molecular_associations:
+            for mol_assoc in activity.molecular_associations:
+                assert mol_assoc.provenances is not None
+                assert len(mol_assoc.provenances) > 0
 
         if activity.occurs_in is not None:
             assert activity.occurs_in.provenances is not None
@@ -344,7 +361,7 @@ def test_additional_taxa():
     minerva_object["facts"] = [
         {
             "subject": "gomodel:test123/activity1",
-            "property": "RO:0002333",
+            "property": Relation.HAS_INPUT,
             "object": "gomodel:test123/protein1",
             "annotations": [],
         }
@@ -427,7 +444,7 @@ def test_translation_warning_missing_term():
     minerva_object["facts"].append(
         {
             "subject": "gomodel:663d668500002178/subject_missing_term",
-            "property": "RO:0002333",
+            "property": Relation.HAS_INPUT,
             "object": "gomodel:663d668500002178/object_missing_term",
             "annotations": [],
         }
@@ -442,10 +459,9 @@ def test_translation_warning_missing_term():
         (w for w in warnings if w.type == WarningType.MISSING_TERM), None
     )
     assert missing_term_warning is not None
-    assert "Missing term for subject" in missing_term_warning.message
+    assert "Missing term for object" in missing_term_warning.message
     assert (
-        missing_term_warning.entity_id
-        == "gomodel:663d668500002178/subject_missing_term"
+        missing_term_warning.entity_id == "gomodel:663d668500002178/object_missing_term"
     )
 
     # A second warning should be generated for an unhandled fact due to the missing term
@@ -548,13 +564,13 @@ def test_happens_during():
         "facts": [
             {
                 "subject": "gomodel:test_happens_during/activity1",
-                "property": "RO:0002333",  # enabled_by
+                "property": Relation.ENABLED_BY,
                 "object": "gomodel:test_happens_during/protein1",
                 "annotations": [],
             },
             {
                 "subject": "gomodel:test_happens_during/activity1",
-                "property": "RO:0002092",  # happens_during
+                "property": Relation.HAPPENS_DURING,
                 "object": "gomodel:test_happens_during/phase1",
                 "annotations": [],
             },

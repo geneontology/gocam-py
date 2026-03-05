@@ -386,7 +386,7 @@ activities:
       provided_by:
       - http://www.wormbase.org
     term: GO:0140367
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000315
@@ -403,6 +403,7 @@ activities:
       date: '2020-10-28'
       provided_by:
       - http://www.wormbase.org
+    predicate: RO:0002233
     molecule: gomodel:568b0f9600000284/5f46c3b700003606
   causal_associations:
   - type: CausalAssociation
@@ -482,7 +483,7 @@ activities:
       provided_by:
       - http://www.wormbase.org
     term: GO:0140367
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000314
@@ -499,6 +500,7 @@ activities:
       date: '2020-10-28'
       provided_by:
       - http://www.wormbase.org
+    predicate: RO:0002233
     molecule: gomodel:568b0f9600000284/5f46c3b700003602
   causal_associations:
   - type: CausalAssociation
@@ -577,7 +579,7 @@ activities:
       provided_by:
       - http://www.wormbase.org
     term: GO:0140367
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000314
@@ -594,6 +596,7 @@ activities:
       date: '2020-10-28'
       provided_by:
       - http://www.wormbase.org
+    predicate: RO:0002233
     molecule: gomodel:568b0f9600000284/5f46c3b700003608
   causal_associations:
   - type: CausalAssociation
@@ -685,7 +688,7 @@ activities:
       provided_by:
       - http://www.wormbase.org
     term: GO:1900425
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000315
@@ -710,6 +713,7 @@ activities:
       date: '2020-10-28'
       provided_by:
       - http://www.wormbase.org
+    predicate: RO:0002233
     molecule: gomodel:568b0f9600000284/5f46c3b700003610
   causal_associations:
   - type: CausalAssociation

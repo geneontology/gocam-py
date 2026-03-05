@@ -5,6 +5,7 @@ from collections import defaultdict
 import networkx as nx
 
 from gocam.datamodel import Activity, Model, MoleculeAssociation
+from gocam.vocabulary import Relation
 
 SPECIES_CODES = [
     "Atal",
@@ -51,10 +52,12 @@ def all_activity_inputs(activity: Activity) -> list[MoleculeAssociation]:
     Returns:
         List of all molecule associations that are inputs to the activity.
     """
-    inputs: list[MoleculeAssociation] = list(activity.has_input or [])
-    if activity.has_primary_input:
-        inputs.append(activity.has_primary_input)
-    return inputs
+    return [
+        ma
+        for ma in activity.molecular_associations or []
+        if ma.predicate == Relation.HAS_INPUT
+        or ma.predicate == Relation.HAS_PRIMARY_INPUT
+    ]
 
 
 def all_activity_outputs(activity: Activity) -> list[MoleculeAssociation]:
@@ -66,10 +69,12 @@ def all_activity_outputs(activity: Activity) -> list[MoleculeAssociation]:
     Returns:
         List of all molecule associations that are outputs of the activity.
     """
-    outputs: list[MoleculeAssociation] = list(activity.has_output or [])
-    if activity.has_primary_output:
-        outputs.append(activity.has_primary_output)
-    return outputs
+    return [
+        ma
+        for ma in activity.molecular_associations or []
+        if ma.predicate == Relation.HAS_OUTPUT
+        or ma.predicate == Relation.HAS_PRIMARY_OUTPUT
+    ]
 
 
 def model_to_digraph(model: Model) -> nx.DiGraph:
