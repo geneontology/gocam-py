@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
 
+from gocam.vocabulary import Relation
+
 
 class Color(str, Enum):
     BLUE = "#6495ED"
@@ -44,24 +46,6 @@ class NodeType(str, Enum):
     MOLECULE = "molecule"
 
 
-class RelationType(str, Enum):
-    CAUSALLY_UPSTREAM_OF_POSITIVE_EFFECT = "RO:0002304"
-    CAUSALLY_UPSTREAM_OF_NEGATIVE_EFFECT = "RO:0002305"
-    CONSTITUTIVELY_UPSTREAM_OF = "RO:0012009"
-    DIRECTLY_NEGATIVELY_REGULATES = "RO:0002630"
-    DIRECTLY_POSITIVELY_REGULATES = "RO:0002629"
-    HAS_INPUT = "RO:0002233"
-    HAS_OUTPUT = "RO:0002234"
-    INDIRECTLY_NEGATIVELY_REGULATES = "RO:0002407"
-    INDIRECTLY_POSITIVELY_REGULATES = "RO:0002409"
-    IS_SMALL_MOLECULE_INHIBITOR_OF = "RO:0012006"
-    IS_SMALL_MOLECULE_ACTIVATOR_OF = "RO:0012005"
-    NEGATIVELY_REGULATES = "RO:0002212"
-    POSITIVELY_REGULATES = "RO:0002213"
-    PROVIDES_INPUT_FOR = "RO:0002413"
-    REMOVES_INPUT_FOR = "RO:0012010"
-
-
 class NodeShape(str, Enum):
     ELLIPSE = "ellipse"
     OCTAGON = "octagon"
@@ -89,98 +73,98 @@ class NodeStyle:
 
 
 RELATIONS = {
-    RelationType.CAUSALLY_UPSTREAM_OF_POSITIVE_EFFECT: RelationStyle(
+    Relation.CAUSALLY_UPSTREAM_OF_POSITIVE_EFFECT: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TRIANGLE,
         label="causally upstream of, positive effect",
         color=Color.LIGHT_GREEN,
         width=Width.DEFAULT,
     ),
-    RelationType.CAUSALLY_UPSTREAM_OF_NEGATIVE_EFFECT: RelationStyle(
+    Relation.CAUSALLY_UPSTREAM_OF_NEGATIVE_EFFECT: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TEE,
         label="causally upstream of, negative effect",
         color=Color.LIGHT_RED,
         width=Width.DEFAULT,
     ),
-    RelationType.CONSTITUTIVELY_UPSTREAM_OF: RelationStyle(
+    Relation.CONSTITUTIVELY_UPSTREAM_OF: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.CIRCLE,
         label="constitutively upstream of",
         color=Color.LIGHT_GREEN,
         width=Width.DEFAULT,
     ),
-    RelationType.DIRECTLY_NEGATIVELY_REGULATES: RelationStyle(
+    Relation.DIRECTLY_NEGATIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TEE,
         label="directly negatively regulates",
         color=Color.RED,
         width=Width.DEFAULT,
     ),
-    RelationType.DIRECTLY_POSITIVELY_REGULATES: RelationStyle(
+    Relation.DIRECTLY_POSITIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TRIANGLE,
         label="directly positively regulates",
         color=Color.GREEN,
         width=Width.DEFAULT,
     ),
-    RelationType.HAS_INPUT: RelationStyle(
+    Relation.HAS_INPUT: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.CIRCLE,
         label="has input",
         color=Color.BLUE,
         width=Width.DEFAULT,
     ),
-    RelationType.HAS_OUTPUT: RelationStyle(
+    Relation.HAS_OUTPUT: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.CIRCLE,
         label="has output",
         color=Color.PINK,
         width=Width.DEFAULT,
     ),
-    RelationType.INDIRECTLY_NEGATIVELY_REGULATES: RelationStyle(
+    Relation.INDIRECTLY_NEGATIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TEE,
         label="indirectly negatively regulates",
         color=Color.RED,
         width=Width.DEFAULT,
     ),
-    RelationType.INDIRECTLY_POSITIVELY_REGULATES: RelationStyle(
+    Relation.INDIRECTLY_POSITIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TRIANGLE,
         label="indirectly positively regulates",
         color=Color.GREEN,
         width=Width.DEFAULT,
     ),
-    RelationType.IS_SMALL_MOLECULE_INHIBITOR_OF: RelationStyle(
+    Relation.IS_SMALL_MOLECULE_INHIBITOR_OF: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TEE,
         label="is small molecule inhibitor of",
         color=Color.RED,
         width=Width.DEFAULT,
     ),
-    RelationType.IS_SMALL_MOLECULE_ACTIVATOR_OF: RelationStyle(
+    Relation.IS_SMALL_MOLECULE_ACTIVATOR_OF: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TRIANGLE,
         label="is small molecule activator of",
         color=Color.GREEN,
         width=Width.DEFAULT,
     ),
-    RelationType.NEGATIVELY_REGULATES: RelationStyle(
+    Relation.NEGATIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TEE,
         label="negatively regulates",
         color=Color.RED,
         width=Width.DEFAULT,
     ),
-    RelationType.POSITIVELY_REGULATES: RelationStyle(
+    Relation.POSITIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.DASHED,
         arrow_shape=ArrowShape.TRIANGLE,
         label="positively regulates",
         color=Color.GREEN,
         width=Width.DEFAULT,
     ),
-    RelationType.PROVIDES_INPUT_FOR: RelationStyle(
+    Relation.PROVIDES_INPUT_FOR: RelationStyle(
         line_style=LineStyle.SOLID,
         # The widget uses `circle-triangle` in this case, but that shape is not part of the CX2
         # spec. So we need to intentionally deviate and use a supported shape here.
@@ -190,7 +174,7 @@ RELATIONS = {
         color=Color.PURPLE,
         width=Width.DEFAULT,
     ),
-    RelationType.REMOVES_INPUT_FOR: RelationStyle(
+    Relation.REMOVES_INPUT_FOR: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.SQUARE,
         label="removes input for",

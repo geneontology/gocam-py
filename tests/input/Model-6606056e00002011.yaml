@@ -102,7 +102,7 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0050853
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000250
@@ -121,6 +121,7 @@ activities:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
+    predicate: RO:0002233
     molecule: gomodel:6606056e00002011/662af8fa00002864
   causal_associations:
   - type: CausalAssociation
@@ -261,7 +262,7 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0001782
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000250
@@ -280,6 +281,7 @@ activities:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
+    predicate: RO:0002233
     molecule: gomodel:6606056e00002011/662af8fa00002875
   causal_associations:
   - type: CausalAssociation
