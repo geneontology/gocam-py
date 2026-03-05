@@ -318,7 +318,7 @@ activities:
       provided_by:
       - http://www.pombase.org
     term: GO:1904679
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence: []
     provenances:
@@ -327,8 +327,8 @@ activities:
       date: '2025-03-14'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002233
     molecule: gomodel:663d668500002178/67c10cc400004789
-  has_output:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000315
@@ -366,6 +366,7 @@ activities:
       date: '2025-02-26'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002234
     molecule: gomodel:663d668500002178/67b1629100003514
   - type: MoleculeAssociation
     evidence:
@@ -404,6 +405,7 @@ activities:
       date: '2025-02-26'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002234
     molecule: gomodel:663d668500002178/67b1629100003514
   causal_associations:
   - type: CausalAssociation
@@ -755,7 +757,7 @@ activities:
       provided_by:
       - http://www.pombase.org
     term: GO:0046854
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000315
@@ -772,6 +774,7 @@ activities:
       date: '2024-09-08'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002233
     molecule: gomodel:663d668500002178/66c7d41500001893
   - type: MoleculeAssociation
     evidence:
@@ -789,6 +792,7 @@ activities:
       date: '2024-09-08'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002233
     molecule: gomodel:663d668500002178/66c7d41500001893
   causal_associations:
   - type: CausalAssociation
@@ -999,7 +1003,7 @@ activities:
       provided_by:
       - http://www.pombase.org
     term: GO:0046854
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000315
@@ -1016,6 +1020,7 @@ activities:
       date: '2024-09-08'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002233
     molecule: gomodel:663d668500002178/66c7d41500001893
 - id: gomodel:663d668500002178/663d668500002281
   enabled_by:
@@ -1077,7 +1082,7 @@ activities:
       provided_by:
       - http://www.pombase.org
     term: GO:0006661
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence: []
     provenances:
@@ -1086,6 +1091,7 @@ activities:
       date: '2025-02-26'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002233
     molecule: gomodel:663d668500002178/67b1629100003514
   - type: MoleculeAssociation
     evidence: []
@@ -1095,8 +1101,8 @@ activities:
       date: '2025-02-26'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002233
     molecule: gomodel:663d668500002178/67b1629100003513
-  has_output:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000303
@@ -1113,6 +1119,7 @@ activities:
       date: '2024-09-08'
       provided_by:
       - http://www.pombase.org
+    predicate: RO:0002234
     molecule: gomodel:663d668500002178/66c7d41500001893
 - id: gomodel:663d668500002178/663d668500002267
   enabled_by:

@@ -34,17 +34,9 @@ from gocam.datamodel import (
     Model,
     MoleculeAssociation,
 )
-from gocam.translation.minerva_wrapper import (
-    ENABLED_BY,
-    HAS_INPUT,
-    HAS_PRIMARY_INPUT,
-    HAS_PRIMARY_OUTPUT,
-    OCCURS_IN,
-)
+from gocam.vocabulary import Relation
 
 logger = logging.getLogger(__name__)
-
-HAPPENS_DURING = "RO:0002092"
 
 SIMPLE_AXIOM = Union[SubClassOf, AnnotationAssertion]
 
@@ -148,7 +140,7 @@ class TBoxTranslator:
                 pc_id = self.make_id(
                     model, eb.term, *(m.term for m in (eb.members or []))
                 )
-                yield from self.add_edge(activity.id, ENABLED_BY, pc_id)
+                yield from self.add_edge(activity.id, Relation.ENABLED_BY, pc_id)
                 member_labels: list[str] = []
                 if eb.members:
                     for m in eb.members:
@@ -156,7 +148,7 @@ class TBoxTranslator:
                         member_labels.append(self._label(model, m.term))
                 eb_label = f"{self._label(model, eb.term)}[{' '.join(member_labels)}]"
             elif isinstance(eb, EnabledByGeneProductAssociation):
-                yield from self.add_edge(activity.id, ENABLED_BY, eb.term)
+                yield from self.add_edge(activity.id, Relation.ENABLED_BY, eb.term)
                 eb_label = self._label(model, eb.term)
             else:
                 raise NotImplementedError(f"Cannot handle {eb}")
@@ -182,14 +174,8 @@ class TBoxTranslator:
             yield from self.translate_cellular_anatomical_entity(
                 model, activity.id, activity.occurs_in
             )
-        yield from self.translate_io(activity.id, activity.has_input, HAS_INPUT)
-        yield from self.translate_io(
-            activity.id, activity.has_primary_input, HAS_PRIMARY_INPUT
-        )
-        yield from self.translate_io(activity.id, activity.has_output, HAS_OUTPUT)
-        yield from self.translate_io(
-            activity.id, activity.has_primary_output, HAS_PRIMARY_OUTPUT
-        )
+        for ma in activity.molecular_associations or []:
+            yield from self.translate_io(activity.id, ma, ma.predicate)
 
     def translate_biological_process(
         self, model: Model, child: str, ta: BiologicalProcessAssociation
@@ -208,7 +194,9 @@ class TBoxTranslator:
         else:
             yield from self.add_edge(bp_id, PART_OF, model.id)
         if ta.happens_during:
-            yield from self.add_edge(bp_id, HAPPENS_DURING, ta.happens_during.term)
+            yield from self.add_edge(
+                bp_id, Relation.HAPPENS_DURING, ta.happens_during.term
+            )
 
     def translate_cellular_anatomical_entity(
         self,
@@ -222,7 +210,7 @@ class TBoxTranslator:
         cc_id = self.make_id(model, cc_term_id)
         label = f"{self._label(model, cc_term_id)} in {self._label(model, model.id)}"
         yield from self.add_annotation(cc_id, RDFS_LABEL, label)
-        yield from self.add_edge(child, OCCURS_IN, cc_id)
+        yield from self.add_edge(child, Relation.OCCURS_IN, cc_id)
         yield from self.add_edge(cc_id, IS_A, cc_term_id)
         if ta.part_of:
             # recursive; predicate switches to

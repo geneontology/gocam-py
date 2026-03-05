@@ -27,18 +27,14 @@ from gocam.datamodel import (
     ProvenanceInfo,
 )
 from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
-from gocam.vocabulary.taxa import TaxonVocabulary
+from gocam.vocabulary import Relation, TaxonVocabulary
 
-ENABLED_BY = "RO:0002333"
-PART_OF = "BFO:0000050"
-HAS_PART = "BFO:0000051"
-OCCURS_IN = "BFO:0000066"
-HAS_INPUT = "RO:0002233"
-HAS_OUTPUT = "RO:0002234"
-HAS_PRIMARY_INPUT = "RO:0004009"
-HAS_PRIMARY_OUTPUT = "RO:0004008"
-HAPPENS_DURING = "RO:0002092"
-LOCATED_IN = "RO:0001025"
+MOLECULAR_ASSOCIATION_PROPERTIES = (
+    Relation.HAS_INPUT,
+    Relation.HAS_PRIMARY_INPUT,
+    Relation.HAS_OUTPUT,
+    Relation.HAS_PRIMARY_OUTPUT,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -311,7 +307,7 @@ class MinervaWrapper:
             )
 
             for located_in_fact in facts_by_subject_property.get(
-                (individual_id, LOCATED_IN), []
+                (individual_id, Relation.LOCATED_IN), []
             ):
                 evs, prov = _process_fact(located_in_fact)
                 if molecule_node.located_in is not None:
@@ -366,12 +362,12 @@ class MinervaWrapper:
             facts_by_property[fact["property"]].append(fact)
             facts_by_subject_property[(fact["subject"], fact["property"])].append(fact)
 
-        enabled_by_facts = facts_by_property.get(ENABLED_BY, [])
+        enabled_by_facts = facts_by_property.get(Relation.ENABLED_BY, [])
         if not enabled_by_facts:
             translation_warnings.add(
                 TranslationWarning(
                     type=WarningType.NO_ENABLED_BY_FACTS,
-                    message=f"No enabled_by ({ENABLED_BY}) facts found",
+                    message=f"No enabled_by ({Relation.ENABLED_BY}) facts found",
                     entity_id=id,
                 )
             )
@@ -402,7 +398,9 @@ class MinervaWrapper:
             enabled_by_association: EnabledByAssociation
             if PROTEIN_CONTAINING_COMPLEX in root_types:
                 member_associations: list[ProteinComplexMemberAssociation] = []
-                has_part_facts = facts_by_subject_property.get((object_, HAS_PART), [])
+                has_part_facts = facts_by_subject_property.get(
+                    (object_, Relation.HAS_PART), []
+                )
                 for has_part_fact in has_part_facts:
                     member_object = has_part_fact["object"]
                     member_term = individual_to_term.get(member_object)
@@ -456,14 +454,14 @@ class MinervaWrapper:
             activities_by_mf_id[subject].append(activity)
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=PART_OF
+            fact_property=Relation.PART_OF
         ):
             association = BiologicalProcessAssociation(
                 term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
 
             happens_during_facts = facts_by_subject_property.get(
-                (object_, HAPPENS_DURING), []
+                (object_, Relation.HAPPENS_DURING), []
             )
             for happens_during_fact in happens_during_facts:
                 evs, prov = _process_fact(happens_during_fact)
@@ -481,7 +479,9 @@ class MinervaWrapper:
                     provenances=[prov],
                 )
 
-            part_of_facts = facts_by_subject_property.get((object_, PART_OF), [])
+            part_of_facts = facts_by_subject_property.get(
+                (object_, Relation.PART_OF), []
+            )
             for part_of_fact in part_of_facts:
                 evs, prov = _process_fact(part_of_fact)
                 if association.part_of is not None:
@@ -501,13 +501,15 @@ class MinervaWrapper:
             _setattr_with_warning(activity, "part_of", association)
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=OCCURS_IN
+            fact_property=Relation.OCCURS_IN
         ):
             association = CellularAnatomicalEntityAssociation(
                 term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
 
-            part_of_facts = facts_by_subject_property.get((object_, PART_OF), [])
+            part_of_facts = facts_by_subject_property.get(
+                (object_, Relation.PART_OF), []
+            )
             for part_of_fact in part_of_facts:
                 evs, prov = _process_fact(part_of_fact)
                 if association.part_of is not None:
@@ -527,50 +529,40 @@ class MinervaWrapper:
             _setattr_with_warning(activity, "occurs_in", association)
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAPPENS_DURING
+            fact_property=Relation.HAPPENS_DURING
         ):
             association = PhaseAssociation(
                 term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "happens_during", association)
 
-        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAS_INPUT
-        ):
-            if activity.has_input is None:
-                activity.has_input = []
-            _add_molecule_node(object_)
-            activity.has_input.append(
-                MoleculeAssociation(molecule=object_, evidence=evs, provenances=[prov])
-            )
-
-        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAS_PRIMARY_INPUT
-        ):
-            _add_molecule_node(object_)
-            association = MoleculeAssociation(
-                molecule=object_, evidence=evs, provenances=[prov]
-            )
-            _setattr_with_warning(activity, "has_primary_input", association)
-
-        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAS_OUTPUT
-        ):
-            if activity.has_output is None:
-                activity.has_output = []
-            _add_molecule_node(object_)
-            activity.has_output.append(
-                MoleculeAssociation(molecule=object_, evidence=evs, provenances=[prov])
-            )
-
-        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAS_PRIMARY_OUTPUT
-        ):
-            _add_molecule_node(object_)
-            association = MoleculeAssociation(
-                molecule=object_, evidence=evs, provenances=[prov]
-            )
-            _setattr_with_warning(activity, "has_primary_output", association)
+        for fact_property, facts in facts_by_property.items():
+            if fact_property not in MOLECULAR_ASSOCIATION_PROPERTIES:
+                continue
+            for fact in facts:
+                subject, object_ = fact["subject"], fact["object"]
+                if object_ not in individual_to_term:
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.MISSING_TERM,
+                            message=f"Missing term for object {object_} in fact",
+                            entity_id=object_,
+                        )
+                    )
+                    continue
+                subject_activities = activities_by_mf_id.get(subject, [])
+                for activity in subject_activities:
+                    evs, prov = _process_fact(fact)
+                    _add_molecule_node(object_)
+                    association = MoleculeAssociation(
+                        molecule=object_,
+                        predicate=fact_property,
+                        evidence=evs,
+                        provenances=[prov],
+                    )
+                    if activity.molecular_associations is None:
+                        activity.molecular_associations = []
+                    activity.molecular_associations.append(association)
 
         for fact_property, facts in facts_by_property.items():
             for fact in facts:
