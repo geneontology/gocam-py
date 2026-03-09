@@ -250,7 +250,7 @@ def main(
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
 
-    reports = [
+    reports: list[IndexReport] = [
         ContributorIndexReport("contributor_index.json"),
         EntityIndexReport("entity_index.json"),
         EvidenceIndexReport("evidence_index.json"),
