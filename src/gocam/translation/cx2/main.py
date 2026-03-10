@@ -21,7 +21,6 @@ from gocam.translation.cx2.style import (
     VISUAL_EDITOR_PROPERTIES,
     VISUAL_PROPERTIES,
     NodeType,
-    RelationType,
 )
 from gocam.utils import remove_species_code_suffix
 from gocam.vocabulary import Relation
@@ -270,7 +269,7 @@ def model_to_cx2(
             for association in activity.causal_associations:
                 if association.downstream_activity in activity_nodes_by_activity_id:
                     try:
-                        relation_type = RelationType(association.predicate)
+                        relation_type = Relation(association.predicate)
                         relation_style = RELATIONS.get(relation_type, None)
                     except ValueError:
                         relation_style = None
