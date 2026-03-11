@@ -141,11 +141,20 @@ def model_to_cx2(
                     f"Association molecule {association.molecule} not found in model.molecules: skipping"
                 )
                 continue
-            relation = Relation(association.predicate)
-            edge_attributes = {
-                "name": relation.name.lower().replace("_", " "),
-                "represents": relation.value,
-            }
+            try:
+                relation = Relation(association.predicate)
+                edge_attributes = {
+                    "name": relation.name.lower().replace("_", " "),
+                    "represents": relation.value,
+                }
+            except ValueError:
+                logger.warning(
+                    f"Unknown Relation for molecule association predicate: {association.predicate}"
+                )
+                edge_attributes = {
+                    "name": association.predicate,
+                    "represents": association.predicate,
+                }
             # Filter proteins at CX2 level (per issue #65)
             # Skip if the term is an INFORMATION_BIOMACROMOLECULE
             # We check if it's already in activity_nodes_by_enabled_by_id as a simple
