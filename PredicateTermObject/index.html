@@ -261,7 +261,7 @@
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
 <h1 id="class-predicatetermobject">Class: PredicateTermObject</h1>
-<p><em>A term object that represents a taxon term from NCBITaxon</em></p>
+<p><em>A term object that represents an OWL relation from the OBO Relations Ontology</em></p>
 <p>URI: <a href="https://w3id.org/gocam/PredicateTermObject">gocam:PredicateTermObject</a></p>
 <div class="mermaid"> classDiagram
     class PredicateTermObject
@@ -343,6 +343,12 @@
 <td>range</td>
 <td><a href="./">PredicateTermObject</a></td>
 </tr>
+<tr>
+<td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">PredicateTermObject</a></td>
+</tr>
 </tbody>
 </table>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
@@ -381,7 +387,8 @@
 <pre><code class="language-yaml">name: PredicateTermObject
 id_prefixes:
 - RO
-description: A term object that represents a taxon term from NCBITaxon
+description: A term object that represents an OWL relation from the OBO Relations
+  Ontology
 from_schema: https://w3id.org/gocam
 is_a: TermObject
 
@@ -392,7 +399,8 @@ is_a: TermObject
 <pre><code class="language-yaml">name: PredicateTermObject
 id_prefixes:
 - RO
-description: A term object that represents a taxon term from NCBITaxon
+description: A term object that represents an OWL relation from the OBO Relations
+  Ontology
 from_schema: https://w3id.org/gocam
 is_a: TermObject
 attributes:

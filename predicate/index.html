@@ -350,23 +350,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Identifier and Mapping Information">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#schema-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -412,7 +395,6 @@
 
 
 <h1 id="slot-predicate">Slot: predicate</h1>
-<p><em>The RO relation that represents the type of relationship</em></p>
 <p>URI: <a href="https://w3id.org/gocam/predicate">gocam:predicate</a>
 Alias: predicate</p>
 <!-- no inheritance hierarchy -->
@@ -427,6 +409,11 @@ Alias: predicate</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td>An association between an activity and a molecule node</td>
+<td>no</td>
+</tr>
 <tr>
 <td><a href="../CausalAssociation/">CausalAssociation</a></td>
 <td>A causal association between two activities</td>
@@ -446,11 +433,11 @@ Alias: predicate</p>
 <tbody>
 <tr>
 <td>Range</td>
-<td><a href="../PredicateTermObject/">PredicateTermObject</a></td>
+<td><a href="../String/">String</a></td>
 </tr>
 <tr>
 <td>Domain Of</td>
-<td><a href="../CausalAssociation/">CausalAssociation</a></td>
+<td><a href="../CausalAssociation/">CausalAssociation</a>, <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
 </tr>
 </tbody>
 </table>
@@ -464,30 +451,12 @@ Alias: predicate</p>
 </thead>
 <tbody>
 <tr>
-<td>### Slot Characteristics</td>
+<td></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Owner</td>
-<td><a href="../CausalAssociation/">CausalAssociation</a></td>
-</tr>
-</tbody>
-</table>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
 <h2 id="mappings">Mappings</h2>
 <table>
 <thead>
@@ -511,14 +480,11 @@ Alias: predicate</p>
 <details>
 
 <pre><code class="language-yaml">name: predicate
-description: The RO relation that represents the type of relationship
-from_schema: https://w3id.org/gocam
-rank: 1000
 alias: predicate
-owner: CausalAssociation
 domain_of:
 - CausalAssociation
-range: PredicateTermObject
+- MoleculeAssociation
+range: string
 
 </code></pre>
 

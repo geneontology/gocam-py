@@ -282,6 +282,17 @@
 
 
 
+      MoleculeAssociation : predicate
+
+
+
+
+
+        MoleculeAssociation --&gt; "1" PredicateTermObject : predicate
+        click PredicateTermObject href "../PredicateTermObject/"
+
+
+
       MoleculeAssociation : provenances
 
 
@@ -315,6 +326,12 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../predicate/">predicate</a></td>
+<td>1 <br/> <a href="../PredicateTermObject/">PredicateTermObject</a></td>
+<td>The RO relation that represents the type of relationship</td>
+<td>direct</td>
+</tr>
 <tr>
 <td><a href="../molecule/">molecule</a></td>
 <td>0..1 <br/> <a href="../MoleculeNode/">MoleculeNode</a></td>
@@ -354,25 +371,7 @@
 <tbody>
 <tr>
 <td><a href="../Activity/">Activity</a></td>
-<td><a href="../has_input/">has_input</a></td>
-<td>range</td>
-<td><a href="./">MoleculeAssociation</a></td>
-</tr>
-<tr>
-<td><a href="../Activity/">Activity</a></td>
-<td><a href="../has_primary_input/">has_primary_input</a></td>
-<td>range</td>
-<td><a href="./">MoleculeAssociation</a></td>
-</tr>
-<tr>
-<td><a href="../Activity/">Activity</a></td>
-<td><a href="../has_output/">has_output</a></td>
-<td>range</td>
-<td><a href="./">MoleculeAssociation</a></td>
-</tr>
-<tr>
-<td><a href="../Activity/">Activity</a></td>
-<td><a href="../has_primary_output/">has_primary_output</a></td>
+<td><a href="../molecular_associations/">molecular_associations</a></td>
 <td>range</td>
 <td><a href="./">MoleculeAssociation</a></td>
 </tr>
@@ -411,6 +410,15 @@ description: An association between an activity and a molecule node
 from_schema: https://w3id.org/gocam
 is_a: Association
 attributes:
+  predicate:
+    name: predicate
+    description: The RO relation that represents the type of relationship
+    from_schema: https://w3id.org/gocam
+    domain_of:
+    - CausalAssociation
+    - MoleculeAssociation
+    range: PredicateTermObject
+    required: true
   molecule:
     name: molecule
     description: The molecule node that is associated with this activity
@@ -429,6 +437,17 @@ description: An association between an activity and a molecule node
 from_schema: https://w3id.org/gocam
 is_a: Association
 attributes:
+  predicate:
+    name: predicate
+    description: The RO relation that represents the type of relationship
+    from_schema: https://w3id.org/gocam
+    alias: predicate
+    owner: MoleculeAssociation
+    domain_of:
+    - CausalAssociation
+    - MoleculeAssociation
+    range: PredicateTermObject
+    required: true
   molecule:
     name: molecule
     description: The molecule node that is associated with this activity
