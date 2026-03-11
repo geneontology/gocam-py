@@ -1,6 +1,8 @@
 """
 Shared pytest fixtures for all tests.
 """
+
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
@@ -15,24 +17,26 @@ INPUT_DIR = TESTS_DIR / "input"
 
 
 @pytest.fixture
-def get_model():
+def get_model() -> Callable[[str], Model]:
     """
     Factory fixture for loading models from YAML files.
-    
+
     Usage:
         def test_something(get_model):
             model = get_model('input/Model-63f809ec00000701')  # loads from tests/input/
     """
-    def _get_model(model_path):
-        if model_path.startswith('input/'):
+
+    def _get_model(model_path: str) -> Model:
+        if model_path.startswith("input/"):
             full_path = INPUT_DIR / f"{model_path[6:]}.yaml"
         else:
             raise ValueError(f"Model path must start with 'input/', got: {model_path}")
-        
+
         with open(full_path, "r") as f:
             deserialized = yaml.safe_load(f)
         model = Model.model_validate(deserialized)
         return model
+
     return _get_model
 
 

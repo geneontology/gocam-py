@@ -102,7 +102,7 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0050853
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000250
@@ -121,7 +121,28 @@ activities:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
+    predicate: RO:0002233
     molecule: gomodel:6606056e00002011/662af8fa00002864
+  - type: MoleculeAssociation
+    evidence:
+    - term: ECO:0000250
+      reference: GO_REF:0000024
+      with_objects:
+      - MGI:96892
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7646-0052
+      date: '2024-05-07'
+      provided_by:
+      - https://www.uniprot.org
+    predicate: RO:0012001
+    molecule: gomodel:6606056e00002011/662af8fa00002871
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -261,7 +282,7 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0001782
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000250
@@ -280,6 +301,7 @@ activities:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
+    predicate: RO:0002233
     molecule: gomodel:6606056e00002011/662af8fa00002875
   causal_associations:
   - type: CausalAssociation
@@ -358,6 +380,25 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0050859
+  molecular_associations:
+  - type: MoleculeAssociation
+    evidence:
+    - term: ECO:0000314
+      reference: PMID:27810925
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0001-7646-0052
+        date: '2024-05-07'
+        provided_by:
+        - https://www.uniprot.org
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7646-0052
+      date: '2024-05-07'
+      provided_by:
+      - https://www.uniprot.org
+    predicate: RO:0012001
+    molecule: gomodel:6606056e00002011/662af8fa00002871
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -382,6 +423,18 @@ molecules:
   term: UniProtKB:P21854
 - id: gomodel:6606056e00002011/662af8fa00002864
   term: UniProtKB:P07948
+- id: gomodel:6606056e00002011/662af8fa00002871
+  term: CHEBI:166824
+  located_in:
+    type: CellularAnatomicalEntityAssociation
+    evidence: []
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-7646-0052
+      date: '2024-05-07'
+      provided_by:
+      - https://www.uniprot.org
+    term: GO:0005615
 objects:
 - id: GO:0005615
   label: extracellular space

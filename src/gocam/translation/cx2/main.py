@@ -2,7 +2,7 @@ import json
 import logging
 import re
 from functools import cache
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 import networkx as nx
 import prefixmaps
@@ -21,9 +21,9 @@ from gocam.translation.cx2.style import (
     VISUAL_EDITOR_PROPERTIES,
     VISUAL_PROPERTIES,
     NodeType,
-    RelationType,
 )
 from gocam.utils import remove_species_code_suffix
+from gocam.vocabulary import Relation
 
 logger = logging.getLogger(__name__)
 
@@ -128,13 +128,10 @@ def model_to_cx2(
         return formatted
 
     def _add_input_output_nodes(
-        associations: Optional[Union[MoleculeAssociation, List[MoleculeAssociation]]],
-        edge_attributes: dict,
+        associations: Optional[List[MoleculeAssociation]],
     ) -> None:
         if associations is None:
             return
-        if not isinstance(associations, list):
-            associations = [associations]
         for association in associations:
             if association.molecule is None:
                 continue
@@ -144,6 +141,20 @@ def model_to_cx2(
                     f"Association molecule {association.molecule} not found in model.molecules: skipping"
                 )
                 continue
+            try:
+                relation = Relation(association.predicate)
+                edge_attributes = {
+                    "name": relation.name.lower().replace("_", " "),
+                    "represents": relation.value,
+                }
+            except ValueError:
+                logger.warning(
+                    f"Unknown Relation for molecule association predicate: {association.predicate}"
+                )
+                edge_attributes = {
+                    "name": association.predicate,
+                    "represents": association.predicate,
+                }
             # Filter proteins at CX2 level (per issue #65)
             # Skip if the term is an INFORMATION_BIOMACROMOLECULE
             # We check if it's already in activity_nodes_by_enabled_by_id as a simple
@@ -256,20 +267,7 @@ def model_to_cx2(
     # Add nodes for input/output molecules and create edges to activity nodes
     if gocam.activities:
         for activity in gocam.activities:
-            _add_input_output_nodes(
-                activity.has_input, {"name": "has input", "represents": "RO:0002233"}
-            )
-            _add_input_output_nodes(
-                activity.has_output, {"name": "has output", "represents": "RO:0002234"}
-            )
-            _add_input_output_nodes(
-                activity.has_primary_input,
-                {"name": "has primary input", "represents": "RO:0004009"},
-            )
-            _add_input_output_nodes(
-                activity.has_primary_output,
-                {"name": "has primary output", "represents": "RO:0004008"},
-            )
+            _add_input_output_nodes(activity.molecular_associations)
 
     # Add edges for causal associations between activity nodes
     if gocam.activities:
@@ -280,7 +278,7 @@ def model_to_cx2(
             for association in activity.causal_associations:
                 if association.downstream_activity in activity_nodes_by_activity_id:
                     try:
-                        relation_type = RelationType(association.predicate)
+                        relation_type = Relation(association.predicate)
                         relation_style = RELATIONS.get(relation_type, None)
                     except ValueError:
                         relation_style = None

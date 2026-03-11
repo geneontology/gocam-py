@@ -1,10 +1,13 @@
+from collections.abc import Callable
+
 from ndex2.cx2 import CX2Network, RawCX2NetworkFactory
 
-from gocam.datamodel import MoleculeNode
+from gocam.datamodel import Model, MoleculeAssociation, MoleculeNode
 from gocam.translation.cx2 import model_to_cx2
+from gocam.vocabulary import Relation
 
 
-def test_model_to_cx2(get_model):
+def test_model_to_cx2(get_model: Callable[[str], Model]):
     """Test the model_to_cx2 function."""
     model = get_model("input/Model-663d668500002178")
     cx2 = model_to_cx2(model)
@@ -20,7 +23,7 @@ def test_model_to_cx2(get_model):
     assert len(edge_aspect["edges"]) == 21, "Incorrect number of edges in CX2"
 
 
-def test_load_cx2_to_ndex(get_model):
+def test_load_cx2_to_ndex(get_model: Callable[[str], Model]):
     """Test loading generated CX2 file by NDEx library."""
     model = get_model("input/Model-663d668500002178")
     cx2 = model_to_cx2(model)
@@ -33,7 +36,7 @@ def test_load_cx2_to_ndex(get_model):
     assert len(cx2_network.get_edges()) == 21, "Incorrect number of edges in CX2"
 
 
-def test_node_type_attribute(get_model):
+def test_node_type_attribute(get_model: Callable[[str], Model]):
     """Test that the `type` attribute is correctly set for nodes."""
     model = get_model("input/Model-6606056e00002011")
     cx2 = model_to_cx2(model)
@@ -50,7 +53,7 @@ def test_node_type_attribute(get_model):
             assert node_attrs["type"] == "gene" or node_attrs["type"] == "molecule"
 
 
-def test_node_name_and_member_attributes(get_model):
+def test_node_name_and_member_attributes(get_model: Callable[[str], Model]):
     model = get_model("input/Model-6606056e00002011")
     cx2 = model_to_cx2(model)
 
@@ -67,7 +70,7 @@ def test_node_name_and_member_attributes(get_model):
             assert "Hsap" not in node_attrs["name"]
 
 
-def test_activity_input_output_notes(get_model):
+def test_activity_input_output_notes(get_model: Callable[[str], Model]):
     model = get_model("input/Model-63f809ec00000701")
     cx2 = model_to_cx2(model)
 
@@ -104,36 +107,38 @@ def test_activity_input_output_notes(get_model):
     assert output_edge is not None
 
 
-def test_issue_65_protein_inputs_filtered(get_model):
+def test_issue_65_protein_inputs_filtered(get_model: Callable[[str], Model]):
     """Test that protein inputs are filtered at the CX level (issue #65)"""
-    from gocam.datamodel import MoleculeAssociation
-
     model = get_model("input/Model-63f809ec00000701")
 
     # Find activities with protein inputs
     activities_with_protein_inputs = []
 
     # Add a protein input to an activity to test filtering
-    for activity in model.activities:
+    for activity in model.activities or []:
         if activity.enabled_by is None:
             continue
 
         # Find another activity to use as input
-        for other_activity in model.activities:
+        for other_activity in model.activities or []:
             if other_activity.enabled_by is None or other_activity == activity:
                 continue
 
             # Add the other activity's enabled_by as an input to this activity
-            if activity.has_input is None:
-                activity.has_input = []
+            if activity.molecular_associations is None:
+                activity.molecular_associations = []
 
             molecule_node = MoleculeNode(
                 id="gomodel:63f809ec00000701/test-protein",
-                term=other_activity.enabled_by.term,
+                term=other_activity.enabled_by.term or "UNKNOWN",
             )
+            if model.molecules is None:
+                model.molecules = []
             model.molecules.append(molecule_node)
-            activity.has_input.append(
-                MoleculeAssociation(molecule=molecule_node.id, evidence=[])
+            activity.molecular_associations.append(
+                MoleculeAssociation(
+                    molecule=molecule_node.id, predicate=Relation.HAS_INPUT, evidence=[]
+                )
             )
             activities_with_protein_inputs.append(activity)
             break
@@ -154,7 +159,7 @@ def test_issue_65_protein_inputs_filtered(get_model):
     # Create a list of protein terms
     protein_terms = [
         activity.enabled_by.term
-        for activity in model.activities
+        for activity in model.activities or []
         if activity.enabled_by is not None
     ]
 

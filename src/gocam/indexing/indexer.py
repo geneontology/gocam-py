@@ -25,6 +25,7 @@ from gocam.datamodel import (
     TermObject,
 )
 from gocam.utils import model_to_digraph
+from gocam.vocabulary import Relation
 
 logger = logging.getLogger(__name__)
 
@@ -83,17 +84,8 @@ def _iter_model_associations(model: Model) -> Iterable[Association]:
         if activity.happens_during:
             yield activity.happens_during
 
-        if activity.has_primary_input:
-            yield activity.has_primary_input
-
-        for has_input in activity.has_input or []:
-            yield has_input
-
-        if activity.has_primary_output:
-            yield activity.has_primary_output
-
-        for has_output in activity.has_output or []:
-            yield has_output
+        for molecule_association in activity.molecular_associations or []:
+            yield molecule_association
 
         for causal_association in activity.causal_associations or []:
             yield causal_association
@@ -390,10 +382,14 @@ class Indexer:
                 all_occurs_ins.add(activity.occurs_in.term)
                 annoton_term_id_parts.append(activity.occurs_in.term)
 
-            if activity.has_input:
-                for ta in activity.has_input:
-                    if ta.molecule and ta.molecule in molecule_nodes_by_id:
-                        input_molecule = molecule_nodes_by_id[ta.molecule]
+            if activity.molecular_associations:
+                for ma in activity.molecular_associations:
+                    if (
+                        ma.molecule
+                        and ma.molecule in molecule_nodes_by_id
+                        and ma.predicate == Relation.HAS_INPUT
+                    ):
+                        input_molecule = molecule_nodes_by_id[ma.molecule]
                         all_has_inputs.add(input_molecule.term)
                         annoton_term_id_parts.append(input_molecule.term)
 

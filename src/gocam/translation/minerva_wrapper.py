@@ -27,18 +27,32 @@ from gocam.datamodel import (
     ProvenanceInfo,
 )
 from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
-from gocam.vocabulary.taxa import TaxonVocabulary
+from gocam.vocabulary import Relation, TaxonVocabulary
 
-ENABLED_BY = "RO:0002333"
-PART_OF = "BFO:0000050"
-HAS_PART = "BFO:0000051"
-OCCURS_IN = "BFO:0000066"
-HAS_INPUT = "RO:0002233"
-HAS_OUTPUT = "RO:0002234"
-HAS_PRIMARY_INPUT = "RO:0004009"
-HAS_PRIMARY_OUTPUT = "RO:0004008"
-HAPPENS_DURING = "RO:0002092"
-LOCATED_IN = "RO:0001025"
+# These are properties which occur in facts that represent associations between molecular functions
+# and molecules, where the subject is the molecular function and the object is the molecule. These
+# facts can be directly translated into MoleculeAssociation objects on the relevant Activity.
+MOLECULAR_ASSOCIATION_PROPERTIES = (
+    Relation.HAS_INPUT,
+    Relation.HAS_PRIMARY_INPUT,
+    Relation.HAS_OUTPUT,
+    Relation.HAS_PRIMARY_OUTPUT,
+    Relation.HAS_SMALL_MOLECULE_ACTIVATOR,
+    Relation.HAS_SMALL_MOLECULE_INHIBITOR,
+)
+
+# These keys of this dict are properties which occur in facts that represent associations between
+# molecular functions and molecules, where the subject is the molecule and the object is the
+# molecular function. The values of the dict are the corresponding inverse properties. Because the
+# data model is oriented around activities (molecular functions), if we encounter a fact with one of
+# the key properties, we will use the corresponding inverse property to create a MoleculeAssociation
+# on the relevant Activity.
+MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES = {
+    Relation.INPUT_OF: Relation.HAS_INPUT,
+    Relation.OUTPUT_OF: Relation.HAS_OUTPUT,
+    Relation.IS_SMALL_MOLECULE_ACTIVATOR_OF: Relation.HAS_SMALL_MOLECULE_ACTIVATOR,
+    Relation.IS_SMALL_MOLECULE_INHIBITOR_OF: Relation.HAS_SMALL_MOLECULE_INHIBITOR,
+}
 
 logger = logging.getLogger(__name__)
 
@@ -290,10 +304,11 @@ class MinervaWrapper:
                     evs, provenance = _process_fact(fact)
                     yield activity, object_, evs, provenance
 
-        def _add_molecule_node(individual_id: str) -> None:
+        def _add_molecule_node(individual_id: str) -> MoleculeNode | None:
+            """Add a molecule node for a given individual ID, if it doesn't already exist."""
             if individual_id in molecule_nodes_by_id:
                 # Molecule node already exists, nothing to do
-                return
+                return molecule_nodes_by_id[individual_id]
 
             if individual_id not in individual_to_term:
                 translation_warnings.add(
@@ -303,7 +318,7 @@ class MinervaWrapper:
                         entity_id=individual_id,
                     )
                 )
-                return
+                return None
 
             molecule_node = MoleculeNode(
                 id=individual_id,
@@ -311,7 +326,7 @@ class MinervaWrapper:
             )
 
             for located_in_fact in facts_by_subject_property.get(
-                (individual_id, LOCATED_IN), []
+                (individual_id, Relation.LOCATED_IN), []
             ):
                 evs, prov = _process_fact(located_in_fact)
                 if molecule_node.located_in is not None:
@@ -329,6 +344,55 @@ class MinervaWrapper:
                 )
 
             molecule_nodes_by_id[individual_id] = molecule_node
+            return molecule_node
+
+        def _add_molecule_association(fact: dict, *, is_inverse: bool = False) -> None:
+            """Add a molecule association to the relevant activity based on a fact."""
+            if not is_inverse:
+                mf_individual_id = fact["subject"]
+                molecule_individual_id = fact["object"]
+                predicate = fact["property"]
+            else:
+                mf_individual_id = fact["object"]
+                molecule_individual_id = fact["subject"]
+                predicate = MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES.get(
+                    fact["property"], None
+                )
+                if predicate is None:
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.UNKNOWN_PROPERTY_INVERSE,
+                            message=f"Fact property '{fact['property']}' does not have a known inverse",
+                            entity_id=fact["property"],
+                        )
+                    )
+                    return
+
+            molecule_node = _add_molecule_node(molecule_individual_id)
+            if molecule_node is None:
+                return
+
+            activities = activities_by_mf_id.get(mf_individual_id)
+            if not activities:
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.NO_ACTIVITIES,
+                        message=f"No activities found for molecular function individual {mf_individual_id}",
+                        entity_id=mf_individual_id,
+                    )
+                )
+                return
+            evs, prov = _process_fact(fact)
+            for activity in activities:
+                association = MoleculeAssociation(
+                    molecule=molecule_node.id,
+                    predicate=predicate,
+                    evidence=evs,
+                    provenances=[prov],
+                )
+                if activity.molecular_associations is None:
+                    activity.molecular_associations = []
+                activity.molecular_associations.append(association)
 
         for individual in minerva_obj["individuals"]:
             individual_id = individual["id"]
@@ -366,12 +430,12 @@ class MinervaWrapper:
             facts_by_property[fact["property"]].append(fact)
             facts_by_subject_property[(fact["subject"], fact["property"])].append(fact)
 
-        enabled_by_facts = facts_by_property.get(ENABLED_BY, [])
+        enabled_by_facts = facts_by_property.get(Relation.ENABLED_BY, [])
         if not enabled_by_facts:
             translation_warnings.add(
                 TranslationWarning(
                     type=WarningType.NO_ENABLED_BY_FACTS,
-                    message=f"No enabled_by ({ENABLED_BY}) facts found",
+                    message=f"No enabled_by ({Relation.ENABLED_BY}) facts found",
                     entity_id=id,
                 )
             )
@@ -402,7 +466,9 @@ class MinervaWrapper:
             enabled_by_association: EnabledByAssociation
             if PROTEIN_CONTAINING_COMPLEX in root_types:
                 member_associations: list[ProteinComplexMemberAssociation] = []
-                has_part_facts = facts_by_subject_property.get((object_, HAS_PART), [])
+                has_part_facts = facts_by_subject_property.get(
+                    (object_, Relation.HAS_PART), []
+                )
                 for has_part_fact in has_part_facts:
                     member_object = has_part_fact["object"]
                     member_term = individual_to_term.get(member_object)
@@ -456,14 +522,14 @@ class MinervaWrapper:
             activities_by_mf_id[subject].append(activity)
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=PART_OF
+            fact_property=Relation.PART_OF
         ):
             association = BiologicalProcessAssociation(
                 term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
 
             happens_during_facts = facts_by_subject_property.get(
-                (object_, HAPPENS_DURING), []
+                (object_, Relation.HAPPENS_DURING), []
             )
             for happens_during_fact in happens_during_facts:
                 evs, prov = _process_fact(happens_during_fact)
@@ -481,7 +547,9 @@ class MinervaWrapper:
                     provenances=[prov],
                 )
 
-            part_of_facts = facts_by_subject_property.get((object_, PART_OF), [])
+            part_of_facts = facts_by_subject_property.get(
+                (object_, Relation.PART_OF), []
+            )
             for part_of_fact in part_of_facts:
                 evs, prov = _process_fact(part_of_fact)
                 if association.part_of is not None:
@@ -501,13 +569,15 @@ class MinervaWrapper:
             _setattr_with_warning(activity, "part_of", association)
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=OCCURS_IN
+            fact_property=Relation.OCCURS_IN
         ):
             association = CellularAnatomicalEntityAssociation(
                 term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
 
-            part_of_facts = facts_by_subject_property.get((object_, PART_OF), [])
+            part_of_facts = facts_by_subject_property.get(
+                (object_, Relation.PART_OF), []
+            )
             for part_of_fact in part_of_facts:
                 evs, prov = _process_fact(part_of_fact)
                 if association.part_of is not None:
@@ -527,50 +597,20 @@ class MinervaWrapper:
             _setattr_with_warning(activity, "occurs_in", association)
 
         for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAPPENS_DURING
+            fact_property=Relation.HAPPENS_DURING
         ):
             association = PhaseAssociation(
                 term=individual_to_term[object_], evidence=evs, provenances=[prov]
             )
             _setattr_with_warning(activity, "happens_during", association)
 
-        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAS_INPUT
-        ):
-            if activity.has_input is None:
-                activity.has_input = []
-            _add_molecule_node(object_)
-            activity.has_input.append(
-                MoleculeAssociation(molecule=object_, evidence=evs, provenances=[prov])
-            )
-
-        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAS_PRIMARY_INPUT
-        ):
-            _add_molecule_node(object_)
-            association = MoleculeAssociation(
-                molecule=object_, evidence=evs, provenances=[prov]
-            )
-            _setattr_with_warning(activity, "has_primary_input", association)
-
-        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAS_OUTPUT
-        ):
-            if activity.has_output is None:
-                activity.has_output = []
-            _add_molecule_node(object_)
-            activity.has_output.append(
-                MoleculeAssociation(molecule=object_, evidence=evs, provenances=[prov])
-            )
-
-        for activity, object_, evs, prov in _iter_activities_by_fact_subject(
-            fact_property=HAS_PRIMARY_OUTPUT
-        ):
-            _add_molecule_node(object_)
-            association = MoleculeAssociation(
-                molecule=object_, evidence=evs, provenances=[prov]
-            )
-            _setattr_with_warning(activity, "has_primary_output", association)
+        for fact_property, facts in facts_by_property.items():
+            if fact_property in MOLECULAR_ASSOCIATION_PROPERTIES:
+                for fact in facts:
+                    _add_molecule_association(fact)
+            elif fact_property in MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES:
+                for fact in facts:
+                    _add_molecule_association(fact, is_inverse=True)
 
         for fact_property, facts in facts_by_property.items():
             for fact in facts:

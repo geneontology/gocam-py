@@ -284,12 +284,7 @@ class Activity(ConfiguredBaseModel):
                        'GrossAnatomyAssociation'],
          'recommended': True} })
     happens_during: Optional[PhaseAssociation] = Field(default=None, description="""The phase during which the activity takes place""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'BiologicalProcessAssociation']} })
-    has_input: Optional[list[MoleculeAssociation]] = Field(default=None, description="""The input molecules that are directly consumed by the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'todos': ['resolve has_input vs has_primary_input']} })
-    has_primary_input: Optional[MoleculeAssociation] = Field(default=None, description="""The primary input molecule that is directly consumed by the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'todos': ['resolve has_input vs has_primary_input']} })
-    has_output: Optional[list[MoleculeAssociation]] = Field(default=None, description="""The output molecules that are directly produced by the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'todos': ['resolve has_output vs has_primary_output']} })
-    has_primary_output: Optional[MoleculeAssociation] = Field(default=None, description="""The primary output molecule that is directly produced by the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'todos': ['resolve has_output vs has_primary_output']} })
+    molecular_associations: Optional[list[MoleculeAssociation]] = Field(default=None, description="""Associations between the activity and molecules that are relevant to it. This includes molecules that are products/substrates or regulators of the activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity']} })
     causal_associations: Optional[list[CausalAssociation]] = Field(default=None, description="""The causal associations that flow out of this activity""", json_schema_extra = { "linkml_meta": {'comments': ['All activities in a model must be connected to at least one '
                       'other activity. If a an activity has no outgoing activities '
                       '(i.e the value of this slot is empty) then it is a terminal '
@@ -499,7 +494,7 @@ class CausalAssociation(Association):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    predicate: Optional[str] = Field(default=None, description="""The RO relation that represents the type of relationship""", json_schema_extra = { "linkml_meta": {'domain_of': ['CausalAssociation']} })
+    predicate: Optional[str] = Field(default=None, description="""The RO relation that represents the type of relationship""", json_schema_extra = { "linkml_meta": {'domain_of': ['CausalAssociation', 'MoleculeAssociation']} })
     downstream_activity: Optional[str] = Field(default=None, description="""The activity unit that is downstream of this one""", json_schema_extra = { "linkml_meta": {'aliases': ['object'], 'domain_of': ['CausalAssociation']} })
     type: Literal["CausalAssociation"] = Field(default="CausalAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
@@ -714,6 +709,7 @@ class MoleculeAssociation(Association):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
+    predicate: str = Field(default=..., description="""The RO relation that represents the type of relationship""", json_schema_extra = { "linkml_meta": {'domain_of': ['CausalAssociation', 'MoleculeAssociation']} })
     molecule: Optional[str] = Field(default=None, description="""The molecule node that is associated with this activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeAssociation']} })
     type: Literal["MoleculeAssociation"] = Field(default="MoleculeAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
@@ -911,7 +907,7 @@ class TaxonTermObject(TermObject):
 
 class PredicateTermObject(TermObject):
     """
-    A term object that represents a taxon term from NCBITaxon
+    A term object that represents an OWL relation from the OBO Relations Ontology
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['RO']})
 

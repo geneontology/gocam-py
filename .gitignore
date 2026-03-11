@@ -1,6 +1,7 @@
 .idea
 tmp
 tests/output
+examples/output
 /docs/
 /project/docs/
 /tmp/
