@@ -372,7 +372,16 @@ class MinervaWrapper:
             if molecule_node is None:
                 return
 
-            activities = activities_by_mf_id.get(mf_individual_id, [])
+            activities = activities_by_mf_id.get(mf_individual_id)
+            if not activities:
+                translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.NO_ACTIVITIES,
+                        message=f"No activities found for molecular function individual {mf_individual_id}",
+                        entity_id=mf_individual_id,
+                    )
+                )
+                return
             evs, prov = _process_fact(fact)
             for activity in activities:
                 association = MoleculeAssociation(
