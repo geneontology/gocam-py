@@ -29,12 +29,30 @@ from gocam.datamodel import (
 from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
 from gocam.vocabulary import Relation, TaxonVocabulary
 
+# These are properties which occur in facts that represent associations between molecular functions
+# and molecules, where the subject is the molecular function and the object is the molecule. These
+# facts can be directly translated into MoleculeAssociation objects on the relevant Activity.
 MOLECULAR_ASSOCIATION_PROPERTIES = (
     Relation.HAS_INPUT,
     Relation.HAS_PRIMARY_INPUT,
     Relation.HAS_OUTPUT,
     Relation.HAS_PRIMARY_OUTPUT,
+    Relation.HAS_SMALL_MOLECULE_ACTIVATOR,
+    Relation.HAS_SMALL_MOLECULE_INHIBITOR,
 )
+
+# These keys of this dict are properties which occur in facts that represent associations between
+# molecular functions and molecules, where the subject is the molecule and the object is the
+# molecular function. The values of the dict are the corresponding inverse properties. Because the
+# data model is oriented around activities (molecular functions), if we encounter a fact with one of
+# the key properties, we will use the corresponding inverse property to create a MoleculeAssociation
+# on the relevant Activity.
+MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES = {
+    Relation.INPUT_OF: Relation.HAS_INPUT,
+    Relation.OUTPUT_OF: Relation.HAS_OUTPUT,
+    Relation.IS_SMALL_MOLECULE_ACTIVATOR_OF: Relation.HAS_SMALL_MOLECULE_ACTIVATOR,
+    Relation.IS_SMALL_MOLECULE_INHIBITOR_OF: Relation.HAS_SMALL_MOLECULE_INHIBITOR,
+}
 
 logger = logging.getLogger(__name__)
 
@@ -286,10 +304,11 @@ class MinervaWrapper:
                     evs, provenance = _process_fact(fact)
                     yield activity, object_, evs, provenance
 
-        def _add_molecule_node(individual_id: str) -> None:
+        def _add_molecule_node(individual_id: str) -> MoleculeNode | None:
+            """Add a molecule node for a given individual ID, if it doesn't already exist."""
             if individual_id in molecule_nodes_by_id:
                 # Molecule node already exists, nothing to do
-                return
+                return molecule_nodes_by_id[individual_id]
 
             if individual_id not in individual_to_term:
                 translation_warnings.add(
@@ -299,7 +318,7 @@ class MinervaWrapper:
                         entity_id=individual_id,
                     )
                 )
-                return
+                return None
 
             molecule_node = MoleculeNode(
                 id=individual_id,
@@ -325,6 +344,46 @@ class MinervaWrapper:
                 )
 
             molecule_nodes_by_id[individual_id] = molecule_node
+            return molecule_node
+
+        def _add_molecule_association(fact: dict, *, is_inverse: bool = False) -> None:
+            """Add a molecule association to the relevant activity based on a fact."""
+            if not is_inverse:
+                mf_individual_id = fact["subject"]
+                molecule_individual_id = fact["object"]
+                predicate = fact["property"]
+            else:
+                mf_individual_id = fact["object"]
+                molecule_individual_id = fact["subject"]
+                predicate = MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES.get(
+                    fact["property"], None
+                )
+                if predicate is None:
+                    translation_warnings.add(
+                        TranslationWarning(
+                            type=WarningType.UNKNOWN_PROPERTY_INVERSE,
+                            message=f"Fact property '{fact['property']}' does not have a known inverse",
+                            entity_id=fact["property"],
+                        )
+                    )
+                    return
+
+            molecule_node = _add_molecule_node(molecule_individual_id)
+            if molecule_node is None:
+                return
+
+            activities = activities_by_mf_id.get(mf_individual_id, [])
+            evs, prov = _process_fact(fact)
+            for activity in activities:
+                association = MoleculeAssociation(
+                    molecule=molecule_node.id,
+                    predicate=predicate,
+                    evidence=evs,
+                    provenances=[prov],
+                )
+                if activity.molecular_associations is None:
+                    activity.molecular_associations = []
+                activity.molecular_associations.append(association)
 
         for individual in minerva_obj["individuals"]:
             individual_id = individual["id"]
@@ -537,32 +596,12 @@ class MinervaWrapper:
             _setattr_with_warning(activity, "happens_during", association)
 
         for fact_property, facts in facts_by_property.items():
-            if fact_property not in MOLECULAR_ASSOCIATION_PROPERTIES:
-                continue
-            for fact in facts:
-                subject, object_ = fact["subject"], fact["object"]
-                if object_ not in individual_to_term:
-                    translation_warnings.add(
-                        TranslationWarning(
-                            type=WarningType.MISSING_TERM,
-                            message=f"Missing term for object {object_} in fact",
-                            entity_id=object_,
-                        )
-                    )
-                    continue
-                subject_activities = activities_by_mf_id.get(subject, [])
-                for activity in subject_activities:
-                    evs, prov = _process_fact(fact)
-                    _add_molecule_node(object_)
-                    association = MoleculeAssociation(
-                        molecule=object_,
-                        predicate=fact_property,
-                        evidence=evs,
-                        provenances=[prov],
-                    )
-                    if activity.molecular_associations is None:
-                        activity.molecular_associations = []
-                    activity.molecular_associations.append(association)
+            if fact_property in MOLECULAR_ASSOCIATION_PROPERTIES:
+                for fact in facts:
+                    _add_molecule_association(fact)
+            elif fact_property in MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES:
+                for fact in facts:
+                    _add_molecule_association(fact, is_inverse=True)
 
         for fact_property, facts in facts_by_property.items():
             for fact in facts:

@@ -4,7 +4,11 @@ import re
 import pytest
 
 from gocam.datamodel import Activity, EnabledByProteinComplexAssociation
-from gocam.translation.minerva_wrapper import MinervaWrapper
+from gocam.translation.minerva_wrapper import (
+    MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES,
+    MOLECULAR_ASSOCIATION_PROPERTIES,
+    MinervaWrapper,
+)
 from gocam.translation.result import WarningType
 from gocam.vocabulary import Relation
 from tests import INPUT_DIR
@@ -459,7 +463,7 @@ def test_translation_warning_missing_term():
         (w for w in warnings if w.type == WarningType.MISSING_TERM), None
     )
     assert missing_term_warning is not None
-    assert "Missing term for object" in missing_term_warning.message
+    assert "Missing term for individual" in missing_term_warning.message
     assert (
         missing_term_warning.entity_id == "gomodel:663d668500002178/object_missing_term"
     )
@@ -585,3 +589,31 @@ def test_happens_during():
     activity = model.activities[0]
     assert activity.happens_during is not None
     assert activity.happens_during.term == "GO:0005132"
+
+
+def test_molecular_association_inverse_properties_definition():
+    """Test that all keys of MOLECULE_ASSOCIATION_INVERSE_PROPERTIES have a value that is included
+    in MOLECULE_ASSOCIATION_PROPERTIES"""
+    for inverse_prop, prop in MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES.items():
+        assert prop in MOLECULAR_ASSOCIATION_PROPERTIES, (
+            f"Inverse property '{inverse_prop}' maps to '{prop}', which is not a valid molecule association property."
+        )
+
+
+def test_has_small_molecule_activator_association():
+    """Test that facts with the is_small_molecule_activator_of property are correctly translated."""
+    minerva_object = load_minerva_object("6606056e00002011")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    # Because the associations are "activity-oriented" in the data model, the
+    # is_small_molecule_activator_of association facts in the Minerva object will be translated to
+    # has_small_molecule_activator associations on the Activity.
+    has_small_molecule_activator_associations = [
+        assoc
+        for activity in model.activities or []
+        for assoc in activity.molecular_associations or []
+        if assoc.predicate == Relation.HAS_SMALL_MOLECULE_ACTIVATOR
+    ]
+
+    assert len(has_small_molecule_activator_associations) == 2
