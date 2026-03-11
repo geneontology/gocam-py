@@ -587,7 +587,7 @@ classes:
       - NCBITaxon
 
   PredicateTermObject:
-    description: A term object that represents an OWL relations from the OBO Relations Ontology
+    description: A term object that represents an OWL relation from the OBO Relations Ontology
     is_a: TermObject
     id_prefixes:
       - RO

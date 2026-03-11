@@ -907,7 +907,7 @@ class TaxonTermObject(TermObject):
 
 class PredicateTermObject(TermObject):
     """
-    A term object that represents an OWL relations from the OBO Relations Ontology
+    A term object that represents an OWL relation from the OBO Relations Ontology
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['RO']})
 
