@@ -644,3 +644,23 @@ def test_deeply_nested_part_of_associations():
     assert rraga_activity.part_of.part_of.term == "GO:1904263"
     assert rraga_activity.part_of.part_of.part_of is not None
     assert rraga_activity.part_of.part_of.part_of.term == "GO:0031669"
+
+
+def test_deeply_nested_molecule_localization():
+    """Test that deeply nested molecule localization associations are correctly translated."""
+    minerva_object = load_minerva_object("nested-localization")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    iron_molecule = next(
+        (m for m in model.molecules or [] if m.term == "CHEBI:29033"),
+        None,
+    )
+
+    assert iron_molecule is not None
+    assert iron_molecule.located_in is not None
+    assert iron_molecule.located_in.term == "GO:0005880"
+    assert iron_molecule.located_in.part_of is not None
+    assert iron_molecule.located_in.part_of.term == "GO:0005637"
+    assert iron_molecule.located_in.part_of.part_of is not None
+    assert iron_molecule.located_in.part_of.part_of.term == "GO:0005634"

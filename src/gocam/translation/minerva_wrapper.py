@@ -441,7 +441,6 @@ class MinervaTranslator:
         for located_in_fact in self.view.get_facts(
             subject=individual_id, property=Relation.LOCATED_IN
         ):
-            evs, prov = self._process_fact(located_in_fact)
             if molecule_node.located_in is not None:
                 self.translation_warnings.add(
                     TranslationWarning(
@@ -450,10 +449,8 @@ class MinervaTranslator:
                         entity_id=individual_id,
                     )
                 )
-            molecule_node.located_in = CellularAnatomicalEntityAssociation(
-                term=self.view.get_term(located_in_fact["object"]),
-                evidence=evs,
-                provenances=[prov],
+            molecule_node.located_in = (
+                self._build_cellular_anatomical_entity_association(located_in_fact)
             )
 
         self.molecule_nodes_by_id[individual_id] = molecule_node
