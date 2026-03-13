@@ -121,8 +121,8 @@ activities:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
-    predicate: RO:0002233
-    molecule: gomodel:6606056e00002011/662af8fa00002864
+    predicate: RO:0012001
+    molecule: gomodel:6606056e00002011/662af8fa00002871
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000250
@@ -141,8 +141,8 @@ activities:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
-    predicate: RO:0012001
-    molecule: gomodel:6606056e00002011/662af8fa00002871
+    predicate: RO:0002233
+    molecule: gomodel:6606056e00002011/662af8fa00002864
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -421,8 +421,6 @@ activities:
 molecules:
 - id: gomodel:6606056e00002011/662af8fa00002875
   term: UniProtKB:P21854
-- id: gomodel:6606056e00002011/662af8fa00002864
-  term: UniProtKB:P07948
 - id: gomodel:6606056e00002011/662af8fa00002871
   term: CHEBI:166824
   located_in:
@@ -435,6 +433,8 @@ molecules:
       provided_by:
       - https://www.uniprot.org
     term: GO:0005615
+- id: gomodel:6606056e00002011/662af8fa00002864
+  term: UniProtKB:P07948
 objects:
 - id: GO:0005615
   label: extracellular space
