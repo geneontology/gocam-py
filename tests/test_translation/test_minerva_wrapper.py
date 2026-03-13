@@ -617,3 +617,30 @@ def test_has_small_molecule_activator_association():
     ]
 
     assert len(has_small_molecule_activator_associations) == 2
+
+
+def test_deeply_nested_part_of_associations():
+    """Test that deeply nested part_of associations are correctly translated."""
+    minerva_object = load_minerva_object("64d5781900000615")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    rraga_activity = next(
+        (
+            a
+            for a in model.activities or []
+            if a.enabled_by
+            and a.enabled_by.term == "UniProtKB:Q7L523"
+            and a.molecular_function
+            and a.molecular_function.term == "GO:0043495"
+        ),
+        None,
+    )
+
+    assert rraga_activity is not None
+    assert rraga_activity.part_of is not None
+    assert rraga_activity.part_of.term == "GO:0061462"
+    assert rraga_activity.part_of.part_of is not None
+    assert rraga_activity.part_of.part_of.term == "GO:1904263"
+    assert rraga_activity.part_of.part_of.part_of is not None
+    assert rraga_activity.part_of.part_of.part_of.term == "GO:0031669"

@@ -16,6 +16,7 @@ from gocam.datamodel import (
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     EvidenceItem,
+    GrossAnatomyAssociation,
     Model,
     ModelStateEnum,
     MolecularFunctionAssociation,
@@ -260,30 +261,37 @@ class MinervaTranslator:
         were not.
         """
         self.processed_facts.add((fact["subject"], fact["property"], fact["object"]))
+        return self._extract_evidence_and_provenance(fact)
 
-        annotations = self.view.get_annotations(fact)
-        annotations_mv = self.view.get_annotations_multivalued(fact)
+    def _extract_evidence_and_provenance(
+        self, id_or_dict: str | dict
+    ) -> tuple[list[EvidenceItem], ProvenanceInfo]:
+        """Extract evidence and provenance for an entity or fact."""
+        annotations = self.view.get_annotations(id_or_dict)
+        annotations_mv = self.view.get_annotations_multivalued(id_or_dict)
 
-        evidence_inst_ids = annotations_mv.get("evidence", [])
+        evidence_individual_ids = annotations_mv.get("evidence", [])
         evs: list[EvidenceItem] = []
-        for evidence_inst_id in evidence_inst_ids:
-            evidence_inst_annotations = self.view.get_annotations(evidence_inst_id)
-            evidence_inst_annotations_multivalued = (
-                self.view.get_annotations_multivalued(evidence_inst_id)
+        for evidence_individual_id in evidence_individual_ids:
+            evidence_annotations = self.view.get_annotations(evidence_individual_id)
+            evidence_annotations_mv = self.view.get_annotations_multivalued(
+                evidence_individual_id
             )
-            with_obj: str | None = evidence_inst_annotations.get("with", None)
+
+            with_obj: str | None = evidence_annotations.get("with", None)
             if with_obj:
                 with_objs = [s.strip() for s in with_obj.split("|")]
             else:
                 with_objs = None
+
             prov = ProvenanceInfo(
-                contributor=evidence_inst_annotations_multivalued.get("contributor"),
-                date=evidence_inst_annotations.get("date", None),
-                provided_by=evidence_inst_annotations_multivalued.get("providedBy"),
+                contributor=evidence_annotations_mv.get("contributor"),
+                date=evidence_annotations.get("date"),
+                provided_by=evidence_annotations_mv.get("providedBy"),
             )
             ev = EvidenceItem(
-                term=self.view.get_term(evidence_inst_id),
-                reference=evidence_inst_annotations.get("source", None),
+                term=self.view.get_term(evidence_individual_id),
+                reference=evidence_annotations.get("source"),
                 with_objects=with_objs,
                 provenances=[prov],
             )
@@ -296,26 +304,118 @@ class MinervaTranslator:
         )
         return evs, prov
 
-    def _iter_activities_by_fact_subject(
-        self,
-        *,
-        fact_property: str,
-    ) -> Iterator[tuple[Activity, str, list[EvidenceItem], ProvenanceInfo]]:
-        """Iterate over activities that are the subject of a fact with the given property."""
-        for fact in self.view.get_facts(property=fact_property):
-            subject, object_ = fact["subject"], fact["object"]
-            if self.view.get_term(object_) is None:
+    def _create_activities(self):
+        """Create Activity objects from enabled_by facts."""
+        enabled_by_facts = self.view.get_facts(property=Relation.ENABLED_BY)
+        if not enabled_by_facts:
+            self.translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.NO_ENABLED_BY_FACTS,
+                    message=f"No enabled_by ({Relation.ENABLED_BY}) facts found",
+                    entity_id=self.minerva_obj["id"],
+                )
+            )
+        for enabled_by_fact in enabled_by_facts:
+            enabled_by_subject = enabled_by_fact["subject"]
+            enabled_by_object = enabled_by_fact["object"]
+            subject_term = self.view.get_term(enabled_by_subject)
+            object_term = self.view.get_term(enabled_by_object)
+
+            if subject_term is None:
                 self.translation_warnings.add(
                     TranslationWarning(
                         type=WarningType.MISSING_TERM,
-                        message=f"Missing term for object {object_} in fact",
-                        entity_id=object_,
+                        message=f"Missing term for subject {enabled_by_subject} in fact",
+                        entity_id=enabled_by_subject,
                     )
                 )
                 continue
-            for activity in self.activities_by_mf_id.get(subject, []):
-                evs, provenance = self._process_fact(fact)
-                yield activity, object_, evs, provenance
+            if object_term is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {enabled_by_object} in fact",
+                        entity_id=enabled_by_object,
+                    )
+                )
+                continue
+
+            evs, prov = self._process_fact(enabled_by_fact)
+            enabled_by_association = self._build_enabled_by_association(
+                enabled_by_object, object_term, evs, prov
+            )
+
+            activity = Activity(
+                id=enabled_by_subject,
+                enabled_by=enabled_by_association,
+                molecular_function=MolecularFunctionAssociation(term=subject_term),
+            )
+            self.activities.append(activity)
+            self.activities_by_mf_id[enabled_by_subject].append(activity)
+
+    def _build_enabled_by_association(
+        self,
+        individual_id: str,
+        term: str,
+        evidence: list[EvidenceItem],
+        prov: ProvenanceInfo,
+    ) -> EnabledByAssociation:
+        """Build an EnabledByAssociation (GeneProduct or ProteinComplex)."""
+        if self.view.is_type(individual_id, PROTEIN_CONTAINING_COMPLEX):
+            return self._build_protein_complex_association(
+                individual_id, term, evidence, prov
+            )
+
+        if not self.view.is_type(individual_id, INFORMATION_BIOMACROMOLECULE):
+            self.translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.UNKNOWN_ENABLED_BY_TYPE,
+                    message=f"Unknown enabled_by type for {individual_id}; assuming gene product",
+                    entity_id=individual_id,
+                )
+            )
+
+        return EnabledByGeneProductAssociation(
+            term=term, evidence=evidence, provenances=[prov]
+        )
+
+    def _build_protein_complex_association(
+        self,
+        individual_id: str,
+        term: str,
+        evidence: list[EvidenceItem],
+        prov: ProvenanceInfo,
+    ) -> EnabledByProteinComplexAssociation:
+        """Build an EnabledByProteinComplexAssociation by gathering member facts."""
+        member_associations: list[ProteinComplexMemberAssociation] = []
+        for has_part_fact in self.view.get_facts(
+            subject=individual_id, property=Relation.HAS_PART
+        ):
+            member_id = has_part_fact["object"]
+            member_term = self.view.get_term(member_id)
+            if member_term is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {member_id} in has_part fact",
+                        entity_id=member_id,
+                    )
+                )
+                continue
+            member_evs, member_prov = self._process_fact(has_part_fact)
+            member_associations.append(
+                ProteinComplexMemberAssociation(
+                    term=member_term,
+                    evidence=member_evs,
+                    provenances=[member_prov],
+                )
+            )
+        return EnabledByProteinComplexAssociation(
+            term=term,
+            members=member_associations,
+            evidence=evidence,
+            provenances=[prov],
+        )
 
     def _add_molecule_node(self, individual_id: str) -> MoleculeNode | None:
         """Add a molecule node for a given individual ID, if it doesn't already exist."""
@@ -409,197 +509,194 @@ class MinervaTranslator:
                 activity.molecular_associations = []
             activity.molecular_associations.append(association)
 
-    def _create_activities(self):
-        """Create Activity objects from enabled_by facts."""
-        enabled_by_facts = self.view.get_facts(property=Relation.ENABLED_BY)
-        if not enabled_by_facts:
-            self.translation_warnings.add(
-                TranslationWarning(
-                    type=WarningType.NO_ENABLED_BY_FACTS,
-                    message=f"No enabled_by ({Relation.ENABLED_BY}) facts found",
-                    entity_id=self.minerva_obj["id"],
-                )
-            )
-        for enabled_by_fact in enabled_by_facts:
-            subject, object_ = enabled_by_fact["subject"], enabled_by_fact["object"]
-            subject_term = self.view.get_term(subject)
-            object_term = self.view.get_term(object_)
+    def _build_biological_process_association(
+        self, fact: dict
+    ) -> BiologicalProcessAssociation:
+        """Recursively build a BiologicalProcessAssociation."""
+        individual_id = fact["object"]
+        term = self.view.get_term(individual_id)
+        evidence, provenance = self._process_fact(fact)
+        association = BiologicalProcessAssociation(
+            term=term,
+            evidence=evidence,
+            provenances=[provenance],
+        )
 
-            if subject_term is None:
+        for happens_during_fact in self.view.get_facts(
+            subject=individual_id, property=Relation.HAPPENS_DURING
+        ):
+            association.happens_during = self._build_phase_association(
+                happens_during_fact
+            )
+
+        for part_of_fact in self.view.get_facts(
+            subject=individual_id, property=Relation.PART_OF
+        ):
+            if part_of_fact["object"] == individual_id:
                 self.translation_warnings.add(
                     TranslationWarning(
-                        type=WarningType.MISSING_TERM,
-                        message=f"Missing term for subject {subject} in fact",
-                        entity_id=subject,
+                        type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
+                        message=f"Circular part_of relationship for {individual_id}",
+                        entity_id=individual_id,
                     )
                 )
                 continue
-            if object_term is None:
+            association.part_of = self._build_biological_process_association(
+                part_of_fact
+            )
+
+        return association
+
+    def _build_phase_association(self, fact: dict) -> PhaseAssociation:
+        """Build a PhaseAssociation."""
+        individual_id = fact["object"]
+        evidence, provenance = self._process_fact(fact)
+        term = self.view.get_term(individual_id)
+        return PhaseAssociation(
+            term=term,
+            evidence=evidence,
+            provenances=[provenance],
+        )
+
+    def _build_cellular_anatomical_entity_association(
+        self, fact: dict
+    ) -> CellularAnatomicalEntityAssociation:
+        """Build a CellularAnatomicalEntityAssociation."""
+        individual_id = fact["object"]
+        evidence, provenance = self._process_fact(fact)
+        term = self.view.get_term(individual_id)
+        association = CellularAnatomicalEntityAssociation(
+            term=term,
+            evidence=evidence,
+            provenances=[provenance],
+        )
+
+        for part_of_fact in self.view.get_facts(
+            subject=individual_id, property=Relation.PART_OF
+        ):
+            association.part_of = self._build_cell_type_association(part_of_fact)
+
+        return association
+
+    def _build_cell_type_association(self, fact: dict) -> CellTypeAssociation:
+        """Build a CellTypeAssociation."""
+        individual_id = fact["object"]
+        evidence, provenance = self._process_fact(fact)
+        term = self.view.get_term(individual_id)
+        association = CellTypeAssociation(
+            term=term,
+            evidence=evidence,
+            provenances=[provenance],
+        )
+
+        for part_of_fact in self.view.get_facts(
+            subject=individual_id, property=Relation.PART_OF
+        ):
+            association.part_of = self._build_gross_anatomy_association(part_of_fact)
+
+        return association
+
+    def _build_gross_anatomy_association(self, fact: dict) -> GrossAnatomyAssociation:
+        """Recursively build a GrossAnatomyAssociation."""
+        individual_id = fact["object"]
+        evidence, provenance = self._process_fact(fact)
+        term = self.view.get_term(individual_id)
+        association = GrossAnatomyAssociation(
+            term=term,
+            evidence=evidence,
+            provenances=[provenance],
+        )
+
+        for part_of_fact in self.view.get_facts(
+            subject=individual_id, property=Relation.PART_OF
+        ):
+            if part_of_fact["object"] == individual_id:
                 self.translation_warnings.add(
                     TranslationWarning(
-                        type=WarningType.MISSING_TERM,
-                        message=f"Missing term for object {object_} in fact",
-                        entity_id=object_,
+                        type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
+                        message=f"Circular part_of relationship for {individual_id}",
+                        entity_id=individual_id,
                     )
                 )
                 continue
+            association.part_of = self._build_gross_anatomy_association(part_of_fact)
 
-            evs, prov = self._process_fact(enabled_by_fact)
-            enabled_by_association: EnabledByAssociation
-            if self.view.is_type(object_, PROTEIN_CONTAINING_COMPLEX):
-                member_associations: list[ProteinComplexMemberAssociation] = []
-                has_part_facts = self.view.get_facts(
-                    subject=object_, property=Relation.HAS_PART
-                )
-                for has_part_fact in has_part_facts:
-                    member_object = has_part_fact["object"]
-                    member_term = self.view.get_term(member_object)
-                    if member_term is None:
-                        self.translation_warnings.add(
-                            TranslationWarning(
-                                type=WarningType.MISSING_TERM,
-                                message=f"Missing term for object {member_object} in has_part fact",
-                                entity_id=member_object,
-                            )
-                        )
-                        continue
-                    member_evs, member_prov = self._process_fact(has_part_fact)
-                    member_associations.append(
-                        ProteinComplexMemberAssociation(
-                            term=member_term,
-                            evidence=member_evs,
-                            provenances=[member_prov],
-                        )
-                    )
-                enabled_by_association = EnabledByProteinComplexAssociation(
-                    term=object_term,
-                    members=member_associations,
-                    evidence=evs,
-                    provenances=[prov],
-                )
-            elif self.view.is_type(object_, INFORMATION_BIOMACROMOLECULE):
-                enabled_by_association = EnabledByGeneProductAssociation(
-                    term=object_term, evidence=evs, provenances=[prov]
-                )
-            else:
-                self.translation_warnings.add(
-                    TranslationWarning(
-                        type=WarningType.UNKNOWN_ENABLED_BY_TYPE,
-                        message=f"Unknown enabled_by type for {object_}; assuming gene product",
-                        entity_id=object_,
-                    )
-                )
-                enabled_by_association = EnabledByGeneProductAssociation(
-                    term=object_term, evidence=evs, provenances=[prov]
-                )
-
-            activity = Activity(
-                id=subject,
-                enabled_by=enabled_by_association,
-                molecular_function=MolecularFunctionAssociation(term=subject_term),
-            )
-            self.activities.append(activity)
-            self.activities_by_mf_id[subject].append(activity)
+        return association
 
     def _process_biological_process_associations(self):
         """Process part_of facts to build biological process associations."""
-        for (
-            activity,
-            object_,
-            evs,
-            prov,
-        ) in self._iter_activities_by_fact_subject(fact_property=Relation.PART_OF):
-            association = BiologicalProcessAssociation(
-                term=self.view.get_term(object_), evidence=evs, provenances=[prov]
-            )
+        for fact in self.view.get_facts(property=Relation.PART_OF):
+            part_of_subject = fact["subject"]
+            part_of_object = fact["object"]
 
-            happens_during_facts = self.view.get_facts(
-                subject=object_, property=Relation.HAPPENS_DURING
-            )
-            for happens_during_fact in happens_during_facts:
-                evs, prov = self._process_fact(happens_during_fact)
-                if association.happens_during is not None:
-                    self.translation_warnings.add(
-                        TranslationWarning(
-                            type=WarningType.ATTRIBUTE_OVERWRITE,
-                            message=f"Overwriting part_of.happens_during for {activity.id}",
-                            entity_id=activity.id,
-                        )
+            activities = self.activities_by_mf_id.get(part_of_subject)
+            if not activities:
+                continue
+
+            if self.view.get_term(part_of_object) is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {part_of_object} in part_of fact",
+                        entity_id=part_of_object,
                     )
-                association.happens_during = PhaseAssociation(
-                    term=self.view.get_term(happens_during_fact["object"]),
-                    evidence=evs,
-                    provenances=[prov],
                 )
+                continue
 
-            part_of_facts = self.view.get_facts(
-                subject=object_, property=Relation.PART_OF
-            )
-            for part_of_fact in part_of_facts:
-                evs, prov = self._process_fact(part_of_fact)
-                if association.part_of is not None:
-                    self.translation_warnings.add(
-                        TranslationWarning(
-                            type=WarningType.ATTRIBUTE_OVERWRITE,
-                            message=f"Overwriting part_of.part_of for {activity.id}",
-                            entity_id=activity.id,
-                        )
-                    )
-                association.part_of = BiologicalProcessAssociation(
-                    term=self.view.get_term(part_of_fact["object"]),
-                    evidence=evs,
-                    provenances=[prov],
-                )
+            association = self._build_biological_process_association(fact)
 
-            self._setattr_with_warning(activity, "part_of", association)
+            for activity in activities:
+                self._setattr_with_warning(activity, "part_of", association)
 
     def _process_occurs_in_associations(self):
         """Process occurs_in facts to build cellular anatomical entity associations."""
-        for (
-            activity,
-            object_,
-            evs,
-            prov,
-        ) in self._iter_activities_by_fact_subject(fact_property=Relation.OCCURS_IN):
-            association = CellularAnatomicalEntityAssociation(
-                term=self.view.get_term(object_), evidence=evs, provenances=[prov]
-            )
+        for fact in self.view.get_facts(property=Relation.OCCURS_IN):
+            occurs_in_subject = fact["subject"]
+            occurs_in_object = fact["object"]
 
-            part_of_facts = self.view.get_facts(
-                subject=object_, property=Relation.PART_OF
-            )
-            for part_of_fact in part_of_facts:
-                evs, prov = self._process_fact(part_of_fact)
-                if association.part_of is not None:
-                    self.translation_warnings.add(
-                        TranslationWarning(
-                            type=WarningType.ATTRIBUTE_OVERWRITE,
-                            message=f"Overwriting occurs_in.part_of for {activity.id}",
-                            entity_id=activity.id,
-                        )
+            activities = self.activities_by_mf_id.get(occurs_in_subject)
+            if not activities:
+                continue
+
+            if self.view.get_term(occurs_in_object) is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {occurs_in_object} in occurs_in fact",
+                        entity_id=occurs_in_object,
                     )
-                association.part_of = CellTypeAssociation(
-                    term=self.view.get_term(part_of_fact["object"]),
-                    evidence=evs,
-                    provenances=[prov],
                 )
+                continue
 
-            self._setattr_with_warning(activity, "occurs_in", association)
+            association = self._build_cellular_anatomical_entity_association(fact)
+
+            for activity in activities:
+                self._setattr_with_warning(activity, "occurs_in", association)
 
     def _process_happens_during_associations(self):
         """Process happens_during facts to build phase associations."""
-        for (
-            activity,
-            object_,
-            evs,
-            prov,
-        ) in self._iter_activities_by_fact_subject(
-            fact_property=Relation.HAPPENS_DURING
-        ):
-            association = PhaseAssociation(
-                term=self.view.get_term(object_), evidence=evs, provenances=[prov]
-            )
-            self._setattr_with_warning(activity, "happens_during", association)
+        for fact in self.view.get_facts(property=Relation.HAPPENS_DURING):
+            happens_during_subject = fact["subject"]
+            happens_during_object = fact["object"]
+
+            activities = self.activities_by_mf_id.get(happens_during_subject)
+            if not activities:
+                continue
+
+            if self.view.get_term(happens_during_object) is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {happens_during_object} in happens_during fact",
+                        entity_id=happens_during_object,
+                    )
+                )
+                continue
+
+            association = self._build_phase_association(fact)
+
+            for activity in activities:
+                self._setattr_with_warning(activity, "happens_during", association)
 
     def _process_molecule_associations(self):
         """Process facts representing associations between molecular functions and molecules."""
@@ -614,30 +711,31 @@ class MinervaTranslator:
         """Process facts representing causal associations between activities."""
         for fact in self.view.all_facts():
             fact_property = fact["property"]
-            subject, object_ = fact["subject"], fact["object"]
-            if not self.view.is_type(subject, MOLECULAR_FUNCTION):
+            fact_subject = fact["subject"]
+            fact_object = fact["object"]
+            if not self.view.is_type(fact_subject, MOLECULAR_FUNCTION):
                 continue
-            if not self.view.is_type(object_, MOLECULAR_FUNCTION):
+            if not self.view.is_type(fact_object, MOLECULAR_FUNCTION):
                 continue
 
-            subject_activities = self.activities_by_mf_id.get(subject, [])
-            object_activities = self.activities_by_mf_id.get(object_, [])
+            subject_activities = self.activities_by_mf_id.get(fact_subject, [])
+            object_activities = self.activities_by_mf_id.get(fact_object, [])
             if not subject_activities or not object_activities:
                 continue
             if len(subject_activities) > 1:
                 self.translation_warnings.add(
                     TranslationWarning(
                         type=WarningType.MULTIPLE_ACTIVITIES,
-                        message=f"Multiple activities for subject {subject}",
-                        entity_id=subject,
+                        message=f"Multiple activities for subject {fact_subject}",
+                        entity_id=fact_subject,
                     )
                 )
             if len(object_activities) > 1:
                 self.translation_warnings.add(
                     TranslationWarning(
                         type=WarningType.MULTIPLE_ACTIVITIES,
-                        message=f"Multiple activities for object {object_}",
-                        entity_id=object_,
+                        message=f"Multiple activities for object {fact_object}",
+                        entity_id=fact_object,
                     )
                 )
 
@@ -659,12 +757,13 @@ class MinervaTranslator:
         annotations = self.view.get_annotations(self.minerva_obj)
         annotations_mv = self.view.get_annotations_multivalued(self.minerva_obj)
 
-        objects: list[Object] = []
-        for obj in self.view.all_objects():
-            object_ = Object(id=obj["id"])
-            if "label" in obj:
-                object_.label = obj["label"]
-            objects.append(object_)
+        objects = [
+            Object(
+                id=obj["id"],
+                label=obj.get("label"),
+            )
+            for obj in self.view.all_objects()
+        ]
 
         provenance = ProvenanceInfo(
             contributor=annotations_mv.get("contributor"),
@@ -672,25 +771,7 @@ class MinervaTranslator:
             provided_by=annotations_mv.get("providedBy"),
         )
 
-        all_taxa = annotations_mv.get(TaxonVocabulary.TAXON_ANNOTATION_KEY, [])
-        legacy_taxon = annotations.get(TaxonVocabulary.LEGACY_TAXON_KEY)
-        if legacy_taxon and legacy_taxon not in all_taxa:
-            all_taxa.append(legacy_taxon)
-
-        if not all_taxa:
-            taxon = None
-            additional_taxa = []
-        elif len(all_taxa) == 1:
-            taxon = all_taxa[0]
-            additional_taxa = []
-        else:
-            host_matches = [t for t in all_taxa if TaxonVocabulary.is_host_taxon(t)]
-            if host_matches:
-                taxon = host_matches[0]
-                additional_taxa = [t for t in all_taxa if t != taxon]
-            else:
-                taxon = all_taxa[0]
-                additional_taxa = all_taxa[1:]
+        taxon, additional_taxa = self._resolve_model_taxa(annotations, annotations_mv)
 
         num_processed_facts = len(self.processed_facts)
         num_facts = len(self.view.all_facts())
@@ -731,10 +812,34 @@ class MinervaTranslator:
                     )
                 )
 
-        if additional_taxa and len(additional_taxa) > 0:
+        if additional_taxa:
             cam.additional_taxa = additional_taxa
 
         return TranslationResult(result=cam, warnings=list(self.translation_warnings))
+
+    def _resolve_model_taxa(
+        self, annotations: dict, annotations_mv: dict
+    ) -> tuple[str | None, list[str]]:
+        """Resolve primary and additional taxa for the model."""
+        all_taxa = annotations_mv.get(TaxonVocabulary.TAXON_ANNOTATION_KEY, [])
+        legacy_taxon = annotations.get(TaxonVocabulary.LEGACY_TAXON_KEY)
+        if legacy_taxon and legacy_taxon not in all_taxa:
+            all_taxa.append(legacy_taxon)
+
+        if not all_taxa:
+            return None, []
+        if len(all_taxa) == 1:
+            return all_taxa[0], []
+
+        host_matches = [t for t in all_taxa if TaxonVocabulary.is_host_taxon(t)]
+        if host_matches:
+            taxon = host_matches[0]
+            additional_taxa = [t for t in all_taxa if t != taxon]
+        else:
+            taxon = all_taxa[0]
+            additional_taxa = all_taxa[1:]
+
+        return taxon, additional_taxa
 
 
 @dataclass
