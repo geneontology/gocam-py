@@ -8,6 +8,7 @@ import requests
 
 from gocam.datamodel import (
     Activity,
+    Association,
     BiologicalProcessAssociation,
     CausalAssociation,
     CellTypeAssociation,
@@ -26,6 +27,7 @@ from gocam.datamodel import (
     PhaseAssociation,
     ProteinComplexMemberAssociation,
     ProvenanceInfo,
+    TermAssociation,
 )
 from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
 from gocam.vocabulary import Relation, TaxonVocabulary
@@ -241,17 +243,31 @@ class MinervaTranslator:
 
         return self._build_result()
 
-    def _setattr_with_warning(self, obj: Activity, attr: str, value: Any):
+    def _set_activity_attr(self, activity: Activity, attr: str, value: Any):
         """Set an attribute on an Activity, with a warning if it already exists."""
-        if getattr(obj, attr, None) is not None:
+        if getattr(activity, attr, None) is not None:
             self.translation_warnings.add(
                 TranslationWarning(
                     type=WarningType.ATTRIBUTE_OVERWRITE,
-                    message=f"Overwriting {attr} for {obj.id}",
-                    entity_id=obj.id,
+                    message=f"Overwriting {attr} for activity {activity.id}",
+                    entity_id=activity.id,
                 )
             )
-        setattr(obj, attr, value)
+        setattr(activity, attr, value)
+
+    def _set_term_association_attr(
+        self, association: TermAssociation, attr: str, value: Any
+    ):
+        """Set an attribute on an TermAssociation, with a warning if it already exists."""
+        if getattr(association, attr, None) is not None:
+            self.translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.ATTRIBUTE_OVERWRITE,
+                    message=f"Overwriting {attr} for association with term {association.term}",
+                    entity_id=association.term,
+                )
+            )
+        setattr(association, attr, value)
 
     def _process_fact(self, fact: dict) -> tuple[list[EvidenceItem], ProvenanceInfo]:
         """Process a fact to extract evidence and provenance information.
@@ -522,8 +538,9 @@ class MinervaTranslator:
         for happens_during_fact in self.view.get_facts(
             subject=individual_id, property=Relation.HAPPENS_DURING
         ):
-            association.happens_during = self._build_phase_association(
-                happens_during_fact
+            phase_association = self._build_phase_association(happens_during_fact)
+            self._set_term_association_attr(
+                association, "happens_during", phase_association
             )
 
         for part_of_fact in self.view.get_facts(
@@ -538,9 +555,8 @@ class MinervaTranslator:
                     )
                 )
                 continue
-            association.part_of = self._build_biological_process_association(
-                part_of_fact
-            )
+            bp_association = self._build_biological_process_association(part_of_fact)
+            self._set_term_association_attr(association, "part_of", bp_association)
 
         return association
 
@@ -571,7 +587,10 @@ class MinervaTranslator:
         for part_of_fact in self.view.get_facts(
             subject=individual_id, property=Relation.PART_OF
         ):
-            association.part_of = self._build_cell_type_association(part_of_fact)
+            cell_type_association = self._build_cell_type_association(part_of_fact)
+            self._set_term_association_attr(
+                association, "part_of", cell_type_association
+            )
 
         return association
 
@@ -589,7 +608,12 @@ class MinervaTranslator:
         for part_of_fact in self.view.get_facts(
             subject=individual_id, property=Relation.PART_OF
         ):
-            association.part_of = self._build_gross_anatomy_association(part_of_fact)
+            gross_anatomy_association = self._build_gross_anatomy_association(
+                part_of_fact
+            )
+            self._set_term_association_attr(
+                association, "part_of", gross_anatomy_association
+            )
 
         return association
 
@@ -616,7 +640,12 @@ class MinervaTranslator:
                     )
                 )
                 continue
-            association.part_of = self._build_gross_anatomy_association(part_of_fact)
+            gross_anatomy_association = self._build_gross_anatomy_association(
+                part_of_fact
+            )
+            self._set_term_association_attr(
+                association, "part_of", gross_anatomy_association
+            )
 
         return association
 
@@ -643,7 +672,7 @@ class MinervaTranslator:
             association = self._build_biological_process_association(fact)
 
             for activity in activities:
-                self._setattr_with_warning(activity, "part_of", association)
+                self._set_activity_attr(activity, "part_of", association)
 
     def _process_occurs_in_associations(self):
         """Process occurs_in facts to build cellular anatomical entity associations."""
@@ -668,7 +697,7 @@ class MinervaTranslator:
             association = self._build_cellular_anatomical_entity_association(fact)
 
             for activity in activities:
-                self._setattr_with_warning(activity, "occurs_in", association)
+                self._set_activity_attr(activity, "occurs_in", association)
 
     def _process_happens_during_associations(self):
         """Process happens_during facts to build phase associations."""
@@ -693,7 +722,7 @@ class MinervaTranslator:
             association = self._build_phase_association(fact)
 
             for activity in activities:
-                self._setattr_with_warning(activity, "happens_during", association)
+                self._set_activity_attr(activity, "happens_during", association)
 
     def _process_molecule_associations(self):
         """Process facts representing associations between molecular functions and molecules."""
