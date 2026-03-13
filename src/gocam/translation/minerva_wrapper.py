@@ -523,10 +523,24 @@ class MinervaTranslator:
             activity.molecular_associations.append(association)
 
     def _build_biological_process_association(
-        self, fact: dict
-    ) -> BiologicalProcessAssociation:
+        self, fact: dict, visited: frozenset[str] | None = None
+    ) -> BiologicalProcessAssociation | None:
         """Recursively build a BiologicalProcessAssociation."""
         individual_id = fact["object"]
+
+        if visited is None:
+            visited = frozenset()
+        if individual_id in visited:
+            self.translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
+                    message=f"Circular relationship detected for {individual_id}",
+                    entity_id=individual_id,
+                )
+            )
+            return None
+        next_visited = visited.union({individual_id})
+
         term = self.view.get_term(individual_id)
         evidence, provenance = self._process_fact(fact)
         association = BiologicalProcessAssociation(
@@ -546,17 +560,11 @@ class MinervaTranslator:
         for part_of_fact in self.view.get_facts(
             subject=individual_id, property=Relation.PART_OF
         ):
-            if part_of_fact["object"] == individual_id:
-                self.translation_warnings.add(
-                    TranslationWarning(
-                        type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
-                        message=f"Circular part_of relationship for {individual_id}",
-                        entity_id=individual_id,
-                    )
-                )
-                continue
-            bp_association = self._build_biological_process_association(part_of_fact)
-            self._set_term_association_attr(association, "part_of", bp_association)
+            bp_association = self._build_biological_process_association(
+                part_of_fact, visited=next_visited
+            )
+            if bp_association is not None:
+                self._set_term_association_attr(association, "part_of", bp_association)
 
         return association
 
@@ -617,9 +625,25 @@ class MinervaTranslator:
 
         return association
 
-    def _build_gross_anatomy_association(self, fact: dict) -> GrossAnatomyAssociation:
+    def _build_gross_anatomy_association(
+        self, fact: dict, visited: frozenset[str] | None = None
+    ) -> GrossAnatomyAssociation | None:
         """Recursively build a GrossAnatomyAssociation."""
         individual_id = fact["object"]
+
+        if visited is None:
+            visited = frozenset()
+        if individual_id in visited:
+            self.translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
+                    message=f"Circular relationship detected for {individual_id}",
+                    entity_id=individual_id,
+                )
+            )
+            return None
+        next_visited = visited.union({individual_id})
+
         evidence, provenance = self._process_fact(fact)
         term = self.view.get_term(individual_id)
         association = GrossAnatomyAssociation(
@@ -631,21 +655,14 @@ class MinervaTranslator:
         for part_of_fact in self.view.get_facts(
             subject=individual_id, property=Relation.PART_OF
         ):
-            if part_of_fact["object"] == individual_id:
-                self.translation_warnings.add(
-                    TranslationWarning(
-                        type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
-                        message=f"Circular part_of relationship for {individual_id}",
-                        entity_id=individual_id,
-                    )
-                )
-                continue
             gross_anatomy_association = self._build_gross_anatomy_association(
-                part_of_fact
+                part_of_fact,
+                visited=next_visited,
             )
-            self._set_term_association_attr(
-                association, "part_of", gross_anatomy_association
-            )
+            if gross_anatomy_association is not None:
+                self._set_term_association_attr(
+                    association, "part_of", gross_anatomy_association
+                )
 
         return association
 
