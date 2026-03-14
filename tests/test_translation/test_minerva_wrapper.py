@@ -7,6 +7,7 @@ from gocam.datamodel import Activity, EnabledByProteinComplexAssociation
 from gocam.translation.minerva_wrapper import (
     MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES,
     MOLECULAR_ASSOCIATION_PROPERTIES,
+    MinervaView,
     MinervaWrapper,
 )
 from gocam.translation.result import WarningType
@@ -617,3 +618,97 @@ def test_has_small_molecule_activator_association():
     ]
 
     assert len(has_small_molecule_activator_associations) == 2
+
+
+def test_deeply_nested_part_of_associations():
+    """Test that deeply nested part_of associations are correctly translated."""
+    minerva_object = load_minerva_object("64d5781900000615")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    rraga_activity = next(
+        (
+            a
+            for a in model.activities or []
+            if a.enabled_by
+            and a.enabled_by.term == "UniProtKB:Q7L523"
+            and a.molecular_function
+            and a.molecular_function.term == "GO:0043495"
+        ),
+        None,
+    )
+
+    assert rraga_activity is not None
+    assert rraga_activity.part_of is not None
+    assert rraga_activity.part_of.term == "GO:0061462"
+    assert rraga_activity.part_of.part_of is not None
+    assert rraga_activity.part_of.part_of.term == "GO:1904263"
+    assert rraga_activity.part_of.part_of.part_of is not None
+    assert rraga_activity.part_of.part_of.part_of.term == "GO:0031669"
+
+
+def test_deeply_nested_molecule_localization():
+    """Test that deeply nested molecule localization associations are correctly translated."""
+    minerva_object = load_minerva_object("nested-localization")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    iron_molecule = next(
+        (m for m in model.molecules or [] if m.term == "CHEBI:29033"),
+        None,
+    )
+
+    assert iron_molecule is not None
+    assert iron_molecule.located_in is not None
+    assert iron_molecule.located_in.term == "GO:0005880"
+    assert iron_molecule.located_in.part_of is not None
+    assert iron_molecule.located_in.part_of.term == "GO:0005637"
+    assert iron_molecule.located_in.part_of.part_of is not None
+    assert iron_molecule.located_in.part_of.part_of.term == "GO:0005634"
+
+
+def test_minerva_view_get_facts():
+    """Test that the MinervaView.get_facts method correctly retrieves facts for a given subject."""
+    minerva_object = {
+        "facts": [
+            {
+                "subject": "S1",
+                "property": "P1",
+                "object": "O1",
+            },
+            {
+                "subject": "S1",
+                "property": "P2",
+                "object": "O2",
+            },
+            {
+                "subject": "S2",
+                "property": "P1",
+                "object": "O3",
+            },
+            {
+                "subject": "S2",
+                "property": "P1",
+                "object": "O4",
+            },
+            {
+                "subject": "S3",
+                "property": "P1",
+                "object": "O3",
+            },
+            {
+                "subject": "S2",
+                "property": "P3",
+                "object": "O3",
+            },
+        ]
+    }
+    view = MinervaView(minerva_object)
+    assert len(view.get_facts()) == 6
+    assert len(view.get_facts(property="P1")) == 4
+    assert len(view.get_facts(object="O1")) == 1
+    assert len(view.get_facts(object="O3", property="P2")) == 0
+    assert len(view.get_facts(subject="S1")) == 2
+    assert len(view.get_facts(subject="S1", property="P2")) == 1
+    assert len(view.get_facts(subject="S1", object="O3")) == 0
+    assert len(view.get_facts(subject="S2", property="P1", object="O3")) == 1

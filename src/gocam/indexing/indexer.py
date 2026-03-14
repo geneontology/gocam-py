@@ -2,7 +2,7 @@ import logging
 from collections.abc import Iterable
 from functools import cached_property, lru_cache
 from pathlib import Path
-from typing import Collection, List, Optional, Tuple
+from typing import Any, Collection, List, Optional, Tuple, overload
 
 import networkx as nx
 import pystow
@@ -11,11 +11,17 @@ from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import IS_A, PART_OF
 
 from gocam.datamodel import (
+    Activity,
     Association,
+    BiologicalProcessAssociation,
+    CellTypeAssociation,
+    CellularAnatomicalEntityAssociation,
+    EnabledByAssociation,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     EvidenceItem,
     EvidenceTermObject,
+    GrossAnatomyAssociation,
     Model,
     MoleculeNode,
     Object,
@@ -52,43 +58,86 @@ def _iter_association_provenances(
                 yield from evidence.provenances
 
 
-def _iter_model_associations(model: Model) -> Iterable[Association]:
+@overload
+def _iter_associations(obj: Model) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: Activity) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: MoleculeNode) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: EnabledByAssociation) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: BiologicalProcessAssociation) -> Iterable[Association]: ...
+@overload
+def _iter_associations(
+    obj: CellularAnatomicalEntityAssociation,
+) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: CellTypeAssociation) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: GrossAnatomyAssociation) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: Association) -> Iterable[Association]: ...
+def _iter_associations(obj: Any) -> Iterable[Association]:
     """
-    Extract all Association objects from a Model.
+    Extract all Association objects from a given object.
 
     Returns:
-        Iterable[Association]: Iterable over Association objects extracted from the model's activities.
+        Iterable[Association]: Iterable over Association objects extracted from the object.
     """
-    for activity in model.activities or []:
-        if activity.enabled_by:
-            yield activity.enabled_by
-            if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-                if activity.enabled_by.members:
-                    yield from activity.enabled_by.members
+    match obj:
+        case Model():
+            for activity in obj.activities or []:
+                yield from _iter_associations(activity)
+            for molecule in obj.molecules or []:
+                yield from _iter_associations(molecule)
 
-        if activity.molecular_function:
-            yield activity.molecular_function
+        case Activity():
+            if obj.enabled_by:
+                yield from _iter_associations(obj.enabled_by)
+            if obj.molecular_function:
+                yield from _iter_associations(obj.molecular_function)
+            if obj.part_of:
+                yield from _iter_associations(obj.part_of)
+            if obj.occurs_in:
+                yield from _iter_associations(obj.occurs_in)
+            if obj.happens_during:
+                yield from _iter_associations(obj.happens_during)
+            for molecule_association in obj.molecular_associations or []:
+                yield from _iter_associations(molecule_association)
+            for causal_association in obj.causal_associations or []:
+                yield from _iter_associations(causal_association)
 
-        if activity.part_of:
-            yield activity.part_of
-            if activity.part_of.happens_during:
-                yield activity.part_of.happens_during
-            if activity.part_of.part_of:
-                yield activity.part_of.part_of
+        case MoleculeNode():
+            if obj.located_in:
+                yield from _iter_associations(obj.located_in)
 
-        if activity.occurs_in:
-            yield activity.occurs_in
-            if activity.occurs_in.part_of:
-                yield activity.occurs_in.part_of
+        case EnabledByProteinComplexAssociation():
+            yield obj
+            for member in obj.members or []:
+                yield from _iter_associations(member)
 
-        if activity.happens_during:
-            yield activity.happens_during
+        case BiologicalProcessAssociation():
+            yield obj
+            if obj.happens_during:
+                yield from _iter_associations(obj.happens_during)
+            if obj.part_of:
+                yield from _iter_associations(obj.part_of)
 
-        for molecule_association in activity.molecular_associations or []:
-            yield molecule_association
+        case (
+            CellularAnatomicalEntityAssociation()
+            | CellTypeAssociation()
+            | GrossAnatomyAssociation()
+        ):
+            yield obj
+            if obj.part_of:
+                yield from _iter_associations(obj.part_of)
 
-        for causal_association in activity.causal_associations or []:
-            yield causal_association
+        case Association():
+            yield obj
+
+        case _:
+            raise ValueError(f"Unsupported object type: {type(obj)}")
 
 
 def _iter_model_provenances(model: Model) -> Iterable[ProvenanceInfo]:
@@ -104,7 +153,7 @@ def _iter_model_provenances(model: Model) -> Iterable[ProvenanceInfo]:
     for activity in model.activities or []:
         if activity.provenances:
             yield from activity.provenances
-    for association in _iter_model_associations(model):
+    for association in _iter_associations(model):
         yield from _iter_association_provenances(association)
 
 
@@ -118,7 +167,7 @@ def _iter_model_evidence(model: Model) -> Iterable[EvidenceItem]:
     Returns:
         Iterable[EvidenceItem]: Iterable over EvidenceItem objects extracted from the model's associations.
     """
-    for association in _iter_model_associations(model):
+    for association in _iter_associations(model):
         if association.evidence:
             yield from association.evidence
 

@@ -320,16 +320,6 @@ activities:
     term: GO:1904679
   molecular_associations:
   - type: MoleculeAssociation
-    evidence: []
-    provenances:
-    - contributor:
-      - https://orcid.org/0000-0001-6330-7526
-      date: '2025-03-14'
-      provided_by:
-      - http://www.pombase.org
-    predicate: RO:0002233
-    molecule: gomodel:663d668500002178/67c10cc400004789
-  - type: MoleculeAssociation
     evidence:
     - term: ECO:0000315
       reference: PMID:9560432
@@ -368,6 +358,16 @@ activities:
       - http://www.pombase.org
     predicate: RO:0002234
     molecule: gomodel:663d668500002178/67b1629100003514
+  - type: MoleculeAssociation
+    evidence: []
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-6330-7526
+      date: '2025-03-14'
+      provided_by:
+      - http://www.pombase.org
+    predicate: RO:0002233
+    molecule: gomodel:663d668500002178/67c10cc400004789
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000315
@@ -1094,16 +1094,6 @@ activities:
     predicate: RO:0002233
     molecule: gomodel:663d668500002178/67b1629100003514
   - type: MoleculeAssociation
-    evidence: []
-    provenances:
-    - contributor:
-      - https://orcid.org/0000-0001-6330-7526
-      date: '2025-02-26'
-      provided_by:
-      - http://www.pombase.org
-    predicate: RO:0002233
-    molecule: gomodel:663d668500002178/67b1629100003513
-  - type: MoleculeAssociation
     evidence:
     - term: ECO:0000303
       reference: GO_REF:0000051
@@ -1121,6 +1111,16 @@ activities:
       - http://www.pombase.org
     predicate: RO:0002234
     molecule: gomodel:663d668500002178/66c7d41500001893
+  - type: MoleculeAssociation
+    evidence: []
+    provenances:
+    - contributor:
+      - https://orcid.org/0000-0001-6330-7526
+      date: '2025-02-26'
+      provided_by:
+      - http://www.pombase.org
+    predicate: RO:0002233
+    molecule: gomodel:663d668500002178/67b1629100003513
 - id: gomodel:663d668500002178/663d668500002267
   enabled_by:
     type: EnabledByGeneProductAssociation
