@@ -185,11 +185,11 @@ class MinervaView:
         property: str | None = None,
     ) -> list[dict]:
         """Query facts by subject, object, and/or predicate."""
-        if subject and property:
+        if subject and property and not object:
             return self._facts_by_subject_property.get((subject, property), [])
-        if object and property:
+        if object and property and not subject:
             return self._facts_by_object_property.get((object, property), [])
-        if property:
+        if property and not subject and not object:
             return self._facts_by_property.get(property, [])
         # Fallback to iteration for other filters
         return [
@@ -197,6 +197,7 @@ class MinervaView:
             for f in self.raw_json.get("facts", [])
             if (not subject or f["subject"] == subject)
             and (not object or f["object"] == object)
+            and (not property or f["property"] == property)
         ]
 
     def all_objects(self) -> list[dict]:
