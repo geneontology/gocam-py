@@ -8,7 +8,6 @@ import requests
 
 from gocam.datamodel import (
     Activity,
-    Association,
     BiologicalProcessAssociation,
     CausalAssociation,
     CellTypeAssociation,
