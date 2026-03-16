@@ -45,8 +45,8 @@ dev = [
     "mkdocs-mermaid2-plugin>=1.1.1",
     "pytest>=8.2.2,<10",
     "requests-mock>=1.12.1,<2",
-    "ruff==0.15.5",
-    "ty==0.0.21",
+    "ruff==0.15.6",
+    "ty==0.0.23",
 ]
 
 [tool.hatch.build.targets.sdist]
