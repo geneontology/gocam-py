@@ -1,11 +1,30 @@
 """
-Output statistics information about GO-CAM models
+Output statistics information about GO-CAM models.
+
+This module processes GO-CAM model JSON files and calculates a variety of
+statistics at the per-model, per-contributor, per-provider, and aggregate
+levels. Statistics include:
+
+- Activity unit counts (total, enabled by gene product, enabled by protein complex)
+- Gene product and protein complex enabler counts (total and unique)
+- Causal relation counts
+- Input/output molecule counts (chemical vs other, total vs unique)
+- GO term counts (total and unique)
+- Reference and PMID counts
+- Inferred relation counts: An inferred relation is identified when an
+  activity A produces chemical outputs (CHEBI terms) that are consumed as
+  inputs by another activity B, and activity B also produces chemical outputs.
+  This captures implicit metabolic pathway connections where one activity's
+  product feeds into another activity's transformation. Each inferred relation
+  records the pair of activity IDs [activity_A, activity_B].
+
+Results are written as JSON files organized into subdirectories by model,
+contributor (curator), and provider (group), along with aggregate summaries.
 """
 
 import logging
 import os
 import re
-from collections import defaultdict
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -19,11 +38,11 @@ from typing import (
 )
 from urllib.parse import urlparse
 
+import typer
 from rich import print
 from rich.logging import RichHandler
 from rich.progress import track
 from rich.tree import Tree
-import typer
 
 from gocam.datamodel import (
     Association,
@@ -31,15 +50,17 @@ from gocam.datamodel import (
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     Model,
-    MoleculeAssociation,
-    MoleculeTermObject,
     QueryIndex,
 )
-from gocam.indexing.Indexer import Indexer
+from gocam.indexing.indexer import Indexer
+from gocam.vocabulary.relation import Relation
 
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
+
+INPUT_PREDICATES = {Relation.HAS_INPUT.value, Relation.HAS_PRIMARY_INPUT.value}
+OUTPUT_PREDICATES = {Relation.HAS_OUTPUT.value, Relation.HAS_PRIMARY_OUTPUT.value}
 
 
 class ResultType(str, Enum):
@@ -49,16 +70,27 @@ class ResultType(str, Enum):
 
 
 class FilterReason(str, Enum):
+    """Reason a GO-CAM model was filtered out during processing."""
+
     NO_MODEL = "No model"
 
 
 class ErrorReason(str, Enum):
+    """Reason a GO-CAM model failed during processing."""
+
     READ_ERROR = "Read error"
     STATS_ERROR = "Error calculating statistics"
     WRITE_ERROR = "Write error"
 
 
 class GocamStats(ConfiguredBaseModel):
+    """Per-model or per-entity (contributor/provider) statistics for GO-CAM data.
+
+    Numeric fields hold computed counts. Set and list fields are working
+    collections used to accumulate data during processing; they feed the
+    final numeric counts and are serialized for detailed output.
+    """
+
     uri: str | None = None
     number_of_models: int = 0
     number_of_activity_units: int = 0
@@ -84,6 +116,8 @@ class GocamStats(ConfiguredBaseModel):
     number_of_unique_other_outputs: int = 0
     number_of_go_terms: int = 0
     number_of_unique_go_terms: int = 0
+    number_of_unique_inferred_relations: int = 0
+    list_inferred_relations: List[List[str]] | None = []
 
     set_models: Set[str] = set()
     set_activities: Set[str] = set()
@@ -106,6 +140,8 @@ class GocamStats(ConfiguredBaseModel):
 
 
 class ModelDetails(ConfiguredBaseModel):
+    """Identifying metadata for a single processed GO-CAM model."""
+
     file_name: str = ""
     model_id: str = ""
     model_name: str = ""
@@ -113,6 +149,12 @@ class ModelDetails(ConfiguredBaseModel):
 
 
 class AggregateInfo(ConfiguredBaseModel):
+    """Aggregate statistics across all processed GO-CAM models, curators, or groups.
+
+    Accumulates counts and working collections from individual GocamStats
+    instances to produce cross-model summary statistics.
+    """
+
     entity: str = ""
     total_number_of_entities_processed: int = 0
     number_of_unique_activity_units: int = 0
@@ -142,6 +184,8 @@ class AggregateInfo(ConfiguredBaseModel):
     number_of_unique_other_outputs: int = 0
     number_of_go_terms: int = 0
     number_of_unique_go_terms: int = 0
+    number_of_unique_inferred_relations: int = 0
+    list_inferred_relations: List[List[str]] | None = []
 
     set_activities: Set[str] = set()
     set_enabled_by_gene_product: Set[str] = set()
@@ -160,6 +204,8 @@ class AggregateInfo(ConfiguredBaseModel):
     list_go_terms: List[str] | None = []
 
 
+#: Return type for :func:`process_gocam_model_file`.
+#: A 3-tuple of (result_type, query_index_or_none, reason_or_none).
 ProcessingResult: TypeAlias = (
     tuple[Literal[ResultType.SUCCESS], QueryIndex, None]
     | tuple[Literal[ResultType.FILTERED], QueryIndex, FilterReason]
@@ -193,6 +239,15 @@ def count_chebis(terms: Collection[str]) -> int:
 
 
 def count_type_in_collection(string_col: Collection[str], prefix: str) -> int:
+    """Count strings in a collection whose lowercase form starts with the given prefix.
+
+    Args:
+        string_col: Collection of strings to search.
+        prefix: Case-insensitive prefix to match against.
+
+    Returns:
+        Number of matching strings.
+    """
     return sum(1 for ent in string_col if ent.lower().startswith(prefix))
 
 
@@ -250,7 +305,14 @@ def _update_entity_gene_stats(
     gocam_model_id: str,
     obsolete_ids: set[str],
 ) -> None:
-    """Update contributor/provider stats from evidence data."""
+    """Update gene product and protein complex enabler stats for an entity.
+
+    Args:
+        entity_info: The GocamStats object for the contributor or provider.
+        activity: An Activity from the GO-CAM model.
+        gocam_model_id: Identifier of the parent model.
+        obsolete_ids: Set of object IDs marked as obsolete.
+    """
     if isinstance(activity.enabled_by, EnabledByGeneProductAssociation):
         entity_info.set_activity_unit_gene_product_enablers.add(activity.id)
         if activity.enabled_by.term and activity.enabled_by.term not in obsolete_ids:
@@ -276,8 +338,8 @@ def _update_entity_gene_stats(
 
 
 def _is_association_obsolete(assoc: Association, obsolete_ids: set[str]) -> bool:
-    """Check if an association references an obsolete term."""
-    term = getattr(assoc, "term", None)
+    """Check if an association references an obsolete term or molecule."""
+    term = getattr(assoc, "term", None) or getattr(assoc, "molecule", None)
     return isinstance(term, str) and term in obsolete_ids
 
 
@@ -285,7 +347,18 @@ def _iter_activity_associations(
     activity,
     obsolete_ids: set[str],
 ) -> list[Association]:
-    """Yield all non-obsolete Association objects from an Activity."""
+    """Collect all non-obsolete Association objects from an Activity.
+
+    Walks enabled_by, molecular_function, part_of, occurs_in, inputs,
+    outputs, and causal_associations, skipping any that reference obsolete terms.
+
+    Args:
+        activity: An Activity from the GO-CAM model.
+        obsolete_ids: Set of object IDs marked as obsolete.
+
+    Returns:
+        List of non-obsolete Association objects.
+    """
     associations: list[Association] = []
     if activity.enabled_by and not _is_association_obsolete(
         activity.enabled_by, obsolete_ids
@@ -320,20 +393,9 @@ def _iter_activity_associations(
             activity.occurs_in.part_of, obsolete_ids
         ):
             associations.append(activity.occurs_in.part_of)
-    if activity.has_primary_input and not _is_association_obsolete(
-        activity.has_primary_input, obsolete_ids
-    ):
-        associations.append(activity.has_primary_input)
-    for has_input in activity.has_input or []:
-        if not _is_association_obsolete(has_input, obsolete_ids):
-            associations.append(has_input)
-    if activity.has_primary_output and not _is_association_obsolete(
-        activity.has_primary_output, obsolete_ids
-    ):
-        associations.append(activity.has_primary_output)
-    for has_output in activity.has_output or []:
-        if not _is_association_obsolete(has_output, obsolete_ids):
-            associations.append(has_output)
+    for mol_assoc in activity.molecular_associations or []:
+        if not _is_association_obsolete(mol_assoc, obsolete_ids):
+            associations.append(mol_assoc)
     for causal_association in activity.causal_associations or []:
         if not _is_association_obsolete(causal_association, obsolete_ids):
             associations.append(causal_association)
@@ -393,12 +455,13 @@ def _collect_molecule_terms(
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
     obsolete_ids: set[str],
+    molecule_lookup: Dict[str, str] | None = None,
 ) -> None:
     """Collect molecule input/output terms from MoleculeAssociation objects.
 
-    Iterates over has_input, has_primary_input, has_output, and
-    has_primary_output associations for the given activity, and attributes
-    terms to contributors and providers via association-level provenances.
+    Iterates over molecular_associations for the given activity, classifying
+    each by its predicate into input or output, and attributes terms to
+    contributors and providers via association-level provenances.
 
     Populates:
         stats_by_model.list_has_input_term / list_has_output_term
@@ -406,18 +469,32 @@ def _collect_molecule_terms(
         contributor_lookup[contributor].list_has_input_term / list_has_output_term
         provider_lookup[provider].list_has_input_term / list_has_output_term
     """
-    # Collect input molecule associations
-    input_associations: list[MoleculeAssociation] = list(activity.has_input or [])
-    if activity.has_primary_input:
-        input_associations.append(activity.has_primary_input)
-
-    for ma in input_associations:
-        if not ma.term or ma.term in obsolete_ids:
+    for ma in activity.molecular_associations or []:
+        molecule_id = ma.molecule
+        if not molecule_id or molecule_id in obsolete_ids:
             continue
-        if stats_by_model.list_has_input_term is not None:
-            stats_by_model.list_has_input_term.append(ma.term)
-        if model_aggregate.list_has_input_term is not None:
-            model_aggregate.list_has_input_term.append(ma.term)
+        # Resolve molecule node ID to its actual term (e.g. CHEBI:58199)
+        molecule = (
+            molecule_lookup.get(molecule_id, molecule_id)
+            if molecule_lookup
+            else molecule_id
+        )
+        if not molecule or molecule in obsolete_ids:
+            continue
+
+        # Determine whether this is an input or output association
+        if ma.predicate in INPUT_PREDICATES:
+            target_attr = "list_has_input_term"
+        elif ma.predicate in OUTPUT_PREDICATES:
+            target_attr = "list_has_output_term"
+        else:
+            continue
+
+        for target in (stats_by_model, model_aggregate):
+            term_list = getattr(target, target_attr)
+            if term_list is not None:
+                term_list.append(molecule)
+
         if ma.provenances:
             for provenance in ma.provenances:
                 if provenance.contributor:
@@ -425,44 +502,17 @@ def _collect_molecule_terms(
                         contributor_info = contributor_lookup.setdefault(
                             contributor, GocamStats()
                         )
-                        if contributor_info.list_has_input_term is not None:
-                            contributor_info.list_has_input_term.append(ma.term)
+                        term_list = getattr(contributor_info, target_attr)
+                        if term_list is not None:
+                            term_list.append(molecule)
                 if provenance.provided_by:
                     for provider in provenance.provided_by:
                         provider_info = provider_lookup.setdefault(
                             provider, GocamStats()
                         )
-                        if provider_info.list_has_input_term is not None:
-                            provider_info.list_has_input_term.append(ma.term)
-
-    # Collect output molecule associations
-    output_associations: list[MoleculeAssociation] = list(activity.has_output or [])
-    if activity.has_primary_output:
-        output_associations.append(activity.has_primary_output)
-
-    for ma in output_associations:
-        if not ma.term or ma.term in obsolete_ids:
-            continue
-        if stats_by_model.list_has_output_term is not None:
-            stats_by_model.list_has_output_term.append(ma.term)
-        if model_aggregate.list_has_output_term is not None:
-            model_aggregate.list_has_output_term.append(ma.term)
-        if ma.provenances:
-            for provenance in ma.provenances:
-                if provenance.contributor:
-                    for contributor in provenance.contributor:
-                        contributor_info = contributor_lookup.setdefault(
-                            contributor, GocamStats()
-                        )
-                        if contributor_info.list_has_output_term is not None:
-                            contributor_info.list_has_output_term.append(ma.term)
-                if provenance.provided_by:
-                    for provider in provenance.provided_by:
-                        provider_info = provider_lookup.setdefault(
-                            provider, GocamStats()
-                        )
-                        if provider_info.list_has_output_term is not None:
-                            provider_info.list_has_output_term.append(ma.term)
+                        term_list = getattr(provider_info, target_attr)
+                        if term_list is not None:
+                            term_list.append(molecule)
 
 
 def _collect_terms(
@@ -540,6 +590,107 @@ def _collect_terms(
     _walk(activity)
 
 
+def _get_chemical_terms(
+    molecular_associations: list | None,
+    predicates: set[str],
+    obsolete_ids: set[str],
+    molecule_lookup: Dict[str, str] | None = None,
+) -> set[str]:
+    """Extract CHEBI chemical terms from molecular associations matching given predicates.
+
+    Filters molecular_associations by predicate, then collects molecule values
+    that are CHEBI terms and not obsolete.
+
+    Args:
+        molecular_associations: List of MoleculeAssociation objects from an activity.
+        predicates: Set of RO relation URIs to match (e.g. INPUT_PREDICATES or OUTPUT_PREDICATES).
+        obsolete_ids: Set of object IDs marked as obsolete.
+
+    Returns:
+        A set of CHEBI molecule strings.
+    """
+    terms: set[str] = set()
+    for ma in molecular_associations or []:
+        if ma.predicate not in predicates:
+            continue
+        molecule_id = ma.molecule
+        if not molecule_id or molecule_id in obsolete_ids:
+            continue
+        # Resolve molecule node ID to its actual term (e.g. CHEBI:58199)
+        molecule = (
+            molecule_lookup.get(molecule_id, molecule_id)
+            if molecule_lookup
+            else molecule_id
+        )
+        if (
+            molecule
+            and molecule not in obsolete_ids
+            and molecule.lower().startswith("chebi")
+        ):
+            terms.add(molecule)
+    return terms
+
+
+def _compute_inferred_relations(
+    activities: list,
+    obsolete_ids: set[str],
+    molecule_lookup: Dict[str, str] | None = None,
+) -> list[list[str]]:
+    """Compute inferred relations between activities based on shared chemicals.
+
+    An inferred relation exists when activity A produces chemical outputs that
+    are consumed as inputs by activity B, and activity B also produces chemical
+    outputs. This captures implicit metabolic pathway connections where one
+    activity's product feeds into another activity's transformation.
+
+    Args:
+        activities: List of Activity objects from a GO-CAM model.
+        obsolete_ids: Set of object IDs marked as obsolete.
+
+    Returns:
+        A deduplicated list of [activity_A_id, activity_B_id] pairs representing
+        inferred relations.
+    """
+    # Build per-activity chemical input and output sets
+    activity_chem_outputs: dict[str, set[str]] = {}
+    activity_chem_inputs: dict[str, set[str]] = {}
+
+    for activity in activities:
+        outputs = _get_chemical_terms(
+            activity.molecular_associations,
+            OUTPUT_PREDICATES,
+            obsolete_ids,
+            molecule_lookup,
+        )
+        if outputs:
+            activity_chem_outputs[activity.id] = outputs
+
+        inputs = _get_chemical_terms(
+            activity.molecular_associations,
+            INPUT_PREDICATES,
+            obsolete_ids,
+            molecule_lookup,
+        )
+        if inputs:
+            activity_chem_inputs[activity.id] = inputs
+
+    # Find pairs where A's outputs overlap with B's inputs and B also has outputs
+    relations: list[list[str]] = []
+    seen: set[tuple[str, str]] = set()
+
+    for a_id, a_outputs in activity_chem_outputs.items():
+        for b_id, b_inputs in activity_chem_inputs.items():
+            if a_id == b_id:
+                continue
+            if a_outputs & b_inputs and b_id in activity_chem_outputs:
+                pair = (a_id, b_id)
+                if pair not in seen:
+                    seen.add(pair)
+                    relations.append([a_id, b_id])
+
+    return relations
+
+
 def process_gocam_model_file(
     json_file: Path,
     output_dir: Path | None,
@@ -547,17 +698,24 @@ def process_gocam_model_file(
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
 ) -> ProcessingResult:
-    """Process a single GOCAM model JSON file and output statistics information about the model.
+    """Process a single GO-CAM model JSON file and compute statistics.
+
+    Reads the model, indexes it, collects per-activity counts (enablers,
+    causal relations, molecule terms, GO terms, inferred relations, and
+    references), and writes per-model statistics files when an output
+    directory is provided.
 
     Args:
-        json_file (Path): Path to the GO-CAM model JSON file.
-        output_dir (Path, optional): Directory to save the GO-CAM model statistics file. If None, no
-            file will be written.
+        json_file: Path to the GO-CAM model JSON file.
+        output_dir: Directory to save the GO-CAM model statistics files.
+            If None (dry run), no files are written.
+        model_aggregate: Accumulator for cross-model aggregate statistics.
+        contributor_lookup: Mapping of contributor URI to per-contributor stats.
+        provider_lookup: Mapping of provider URI to per-provider stats.
 
     Returns:
-        tuple: A tuple indicating the result of processing the GO-CAM file. Possible values are:
-            - (ResultType.SUCCESS, None): If the conversion was successful.
-            - (ResultType.ERROR, ErrorReason): If there was an error, along with the reason.
+        A ProcessingResult 3-tuple of (result_type, query_index_or_none,
+        reason_or_none).
     """
     indexer = Indexer()
     # Read GO-CAM JSON file
@@ -578,6 +736,12 @@ def process_gocam_model_file(
 
     # Build set of obsolete object IDs to filter from statistics
     obsolete_ids = _build_obsolete_ids(gocam_model)
+
+    # Build molecule node ID → term lookup (e.g. "gomodel:.../id" → "CHEBI:58199")
+    molecule_lookup: Dict[str, str] = {}
+    for mol_node in gocam_model.molecules or []:
+        if mol_node.id and mol_node.term:
+            molecule_lookup[mol_node.id] = mol_node.term
 
     # Get model statistics information
     calculated_aggregate_values_by_model = gocam_model.query_index
@@ -701,6 +865,7 @@ def process_gocam_model_file(
                 contributor_lookup,
                 provider_lookup,
                 obsolete_ids,
+                molecule_lookup,
             )
 
             # Collect GO terms from all associations
@@ -722,6 +887,16 @@ def process_gocam_model_file(
         provider_lookup,
         obsolete_ids,
     )
+
+    # Compute inferred relations for the model
+    if gocam_model.activities:
+        inferred = _compute_inferred_relations(
+            gocam_model.activities, obsolete_ids, molecule_lookup
+        )
+        stats_by_model.list_inferred_relations = inferred
+        stats_by_model.number_of_unique_inferred_relations = len(inferred)
+        if model_aggregate.list_inferred_relations is not None:
+            model_aggregate.list_inferred_relations.extend(inferred)
 
     # Set fields, counts and sort data for current model
     stats_by_model.number_of_causal_relations = len(
@@ -823,9 +998,18 @@ def process_gocam_model_file(
     return ResultType.SUCCESS, calculated_aggregate_values_by_model, None
 
 
-def create_filename_from_url(url, replacement="_"):
-    """
-    Generates a safe filename from a URL.
+def create_filename_from_url(url: str, replacement: str = "_") -> str:
+    """Generate a filesystem-safe filename from a URL.
+
+    Extracts the path component, sanitizes invalid characters, and
+    truncates to 250 characters.
+
+    Args:
+        url: The URL to derive a filename from.
+        replacement: Character used to replace invalid filename characters.
+
+    Returns:
+        A sanitized filename string.
     """
     # 1. Parse the URL to get the path component
     parsed_url = urlparse(url)
@@ -862,7 +1046,25 @@ def output_entity_results(
     entity_sub_dir: str,
     entity_agg_file_name: str,
 ) -> None:
-    """Output results for entities"""
+    """Compute final counts and write per-entity and aggregate statistics.
+
+    Iterates over all entities (contributors or providers), finalizes their
+    numeric counts from working sets, accumulates into an entity-level
+    aggregate, and writes JSON output files.
+
+    Args:
+        output_dir: Directory to write JSON files. If None, no files are written.
+        entity_label: Human-readable label for this entity type (e.g. "Curator", "Group").
+        entity_lookup: Mapping of entity URI to per-entity GocamStats.
+        entity_sub_dir: Subdirectory name for per-entity output files.
+        entity_agg_file_name: Filename for the aggregate statistics JSON.
+    """
+    # Inferred relations are only meaningful at the model level, not per-entity
+    _exclude_inferred = {
+        "number_of_unique_inferred_relations": True,
+        "list_inferred_relations": True,
+    }
+
     entity_agg = AggregateInfo()
     entity_agg.entity = entity_label
     entity_agg.total_number_of_entities_processed = len(entity_lookup)
@@ -942,7 +1144,9 @@ def output_entity_results(
             stats_by_curator_output_file.parent.mkdir(parents=True, exist_ok=True)
 
             try:
-                contributor_model_json = details.model_dump_json(exclude_none=True)
+                contributor_model_json = details.model_dump_json(
+                    exclude_none=True, exclude=_exclude_inferred
+                )
                 with open(stats_by_curator_output_file, "w") as f:
                     f.write(contributor_model_json)
                 logger.info(
@@ -992,7 +1196,9 @@ def output_entity_results(
         aggregate_stats_name_output_file.parent.mkdir(parents=True, exist_ok=True)
 
         try:
-            aggregate_json = entity_agg.model_dump_json(exclude_none=True)
+            aggregate_json = entity_agg.model_dump_json(
+                exclude_none=True, exclude=_exclude_inferred
+            )
             with open(aggregate_stats_name_output_file, "w") as f:
                 f.write(aggregate_json)
             logger.info(
@@ -1013,12 +1219,18 @@ def output_summary(
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
 ) -> None:
-    """Output a summary of the processing results.
+    """Finalize aggregate statistics and write all summary output files.
+
+    Computes final counts on the model-level aggregate, writes the
+    aggregate model stats file, delegates contributor and provider
+    aggregate output, and prints a success/failure summary tree.
 
     Args:
-        results (list): List of tuples containing the JSON file path and processing result.
-        contributor_lookup (hashmap): Lookup of curator to annotation details
-        provider_lookup (hashmap): Lookup of group to annotation details
+        results: List of (json_file, ProcessingResult) tuples from model processing.
+        output_dir: Directory to write JSON files. If None, no files are written.
+        model_aggregate: Accumulated cross-model aggregate statistics.
+        contributor_lookup: Mapping of contributor URI to per-contributor stats.
+        provider_lookup: Mapping of provider URI to per-provider stats.
     """
     model_aggregate.entity = "Model"
     model_aggregate.number_of_unique_gene_product_enablers = len(
@@ -1048,6 +1260,10 @@ def output_summary(
         )
     )
     compute_molecule_and_term_counts(model_aggregate)
+
+    model_aggregate.number_of_unique_inferred_relations = len(
+        model_aggregate.list_inferred_relations or []
+    )
 
     if model_aggregate.total_number_of_entities_processed != 0:
         model_aggregate.average_number_of_unique_gene_product_enablers_for_entity = (
@@ -1159,6 +1375,7 @@ def main(
         ),
     ] = 0,
 ):
+    """CLI entry point: process GO-CAM model JSON files and output statistics."""
     setup_logger(verbose)
     # Validate output directory if not a dry run
     if not dry_run and output_dir is None:
