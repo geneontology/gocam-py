@@ -222,6 +222,7 @@
       },
       "occurs_in": {
         "type": "CellularAnatomicalEntityAssociation",
+        "evidence": [],
         "provenances": [
           {
             "contributor": [
@@ -237,6 +238,7 @@
       },
       "part_of": {
         "type": "BiologicalProcessAssociation",
+        "evidence": [],
         "provenances": [
           {
             "contributor": [
@@ -325,6 +327,7 @@
         },
         {
           "type": "CausalAssociation",
+          "evidence": [],
           "provenances": [
             {
               "contributor": [
@@ -503,24 +506,7 @@
         ],
         "term": "GO:1904679"
       },
-      "has_input": [
-        {
-          "type": "MoleculeAssociation",
-          "provenances": [
-            {
-              "contributor": [
-                "https://orcid.org/0000-0001-6330-7526"
-              ],
-              "date": "2025-03-14",
-              "provided_by": [
-                "http://www.pombase.org"
-              ]
-            }
-          ],
-          "term": "CHEBI:17268"
-        }
-      ],
-      "has_output": [
+      "molecular_associations": [
         {
           "type": "MoleculeAssociation",
           "evidence": [
@@ -588,7 +574,25 @@
               ]
             }
           ],
-          "term": "CHEBI:17268"
+          "predicate": "RO:0002234",
+          "molecule": "gomodel:663d668500002178/67b1629100003514"
+        },
+        {
+          "type": "MoleculeAssociation",
+          "evidence": [],
+          "provenances": [
+            {
+              "contributor": [
+                "https://orcid.org/0000-0001-6330-7526"
+              ],
+              "date": "2025-03-14",
+              "provided_by": [
+                "http://www.pombase.org"
+              ]
+            }
+          ],
+          "predicate": "RO:0002233",
+          "molecule": "gomodel:663d668500002178/67c10cc400004789"
         },
         {
           "type": "MoleculeAssociation",
@@ -657,7 +661,8 @@
               ]
             }
           ],
-          "term": "CHEBI:17268"
+          "predicate": "RO:0002234",
+          "molecule": "gomodel:663d668500002178/67b1629100003514"
         }
       ],
       "causal_associations": [
@@ -898,6 +903,7 @@
       "causal_associations": [
         {
           "type": "CausalAssociation",
+          "evidence": [],
           "provenances": [
             {
               "contributor": [
@@ -1249,7 +1255,7 @@
         ],
         "term": "GO:0046854"
       },
-      "has_input": [
+      "molecular_associations": [
         {
           "type": "MoleculeAssociation",
           "evidence": [
@@ -1280,7 +1286,8 @@
               ]
             }
           ],
-          "term": "CHEBI:16749"
+          "predicate": "RO:0002233",
+          "molecule": "gomodel:663d668500002178/66c7d41500001893"
         },
         {
           "type": "MoleculeAssociation",
@@ -1312,7 +1319,8 @@
               ]
             }
           ],
-          "term": "CHEBI:16749"
+          "predicate": "RO:0002233",
+          "molecule": "gomodel:663d668500002178/66c7d41500001893"
         }
       ],
       "causal_associations": [
@@ -1667,7 +1675,7 @@
         ],
         "term": "GO:0046854"
       },
-      "has_input": [
+      "molecular_associations": [
         {
           "type": "MoleculeAssociation",
           "evidence": [
@@ -1698,7 +1706,8 @@
               ]
             }
           ],
-          "term": "CHEBI:16749"
+          "predicate": "RO:0002233",
+          "molecule": "gomodel:663d668500002178/66c7d41500001893"
         }
       ]
     },
@@ -1807,9 +1816,10 @@
         ],
         "term": "GO:0006661"
       },
-      "has_input": [
+      "molecular_associations": [
         {
           "type": "MoleculeAssociation",
+          "evidence": [],
           "provenances": [
             {
               "contributor": [
@@ -1821,25 +1831,9 @@
               ]
             }
           ],
-          "term": "CHEBI:17268"
+          "predicate": "RO:0002233",
+          "molecule": "gomodel:663d668500002178/67b1629100003514"
         },
-        {
-          "type": "MoleculeAssociation",
-          "provenances": [
-            {
-              "contributor": [
-                "https://orcid.org/0000-0001-6330-7526"
-              ],
-              "date": "2025-02-26",
-              "provided_by": [
-                "http://www.pombase.org"
-              ]
-            }
-          ],
-          "term": "CHEBI:58332"
-        }
-      ],
-      "has_output": [
         {
           "type": "MoleculeAssociation",
           "evidence": [
@@ -1870,7 +1864,25 @@
               ]
             }
           ],
-          "term": "CHEBI:16749"
+          "predicate": "RO:0002234",
+          "molecule": "gomodel:663d668500002178/66c7d41500001893"
+        },
+        {
+          "type": "MoleculeAssociation",
+          "evidence": [],
+          "provenances": [
+            {
+              "contributor": [
+                "https://orcid.org/0000-0001-6330-7526"
+              ],
+              "date": "2025-02-26",
+              "provided_by": [
+                "http://www.pombase.org"
+              ]
+            }
+          ],
+          "predicate": "RO:0002233",
+          "molecule": "gomodel:663d668500002178/67b1629100003513"
         }
       ]
     },
@@ -1944,6 +1956,56 @@
         ],
         "term": "GO:0043647"
       }
+    }
+  ],
+  "molecules": [
+    {
+      "id": "gomodel:663d668500002178/66c7d41500001893",
+      "term": "CHEBI:16749"
+    },
+    {
+      "id": "gomodel:663d668500002178/67b1629100003514",
+      "term": "CHEBI:17268",
+      "located_in": {
+        "type": "CellularAnatomicalEntityAssociation",
+        "evidence": [],
+        "provenances": [
+          {
+            "contributor": [
+              "https://orcid.org/0000-0001-6330-7526"
+            ],
+            "date": "2025-03-14",
+            "provided_by": [
+              "http://www.pombase.org"
+            ]
+          }
+        ],
+        "term": "GO:0005829"
+      }
+    },
+    {
+      "id": "gomodel:663d668500002178/67c10cc400004789",
+      "term": "CHEBI:17268",
+      "located_in": {
+        "type": "CellularAnatomicalEntityAssociation",
+        "evidence": [],
+        "provenances": [
+          {
+            "contributor": [
+              "https://orcid.org/0000-0001-6330-7526"
+            ],
+            "date": "2025-03-14",
+            "provided_by": [
+              "http://www.pombase.org"
+            ]
+          }
+        ],
+        "term": "GO:0005576"
+      }
+    },
+    {
+      "id": "gomodel:663d668500002178/67b1629100003513",
+      "term": "CHEBI:58332"
     }
   ],
   "objects": [

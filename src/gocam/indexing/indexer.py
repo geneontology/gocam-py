@@ -2,7 +2,7 @@ import logging
 from collections.abc import Iterable
 from functools import cached_property, lru_cache
 from pathlib import Path
-from typing import Collection, List, Optional, Tuple
+from typing import Any, Collection, List, Optional, Tuple, overload
 
 import networkx as nx
 import pystow
@@ -11,18 +11,27 @@ from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import IS_A, PART_OF
 
 from gocam.datamodel import (
+    Activity,
     Association,
+    BiologicalProcessAssociation,
+    CellTypeAssociation,
+    CellularAnatomicalEntityAssociation,
+    EnabledByAssociation,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     EvidenceItem,
     EvidenceTermObject,
+    GrossAnatomyAssociation,
     Model,
+    MoleculeNode,
     Object,
     ProvenanceInfo,
     PublicationObject,
     QueryIndex,
     TermObject,
 )
+from gocam.utils import model_to_digraph
+from gocam.vocabulary import Relation
 
 logger = logging.getLogger(__name__)
 
@@ -49,49 +58,86 @@ def _iter_association_provenances(
                 yield from evidence.provenances
 
 
-def _iter_model_associations(model: Model) -> Iterable[Association]:
+@overload
+def _iter_associations(obj: Model) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: Activity) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: MoleculeNode) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: EnabledByAssociation) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: BiologicalProcessAssociation) -> Iterable[Association]: ...
+@overload
+def _iter_associations(
+    obj: CellularAnatomicalEntityAssociation,
+) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: CellTypeAssociation) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: GrossAnatomyAssociation) -> Iterable[Association]: ...
+@overload
+def _iter_associations(obj: Association) -> Iterable[Association]: ...
+def _iter_associations(obj: Any) -> Iterable[Association]:
     """
-    Extract all Association objects from a Model.
+    Extract all Association objects from a given object.
 
     Returns:
-        Iterable[Association]: Iterable over Association objects extracted from the model's activities.
+        Iterable[Association]: Iterable over Association objects extracted from the object.
     """
-    for activity in model.activities or []:
-        if activity.enabled_by:
-            yield activity.enabled_by
-            if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-                if activity.enabled_by.members:
-                    yield from activity.enabled_by.members
+    match obj:
+        case Model():
+            for activity in obj.activities or []:
+                yield from _iter_associations(activity)
+            for molecule in obj.molecules or []:
+                yield from _iter_associations(molecule)
 
-        if activity.molecular_function:
-            yield activity.molecular_function
+        case Activity():
+            if obj.enabled_by:
+                yield from _iter_associations(obj.enabled_by)
+            if obj.molecular_function:
+                yield from _iter_associations(obj.molecular_function)
+            if obj.part_of:
+                yield from _iter_associations(obj.part_of)
+            if obj.occurs_in:
+                yield from _iter_associations(obj.occurs_in)
+            if obj.happens_during:
+                yield from _iter_associations(obj.happens_during)
+            for molecule_association in obj.molecular_associations or []:
+                yield from _iter_associations(molecule_association)
+            for causal_association in obj.causal_associations or []:
+                yield from _iter_associations(causal_association)
 
-        if activity.part_of:
-            yield activity.part_of
-            if activity.part_of.happens_during:
-                yield activity.part_of.happens_during
-            if activity.part_of.part_of:
-                yield activity.part_of.part_of
+        case MoleculeNode():
+            if obj.located_in:
+                yield from _iter_associations(obj.located_in)
 
-        if activity.occurs_in:
-            yield activity.occurs_in
-            if activity.occurs_in.part_of:
-                yield activity.occurs_in.part_of
+        case EnabledByProteinComplexAssociation():
+            yield obj
+            for member in obj.members or []:
+                yield from _iter_associations(member)
 
-        if activity.has_primary_input:
-            yield activity.has_primary_input
+        case BiologicalProcessAssociation():
+            yield obj
+            if obj.happens_during:
+                yield from _iter_associations(obj.happens_during)
+            if obj.part_of:
+                yield from _iter_associations(obj.part_of)
 
-        for has_input in activity.has_input or []:
-            yield has_input
+        case (
+            CellularAnatomicalEntityAssociation()
+            | CellTypeAssociation()
+            | GrossAnatomyAssociation()
+        ):
+            yield obj
+            if obj.part_of:
+                yield from _iter_associations(obj.part_of)
 
-        if activity.has_primary_output:
-            yield activity.has_primary_output
+        case Association():
+            yield obj
 
-        for has_output in activity.has_output or []:
-            yield has_output
-
-        for causal_association in activity.causal_associations or []:
-            yield causal_association
+        case _:
+            raise ValueError(f"Unsupported object type: {type(obj)}")
 
 
 def _iter_model_provenances(model: Model) -> Iterable[ProvenanceInfo]:
@@ -107,7 +153,7 @@ def _iter_model_provenances(model: Model) -> Iterable[ProvenanceInfo]:
     for activity in model.activities or []:
         if activity.provenances:
             yield from activity.provenances
-    for association in _iter_model_associations(model):
+    for association in _iter_associations(model):
         yield from _iter_association_provenances(association)
 
 
@@ -121,7 +167,7 @@ def _iter_model_evidence(model: Model) -> Iterable[EvidenceItem]:
     Returns:
         Iterable[EvidenceItem]: Iterable over EvidenceItem objects extracted from the model's associations.
     """
-    for association in _iter_model_associations(model):
+    for association in _iter_associations(model):
         if association.evidence:
             yield from association.evidence
 
@@ -334,7 +380,6 @@ class Indexer:
         model.query_index = qi
         qi = model.query_index
         qi.number_of_activities = len(model.activities or [])
-        all_causal_associations = []
         all_mfs = set()
         all_enabled_bys = set()
         all_enabled_by_genes = set()
@@ -354,10 +399,12 @@ class Indexer:
 
             return x
 
+        molecule_nodes_by_id: dict[str, MoleculeNode] = {
+            node.id: node for node in model.molecules or []
+        }
+
         for activity in model.activities or []:
             annoton_term_id_parts = []
-            if activity.causal_associations:
-                all_causal_associations.extend(activity.causal_associations)
 
             if activity.enabled_by:
                 all_enabled_bys.add(activity.enabled_by.term)
@@ -384,10 +431,16 @@ class Indexer:
                 all_occurs_ins.add(activity.occurs_in.term)
                 annoton_term_id_parts.append(activity.occurs_in.term)
 
-            if activity.has_input:
-                for ta in activity.has_input:
-                    all_has_inputs.add(ta.term)
-                    annoton_term_id_parts.append(ta.term)
+            if activity.molecular_associations:
+                for ma in activity.molecular_associations:
+                    if (
+                        ma.molecule
+                        and ma.molecule in molecule_nodes_by_id
+                        and ma.predicate == Relation.HAS_INPUT
+                    ):
+                        input_molecule = molecule_nodes_by_id[ma.molecule]
+                        all_has_inputs.add(input_molecule.term)
+                        annoton_term_id_parts.append(input_molecule.term)
 
             if activity.enabled_by:
                 annoton_term_id_parts = filter(None, annoton_term_id_parts)
@@ -398,8 +451,10 @@ class Indexer:
                 )
                 all_annoton_terms.append(annoton_term)
 
+        graph = model_to_digraph(model)
+
         qi.number_of_enabled_by_terms = len(all_enabled_bys)
-        qi.number_of_causal_associations = len(all_causal_associations)
+        qi.number_of_causal_associations = graph.number_of_edges()
 
         all_provided_bys = set()
         all_contributors = set()
@@ -435,7 +490,6 @@ class Indexer:
             for term in sorted(all_evidence_terms)
         ]
 
-        graph = self.model_to_digraph(model)
         # use nx to find the longest path and all SCCs
         if graph.number_of_nodes() > 0:
             # Find the longest path length
@@ -509,23 +563,3 @@ class Indexer:
             qi.taxon_label = self._ncbi_taxon_label(model.taxon)
 
         return qi
-
-    def model_to_digraph(self, model: Model) -> nx.DiGraph:
-        """
-        Convert a model to a directed graph where nodes are activities
-        and edges represent causal relationships between activities.
-
-        Args:
-            model: The GO-CAM model to convert
-
-        Returns:
-            A directed graph (DiGraph) where nodes are activity IDs and edges represent
-            causal relationships from source to target activities
-        """
-        g = nx.DiGraph()
-        for a in model.activities or []:
-            if a.causal_associations:
-                for ca in a.causal_associations:
-                    if ca.downstream_activity:
-                        g.add_edge(ca.downstream_activity, a.id)
-        return g

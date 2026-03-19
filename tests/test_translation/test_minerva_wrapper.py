@@ -3,12 +3,16 @@ import re
 
 import pytest
 
-from gocam.datamodel import EnabledByProteinComplexAssociation
-from gocam.translation.minerva_wrapper import MinervaWrapper
+from gocam.datamodel import Activity, EnabledByProteinComplexAssociation
+from gocam.translation.minerva_wrapper import (
+    MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES,
+    MOLECULAR_ASSOCIATION_PROPERTIES,
+    MinervaView,
+    MinervaWrapper,
+)
 from gocam.translation.result import WarningType
+from gocam.vocabulary import Relation
 from tests import INPUT_DIR
-
-ENABLED_BY = "RO:0002333"
 
 
 def load_minerva_object(id: str):
@@ -35,7 +39,9 @@ def test_object(id):
     assert model is not None
     assert model.id == minerva_object["id"]
     enabled_by_facts = [
-        fact for fact in minerva_object["facts"] if fact["property"] == ENABLED_BY
+        fact
+        for fact in minerva_object["facts"]
+        if fact["property"] == Relation.ENABLED_BY
     ]
     assert model.activities is not None
     assert len(model.activities) == len(enabled_by_facts)
@@ -70,27 +76,50 @@ def test_has_input_and_has_output():
     mw = MinervaWrapper()
     model = mw.minerva_object_to_model(minerva_object)
 
-    activities_with_input = []
-    activities_with_output = []
-    for activity in model.activities or []:
-        if activity.has_input:
-            activities_with_input.append(activity)
-        if activity.has_output:
-            activities_with_output.append(activity)
+    activities_with_input: list[Activity] = [
+        activity
+        for activity in model.activities or []
+        if any(
+            ma.predicate == Relation.HAS_INPUT
+            for ma in activity.molecular_associations or []
+        )
+    ]
+    activities_with_output: list[Activity] = [
+        activity
+        for activity in model.activities or []
+        if any(
+            ma.predicate == Relation.HAS_OUTPUT
+            for ma in activity.molecular_associations or []
+        )
+    ]
 
     # Basic sanity check on the number of activities with input/output
     assert len(activities_with_input) == 3
     assert len(activities_with_output) == 7
 
     # Verify that one activity has uric acid as an input
+    uric_acid_molecule = next(
+        m for m in model.molecules or [] if m.term == "CHEBI:27226"
+    )
     uric_acid_input_activities = [
-        a for a in activities_with_input if a.has_input[0].term == "CHEBI:27226"
+        a
+        for a in activities_with_input
+        if any(
+            ma.molecule == uric_acid_molecule.id and ma.predicate == Relation.HAS_INPUT
+            for ma in a.molecular_associations or []
+        )
     ]
     assert len(uric_acid_input_activities) == 1
 
     # Verify that three activities have urea as an output
+    urea_molecule = next(m for m in model.molecules or [] if m.term == "CHEBI:16199")
     urea_output_activities = [
-        a for a in activities_with_output if a.has_output[0].term == "CHEBI:16199"
+        a
+        for a in activities_with_output
+        if any(
+            ma.molecule == urea_molecule.id and ma.predicate == Relation.HAS_OUTPUT
+            for ma in a.molecular_associations or []
+        )
     ]
     assert len(urea_output_activities) == 3
 
@@ -103,15 +132,27 @@ def test_has_input_issue_65():
 
     # Find activities with inputs
     activities_with_input = [
-        a for a in (model.activities or []) if a.has_input is not None
+        a
+        for a in (model.activities or [])
+        if a.molecular_associations
+        and any(ma.predicate == Relation.HAS_INPUT for ma in a.molecular_associations)
     ]
 
     # Verify that all inputs are included, even protein inputs
     for activity in activities_with_input:
-        for input_assoc in activity.has_input or []:
+        for input_assoc in activity.molecular_associations or []:
+            if input_assoc.predicate != Relation.HAS_INPUT:
+                continue
             # Check if the input term is also the term of an enabled_by for any activity
+            if input_assoc.molecule is None or not model.molecules:
+                continue
+            input_molecule = next(
+                (m for m in model.molecules if m.id == input_assoc.molecule), None
+            )
+            if input_molecule is None:
+                continue
             is_protein = any(
-                a.enabled_by.term == input_assoc.term
+                a.enabled_by.term == input_molecule.term
                 for a in (model.activities or [])
                 if a.enabled_by is not None
             )
@@ -131,10 +172,19 @@ def test_multivalued_input_and_output():
         for a in (model.activities or [])
         if a.molecular_function and a.molecular_function.term == "GO:0004108"
     )
-    assert cs_activity.has_input is not None
-    assert len(cs_activity.has_input) == 3
-    assert cs_activity.has_output is not None
-    assert len(cs_activity.has_output) == 2
+    assert cs_activity.molecular_associations is not None
+    inputs = [
+        ma
+        for ma in cs_activity.molecular_associations
+        if ma.predicate == Relation.HAS_INPUT
+    ]
+    outputs = [
+        ma
+        for ma in cs_activity.molecular_associations
+        if ma.predicate == Relation.HAS_OUTPUT
+    ]
+    assert len(inputs) == 3
+    assert len(outputs) == 2
 
 
 def test_missing_enabled_by():
@@ -218,23 +268,10 @@ def test_provenance_on_associations():
                 assert causal_assoc.provenances is not None
                 assert len(causal_assoc.provenances) > 0
 
-        if activity.has_input is not None:
-            for input_assoc in activity.has_input:
-                assert input_assoc.provenances is not None
-                assert len(input_assoc.provenances) > 0
-
-        if activity.has_output is not None:
-            for output_assoc in activity.has_output:
-                assert output_assoc.provenances is not None
-                assert len(output_assoc.provenances) > 0
-
-        if activity.has_primary_input is not None:
-            assert activity.has_primary_input.provenances is not None
-            assert len(activity.has_primary_input.provenances) > 0
-
-        if activity.has_primary_output is not None:
-            assert activity.has_primary_output.provenances is not None
-            assert len(activity.has_primary_output.provenances) > 0
+        if activity.molecular_associations:
+            for mol_assoc in activity.molecular_associations:
+                assert mol_assoc.provenances is not None
+                assert len(mol_assoc.provenances) > 0
 
         if activity.occurs_in is not None:
             assert activity.occurs_in.provenances is not None
@@ -329,7 +366,7 @@ def test_additional_taxa():
     minerva_object["facts"] = [
         {
             "subject": "gomodel:test123/activity1",
-            "property": "RO:0002333",
+            "property": Relation.HAS_INPUT,
             "object": "gomodel:test123/protein1",
             "annotations": [],
         }
@@ -412,7 +449,7 @@ def test_translation_warning_missing_term():
     minerva_object["facts"].append(
         {
             "subject": "gomodel:663d668500002178/subject_missing_term",
-            "property": "RO:0002333",
+            "property": Relation.HAS_INPUT,
             "object": "gomodel:663d668500002178/object_missing_term",
             "annotations": [],
         }
@@ -427,10 +464,9 @@ def test_translation_warning_missing_term():
         (w for w in warnings if w.type == WarningType.MISSING_TERM), None
     )
     assert missing_term_warning is not None
-    assert "Missing term for subject" in missing_term_warning.message
+    assert "Missing term for individual" in missing_term_warning.message
     assert (
-        missing_term_warning.entity_id
-        == "gomodel:663d668500002178/subject_missing_term"
+        missing_term_warning.entity_id == "gomodel:663d668500002178/object_missing_term"
     )
 
     # A second warning should be generated for an unhandled fact due to the missing term
@@ -487,3 +523,192 @@ def test_translation_warning_invalid_model_state():
     assert warnings[0].type == WarningType.INVALID_MODEL_STATE
     assert "invalid_state_for_testing" in warnings[0].message
     assert warnings[0].entity_id == "gomodel:663d668500002178"
+
+
+def test_happens_during():
+    """Test that the happens_during slot on Activity instances is populated correctly."""
+    minerva_object = {
+        "id": "gomodel:test_happens_during",
+        "annotations": [{"key": "title", "value": "Test model with happens_during"}],
+        "individuals": [
+            {
+                "id": "gomodel:test_happens_during/activity1",
+                "type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "annotations": [],
+            },
+            {
+                "id": "gomodel:test_happens_during/protein1",
+                "type": [
+                    {"type": "class", "id": "UniProtKB:P12345", "label": "test protein"}
+                ],
+                "root-type": [
+                    {
+                        "type": "class",
+                        "id": "CHEBI:33695",
+                        "label": "information biomacromolecule",
+                    }
+                ],
+                "annotations": [],
+            },
+            {
+                "id": "gomodel:test_happens_during/phase1",
+                "type": [
+                    {"type": "class", "id": "GO:0005132", "label": "cell cycle phase"}
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0044848", "label": "biological phase"}
+                ],
+                "annotations": [],
+            },
+        ],
+        "facts": [
+            {
+                "subject": "gomodel:test_happens_during/activity1",
+                "property": Relation.ENABLED_BY,
+                "object": "gomodel:test_happens_during/protein1",
+                "annotations": [],
+            },
+            {
+                "subject": "gomodel:test_happens_during/activity1",
+                "property": Relation.HAPPENS_DURING,
+                "object": "gomodel:test_happens_during/phase1",
+                "annotations": [],
+            },
+        ],
+    }
+
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    assert model.activities is not None
+    assert len(model.activities) == 1
+    activity = model.activities[0]
+    assert activity.happens_during is not None
+    assert activity.happens_during.term == "GO:0005132"
+
+
+def test_molecular_association_inverse_properties_definition():
+    """Test that all keys of MOLECULE_ASSOCIATION_INVERSE_PROPERTIES have a value that is included
+    in MOLECULE_ASSOCIATION_PROPERTIES"""
+    for inverse_prop, prop in MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES.items():
+        assert prop in MOLECULAR_ASSOCIATION_PROPERTIES, (
+            f"Inverse property '{inverse_prop}' maps to '{prop}', which is not a valid molecule association property."
+        )
+
+
+def test_has_small_molecule_activator_association():
+    """Test that facts with the is_small_molecule_activator_of property are correctly translated."""
+    minerva_object = load_minerva_object("6606056e00002011")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    # Because the associations are "activity-oriented" in the data model, the
+    # is_small_molecule_activator_of association facts in the Minerva object will be translated to
+    # has_small_molecule_activator associations on the Activity.
+    has_small_molecule_activator_associations = [
+        assoc
+        for activity in model.activities or []
+        for assoc in activity.molecular_associations or []
+        if assoc.predicate == Relation.HAS_SMALL_MOLECULE_ACTIVATOR
+    ]
+
+    assert len(has_small_molecule_activator_associations) == 2
+
+
+def test_deeply_nested_part_of_associations():
+    """Test that deeply nested part_of associations are correctly translated."""
+    minerva_object = load_minerva_object("64d5781900000615")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    rraga_activity = next(
+        (
+            a
+            for a in model.activities or []
+            if a.enabled_by
+            and a.enabled_by.term == "UniProtKB:Q7L523"
+            and a.molecular_function
+            and a.molecular_function.term == "GO:0043495"
+        ),
+        None,
+    )
+
+    assert rraga_activity is not None
+    assert rraga_activity.part_of is not None
+    assert rraga_activity.part_of.term == "GO:0061462"
+    assert rraga_activity.part_of.part_of is not None
+    assert rraga_activity.part_of.part_of.term == "GO:1904263"
+    assert rraga_activity.part_of.part_of.part_of is not None
+    assert rraga_activity.part_of.part_of.part_of.term == "GO:0031669"
+
+
+def test_deeply_nested_molecule_localization():
+    """Test that deeply nested molecule localization associations are correctly translated."""
+    minerva_object = load_minerva_object("nested-localization")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    iron_molecule = next(
+        (m for m in model.molecules or [] if m.term == "CHEBI:29033"),
+        None,
+    )
+
+    assert iron_molecule is not None
+    assert iron_molecule.located_in is not None
+    assert iron_molecule.located_in.term == "GO:0005880"
+    assert iron_molecule.located_in.part_of is not None
+    assert iron_molecule.located_in.part_of.term == "GO:0005637"
+    assert iron_molecule.located_in.part_of.part_of is not None
+    assert iron_molecule.located_in.part_of.part_of.term == "GO:0005634"
+
+
+def test_minerva_view_get_facts():
+    """Test that the MinervaView.get_facts method correctly retrieves facts for a given subject."""
+    minerva_object = {
+        "facts": [
+            {
+                "subject": "S1",
+                "property": "P1",
+                "object": "O1",
+            },
+            {
+                "subject": "S1",
+                "property": "P2",
+                "object": "O2",
+            },
+            {
+                "subject": "S2",
+                "property": "P1",
+                "object": "O3",
+            },
+            {
+                "subject": "S2",
+                "property": "P1",
+                "object": "O4",
+            },
+            {
+                "subject": "S3",
+                "property": "P1",
+                "object": "O3",
+            },
+            {
+                "subject": "S2",
+                "property": "P3",
+                "object": "O3",
+            },
+        ]
+    }
+    view = MinervaView(minerva_object)
+    assert len(view.get_facts()) == 6
+    assert len(view.get_facts(property="P1")) == 4
+    assert len(view.get_facts(object="O1")) == 1
+    assert len(view.get_facts(object="O3", property="P2")) == 0
+    assert len(view.get_facts(subject="S1")) == 2
+    assert len(view.get_facts(subject="S1", property="P2")) == 1
+    assert len(view.get_facts(subject="S1", object="O3")) == 0
+    assert len(view.get_facts(subject="S2", property="P1", object="O3")) == 1

@@ -20,8 +20,8 @@ from typing_extensions import Annotated, Literal
 
 from gocam import __version__
 from gocam.datamodel import Model
-from gocam.indexing.Flattener import Flattener
-from gocam.indexing.Indexer import Indexer
+from gocam.indexing.flattener import Flattener
+from gocam.indexing.indexer import Indexer
 from gocam.translation import MinervaWrapper
 from gocam.translation.cx2 import model_to_cx2
 from gocam.translation.networkx.model_network_translator import ModelNetworkTranslator

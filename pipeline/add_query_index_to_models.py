@@ -24,7 +24,7 @@ from _common import (
 from rich.progress import track
 
 from gocam.datamodel import Model
-from gocam.indexing.Indexer import Indexer
+from gocam.indexing.indexer import Indexer
 
 app = typer.Typer()
 

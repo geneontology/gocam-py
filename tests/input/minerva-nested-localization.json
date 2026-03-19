@@ -1,0 +1,437 @@
+{
+  "id": "gomodel:69a8e69700000059",
+  "individuals": [
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000025",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0034986",
+          "label": "iron chaperone activity"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "BFO:0000015",
+          "label": "process"
+        },
+        {
+          "type": "class",
+          "id": "GO:0034986",
+          "label": "iron chaperone activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000026",
+      "type": [
+        {
+          "type": "class",
+          "id": "ZFIN:ZDB-GENE-990415-8",
+          "label": "pax2a Drer"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "ZFIN:ZDB-GENE-990415-8",
+          "label": "pax2a Drer"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000027",
+      "type": [
+        {
+          "type": "class",
+          "id": "CHEBI:29033",
+          "label": "iron(2+)"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "BFO:0000004",
+          "label": "independent continuant"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:29033",
+          "label": "iron(2+)"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000028",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005880",
+          "label": "nuclear microtubule"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "BFO:0000004",
+          "label": "independent continuant"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005880",
+          "label": "nuclear microtubule"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000029",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005637",
+          "label": "nuclear inner membrane"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "BFO:0000004",
+          "label": "independent continuant"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005637",
+          "label": "nuclear inner membrane"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000030",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0005634",
+          "label": "nucleus"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "BFO:0000004",
+          "label": "independent continuant"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005634",
+          "label": "nucleus"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "UBERON:0001062",
+          "label": "anatomical entity"
+        },
+        {
+          "type": "class",
+          "id": "GO:0110165",
+          "label": "cellular anatomical structure"
+        },
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000027",
+      "property": "RO:0001025",
+      "property-label": "located in",
+      "object": "gomodel:69a8e69700000059/69b432fc00000028",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000028",
+      "property": "BFO:0000050",
+      "property-label": "part of",
+      "object": "gomodel:69a8e69700000059/69b432fc00000029",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000029",
+      "property": "BFO:0000050",
+      "property-label": "part of",
+      "object": "gomodel:69a8e69700000059/69b432fc00000030",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000025",
+      "property": "RO:0002233",
+      "property-label": "has input",
+      "object": "gomodel:69a8e69700000059/69b432fc00000027",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000025",
+      "property": "RO:0002333",
+      "property-label": "enabled by",
+      "object": "gomodel:69a8e69700000059/69b432fc00000026",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-13"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "key": "conforms-to-gpad",
+      "value": "true",
+      "value-type": "xsd:boolean"
+    },
+    {
+      "key": "state",
+      "value": "development"
+    },
+    {
+      "key": "contributor",
+      "value": "https://orcid.org/0000-0002-6150-307X"
+    },
+    {
+      "key": "date",
+      "value": "2026-03-13"
+    },
+    {
+      "key": "title",
+      "value": "test arbitrarily deep part_ofs"
+    },
+    {
+      "key": "providedBy",
+      "value": "http://geneontology.org"
+    },
+    {
+      "key": "https://w3id.org/biolink/vocab/in_taxon",
+      "value": "NCBITaxon:7955",
+      "value-type": "IRI"
+    }
+  ]
+}

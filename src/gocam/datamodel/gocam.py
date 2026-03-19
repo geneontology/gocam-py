@@ -29,7 +29,7 @@ from pydantic import (
 )
 
 
-metamodel_version = "None"
+metamodel_version = "1.7.0"
 version = "None"
 
 
@@ -45,19 +45,7 @@ class ConfiguredBaseModel(BaseModel):
         strict = False,
     )
 
-    @model_serializer(mode='wrap', when_used='unless-none')
-    def treat_empty_lists_as_none(
-            self, handler: SerializerFunctionWrapHandler,
-            info: SerializationInfo) -> dict[str, Any]:
-        if info.exclude_none:
-            _instance = self.model_copy()
-            for field, field_info in type(_instance).model_fields.items():
-                if getattr(_instance, field) == [] and not(
-                        field_info.is_required()):
-                    setattr(_instance, field, None)
-        else:
-            _instance = self
-        return handler(_instance, info)
+
 
 
 
@@ -232,13 +220,6 @@ class CellularAnatomicalEntityEnum(str):
     pass
 
 
-class PhaseEnum(str):
-    """
-    A term from either the phase branch of GO or the phase branch of an anatomy ontology
-    """
-    pass
-
-
 
 class Model(ConfiguredBaseModel):
     """
@@ -251,20 +232,24 @@ class Model(ConfiguredBaseModel):
                                                                      'name': 'status'}}},
                     'title': 'Production rules must have at least one activity'}]})
 
-    id: str = Field(default=..., description="""The identifier of the model. Should be in gocam namespace.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., description="""The identifier of the model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object'],
+         'examples': [{'description': 'A model representing tRNA repair and recycling',
+                       'value': 'gomodel:63f809ec00000701'}],
+         'id_prefixes': ['gomodel']} })
     title: str = Field(default=..., description="""The human-readable descriptive title of the model""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model'], 'slot_uri': 'dct:title'} })
     taxon: Optional[str] = Field(default=None, description="""The primary taxon that the model is about""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
-    additional_taxa: Optional[list[str]] = Field(default=[], description="""Additional taxa that the model is about""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
+    additional_taxa: Optional[list[str]] = Field(default=None, description="""Additional taxa that the model is about""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
     status: Optional[ModelStateEnum] = Field(default=None, description="""The status of the model in terms of its progression along the developmental lifecycle""", json_schema_extra = { "linkml_meta": {'aliases': ['model state'], 'domain_of': ['Model'], 'slot_uri': 'pav:status'} })
     date_modified: Optional[str] = Field(default=None, description="""The date that the model was last modified""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model'], 'slot_uri': 'dct:date'} })
-    comments: Optional[list[str]] = Field(default=[], description="""Curator-provided comments about the model""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model'], 'slot_uri': 'rdfs:comment'} })
-    activities: Optional[list[Activity]] = Field(default=[], description="""All of the activities that are part of the model""", json_schema_extra = { "linkml_meta": {'comments': ['this slot is conditionally required. It is optional for models '
+    comments: Optional[list[str]] = Field(default=None, description="""Curator-provided comments about the model""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model'], 'slot_uri': 'rdfs:comment'} })
+    activities: Optional[list[Activity]] = Field(default=None, description="""All of the activities that are part of the model""", json_schema_extra = { "linkml_meta": {'comments': ['this slot is conditionally required. It is optional for models '
                       'in development state (because a curator may need to instantiate '
                       'a Model before populating it with activities), but is required '
                       'for production models. See the associated rule.'],
          'domain_of': ['Model']} })
-    objects: Optional[list[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""Model-level provenance information""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    molecules: Optional[list[MoleculeNode]] = Field(default=None, description="""All of the molecule nodes that are part of the model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
+    objects: Optional[list[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All of the objects that are part of the model. This includes terms as well as publications and database objects like gene. This is not strictly part of the data managed by the model, it is for convenience, and should be refreshed from outside.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""Model-level provenance information""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
     query_index: Optional[QueryIndex] = Field(default=None, description="""An optional object that contains the results of indexing a model with various summary statistics and retrieval indices.""", json_schema_extra = { "linkml_meta": {'comments': ['This is typically not populated in the primary transactional '
                       'store (OLTP processing), because the values will be redundant '
                       'with the primary edited components of the model. It is intended '
@@ -279,12 +264,13 @@ class Activity(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'aliases': ['annoton'], 'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., description="""Identifier of the activity unit. Should be in gocam namespace.""", json_schema_extra = { "linkml_meta": {'comments': ['Typically does not need to be exposed to end-user, this exists '
+    id: str = Field(default=..., description="""Identifier of the activity unit.""", json_schema_extra = { "linkml_meta": {'comments': ['Typically does not need to be exposed to end-user, this exists '
                       'to allow activity flows'],
-         'domain_of': ['Model', 'Activity', 'Object'],
-         'examples': [{'description': 'A model representing tRNA repair and recycling',
-                       'value': 'gomodel:63f809ec00000701'}],
-         'id_prefixes': ['gocam']} })
+         'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object'],
+         'examples': [{'description': 'A activity of the model representing '
+                                      'alpha-aminoacyl-tRNA binding enabled by NEMF',
+                       'value': 'gomodel:63f809ec00000701/63f809ec00000706'}],
+         'id_prefixes': ['gomodel']} })
     enabled_by: Optional[Union[EnabledByAssociation,EnabledByGeneProductAssociation,EnabledByProteinComplexAssociation]] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'recommended': True} })
     molecular_function: Optional[MolecularFunctionAssociation] = Field(default=None, description="""The molecular function that is carried out by the gene product or complex""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
          'recommended': True,
@@ -297,19 +283,35 @@ class Activity(ConfiguredBaseModel):
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation'],
          'recommended': True} })
-    has_input: Optional[list[MoleculeAssociation]] = Field(default=[], description="""The input molecules that are directly consumed by the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'todos': ['resolve has_input vs has_primary_input']} })
-    has_primary_input: Optional[MoleculeAssociation] = Field(default=None, description="""The primary input molecule that is directly consumed by the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'todos': ['resolve has_input vs has_primary_input']} })
-    has_output: Optional[list[MoleculeAssociation]] = Field(default=[], description="""The output molecules that are directly produced by the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'todos': ['resolve has_output vs has_primary_output']} })
-    has_primary_output: Optional[MoleculeAssociation] = Field(default=None, description="""The primary output molecule that is directly produced by the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'],
-         'todos': ['resolve has_output vs has_primary_output']} })
-    causal_associations: Optional[list[CausalAssociation]] = Field(default=[], description="""The causal associations that flow out of this activity""", json_schema_extra = { "linkml_meta": {'comments': ['All activities in a model must be connected to at least one '
+    happens_during: Optional[PhaseAssociation] = Field(default=None, description="""The phase during which the activity takes place""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'BiologicalProcessAssociation']} })
+    molecular_associations: Optional[list[MoleculeAssociation]] = Field(default=None, description="""Associations between the activity and molecules that are relevant to it. This includes molecules that are products/substrates or regulators of the activity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity']} })
+    causal_associations: Optional[list[CausalAssociation]] = Field(default=None, description="""The causal associations that flow out of this activity""", json_schema_extra = { "linkml_meta": {'comments': ['All activities in a model must be connected to at least one '
                       'other activity. If a an activity has no outgoing activities '
                       '(i.e the value of this slot is empty) then it is a terminal '
                       'activity in the model. If an activity has no incoming '
                       'activities, it is an initial activity.'],
          'domain_of': ['Activity']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""Provenance information for the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""Provenance information for the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+
+
+class MoleculeNode(ConfiguredBaseModel):
+    """
+    An individual molecule or chemical entity in a causal model, representing a specific occurrence of a molecule that participates in activities as an input or output and may be localized to a particular cellular location.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
+
+    id: str = Field(default=..., description="""Identifier of the molecule node.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object'],
+         'examples': [{'description': 'A molecule node of the model representing tRNA '
+                                      'precursor (CHEBI:10668) that is an input to '
+                                      'tRNA-specific ribonuclease activity '
+                                      '(GO:0004549)',
+                       'value': 'gomodel:63f809ec00000701/63f809ec00000733'}],
+         'id_prefixes': ['gomodel']} })
+    term: str = Field(default=..., description="""The molecule term associated with the molecule node""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
+    located_in: Optional[CellularAnatomicalEntityAssociation] = Field(default=None, description="""The cellular location in which the molecule is located""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode']} })
 
 
 class EvidenceItem(ConfiguredBaseModel):
@@ -321,14 +323,17 @@ class EvidenceItem(ConfiguredBaseModel):
     term: Optional[str] = Field(default=None, description="""The ECO term representing the type of evidence""", json_schema_extra = { "linkml_meta": {'bindings': [{'binds_value_of': 'id',
                        'obligation_level': 'REQUIRED',
                        'range': 'EvidenceCodeEnum'}],
-         'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation'],
+         'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation'],
          'examples': [{'description': 'direct assay evidence used in manual assertion '
                                       '(IDA)',
                        'value': 'ECO:0000314'}],
          'id_prefixes': ['ECO']} })
     reference: Optional[str] = Field(default=None, description="""The publication of reference that describes the evidence""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem'], 'examples': [{'value': 'PMID:32075755'}]} })
-    with_objects: Optional[list[str]] = Field(default=[], description="""Supporting database entities or terms""", json_schema_extra = { "linkml_meta": {'aliases': ['with', 'with/from'], 'domain_of': ['EvidenceItem']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""Provenance about the assertion, e.g. who made it""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    with_objects: Optional[list[str]] = Field(default=None, description="""Supporting database entities or terms""", json_schema_extra = { "linkml_meta": {'aliases': ['with', 'with/from'], 'domain_of': ['EvidenceItem']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""Provenance about the assertion, e.g. who made it""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class Association(ConfiguredBaseModel):
@@ -342,8 +347,8 @@ class Association(ConfiguredBaseModel):
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class EnabledByAssociation(Association):
@@ -357,14 +362,17 @@ class EnabledByAssociation(Association):
                       'on what kind of entity enables the association'],
          'from_schema': 'https://w3id.org/gocam'})
 
-    term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["EnabledByAssociation"] = Field(default="EnabledByAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class EnabledByGeneProductAssociation(EnabledByAssociation):
@@ -409,7 +417,10 @@ class EnabledByGeneProductAssociation(EnabledByAssociation):
                       'authoritative GPI allows it). Note that the *interpretation* of '
                       'the gene ID in the context of a GO-CAM model is the (spliceform '
                       'and proteoform agnostic) *product* of that gene.'],
-         'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation'],
+         'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation'],
          'examples': [{'description': 'The protein product of the Homo sapiens TRNT1 '
                                       'gene',
                        'value': 'UniProtKB:Q96Q11'},
@@ -420,8 +431,8 @@ class EnabledByGeneProductAssociation(EnabledByAssociation):
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class EnabledByProteinComplexAssociation(EnabledByAssociation):
@@ -457,8 +468,11 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
                                  'name': 'term',
                                  'range': 'ProteinComplexTermObject'}}})
 
-    members: Optional[list[ProteinComplexMemberAssociation]] = Field(default=[], description="""Associations between the complex and its members.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EnabledByProteinComplexAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation'],
+    members: Optional[list[ProteinComplexMemberAssociation]] = Field(default=None, description="""Associations between the complex and its members.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EnabledByProteinComplexAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation'],
          'examples': [{'description': 'The generic GO entry for a protein complex. If '
                                       'this is the value of `term`, then members '
                                       '*must* be specified.',
@@ -470,8 +484,8 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class CausalAssociation(Association):
@@ -480,15 +494,15 @@ class CausalAssociation(Association):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    predicate: Optional[str] = Field(default=None, description="""The RO relation that represents the type of relationship""", json_schema_extra = { "linkml_meta": {'domain_of': ['CausalAssociation']} })
+    predicate: Optional[str] = Field(default=None, description="""The RO relation that represents the type of relationship""", json_schema_extra = { "linkml_meta": {'domain_of': ['CausalAssociation', 'MoleculeAssociation']} })
     downstream_activity: Optional[str] = Field(default=None, description="""The activity unit that is downstream of this one""", json_schema_extra = { "linkml_meta": {'aliases': ['object'], 'domain_of': ['CausalAssociation']} })
     type: Literal["CausalAssociation"] = Field(default="CausalAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class TermAssociation(Association):
@@ -497,14 +511,17 @@ class TermAssociation(Association):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'abstract': True, 'from_schema': 'https://w3id.org/gocam'})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["TermAssociation"] = Field(default="TermAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class ProteinComplexMemberAssociation(TermAssociation):
@@ -512,16 +529,22 @@ class ProteinComplexMemberAssociation(TermAssociation):
     An association between a protein complex and one of its members.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
-         'slot_usage': {'term': {'name': 'term', 'range': 'GeneProductTermObject'}}})
+         'slot_usage': {'term': {'description': 'The member gene product that is part '
+                                                'of the protein complex.',
+                                 'name': 'term',
+                                 'range': 'GeneProductTermObject'}}})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The member gene product that is part of the protein complex.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["ProteinComplexMemberAssociation"] = Field(default="ProteinComplexMemberAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class MolecularFunctionAssociation(TermAssociation):
@@ -533,14 +556,17 @@ class MolecularFunctionAssociation(TermAssociation):
                                  'range': 'MolecularFunctionTermObject'}},
          'todos': ['account for non-MF activity types in Reactome (MolecularEvent)']})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["MolecularFunctionAssociation"] = Field(default="MolecularFunctionAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class BiologicalProcessAssociation(TermAssociation):
@@ -551,37 +577,47 @@ class BiologicalProcessAssociation(TermAssociation):
          'slot_usage': {'term': {'name': 'term',
                                  'range': 'BiologicalProcessTermObject'}}})
 
-    happens_during: Optional[BiologicalProcessPhaseAssociation] = Field(default=None, description="""Optional extension describing the phase during which the BP takes place""", json_schema_extra = { "linkml_meta": {'domain_of': ['BiologicalProcessAssociation']} })
+    happens_during: Optional[PhaseAssociation] = Field(default=None, description="""Optional extension describing the phase during which the BP takes place""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'BiologicalProcessAssociation']} })
     part_of: Optional[BiologicalProcessAssociation] = Field(default=None, description="""Optional extension allowing hierarchical nesting of BPs""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity',
                        'BiologicalProcessAssociation',
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["BiologicalProcessAssociation"] = Field(default="BiologicalProcessAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
-class BiologicalProcessPhaseAssociation(TermAssociation):
+class PhaseAssociation(TermAssociation):
     """
-    An association between a biological process and a phase term
+    An association between an activity or biological process and a phase term
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
-         'slot_usage': {'term': {'name': 'term', 'range': 'PhaseTermObject'}}})
+         'slot_usage': {'term': {'description': 'The phase ontology term associated '
+                                                'with the biological process (not the '
+                                                'relation type)',
+                                 'name': 'term',
+                                 'range': 'PhaseTermObject'}}})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
-    type: Literal["BiologicalProcessPhaseAssociation"] = Field(default="BiologicalProcessPhaseAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
+    term: Optional[str] = Field(default=None, description="""The phase ontology term associated with the biological process (not the relation type)""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
+    type: Literal["PhaseAssociation"] = Field(default="PhaseAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class CellularAnatomicalEntityAssociation(TermAssociation):
@@ -603,14 +639,17 @@ class CellularAnatomicalEntityAssociation(TermAssociation):
     term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'bindings': [{'binds_value_of': 'id',
                        'obligation_level': 'REQUIRED',
                        'range': 'CellularAnatomicalEntityEnum'}],
-         'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+         'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["CellularAnatomicalEntityAssociation"] = Field(default="CellularAnatomicalEntityAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class CellTypeAssociation(TermAssociation):
@@ -625,14 +664,17 @@ class CellTypeAssociation(TermAssociation):
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["CellTypeAssociation"] = Field(default="CellTypeAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class GrossAnatomyAssociation(TermAssociation):
@@ -648,31 +690,34 @@ class GrossAnatomyAssociation(TermAssociation):
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
     type: Literal["GrossAnatomyAssociation"] = Field(default="GrossAnatomyAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
-class MoleculeAssociation(TermAssociation):
+class MoleculeAssociation(Association):
     """
-    An association between an activity and a molecule term
+    An association between an activity and a molecule node
     """
-    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
-         'slot_usage': {'term': {'name': 'term', 'range': 'MoleculeTermObject'}}})
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['EvidenceItem', 'EnabledByAssociation', 'TermAssociation']} })
+    predicate: str = Field(default=..., description="""The RO relation that represents the type of relationship""", json_schema_extra = { "linkml_meta": {'domain_of': ['CausalAssociation', 'MoleculeAssociation']} })
+    molecule: Optional[str] = Field(default=None, description="""The molecule node that is associated with this activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeAssociation']} })
     type: Literal["MoleculeAssociation"] = Field(default="MoleculeAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
          'domain_of': ['Association', 'Object']} })
-    evidence: Optional[list[EvidenceItem]] = Field(default=[], description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
-    provenances: Optional[list[ProvenanceInfo]] = Field(default=[], description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
 class Object(ConfiguredBaseModel):
@@ -681,7 +726,7 @@ class Object(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/Object","gocam:Object"] = Field(default="gocam:Object", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -693,7 +738,7 @@ class TermObject(Object):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/TermObject","gocam:TermObject"] = Field(default="gocam:TermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -708,7 +753,7 @@ class PublicationObject(Object):
 
     abstract_text: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PublicationObject']} })
     full_text: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['PublicationObject']} })
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/PublicationObject","gocam:PublicationObject"] = Field(default="gocam:PublicationObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -720,7 +765,7 @@ class EvidenceTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['ECO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/EvidenceTermObject","gocam:EvidenceTermObject"] = Field(default="gocam:EvidenceTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -732,7 +777,7 @@ class MolecularFunctionTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['GO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/MolecularFunctionTermObject","gocam:MolecularFunctionTermObject"] = Field(default="gocam:MolecularFunctionTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -744,7 +789,7 @@ class BiologicalProcessTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['GO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/BiologicalProcessTermObject","gocam:BiologicalProcessTermObject"] = Field(default="gocam:BiologicalProcessTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -756,7 +801,7 @@ class CellularAnatomicalEntityTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['GO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/CellularAnatomicalEntityTermObject","gocam:CellularAnatomicalEntityTermObject"] = Field(default="gocam:CellularAnatomicalEntityTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -768,7 +813,7 @@ class MoleculeTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['CHEBI', 'UniProtKB']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/MoleculeTermObject","gocam:MoleculeTermObject"] = Field(default="gocam:MoleculeTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -781,7 +826,7 @@ class CellTypeTermObject(TermObject):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
          'id_prefixes': ['CL', 'PO', 'FAO', 'DDANAT']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/CellTypeTermObject","gocam:CellTypeTermObject"] = Field(default="gocam:CellTypeTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -794,7 +839,7 @@ class GrossAnatomicalStructureTermObject(TermObject):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
          'id_prefixes': ['UBERON', 'PO', 'FAO', 'DDANAT']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/GrossAnatomicalStructureTermObject","gocam:GrossAnatomicalStructureTermObject"] = Field(default="gocam:GrossAnatomicalStructureTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -806,7 +851,7 @@ class PhaseTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['GO', 'UBERON', 'PO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/PhaseTermObject","gocam:PhaseTermObject"] = Field(default="gocam:PhaseTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -818,7 +863,7 @@ class InformationBiomacromoleculeTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'abstract': True, 'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/InformationBiomacromoleculeTermObject","gocam:InformationBiomacromoleculeTermObject"] = Field(default="gocam:InformationBiomacromoleculeTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -830,7 +875,7 @@ class GeneProductTermObject(InformationBiomacromoleculeTermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/GeneProductTermObject","gocam:GeneProductTermObject"] = Field(default="gocam:GeneProductTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -842,7 +887,7 @@ class ProteinComplexTermObject(InformationBiomacromoleculeTermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/ProteinComplexTermObject","gocam:ProteinComplexTermObject"] = Field(default="gocam:ProteinComplexTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -854,7 +899,7 @@ class TaxonTermObject(TermObject):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['NCBITaxon']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/TaxonTermObject","gocam:TaxonTermObject"] = Field(default="gocam:TaxonTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -862,11 +907,11 @@ class TaxonTermObject(TermObject):
 
 class PredicateTermObject(TermObject):
     """
-    A term object that represents a taxon term from NCBITaxon
+    A term object that represents an OWL relation from the OBO Relations Ontology
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam', 'id_prefixes': ['RO']})
 
-    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'Object']} })
+    id: str = Field(default=..., json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'MoleculeNode', 'Object']} })
     label: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object'], 'slot_uri': 'rdfs:label'} })
     type: Literal["https://w3id.org/gocam/PredicateTermObject","gocam:PredicateTermObject"] = Field(default="gocam:PredicateTermObject", json_schema_extra = { "linkml_meta": {'designates_type': True, 'domain_of': ['Association', 'Object']} })
     obsolete: Optional[bool] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Object']} })
@@ -878,12 +923,12 @@ class ProvenanceInfo(ConfiguredBaseModel):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    contributor: Optional[list[str]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['ProvenanceInfo'], 'slot_uri': 'dct:contributor'} })
+    contributor: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ProvenanceInfo'], 'slot_uri': 'dct:contributor'} })
     created: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ProvenanceInfo'], 'slot_uri': 'dct:created'} })
     date: Optional[str] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ProvenanceInfo'],
          'slot_uri': 'dct:date',
          'todos': ['consider modeling as date rather than string']} })
-    provided_by: Optional[list[str]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['ProvenanceInfo'], 'slot_uri': 'pav:providedBy'} })
+    provided_by: Optional[list[str]] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['ProvenanceInfo'], 'slot_uri': 'pav:providedBy'} })
 
 
 class QueryIndex(ConfiguredBaseModel):
@@ -896,56 +941,54 @@ class QueryIndex(ConfiguredBaseModel):
     number_of_activities: Optional[int] = Field(default=None, description="""The number of activities in a model.""", json_schema_extra = { "linkml_meta": {'comments': ['this includes all activities, even those without an enabler.'],
          'domain_of': ['QueryIndex']} })
     number_of_enabled_by_terms: Optional[int] = Field(default=None, description="""The number of molecular entities or sets of entities in a model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    number_of_causal_associations: Optional[int] = Field(default=None, description="""Total number of causal association edges connecting activities in a model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex'],
-         'todos': ['decide what to do about "implicit" causal associations, i.e '
-                   'provides_input_for']} })
+    number_of_causal_associations: Optional[int] = Field(default=None, description="""Total number of causal association edges connecting activities in a model. This includes both explicit causal associations (e.g. \"directly positively regulates\") between activities and implicit causal associations between activities with shared input/output chemical entities.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
     length_of_longest_causal_association_path: Optional[int] = Field(default=None, description="""The maximum number of hops along activities along the direction of causal flow in a model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
     number_of_strongly_connected_components: Optional[int] = Field(default=None, description="""The number of distinct components that consist of activities that are connected (directly or indirectly) via causal connections. Most models will consist of a single SCC. Some models may consist of two or more \"islands\" where there is no connection from one island to another.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    flattened_references: Optional[list[PublicationObject]] = Field(default=[], description="""All publication objects from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    flattened_provided_by: Optional[list[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All provided_by values from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    flattened_contributors: Optional[list[str]] = Field(default=[], description="""All contributor values from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    flattened_evidence_terms: Optional[list[EvidenceTermObject]] = Field(default=[], description="""All evidence term objects from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_molecular_function_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All MF terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_molecular_function_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The reflexive transitive closure of `model_activity_molecular_function_terms`, over the is_a relationship""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
+    flattened_references: Optional[list[PublicationObject]] = Field(default=None, description="""All publication objects from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    flattened_provided_by: Optional[list[Union[Object,TermObject,PublicationObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All provided_by values from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    flattened_contributors: Optional[list[str]] = Field(default=None, description="""All contributor values from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    flattened_evidence_terms: Optional[list[EvidenceTermObject]] = Field(default=None, description="""All evidence term objects from the model across different levels combined in one place""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_molecular_function_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All MF terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_molecular_function_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The reflexive transitive closure of `model_activity_molecular_function_terms`, over the is_a relationship""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
                                                    'value': '[rdfs:subClassOf]'}},
          'domain_of': ['QueryIndex']} })
-    model_activity_molecular_function_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The rollup of `model_activity_molecular_function_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'comments': ['added for completion but may not be useful in practice'],
+    model_activity_molecular_function_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The rollup of `model_activity_molecular_function_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'comments': ['added for completion but may not be useful in practice'],
          'domain_of': ['QueryIndex']} })
-    model_activity_occurs_in_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All direct cellular component localization terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_occurs_in_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The reflexive transitive closure of `model_activity_occurs_in_terms`, over the is_a and part_of relationship type""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
+    model_activity_occurs_in_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All direct cellular component localization terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_occurs_in_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The reflexive transitive closure of `model_activity_occurs_in_terms`, over the is_a and part_of relationship type""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
                                                    'value': '[rdfs:subClassOf, '
                                                             'BFO:0000050]'}},
          'domain_of': ['QueryIndex']} })
-    model_activity_occurs_in_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The rollup of `model_activity_occurs_in_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_enabled_by_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All direct enabler terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_enabled_by_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The reflexive transitive closure of `model_activity_enabled_by_terms`, over the is_a and part_of relationship types""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
+    model_activity_occurs_in_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The rollup of `model_activity_occurs_in_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_enabled_by_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All direct enabler terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_enabled_by_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The reflexive transitive closure of `model_activity_enabled_by_terms`, over the is_a and part_of relationship types""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
                                                    'value': '[rdfs:subClassOf, '
                                                             'BFO:0000050]'}},
          'domain_of': ['QueryIndex']} })
-    model_activity_enabled_by_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The rollup of `model_activity_enabled_by_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'comments': ['added for completion but may not be useful in practice'],
+    model_activity_enabled_by_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The rollup of `model_activity_enabled_by_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'comments': ['added for completion but may not be useful in practice'],
          'domain_of': ['QueryIndex']} })
-    model_activity_enabled_by_genes: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All direct enabler genes and genes that are part of enabler complexes for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_part_of_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All direct biological process terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_part_of_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The reflexive transitive closure of `model_activity_part_of_terms`, over the is_a and part_of relationship type""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
+    model_activity_enabled_by_genes: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All direct enabler genes and genes that are part of enabler complexes for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_part_of_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All direct biological process terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_part_of_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The reflexive transitive closure of `model_activity_part_of_terms`, over the is_a and part_of relationship type""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
                                                    'value': '[rdfs:subClassOf, '
                                                             'BFO:0000050]'}},
          'domain_of': ['QueryIndex']} })
-    model_activity_part_of_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The rollup of `model_activity_part_of_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_has_input_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""All direct input terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_activity_has_input_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The reflexive transitive closure of `model_activity_has_input_terms`, over the is_a relationship type""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
+    model_activity_part_of_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The rollup of `model_activity_part_of_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_has_input_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""All direct input terms for all activities""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_activity_has_input_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The reflexive transitive closure of `model_activity_has_input_terms`, over the is_a relationship type""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
                                                    'value': '[rdfs:subClassOf]'}},
          'domain_of': ['QueryIndex']} })
-    model_activity_has_input_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The rollup of `model_activity_has_input_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_taxon: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The primary taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the primary taxon that the model is relevant to.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    model_taxon_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The reflexive transitive closure of the taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the set of taxa that are relevant to the model.""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
+    model_activity_has_input_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The rollup of `model_activity_has_input_closure` to a GO subset or slim.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_taxon: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The primary taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the primary taxon that the model is relevant to.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_taxon_closure: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The reflexive transitive closure of the taxon term for the model, over the NCBITaxon:subClassOf relationship type. This is used to determine the set of taxa that are relevant to the model.""", json_schema_extra = { "linkml_meta": {'annotations': {'closure_computed_over': {'tag': 'closure_computed_over',
                                                    'value': '[rdfs:subClassOf]'}},
          'domain_of': ['QueryIndex']} })
-    model_taxon_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], description="""The rollup of the taxon closure to a NCBITaxon subset or slim.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    annoton_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=[], json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    start_activities: Optional[list[str]] = Field(default=[], description="""The set of activities that are the starting points of the model, i.e. those that have no incoming causal associations.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    end_activities: Optional[list[str]] = Field(default=[], description="""The set of activities that are the end points of the model, i.e. those that have no outgoing causal associations.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    intermediate_activities: Optional[list[str]] = Field(default=[], description="""The set of activities that are neither start nor end activities, i.e. those that have both incoming and outgoing causal associations.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
-    singleton_activities: Optional[list[str]] = Field(default=[], description="""The set of activities that have no causal associations, i.e. those that are not connected to any other activity in the model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    model_taxon_rollup: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, description="""The rollup of the taxon closure to a NCBITaxon subset or slim.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    annoton_terms: Optional[list[Union[TermObject,EvidenceTermObject,MolecularFunctionTermObject,BiologicalProcessTermObject,CellularAnatomicalEntityTermObject,MoleculeTermObject,CellTypeTermObject,GrossAnatomicalStructureTermObject,PhaseTermObject,InformationBiomacromoleculeTermObject,TaxonTermObject,PredicateTermObject,GeneProductTermObject,ProteinComplexTermObject]]] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    start_activities: Optional[list[str]] = Field(default=None, description="""The set of activities that are the starting points of the model, i.e. those that have no incoming causal associations.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    end_activities: Optional[list[str]] = Field(default=None, description="""The set of activities that are the end points of the model, i.e. those that have no outgoing causal associations.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    intermediate_activities: Optional[list[str]] = Field(default=None, description="""The set of activities that are neither start nor end activities, i.e. those that have both incoming and outgoing causal associations.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
+    singleton_activities: Optional[list[str]] = Field(default=None, description="""The set of activities that have no causal associations, i.e. those that are not connected to any other activity in the model.""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
     number_of_start_activities: Optional[int] = Field(default=None, description="""The number of start activities in a model""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
     number_of_end_activities: Optional[int] = Field(default=None, description="""The number of end activities in a model""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
     number_of_intermediate_activities: Optional[int] = Field(default=None, description="""The number of intermediate activities in a model""", json_schema_extra = { "linkml_meta": {'domain_of': ['QueryIndex']} })
@@ -956,6 +999,7 @@ class QueryIndex(ConfiguredBaseModel):
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
 Model.model_rebuild()
 Activity.model_rebuild()
+MoleculeNode.model_rebuild()
 EvidenceItem.model_rebuild()
 Association.model_rebuild()
 EnabledByAssociation.model_rebuild()
@@ -966,7 +1010,7 @@ TermAssociation.model_rebuild()
 ProteinComplexMemberAssociation.model_rebuild()
 MolecularFunctionAssociation.model_rebuild()
 BiologicalProcessAssociation.model_rebuild()
-BiologicalProcessPhaseAssociation.model_rebuild()
+PhaseAssociation.model_rebuild()
 CellularAnatomicalEntityAssociation.model_rebuild()
 CellTypeAssociation.model_rebuild()
 GrossAnatomyAssociation.model_rebuild()

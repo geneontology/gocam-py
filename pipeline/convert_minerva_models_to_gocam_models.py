@@ -30,64 +30,16 @@ from _common import (
     ResultSummary,
     SuccessResult,
     get_json_files,
-    model_to_graph,
     setup_logger,
 )
 from rich.progress import track
 
-from gocam.datamodel import Activity, Model
 from gocam.translation import MinervaWrapper
+from gocam.utils import model_to_digraph
 
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
-
-
-def activity_has_direct_causal_association(activity: Activity) -> bool:
-    """Check if the activity has at least one direct causal association to another activity.
-
-    Args:
-        activity: The activity object.
-
-    Returns:
-        bool: True if the activity has at least one direct causal association, False otherwise.
-    """
-    return bool(activity.causal_associations)
-
-
-def activity_has_indirect_chemical_association(
-    activity: Activity, model: Model
-) -> bool:
-    """Check if the activity has at least one indirect association to another activity via input
-    and output associations to the same chemical entity.
-
-    Args:
-        activity: The activity object.
-        model: The GO-CAM model object.
-
-    Returns:
-        bool: True if the activity has at least one indirect chemical association, False otherwise.
-    """
-    all_outputs = []
-    if activity.has_output:
-        all_outputs.extend(activity.has_output)
-    if activity.has_primary_output:
-        all_outputs.append(activity.has_primary_output)
-
-    for output in all_outputs:
-        for other_activity in model.activities or []:
-            if other_activity.id == activity.id:
-                continue
-
-            all_inputs = []
-            if other_activity.has_input:
-                all_inputs.extend(other_activity.has_input)
-            if other_activity.has_primary_input:
-                all_inputs.append(other_activity.has_primary_input)
-
-            if output.term in {inp.term for inp in all_inputs}:
-                return True
-    return False
 
 
 def minerva_model_uses_complement(minerva_model: dict) -> bool:
@@ -148,7 +100,7 @@ def process_minerva_model_file(
         return ErrorResult(reason=ErrorReason.CONVERSION_ERROR, details=str(e))
 
     # Detect if there is at least one activity edge in the model. If not, skip writing the model.
-    graph = model_to_graph(gocam_model)
+    graph = model_to_digraph(gocam_model)
     has_activity_edge = graph.number_of_edges() > 0
     if not has_activity_edge:
         logger.info(f"GO-CAM model {gocam_model.id} has no activity edges; skipping.")

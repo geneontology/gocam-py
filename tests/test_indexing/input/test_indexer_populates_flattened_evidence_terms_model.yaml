@@ -69,6 +69,24 @@ activities:
           provided_by:
             - http://example.org
       term: GO:0038138
+    happens_during:
+      type: PhaseAssociation
+      evidence:
+        - term: ECO:0000003
+          reference: PMID:00000000
+          provenances:
+            - contributor:
+                - https://example.org/0001
+              date: '2025-03-24'
+              provided_by:
+                - https://example.org
+      provenances:
+        - contributor:
+            - https://example.org/0001
+          date: '2025-03-24'
+          provided_by:
+            - https://example.org
+      term: GO:0000090
     causal_associations:
       - type: CausalAssociation
         evidence:
@@ -95,6 +113,8 @@ objects:
     label: 'Test Evidence 1'
   - id: ECO:0000002
     label: 'Test Evidence 2'
+  - id: ECO:0000003
+    label: 'Test Evidence 3'
 provenances:
   - contributor:
       - https://example.org/0001

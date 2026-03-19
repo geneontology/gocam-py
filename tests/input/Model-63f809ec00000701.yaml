@@ -46,7 +46,7 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0072344
-  has_output:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000314
@@ -63,7 +63,8 @@ activities:
       date: '2023-03-01'
       provided_by:
       - https://www.uniprot.org
-    term: CHEBI:10668
+    predicate: RO:0002234
+    molecule: gomodel:63f809ec00000701/63f809ec00000733
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -199,7 +200,7 @@ activities:
         provided_by:
         - https://www.uniprot.org
       term: GO:0072344
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000314
@@ -216,7 +217,8 @@ activities:
       date: '2023-03-01'
       provided_by:
       - https://www.uniprot.org
-    term: CHEBI:10668
+    predicate: RO:0002233
+    molecule: gomodel:63f809ec00000701/63f809ec00000733
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -294,7 +296,7 @@ activities:
       provided_by:
       - https://www.uniprot.org
     term: GO:0140708
-  has_input:
+  molecular_associations:
   - type: MoleculeAssociation
     evidence:
     - term: ECO:0000314
@@ -311,7 +313,8 @@ activities:
       date: '2023-03-01'
       provided_by:
       - https://www.uniprot.org
-    term: CHEBI:17732
+    predicate: RO:0002233
+    molecule: gomodel:63f809ec00000701/63f809ec00000710
   causal_associations:
   - type: CausalAssociation
     evidence:
@@ -331,6 +334,11 @@ activities:
       - https://www.uniprot.org
     predicate: RO:0002304
     downstream_activity: gomodel:63f809ec00000701/63f809ec00000726
+molecules:
+- id: gomodel:63f809ec00000701/63f809ec00000733
+  term: CHEBI:10668
+- id: gomodel:63f809ec00000701/63f809ec00000710
+  term: CHEBI:17732
 objects:
 - id: GO:1904678
   label: alpha-aminoacyl-tRNA binding
