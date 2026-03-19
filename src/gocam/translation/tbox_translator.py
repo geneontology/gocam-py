@@ -144,6 +144,10 @@ class TBoxTranslator:
                 yield from self.translate_gene_product(model, activity, mf_label, eb)
             else:
                 raise NotImplementedError(f"Cannot handle {eb}")
+        else:
+            yield from self.add_annotation(
+                activity.id, RDFS_LABEL, f"UNKNOWN ({mf_label})"
+            )
 
         if activity.causal_associations:
             for ca in activity.causal_associations:
