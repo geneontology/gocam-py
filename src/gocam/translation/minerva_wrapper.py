@@ -23,8 +23,9 @@ from gocam.datamodel import (
     MoleculeAssociation,
     MoleculeNode,
     Object,
+    PartOfProteinComplexAssociation,
     PhaseAssociation,
-    ProteinComplexMemberAssociation,
+    ProteinComplexHasPartAssociation,
     ProvenanceInfo,
     TermAssociation,
 )
@@ -391,9 +392,7 @@ class MinervaTranslator:
                 )
             )
 
-        return EnabledByGeneProductAssociation(
-            term=term, evidence=evidence, provenances=[prov]
-        )
+        return self._build_gene_product_association(individual_id, term, evidence, prov)
 
     def _build_protein_complex_association(
         self,
@@ -403,35 +402,169 @@ class MinervaTranslator:
         prov: ProvenanceInfo,
     ) -> EnabledByProteinComplexAssociation:
         """Build an EnabledByProteinComplexAssociation by gathering member facts."""
-        member_associations: list[ProteinComplexMemberAssociation] = []
-        for has_part_fact in self.view.get_facts(
-            subject=individual_id, property=Relation.HAS_PART
-        ):
-            member_id = has_part_fact["object"]
-            member_term = self.view.get_term(member_id)
-            if member_term is None:
-                self.translation_warnings.add(
-                    TranslationWarning(
-                        type=WarningType.MISSING_TERM,
-                        message=f"Missing term for object {member_id} in has_part fact",
-                        entity_id=member_id,
-                    )
-                )
-                continue
-            member_evs, member_prov = self._process_fact(has_part_fact)
-            member_associations.append(
-                ProteinComplexMemberAssociation(
-                    term=member_term,
-                    evidence=member_evs,
-                    provenances=[member_prov],
-                )
-            )
-        return EnabledByProteinComplexAssociation(
+
+        enabled_by_association = EnabledByProteinComplexAssociation(
             term=term,
-            members=member_associations,
             evidence=evidence,
             provenances=[prov],
         )
+
+        for has_part_fact in self.view.get_facts(
+            subject=individual_id, property=Relation.HAS_PART
+        ):
+            has_part_object = has_part_fact["object"]
+            has_part_term = self.view.get_term(has_part_object)
+            if has_part_term is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {has_part_term} in has_part fact",
+                        entity_id=has_part_object,
+                    )
+                )
+                continue
+            has_part_association = self._build_protein_complex_has_part_association(
+                has_part_fact
+            )
+            if enabled_by_association.has_part is None:
+                enabled_by_association.has_part = []
+            enabled_by_association.has_part.append(has_part_association)
+
+        return enabled_by_association
+
+    def _build_gene_product_association(
+        self,
+        individual_id: str,
+        term: str,
+        evidence: list[EvidenceItem],
+        prov: ProvenanceInfo,
+    ) -> EnabledByGeneProductAssociation:
+        """Build an EnabledByGeneProductAssociation."""
+
+        enabled_by_association = EnabledByGeneProductAssociation(
+            term=term,
+            evidence=evidence,
+            provenances=[prov],
+        )
+
+        for part_of_fact in self.view.get_facts(
+            subject=individual_id, property=Relation.PART_OF
+        ):
+            part_of_object = part_of_fact["object"]
+            part_of_term = self.view.get_term(part_of_object)
+            if part_of_term is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {part_of_object} in part_of fact",
+                        entity_id=part_of_object,
+                    )
+                )
+                continue
+            part_of_association = self._build_part_of_protein_complex_association(
+                part_of_fact
+            )
+            if enabled_by_association.part_of is None:
+                enabled_by_association.part_of = []
+            enabled_by_association.part_of.append(part_of_association)
+
+        return enabled_by_association
+
+    def _build_protein_complex_has_part_association(
+        self, fact: dict, visited: frozenset[str] | None = None
+    ) -> ProteinComplexHasPartAssociation:
+        """Build a ProteinComplexHasPartAssociation from a has_part fact."""
+        if visited is None:
+            visited = frozenset()
+
+        part_id = fact["object"]
+        part_term = self.view.get_term(part_id)
+        evs, prov = self._process_fact(fact)
+        has_part_association = ProteinComplexHasPartAssociation(
+            term=part_term,
+            evidence=evs,
+            provenances=[prov],
+        )
+
+        for part_of_fact in self.view.get_facts(
+            subject=part_id, property=Relation.PART_OF
+        ):
+            part_of_object = part_of_fact["object"]
+            part_of_term = self.view.get_term(part_of_object)
+            if part_of_term is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {part_of_object} in part_of fact",
+                        entity_id=part_of_object,
+                    )
+                )
+                continue
+            if part_of_object in visited:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
+                        message=f"Circular relationship detected for {part_of_object}",
+                        entity_id=part_of_object,
+                    )
+                )
+                continue
+            part_of_association = self._build_part_of_protein_complex_association(
+                part_of_fact, visited=visited.union({part_of_object})
+            )
+            if has_part_association.part_of is None:
+                has_part_association.part_of = []
+            has_part_association.part_of.append(part_of_association)
+
+        return has_part_association
+
+    def _build_part_of_protein_complex_association(
+        self, fact: dict, visited: frozenset[str] | None = None
+    ) -> PartOfProteinComplexAssociation:
+        """Build a PartOfProteinComplexAssociation from a part_of fact."""
+        if visited is None:
+            visited = frozenset()
+
+        complex_id = fact["object"]
+        complex_term = self.view.get_term(complex_id)
+        evs, prov = self._process_fact(fact)
+        part_of_association = PartOfProteinComplexAssociation(
+            term=complex_term,
+            evidence=evs,
+            provenances=[prov],
+        )
+
+        for has_part_fact in self.view.get_facts(
+            subject=complex_id, property=Relation.HAS_PART
+        ):
+            has_part_object = has_part_fact["object"]
+            has_part_term = self.view.get_term(has_part_object)
+            if has_part_term is None:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.MISSING_TERM,
+                        message=f"Missing term for object {has_part_object} in has_part fact",
+                        entity_id=has_part_object,
+                    )
+                )
+                continue
+            if has_part_object in visited:
+                self.translation_warnings.add(
+                    TranslationWarning(
+                        type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
+                        message=f"Circular relationship detected for {has_part_object}",
+                        entity_id=has_part_object,
+                    )
+                )
+                continue
+            has_part_association = self._build_protein_complex_has_part_association(
+                has_part_fact, visited=visited.union({has_part_object})
+            )
+            if part_of_association.has_part is None:
+                part_of_association.has_part = []
+            part_of_association.has_part.append(has_part_association)
+
+        return part_of_association
 
     def _add_molecule_node(self, individual_id: str) -> MoleculeNode | None:
         """Add a molecule node for a given individual ID, if it doesn't already exist."""
