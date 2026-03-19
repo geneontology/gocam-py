@@ -418,7 +418,7 @@ class MinervaTranslator:
                 self.translation_warnings.add(
                     TranslationWarning(
                         type=WarningType.MISSING_TERM,
-                        message=f"Missing term for object {has_part_term} in has_part fact",
+                        message=f"Missing term for object {has_part_object} in has_part fact",
                         entity_id=has_part_object,
                     )
                 )
