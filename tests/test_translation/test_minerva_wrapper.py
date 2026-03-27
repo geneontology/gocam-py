@@ -3,7 +3,11 @@ import re
 
 import pytest
 
-from gocam.datamodel import Activity, EnabledByProteinComplexAssociation
+from gocam.datamodel import (
+    Activity,
+    EnabledByGeneProductAssociation,
+    EnabledByProteinComplexAssociation,
+)
 from gocam.translation.minerva_wrapper import (
     MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES,
     MOLECULAR_ASSOCIATION_PROPERTIES,
@@ -64,7 +68,7 @@ def test_protein_complex():
     assert isinstance(
         protein_complex_activity.enabled_by, EnabledByProteinComplexAssociation
     )
-    assert [m.term for m in protein_complex_activity.enabled_by.members or []] == [
+    assert [m.term for m in protein_complex_activity.enabled_by.has_part or []] == [
         "MGI:MGI:1929608",
         "MGI:MGI:103038",
     ]
@@ -665,6 +669,61 @@ def test_deeply_nested_molecule_localization():
     assert iron_molecule.located_in.part_of.term == "GO:0005637"
     assert iron_molecule.located_in.part_of.part_of is not None
     assert iron_molecule.located_in.part_of.part_of.term == "GO:0005634"
+
+
+def test_deeply_nested_complex_parts():
+    """Test that deeply nested complex part associations are correctly translated."""
+    minerva_object = load_minerva_object("nested-complex-parts")
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    # This activity is enabled by a GP, which is part of a complex, which has a different GP as a part
+    enabled_by_gp_activity = next(
+        (
+            a
+            for a in model.activities or []
+            if isinstance(a.enabled_by, EnabledByGeneProductAssociation)
+        ),
+        None,
+    )
+    assert enabled_by_gp_activity is not None
+    assert enabled_by_gp_activity.enabled_by is not None
+    assert enabled_by_gp_activity.enabled_by.term == "ZFIN:ZDB-GENE-990415-8"
+    assert isinstance(
+        enabled_by_gp_activity.enabled_by, EnabledByGeneProductAssociation
+    )
+    assert enabled_by_gp_activity.enabled_by.part_of is not None
+    assert len(enabled_by_gp_activity.enabled_by.part_of) == 1
+    complex = enabled_by_gp_activity.enabled_by.part_of[0]
+    assert complex.term == "GO:0042385"
+    assert complex.has_part is not None
+    assert len(complex.has_part) == 1
+    complex_part = complex.has_part[0]
+    assert complex_part.term == "ZFIN:ZDB-GENE-001103-1"
+
+    # This activity is enabled by a complex, which has a GP as a part, which is part of another complex
+    enabled_by_complex_activity = next(
+        (
+            a
+            for a in model.activities or []
+            if isinstance(a.enabled_by, EnabledByProteinComplexAssociation)
+        ),
+        None,
+    )
+    assert enabled_by_complex_activity is not None
+    assert enabled_by_complex_activity.enabled_by is not None
+    assert enabled_by_complex_activity.enabled_by.term == "GO:1990230"
+    assert isinstance(
+        enabled_by_complex_activity.enabled_by, EnabledByProteinComplexAssociation
+    )
+    assert enabled_by_complex_activity.enabled_by.has_part is not None
+    assert len(enabled_by_complex_activity.enabled_by.has_part) == 1
+    gp = enabled_by_complex_activity.enabled_by.has_part[0]
+    assert gp.term == "ZFIN:ZDB-GENE-030131-7192"
+    assert gp.part_of is not None
+    assert len(gp.part_of) == 1
+    complex = gp.part_of[0]
+    assert complex.term == "GO:0106069"
 
 
 def test_minerva_view_get_facts():

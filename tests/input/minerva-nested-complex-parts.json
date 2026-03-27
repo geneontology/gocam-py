@@ -1,0 +1,483 @@
+{
+  "id": "gomodel:69a8e69700000059",
+  "individuals": [
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000260",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0042285",
+          "label": "xylosyltransferase activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000261",
+      "type": [
+        {
+          "type": "class",
+          "id": "ZFIN:ZDB-GENE-990415-8",
+          "label": "pax2a Drer"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "ZFIN:ZDB-GENE-990415-8",
+          "label": "pax2a Drer"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000262",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0042385",
+          "label": "myosin III complex"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "GO:0032991",
+          "label": "protein-containing complex"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000263",
+      "type": [
+        {
+          "type": "class",
+          "id": "ZFIN:ZDB-GENE-001103-1",
+          "label": "sox9a Drer"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "ZFIN:ZDB-GENE-001103-1",
+          "label": "sox9a Drer"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000264",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0034986",
+          "label": "iron chaperone activity"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0003674",
+          "label": "molecular_function"
+        },
+        {
+          "type": "class",
+          "id": "obo:go/extensions/reacto.owl#molecular_event",
+          "label": "Molecular Event"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000265",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:1990230",
+          "label": "iron-sulfur cluster transfer complex"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "GO:0032991",
+          "label": "protein-containing complex"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000266",
+      "type": [
+        {
+          "type": "class",
+          "id": "ZFIN:ZDB-GENE-030131-7192",
+          "label": "bmp3 Drer"
+        }
+      ],
+      "inferred-type": [
+        {
+          "type": "class",
+          "id": "ZFIN:ZDB-GENE-030131-7192",
+          "label": "bmp3 Drer"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "CHEBI:33695",
+          "label": "information biomacromolecule"
+        },
+        {
+          "type": "class",
+          "id": "CHEBI:24431",
+          "label": "chemical entity"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        }
+      ]
+    },
+    {
+      "id": "gomodel:69a8e69700000059/69b432fc00000267",
+      "type": [
+        {
+          "type": "class",
+          "id": "GO:0106069",
+          "label": "synapsis initiation complex"
+        }
+      ],
+      "root-type": [
+        {
+          "type": "class",
+          "id": "GO:0005575",
+          "label": "cellular_component"
+        },
+        {
+          "type": "class",
+          "id": "GO:0032991",
+          "label": "protein-containing complex"
+        }
+      ],
+      "annotations": [
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        },
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        }
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000265",
+      "property": "BFO:0000051",
+      "property-label": "has_part",
+      "object": "gomodel:69a8e69700000059/69b432fc00000266",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000260",
+      "property": "RO:0002333",
+      "property-label": "enabled by",
+      "object": "gomodel:69a8e69700000059/69b432fc00000261",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000266",
+      "property": "BFO:0000050",
+      "property-label": "part of",
+      "object": "gomodel:69a8e69700000059/69b432fc00000267",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000264",
+      "property": "RO:0002333",
+      "property-label": "enabled by",
+      "object": "gomodel:69a8e69700000059/69b432fc00000265",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000262",
+      "property": "BFO:0000051",
+      "property-label": "has_part",
+      "object": "gomodel:69a8e69700000059/69b432fc00000263",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    },
+    {
+      "subject": "gomodel:69a8e69700000059/69b432fc00000261",
+      "property": "BFO:0000050",
+      "property-label": "part of",
+      "object": "gomodel:69a8e69700000059/69b432fc00000262",
+      "annotations": [
+        {
+          "key": "contributor",
+          "value": "https://orcid.org/0000-0002-6150-307X"
+        },
+        {
+          "key": "date",
+          "value": "2026-03-19"
+        },
+        {
+          "key": "providedBy",
+          "value": "http://geneontology.org"
+        }
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "key": "conforms-to-gpad",
+      "value": "false",
+      "value-type": "xsd:boolean"
+    },
+    {
+      "key": "state",
+      "value": "development"
+    },
+    {
+      "key": "contributor",
+      "value": "https://orcid.org/0000-0002-6150-307X"
+    },
+    {
+      "key": "date",
+      "value": "2026-03-19"
+    },
+    {
+      "key": "title",
+      "value": "test arbitrarily deep rels"
+    },
+    {
+      "key": "providedBy",
+      "value": "http://geneontology.org"
+    },
+    {
+      "key": "https://w3id.org/biolink/vocab/in_taxon",
+      "value": "NCBITaxon:7955",
+      "value-type": "IRI"
+    }
+  ]
+}

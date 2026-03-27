@@ -25,6 +25,8 @@ from gocam.datamodel import (
     Model,
     MoleculeNode,
     Object,
+    PartOfProteinComplexAssociation,
+    ProteinComplexHasPartAssociation,
     ProvenanceInfo,
     PublicationObject,
     QueryIndex,
@@ -112,10 +114,17 @@ def _iter_associations(obj: Any) -> Iterable[Association]:
             if obj.located_in:
                 yield from _iter_associations(obj.located_in)
 
-        case EnabledByProteinComplexAssociation():
+        case EnabledByGeneProductAssociation() | ProteinComplexHasPartAssociation():
             yield obj
-            for member in obj.members or []:
-                yield from _iter_associations(member)
+            if obj.part_of:
+                for assoc in obj.part_of:
+                    yield from _iter_associations(assoc)
+
+        case EnabledByProteinComplexAssociation() | PartOfProteinComplexAssociation():
+            yield obj
+            if obj.has_part:
+                for assoc in obj.has_part:
+                    yield from _iter_associations(assoc)
 
         case BiologicalProcessAssociation():
             yield obj
@@ -413,9 +422,9 @@ class Indexer:
                 elif isinstance(
                     activity.enabled_by, EnabledByProteinComplexAssociation
                 ):
-                    if activity.enabled_by.members:
+                    if activity.enabled_by.has_part:
                         all_enabled_by_genes.update(
-                            member.term for member in activity.enabled_by.members
+                            member.term for member in activity.enabled_by.has_part
                         )
                 annoton_term_id_parts.append(activity.enabled_by.term)
 
