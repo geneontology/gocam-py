@@ -13,10 +13,8 @@ levels. Statistics include:
 - Reference and PMID counts
 - Inferred relation counts: An inferred relation is identified when an
   activity A produces chemical outputs (CHEBI terms) that are consumed as
-  inputs by another activity B, and activity B also produces chemical outputs.
-  This captures implicit metabolic pathway connections where one activity's
-  product feeds into another activity's transformation. Each inferred relation
-  records the pair of activity IDs [activity_A, activity_B].
+  inputs by another activity B. Each inferred relation records the pair of
+  activity IDs along with the genes that enable each activity.
 
 Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
@@ -29,6 +27,7 @@ from enum import Enum
 from pathlib import Path
 from typing import (
     Annotated,
+    Any,
     Collection,
     Dict,
     List,
@@ -102,8 +101,8 @@ class GocamStats(ConfiguredBaseModel):
     number_of_genes: int = 0
     number_of_unique_references: int = 0
     number_of_unique_pmid: int = 0
-    number_of_causal_relations: int = 0
-    number_of_unique_causal_relations: int = 0
+    number_of_explicit_causal_relations: int = 0
+    number_of_unique_explicit_causal_relations: int = 0
     number_of_inputs: int = 0
     number_of_chemical_inputs: int = 0
     number_of_other_inputs: int = 0
@@ -117,7 +116,7 @@ class GocamStats(ConfiguredBaseModel):
     number_of_go_terms: int = 0
     number_of_unique_go_terms: int = 0
     number_of_unique_inferred_relations: int = 0
-    list_inferred_relations: List[List[str]] | None = []
+    list_inferred_relations: List[Dict[str, Any]] | None = []
 
     set_models: Set[str] = set()
     set_activities: Set[str] = set()
@@ -125,8 +124,8 @@ class GocamStats(ConfiguredBaseModel):
     set_protein_complex_genes: Set[str] = set()
     list_enabled_by_gene_product: List[str] | None = []
     set_references: Set[str] = set()
-    set_causal_relations: Set[str] = set()
-    list_causal_relations: List[str] | None = []
+    set_explicit_causal_relations: Set[str] = set()
+    list_explicit_causal_relations: List[str] | None = []
     set_activity_unit_gene_product_enablers: Set[str] = set()
     set_activity_unit_protein_complex_enablers: Set[str] = set()
     set_protein_complex_in_activity_term: Set[str] = set()
@@ -169,7 +168,7 @@ class AggregateInfo(ConfiguredBaseModel):
 
     average_number_of_unique_gene_product_enablers_for_entity: float = 0.0
 
-    number_of_causal_relations: int = 0
+    number_of_explicit_causal_relations: int = 0
     number_of_unique_references: int = 0
     number_of_unique_pmid: int = 0
     number_of_inputs: int = 0
@@ -185,7 +184,7 @@ class AggregateInfo(ConfiguredBaseModel):
     number_of_go_terms: int = 0
     number_of_unique_go_terms: int = 0
     number_of_unique_inferred_relations: int = 0
-    list_inferred_relations: List[List[str]] | None = []
+    list_inferred_relations: List[Dict[str, Any]] | None = []
 
     set_activities: Set[str] = set()
     set_enabled_by_gene_product: Set[str] = set()
@@ -631,31 +630,54 @@ def _get_chemical_terms(
     return terms
 
 
+def _get_activity_genes(
+    activity,
+    obsolete_ids: set[str],
+) -> list[str]:
+    """Return the list of gene terms that enable an activity.
+
+    For gene-product enablers, returns the single enabler term.
+    For protein-complex enablers, returns the member gene terms.
+    """
+    genes: list[str] = []
+    if isinstance(activity.enabled_by, EnabledByGeneProductAssociation):
+        if activity.enabled_by.term and activity.enabled_by.term not in obsolete_ids:
+            genes.append(activity.enabled_by.term)
+    elif isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
+        if activity.enabled_by.members:
+            for member in activity.enabled_by.members:
+                if member.term and member.term not in obsolete_ids:
+                    genes.append(member.term)
+    return genes
+
+
 def _compute_inferred_relations(
     activities: list,
     obsolete_ids: set[str],
     molecule_lookup: Dict[str, str] | None = None,
-) -> list[list[str]]:
+) -> list[dict[str, Any]]:
     """Compute inferred relations between activities based on shared chemicals.
 
     An inferred relation exists when activity A produces chemical outputs that
-    are consumed as inputs by activity B, and activity B also produces chemical
-    outputs. This captures implicit metabolic pathway connections where one
-    activity's product feeds into another activity's transformation.
+    are consumed as inputs by activity B.
 
     Args:
         activities: List of Activity objects from a GO-CAM model.
         obsolete_ids: Set of object IDs marked as obsolete.
+        molecule_lookup: Optional mapping of molecule IDs to canonical IDs.
 
     Returns:
-        A deduplicated list of [activity_A_id, activity_B_id] pairs representing
-        inferred relations.
+        A deduplicated list of dicts, each with keys activity_a, activity_a_genes,
+        activity_b, and activity_b_genes.
     """
     # Build per-activity chemical input and output sets
     activity_chem_outputs: dict[str, set[str]] = {}
     activity_chem_inputs: dict[str, set[str]] = {}
+    activity_genes: dict[str, list[str]] = {}
 
     for activity in activities:
+        activity_genes[activity.id] = _get_activity_genes(activity, obsolete_ids)
+
         outputs = _get_chemical_terms(
             activity.molecular_associations,
             OUTPUT_PREDICATES,
@@ -674,19 +696,26 @@ def _compute_inferred_relations(
         if inputs:
             activity_chem_inputs[activity.id] = inputs
 
-    # Find pairs where A's outputs overlap with B's inputs and B also has outputs
-    relations: list[list[str]] = []
+    # Find pairs where A's outputs overlap with B's inputs
+    relations: list[dict[str, Any]] = []
     seen: set[tuple[str, str]] = set()
 
     for a_id, a_outputs in activity_chem_outputs.items():
         for b_id, b_inputs in activity_chem_inputs.items():
             if a_id == b_id:
                 continue
-            if a_outputs & b_inputs and b_id in activity_chem_outputs:
+            if a_outputs & b_inputs:
                 pair = (a_id, b_id)
                 if pair not in seen:
                     seen.add(pair)
-                    relations.append([a_id, b_id])
+                    relations.append(
+                        {
+                            "activity_a": a_id,
+                            "activity_a_genes": activity_genes.get(a_id, []),
+                            "activity_b": b_id,
+                            "activity_b_genes": activity_genes.get(b_id, []),
+                        }
+                    )
 
     return relations
 
@@ -745,6 +774,9 @@ def process_gocam_model_file(
 
     # Get model statistics information
     calculated_aggregate_values_by_model = gocam_model.query_index
+    if calculated_aggregate_values_by_model is None:
+        logger.error(f"No query index for model {json_file}")
+        return ResultType.ERROR, None, ErrorReason.READ_ERROR
 
     # Detailed model statistics information
     stats_by_model = GocamStats()
@@ -835,9 +867,11 @@ def process_gocam_model_file(
             # Add information about causal relations
             if activity.causal_associations:
                 for causal_association in activity.causal_associations:
-                    if stats_by_model.list_causal_relations is not None:
-                        stats_by_model.list_causal_relations.append(activity.id)
-                    stats_by_model.set_causal_relations.add(activity.id)
+                    if stats_by_model.list_explicit_causal_relations is not None:
+                        stats_by_model.list_explicit_causal_relations.append(
+                            activity.id
+                        )
+                    stats_by_model.set_explicit_causal_relations.add(activity.id)
                     if causal_association.provenances:
                         for provenance in causal_association.provenances:
                             if provenance.contributor:
@@ -845,17 +879,19 @@ def process_gocam_model_file(
                                     contributor_info = contributor_lookup.setdefault(
                                         contributor, GocamStats()
                                     )
-                                    contributor_info.set_causal_relations.add(
+                                    contributor_info.set_explicit_causal_relations.add(
                                         activity.id
                                     )
-                                    contributor_info.number_of_causal_relations += 1
+                                    contributor_info.number_of_explicit_causal_relations += 1
                             if provenance.provided_by:
                                 for provider in provenance.provided_by:
                                     provider_info = provider_lookup.setdefault(
                                         provider, GocamStats()
                                     )
-                                    provider_info.set_causal_relations.add(activity.id)
-                                    provider_info.number_of_causal_relations += 1
+                                    provider_info.set_explicit_causal_relations.add(
+                                        activity.id
+                                    )
+                                    provider_info.number_of_explicit_causal_relations += 1
 
             # Handle has input and has output
             _collect_molecule_terms(
@@ -899,14 +935,14 @@ def process_gocam_model_file(
             model_aggregate.list_inferred_relations.extend(inferred)
 
     # Set fields, counts and sort data for current model
-    stats_by_model.number_of_causal_relations = len(
-        stats_by_model.list_causal_relations or []
+    stats_by_model.number_of_explicit_causal_relations = len(
+        stats_by_model.list_explicit_causal_relations or []
     )
-    stats_by_model.number_of_unique_causal_relations = len(
-        stats_by_model.set_causal_relations
+    stats_by_model.number_of_unique_explicit_causal_relations = len(
+        stats_by_model.set_explicit_causal_relations
     )
     stats_by_model.number_of_activity_units = (
-        calculated_aggregate_values_by_model.number_of_activities
+        calculated_aggregate_values_by_model.number_of_activities or 0
     )
     stats_by_model.number_of_unique_references = len(stats_by_model.set_references)
     stats_by_model.number_of_unique_pmid = _count_pmids(stats_by_model.set_references)
@@ -940,9 +976,9 @@ def process_gocam_model_file(
     model_aggregate.number_of_genes = (
         model_aggregate.number_of_genes + stats_by_model.number_of_genes
     )
-    model_aggregate.number_of_causal_relations = (
-        model_aggregate.number_of_causal_relations
-        + stats_by_model.number_of_causal_relations
+    model_aggregate.number_of_explicit_causal_relations = (
+        model_aggregate.number_of_explicit_causal_relations
+        + stats_by_model.number_of_explicit_causal_relations
     )
 
     # If dry run is enabled, skip writing the output file
@@ -1045,7 +1081,7 @@ def output_entity_results(
     entity_lookup: Dict[str, GocamStats],
     entity_sub_dir: str,
     entity_agg_file_name: str,
-) -> None:
+) -> tuple[ResultType, ErrorReason] | None:
     """Compute final counts and write per-entity and aggregate statistics.
 
     Iterates over all entities (contributors or providers), finalizes their
@@ -1091,7 +1127,9 @@ def output_entity_results(
         details.number_of_activity_units_enabled_by_protein_complex = len(
             details.set_activity_unit_protein_complex_enablers
         )
-        details.number_of_unique_causal_relations = len(details.set_causal_relations)
+        details.number_of_unique_explicit_causal_relations = len(
+            details.set_explicit_causal_relations
+        )
         compute_molecule_and_term_counts(details)
 
         # Sort lists
@@ -1102,8 +1140,9 @@ def output_entity_results(
         entity_agg.number_of_genes = (
             entity_agg.number_of_genes + details.number_of_genes
         )
-        entity_agg.number_of_causal_relations = (
-            entity_agg.number_of_causal_relations + details.number_of_causal_relations
+        entity_agg.number_of_explicit_causal_relations = (
+            entity_agg.number_of_explicit_causal_relations
+            + details.number_of_explicit_causal_relations
         )
         entity_agg.set_activities.update(details.set_activities)
         entity_agg.set_enabled_by_gene_product.update(
@@ -1218,7 +1257,7 @@ def output_summary(
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
-) -> None:
+) -> tuple[ResultType, ErrorReason] | None:
     """Finalize aggregate statistics and write all summary output files.
 
     Computes final counts on the model-level aggregate, writes the
