@@ -293,14 +293,14 @@
 
 
 
-      EnabledByProteinComplexAssociation : members
+      EnabledByProteinComplexAssociation : has_part
 
 
 
 
 
-        EnabledByProteinComplexAssociation --&gt; "*" ProteinComplexMemberAssociation : members
-        click ProteinComplexMemberAssociation href "../ProteinComplexMemberAssociation/"
+        EnabledByProteinComplexAssociation --&gt; "*" ProteinComplexHasPartAssociation : has_part
+        click ProteinComplexHasPartAssociation href "../ProteinComplexHasPartAssociation/"
 
 
 
@@ -352,9 +352,9 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="../members/">members</a></td>
-<td>* <br/> <a href="../ProteinComplexMemberAssociation/">ProteinComplexMemberAssociation</a></td>
-<td>Associations between the complex and its members</td>
+<td><a href="../has_part/">has_part</a></td>
+<td>* <br/> <a href="../ProteinComplexHasPartAssociation/">ProteinComplexHasPartAssociation</a></td>
+<td>Associations between the complex and gene products that are part of it</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -461,14 +461,16 @@ slot_usage:
       description: The human Caspase-2 complex
     range: ProteinComplexTermObject
 attributes:
-  members:
-    name: members
-    description: Associations between the complex and its members.
+  has_part:
+    name: has_part
+    description: Associations between the complex and gene products that are part
+      of it.
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
     - EnabledByProteinComplexAssociation
-    range: ProteinComplexMemberAssociation
+    - PartOfProteinComplexAssociation
+    range: ProteinComplexHasPartAssociation
     multivalued: true
 rules:
 - preconditions:
@@ -513,16 +515,18 @@ slot_usage:
       description: The human Caspase-2 complex
     range: ProteinComplexTermObject
 attributes:
-  members:
-    name: members
-    description: Associations between the complex and its members.
+  has_part:
+    name: has_part
+    description: Associations between the complex and gene products that are part
+      of it.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: members
+    alias: has_part
     owner: EnabledByProteinComplexAssociation
     domain_of:
     - EnabledByProteinComplexAssociation
-    range: ProteinComplexMemberAssociation
+    - PartOfProteinComplexAssociation
+    range: ProteinComplexHasPartAssociation
     multivalued: true
   term:
     name: term

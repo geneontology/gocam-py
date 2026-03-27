@@ -262,6 +262,17 @@
 
 
 
+      EnabledByGeneProductAssociation : part_of
+
+
+
+
+
+        EnabledByGeneProductAssociation --&gt; "*" PartOfProteinComplexAssociation : part_of
+        click PartOfProteinComplexAssociation href "../PartOfProteinComplexAssociation/"
+
+
+
       EnabledByGeneProductAssociation : provenances
 
 
@@ -309,6 +320,12 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../part_of/">part_of</a></td>
+<td>* <br/> <a href="../PartOfProteinComplexAssociation/">PartOfProteinComplexAssociation</a></td>
+<td>Associations between the gene product and protein complexes it is a part of</td>
+<td>direct</td>
+</tr>
 <tr>
 <td><a href="../term/">term</a></td>
 <td>0..1 <br/> <a href="../GeneProductTermObject/">GeneProductTermObject</a></td>
@@ -387,6 +404,22 @@ slot_usage:
     - value: RNAcentral:URS00026A1FBE_9606
       description: An RNA product of this RNA central gene
     range: GeneProductTermObject
+attributes:
+  part_of:
+    name: part_of
+    description: Associations between the gene product and protein complexes it is
+      a part of.
+    from_schema: https://w3id.org/gocam
+    domain_of:
+    - Activity
+    - EnabledByGeneProductAssociation
+    - ProteinComplexHasPartAssociation
+    - BiologicalProcessAssociation
+    - CellularAnatomicalEntityAssociation
+    - CellTypeAssociation
+    - GrossAnatomyAssociation
+    range: PartOfProteinComplexAssociation
+    multivalued: true
 
 </code></pre>
 </details>
@@ -417,6 +450,23 @@ slot_usage:
       description: An RNA product of this RNA central gene
     range: GeneProductTermObject
 attributes:
+  part_of:
+    name: part_of
+    description: Associations between the gene product and protein complexes it is
+      a part of.
+    from_schema: https://w3id.org/gocam
+    alias: part_of
+    owner: EnabledByGeneProductAssociation
+    domain_of:
+    - Activity
+    - EnabledByGeneProductAssociation
+    - ProteinComplexHasPartAssociation
+    - BiologicalProcessAssociation
+    - CellularAnatomicalEntityAssociation
+    - CellTypeAssociation
+    - GrossAnatomyAssociation
+    range: PartOfProteinComplexAssociation
+    multivalued: true
   term:
     name: term
     description: A "term" that is an entity database object representing an individual

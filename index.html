@@ -542,12 +542,16 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <td>An association between an activity and a molecular function term</td>
 </tr>
 <tr>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="PartOfProteinComplexAssociation/">PartOfProteinComplexAssociation</a></td>
+<td>An association between a gene product and a protein complex that it is a part...</td>
+</tr>
+<tr>
 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="PhaseAssociation/">PhaseAssociation</a></td>
 <td>An association between an activity or biological process and a phase term</td>
 </tr>
 <tr>
-<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ProteinComplexMemberAssociation/">ProteinComplexMemberAssociation</a></td>
-<td>An association between a protein complex and one of its members</td>
+<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="ProteinComplexHasPartAssociation/">ProteinComplexHasPartAssociation</a></td>
+<td>An association between a protein complex and one of its parts</td>
 </tr>
 <tr>
 <td><a href="EvidenceItem/">EvidenceItem</a></td>
@@ -725,6 +729,10 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <td>The phase during which the activity takes place</td>
 </tr>
 <tr>
+<td><a href="has_part/">has_part</a></td>
+<td>Associations between the complex and gene products that are part of it</td>
+</tr>
+<tr>
 <td><a href="id/">id</a></td>
 <td>The identifier of the model</td>
 </tr>
@@ -743,10 +751,6 @@ and <a href="status/">status</a> are <em>required</em>.</p>
 <tr>
 <td><a href="located_in/">located_in</a></td>
 <td>The cellular location in which the molecule is located</td>
-</tr>
-<tr>
-<td><a href="members/">members</a></td>
-<td>Associations between the complex and its members</td>
 </tr>
 <tr>
 <td><a href="model_activity_enabled_by_closure/">model_activity_enabled_by_closure</a></td>
