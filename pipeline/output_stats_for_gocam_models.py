@@ -786,7 +786,8 @@ def process_gocam_model_file(
     model_details.model_name = gocam_model.title
     if model_aggregate.list_model_details is not None:
         model_aggregate.list_model_details.append(model_details)
-    stats_by_model.number_of_models = 1
+    stats_by_model.set_models.add(gocam_model.id)  
+    stats_by_model.number_of_models = len(stats_by_model.set_models)
 
     if gocam_model.activities:
         for activity in gocam_model.activities:
