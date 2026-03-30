@@ -20,6 +20,7 @@ Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
 """
 
+import json
 import logging
 import os
 import re
@@ -60,6 +61,516 @@ logger = logging.getLogger(__name__)
 
 INPUT_PREDICATES = {Relation.HAS_INPUT.value, Relation.HAS_PRIMARY_INPUT.value}
 OUTPUT_PREDICATES = {Relation.HAS_OUTPUT.value, Relation.HAS_PRIMARY_OUTPUT.value}
+
+MEMBER_VARIABLE_DEFINITIONS = [
+    # --- GocamStats ---
+    {
+        "class": "GocamStats",
+        "variable": "uri",
+        "type": "str | None",
+        "description": "URI identifier of the entity (contributor or provider).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_models",
+        "type": "int",
+        "description": "Count of unique GO-CAM models processed for this entity.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_activity_units",
+        "type": "int",
+        "description": "Total number of activities (activity units) in the model(s).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_activity_units_enabled_by_gene_product",
+        "type": "int",
+        "description": "Count of activities enabled by a gene product (not a protein complex).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_activity_units_enabled_by_protein_complex",
+        "type": "int",
+        "description": "Count of activities enabled by a protein complex.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_gene_product_enablers",
+        "type": "int",
+        "description": "Count of unique gene product terms that enable activities.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_protein_complex_genes",
+        "type": "int",
+        "description": "Count of unique genes that are members of protein complexes.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_gene_product_and_protein_complex_gene_enablers",
+        "type": "int",
+        "description": "Count of the union of gene product enablers and protein complex member genes (deduplicated).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_genes",
+        "type": "int",
+        "description": "Total count of all genes (may include duplicates across activities).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_references",
+        "type": "int",
+        "description": "Count of unique reference strings across all evidence items.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_pmid",
+        "type": "int",
+        "description": "Count of unique PubMed IDs extracted from references.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_explicit_causal_relations",
+        "type": "int",
+        "description": "Total count of causal associations on activities (may include duplicates).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_explicit_causal_relations",
+        "type": "int",
+        "description": "Count of unique activities that have causal associations.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_inputs",
+        "type": "int",
+        "description": "Total count of input molecules (has_input or has_primary_input), may include duplicates.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_chemical_inputs",
+        "type": "int",
+        "description": "Count of input molecules that are CHEBI terms.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_other_inputs",
+        "type": "int",
+        "description": "Count of input molecules that are not CHEBI terms.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_chemical_inputs",
+        "type": "int",
+        "description": "Count of unique CHEBI input molecules.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_other_inputs",
+        "type": "int",
+        "description": "Count of unique non-CHEBI input molecules.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_outputs",
+        "type": "int",
+        "description": "Total count of output molecules (has_output or has_primary_output), may include duplicates.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_chemical_outputs",
+        "type": "int",
+        "description": "Count of output molecules that are CHEBI terms.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_other_outputs",
+        "type": "int",
+        "description": "Count of output molecules that are not CHEBI terms.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_chemical_outputs",
+        "type": "int",
+        "description": "Count of unique CHEBI output molecules.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_other_outputs",
+        "type": "int",
+        "description": "Count of unique non-CHEBI output molecules.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_go_terms",
+        "type": "int",
+        "description": "Total count of GO terms across all activities (may include duplicates).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_go_terms",
+        "type": "int",
+        "description": "Count of unique GO terms (identified by 'GO:' prefix).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "number_of_unique_inferred_relations",
+        "type": "int",
+        "description": "Count of inferred relations (activity pairs connected via shared chemical molecules).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "list_inferred_relations",
+        "type": "List[Dict[str, Any]] | None",
+        "description": "List of inferred relation dicts with keys: activity_a, activity_a_genes, activity_b, activity_b_genes.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_models",
+        "type": "Set[str]",
+        "description": "Working set of model IDs processed for this entity.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_activities",
+        "type": "Set[str]",
+        "description": "Working set of activity IDs encountered.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_enabled_by_gene_product",
+        "type": "Set[str]",
+        "description": "Working set of unique gene product terms from EnabledByGeneProductAssociation.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_protein_complex_genes",
+        "type": "Set[str]",
+        "description": "Working set of unique genes that are members of protein complexes.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "list_enabled_by_gene_product",
+        "type": "List[str] | None",
+        "description": "List of all gene product enabler terms (may contain duplicates).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_references",
+        "type": "Set[str]",
+        "description": "Working set of unique reference strings from evidence items.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_explicit_causal_relations",
+        "type": "Set[str]",
+        "description": "Working set of unique activity IDs that have causal associations.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "list_explicit_causal_relations",
+        "type": "List[str] | None",
+        "description": "List of activity IDs with causal associations (may contain duplicates).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_activity_unit_gene_product_enablers",
+        "type": "Set[str]",
+        "description": "Working set of activity IDs that are enabled by gene products.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_activity_unit_protein_complex_enablers",
+        "type": "Set[str]",
+        "description": "Working set of activity IDs that are enabled by protein complexes.",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "unique_protein_complex_in_activity_term",
+        "type": "Set[str]",
+        "description": "Working set of protein complex terms (the complex itself, not its member genes).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "list_has_input_term",
+        "type": "List[str] | None",
+        "description": "List of all input molecule terms (covers both has_input and has_primary_input predicates).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "list_has_output_term",
+        "type": "List[str] | None",
+        "description": "List of all output molecule terms (covers both has_output and has_primary_output predicates).",
+    },
+    {
+        "class": "GocamStats",
+        "variable": "list_go_terms",
+        "type": "List[str] | None",
+        "description": "List of all GO terms found across the activity tree.",
+    },
+    # --- ModelDetails ---
+    {
+        "class": "ModelDetails",
+        "variable": "file_name",
+        "type": "str",
+        "description": "Filename of the JSON source file for this model.",
+    },
+    {
+        "class": "ModelDetails",
+        "variable": "model_id",
+        "type": "str",
+        "description": "Unique identifier of the GO-CAM model.",
+    },
+    {
+        "class": "ModelDetails",
+        "variable": "model_name",
+        "type": "str",
+        "description": "Human-readable title/name of the GO-CAM model.",
+    },
+    {
+        "class": "ModelDetails",
+        "variable": "unique_activities",
+        "type": "Set[str]",
+        "description": "Set of all activity IDs in this model.",
+    },
+    # --- AggregateInfo ---
+    {
+        "class": "AggregateInfo",
+        "variable": "entity",
+        "type": "str",
+        "description": "Label for the aggregation level (e.g. 'Model', 'Curator', 'Group').",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "total_number_of_entities_processed",
+        "type": "int",
+        "description": "Count of unique models, curators, or groups aggregated.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_activity_units",
+        "type": "int",
+        "description": "Total count of unique activities across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_activity_units_enabled_by_gene_product_association",
+        "type": "int",
+        "description": "Count of unique activities enabled by gene products across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_activity_units_enabled_by_protein_complex_association",
+        "type": "int",
+        "description": "Count of unique activities enabled by protein complexes across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_genes",
+        "type": "int",
+        "description": "Total count of genes summed across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_gene_product_enablers",
+        "type": "int",
+        "description": "Count of unique gene product terms across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_protein_complex_terms",
+        "type": "int",
+        "description": "Count of unique protein complex terms (the complexes themselves) across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_member_protein_complex_genes",
+        "type": "int",
+        "description": "Count of unique genes that are members of protein complexes across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_gene_product_and_protein_complex_gene_enablers",
+        "type": "int",
+        "description": "Count of the union of gene product enablers and protein complex member genes (deduplicated) across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "average_number_of_unique_gene_product_enablers_for_entity",
+        "type": "float",
+        "description": "Mean count of unique gene product enablers per entity (rounded to 2 decimals).",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_explicit_causal_relations",
+        "type": "int",
+        "description": "Sum of explicit causal relations across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_references",
+        "type": "int",
+        "description": "Count of unique reference strings across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_pmid",
+        "type": "int",
+        "description": "Count of unique PubMed IDs across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_inputs",
+        "type": "int",
+        "description": "Total count of input molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_chemical_inputs",
+        "type": "int",
+        "description": "Count of CHEBI input molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_other_inputs",
+        "type": "int",
+        "description": "Count of non-CHEBI input molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_chemical_inputs",
+        "type": "int",
+        "description": "Count of unique CHEBI input molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_other_inputs",
+        "type": "int",
+        "description": "Count of unique non-CHEBI input molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_outputs",
+        "type": "int",
+        "description": "Total count of output molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_chemical_outputs",
+        "type": "int",
+        "description": "Count of CHEBI output molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_other_outputs",
+        "type": "int",
+        "description": "Count of non-CHEBI output molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_chemical_outputs",
+        "type": "int",
+        "description": "Count of unique CHEBI output molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_other_outputs",
+        "type": "int",
+        "description": "Count of unique non-CHEBI output molecules across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_go_terms",
+        "type": "int",
+        "description": "Total count of GO terms across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_go_terms",
+        "type": "int",
+        "description": "Count of unique GO terms across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_unique_inferred_relations",
+        "type": "int",
+        "description": "Count of unique inferred relations across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "list_inferred_relations",
+        "type": "List[Dict[str, Any]] | None",
+        "description": "List of inferred relation dicts accumulated from all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "unique_activities",
+        "type": "Set[str]",
+        "description": "Working set of all activity IDs across entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "unique_enabled_by_gene_product",
+        "type": "Set[str]",
+        "description": "Working set of all unique gene product enabler terms across entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "unique_references",
+        "type": "Set[str]",
+        "description": "Working set of all unique reference strings across entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "unique_activity_unit_gene_product_enablers",
+        "type": "Set[str]",
+        "description": "Working set of activity IDs enabled by gene products across entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "unique_activity_unit_protein_complex_enablers",
+        "type": "Set[str]",
+        "description": "Working set of activity IDs enabled by protein complexes across entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "unique_protein_complex_in_activity_term",
+        "type": "Set[str]",
+        "description": "Working set of protein complex terms across all entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "unique_protein_complex_genes",
+        "type": "Set[str]",
+        "description": "Working set of genes that are members of protein complexes across entities.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "list_model_details",
+        "type": "List[ModelDetails] | None",
+        "description": "List of ModelDetails objects (only populated at model aggregate level).",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "list_has_input_term",
+        "type": "List[str] | None",
+        "description": "List of all input molecule terms (covers both has_input and has_primary_input).",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "list_has_output_term",
+        "type": "List[str] | None",
+        "description": "List of all output molecule terms (covers both has_output and has_primary_output).",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "list_go_terms",
+        "type": "List[str] | None",
+        "description": "List of all GO terms across all entities.",
+    },
+]
 
 
 class ResultType(str, Enum):
@@ -118,17 +629,17 @@ class GocamStats(ConfiguredBaseModel):
     number_of_unique_inferred_relations: int = 0
     list_inferred_relations: List[Dict[str, Any]] | None = []
 
-    set_models: Set[str] = set()
-    set_activities: Set[str] = set()
-    set_enabled_by_gene_product: Set[str] = set()
-    set_protein_complex_genes: Set[str] = set()
+    unique_models: Set[str] = set()
+    unique_activities: Set[str] = set()
+    unique_enabled_by_gene_product: Set[str] = set()
+    unique_protein_complex_genes: Set[str] = set()
     list_enabled_by_gene_product: List[str] | None = []
-    set_references: Set[str] = set()
-    set_explicit_causal_relations: Set[str] = set()
+    unique_references: Set[str] = set()
+    unique_explicit_causal_relations: Set[str] = set()
     list_explicit_causal_relations: List[str] | None = []
-    set_activity_unit_gene_product_enablers: Set[str] = set()
-    set_activity_unit_protein_complex_enablers: Set[str] = set()
-    set_protein_complex_in_activity_term: Set[str] = set()
+    unique_activity_unit_gene_product_enablers: Set[str] = set()
+    unique_activity_unit_protein_complex_enablers: Set[str] = set()
+    unique_protein_complex_in_activity_term: Set[str] = set()
     list_has_input_term: (
         List[str] | None
     ) = []  # Covers both has_input and has primary_input
@@ -144,7 +655,7 @@ class ModelDetails(ConfiguredBaseModel):
     file_name: str = ""
     model_id: str = ""
     model_name: str = ""
-    set_activities: Set[str] = set()
+    unique_activities: Set[str] = set()
 
 
 class AggregateInfo(ConfiguredBaseModel):
@@ -186,13 +697,13 @@ class AggregateInfo(ConfiguredBaseModel):
     number_of_unique_inferred_relations: int = 0
     list_inferred_relations: List[Dict[str, Any]] | None = []
 
-    set_activities: Set[str] = set()
-    set_enabled_by_gene_product: Set[str] = set()
-    set_references: Set[str] = set()
-    set_activity_unit_gene_product_enablers: Set[str] = set()
-    set_activity_unit_protein_complex_enablers: Set[str] = set()
-    set_protein_complex_in_activity_term: Set[str] = set()
-    set_protein_complex_genes: Set[str] = set()
+    unique_activities: Set[str] = set()
+    unique_enabled_by_gene_product: Set[str] = set()
+    unique_references: Set[str] = set()
+    unique_activity_unit_gene_product_enablers: Set[str] = set()
+    unique_activity_unit_protein_complex_enablers: Set[str] = set()
+    unique_protein_complex_in_activity_term: Set[str] = set()
+    unique_protein_complex_genes: Set[str] = set()
     list_model_details: List[ModelDetails] | None = []
     list_has_input_term: (
         List[str] | None
@@ -313,27 +824,27 @@ def _update_entity_gene_stats(
         obsolete_ids: Set of object IDs marked as obsolete.
     """
     if isinstance(activity.enabled_by, EnabledByGeneProductAssociation):
-        entity_info.set_activity_unit_gene_product_enablers.add(activity.id)
+        entity_info.unique_activity_unit_gene_product_enablers.add(activity.id)
         if activity.enabled_by.term and activity.enabled_by.term not in obsolete_ids:
             if entity_info.list_enabled_by_gene_product is not None:
                 entity_info.list_enabled_by_gene_product.append(
                     activity.enabled_by.term
                 )
-            entity_info.set_enabled_by_gene_product.add(activity.enabled_by.term)
+            entity_info.unique_enabled_by_gene_product.add(activity.enabled_by.term)
             entity_info.number_of_genes += 1
     if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-        entity_info.set_activity_unit_protein_complex_enablers.add(activity.id)
+        entity_info.unique_activity_unit_protein_complex_enablers.add(activity.id)
         if activity.enabled_by.term and activity.enabled_by.term not in obsolete_ids:
-            entity_info.set_protein_complex_in_activity_term.add(
+            entity_info.unique_protein_complex_in_activity_term.add(
                 activity.enabled_by.term
             )
         if activity.enabled_by.members:
             for member in activity.enabled_by.members:
                 if member.term and member.term not in obsolete_ids:
-                    entity_info.set_protein_complex_genes.add(member.term)
+                    entity_info.unique_protein_complex_genes.add(member.term)
                     entity_info.number_of_genes += 1
-    entity_info.set_activities.add(activity.id)
-    entity_info.set_models.add(gocam_model_id)
+    entity_info.unique_activities.add(activity.id)
+    entity_info.unique_models.add(gocam_model_id)
 
 
 def _is_association_obsolete(assoc: Association, obsolete_ids: set[str]) -> bool:
@@ -416,10 +927,10 @@ def _collect_references(
     via the evidence-level provenances.
 
     Populates:
-        stats_by_model.set_references: all references for this model
-        model_aggregate.set_references: accumulated references across models
-        contributor_lookup[contributor].set_references: references by contributor
-        provider_lookup[provider].set_references: references by provider
+        stats_by_model.unique_references: all references for this model
+        model_aggregate.unique_references: accumulated references across models
+        contributor_lookup[contributor].unique_references: references by contributor
+        provider_lookup[provider].unique_references: references by provider
     """
     for activity in gocam_model.activities or []:
         for association in _iter_activity_associations(activity, obsolete_ids):
@@ -429,8 +940,8 @@ def _collect_references(
                 if not evidence.reference:
                     continue
                 ref = evidence.reference
-                stats_by_model.set_references.add(ref)
-                model_aggregate.set_references.add(ref)
+                stats_by_model.unique_references.add(ref)
+                model_aggregate.unique_references.add(ref)
                 if evidence.provenances:
                     for provenance in evidence.provenances:
                         if provenance.contributor:
@@ -438,13 +949,13 @@ def _collect_references(
                                 contributor_info = contributor_lookup.setdefault(
                                     contributor, GocamStats()
                                 )
-                                contributor_info.set_references.add(ref)
+                                contributor_info.unique_references.add(ref)
                         if provenance.provided_by:
                             for provider in provenance.provided_by:
                                 provider_info = provider_lookup.setdefault(
                                     provider, GocamStats()
                                 )
-                                provider_info.set_references.add(ref)
+                                provider_info.unique_references.add(ref)
 
 
 def _collect_molecule_terms(
@@ -786,17 +1297,17 @@ def process_gocam_model_file(
     model_details.model_name = gocam_model.title
     if model_aggregate.list_model_details is not None:
         model_aggregate.list_model_details.append(model_details)
-    stats_by_model.set_models.add(gocam_model.id)  
-    stats_by_model.number_of_models = len(stats_by_model.set_models)
+    stats_by_model.unique_models.add(gocam_model.id)  
+    stats_by_model.number_of_models = len(stats_by_model.unique_models)
 
     if gocam_model.activities:
         for activity in gocam_model.activities:
-            stats_by_model.set_activities.add(activity.id)
-            model_aggregate.set_activities.add(activity.id)
-            model_details.set_activities.add(activity.id)
+            stats_by_model.unique_activities.add(activity.id)
+            model_aggregate.unique_activities.add(activity.id)
+            model_details.unique_activities.add(activity.id)
             if isinstance(activity.enabled_by, EnabledByGeneProductAssociation):
-                stats_by_model.set_activity_unit_gene_product_enablers.add(activity.id)
-                model_aggregate.set_activity_unit_gene_product_enablers.add(activity.id)
+                stats_by_model.unique_activity_unit_gene_product_enablers.add(activity.id)
+                model_aggregate.unique_activity_unit_gene_product_enablers.add(activity.id)
                 if (
                     activity.enabled_by.term
                     and activity.enabled_by.term not in obsolete_ids
@@ -805,36 +1316,36 @@ def process_gocam_model_file(
                         stats_by_model.list_enabled_by_gene_product.append(
                             activity.enabled_by.term
                         )
-                    stats_by_model.set_enabled_by_gene_product.add(
+                    stats_by_model.unique_enabled_by_gene_product.add(
                         activity.enabled_by.term
                     )
                     stats_by_model.number_of_genes += 1
-                    model_aggregate.set_enabled_by_gene_product.add(
+                    model_aggregate.unique_enabled_by_gene_product.add(
                         activity.enabled_by.term
                     )
 
             elif isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-                stats_by_model.set_activity_unit_protein_complex_enablers.add(
+                stats_by_model.unique_activity_unit_protein_complex_enablers.add(
                     activity.id
                 )
-                model_aggregate.set_activity_unit_protein_complex_enablers.add(
+                model_aggregate.unique_activity_unit_protein_complex_enablers.add(
                     activity.id
                 )
                 if (
                     activity.enabled_by.term
                     and activity.enabled_by.term not in obsolete_ids
                 ):
-                    stats_by_model.set_protein_complex_in_activity_term.add(
+                    stats_by_model.unique_protein_complex_in_activity_term.add(
                         activity.enabled_by.term
                     )
-                    model_aggregate.set_protein_complex_in_activity_term.add(
+                    model_aggregate.unique_protein_complex_in_activity_term.add(
                         activity.enabled_by.term
                     )
                 if activity.enabled_by.members:
                     for member in activity.enabled_by.members:
                         if member.term and member.term not in obsolete_ids:
-                            stats_by_model.set_protein_complex_genes.add(member.term)
-                            model_aggregate.set_protein_complex_genes.add(member.term)
+                            stats_by_model.unique_protein_complex_genes.add(member.term)
+                            model_aggregate.unique_protein_complex_genes.add(member.term)
                             stats_by_model.number_of_genes += 1
 
             if (
@@ -872,7 +1383,7 @@ def process_gocam_model_file(
                         stats_by_model.list_explicit_causal_relations.append(
                             activity.id
                         )
-                    stats_by_model.set_explicit_causal_relations.add(activity.id)
+                    stats_by_model.unique_explicit_causal_relations.add(activity.id)
                     if causal_association.provenances:
                         for provenance in causal_association.provenances:
                             if provenance.contributor:
@@ -880,7 +1391,7 @@ def process_gocam_model_file(
                                     contributor_info = contributor_lookup.setdefault(
                                         contributor, GocamStats()
                                     )
-                                    contributor_info.set_explicit_causal_relations.add(
+                                    contributor_info.unique_explicit_causal_relations.add(
                                         activity.id
                                     )
                                     contributor_info.number_of_explicit_causal_relations += 1
@@ -889,7 +1400,7 @@ def process_gocam_model_file(
                                     provider_info = provider_lookup.setdefault(
                                         provider, GocamStats()
                                     )
-                                    provider_info.set_explicit_causal_relations.add(
+                                    provider_info.unique_explicit_causal_relations.add(
                                         activity.id
                                     )
                                     provider_info.number_of_explicit_causal_relations += 1
@@ -940,31 +1451,31 @@ def process_gocam_model_file(
         stats_by_model.list_explicit_causal_relations or []
     )
     stats_by_model.number_of_unique_explicit_causal_relations = len(
-        stats_by_model.set_explicit_causal_relations
+        stats_by_model.unique_explicit_causal_relations
     )
     stats_by_model.number_of_activity_units = (
         calculated_aggregate_values_by_model.number_of_activities or 0
     )
-    stats_by_model.number_of_unique_references = len(stats_by_model.set_references)
-    stats_by_model.number_of_unique_pmid = _count_pmids(stats_by_model.set_references)
+    stats_by_model.number_of_unique_references = len(stats_by_model.unique_references)
+    stats_by_model.number_of_unique_pmid = _count_pmids(stats_by_model.unique_references)
 
     stats_by_model.number_of_activity_units_enabled_by_gene_product = len(
-        stats_by_model.set_activity_unit_gene_product_enablers
+        stats_by_model.unique_activity_unit_gene_product_enablers
     )
     stats_by_model.number_of_activity_units_enabled_by_protein_complex = len(
-        stats_by_model.set_activity_unit_protein_complex_enablers
+        stats_by_model.unique_activity_unit_protein_complex_enablers
     )
 
     stats_by_model.number_of_unique_gene_product_enablers = len(
-        stats_by_model.set_enabled_by_gene_product
+        stats_by_model.unique_enabled_by_gene_product
     )
     stats_by_model.number_of_unique_protein_complex_genes = len(
-        stats_by_model.set_protein_complex_genes
+        stats_by_model.unique_protein_complex_genes
     )
     stats_by_model.number_of_unique_gene_product_and_protein_complex_gene_enablers = (
         len(
-            stats_by_model.set_enabled_by_gene_product.union(
-                stats_by_model.set_protein_complex_genes
+            stats_by_model.unique_enabled_by_gene_product.union(
+                stats_by_model.unique_protein_complex_genes
             )
         )
     )
@@ -1110,33 +1621,33 @@ def output_entity_results(
         logger.debug(f"Processing contributor: {entity}")
         # Set numbers
         details.uri = entity
-        details.number_of_models = len(details.set_models)
+        details.number_of_models = len(details.unique_models)
         details.number_of_unique_gene_product_enablers = len(
-            details.set_enabled_by_gene_product
+            details.unique_enabled_by_gene_product
         )
         details.number_of_unique_protein_complex_genes = len(
-            details.set_protein_complex_genes
+            details.unique_protein_complex_genes
         )
         details.number_of_unique_gene_product_and_protein_complex_gene_enablers = len(
-            details.set_enabled_by_gene_product.union(details.set_protein_complex_genes)
+            details.unique_enabled_by_gene_product.union(details.unique_protein_complex_genes)
         )
-        details.number_of_unique_references = len(details.set_references)
-        details.number_of_activity_units = len(details.set_activities)
+        details.number_of_unique_references = len(details.unique_references)
+        details.number_of_activity_units = len(details.unique_activities)
         details.number_of_activity_units_enabled_by_gene_product = len(
-            details.set_activity_unit_gene_product_enablers
+            details.unique_activity_unit_gene_product_enablers
         )
         details.number_of_activity_units_enabled_by_protein_complex = len(
-            details.set_activity_unit_protein_complex_enablers
+            details.unique_activity_unit_protein_complex_enablers
         )
         details.number_of_unique_explicit_causal_relations = len(
-            details.set_explicit_causal_relations
+            details.unique_explicit_causal_relations
         )
         compute_molecule_and_term_counts(details)
 
         # Sort lists
         if details.list_enabled_by_gene_product is not None:
             details.list_enabled_by_gene_product.sort()
-        details.number_of_unique_pmid = _count_pmids(details.set_references)
+        details.number_of_unique_pmid = _count_pmids(details.unique_references)
 
         entity_agg.number_of_genes = (
             entity_agg.number_of_genes + details.number_of_genes
@@ -1145,21 +1656,21 @@ def output_entity_results(
             entity_agg.number_of_explicit_causal_relations
             + details.number_of_explicit_causal_relations
         )
-        entity_agg.set_activities.update(details.set_activities)
-        entity_agg.set_enabled_by_gene_product.update(
-            details.set_enabled_by_gene_product
+        entity_agg.unique_activities.update(details.unique_activities)
+        entity_agg.unique_enabled_by_gene_product.update(
+            details.unique_enabled_by_gene_product
         )
-        entity_agg.set_references.update(details.set_references)
-        entity_agg.set_activity_unit_gene_product_enablers.update(
-            details.set_activity_unit_gene_product_enablers
+        entity_agg.unique_references.update(details.unique_references)
+        entity_agg.unique_activity_unit_gene_product_enablers.update(
+            details.unique_activity_unit_gene_product_enablers
         )
-        entity_agg.set_activity_unit_protein_complex_enablers.update(
-            details.set_activity_unit_protein_complex_enablers
+        entity_agg.unique_activity_unit_protein_complex_enablers.update(
+            details.unique_activity_unit_protein_complex_enablers
         )
-        entity_agg.set_protein_complex_in_activity_term.update(
-            details.set_protein_complex_in_activity_term
+        entity_agg.unique_protein_complex_in_activity_term.update(
+            details.unique_protein_complex_in_activity_term
         )
-        entity_agg.set_protein_complex_genes.update(details.set_protein_complex_genes)
+        entity_agg.unique_protein_complex_genes.update(details.unique_protein_complex_genes)
         if (
             entity_agg.list_has_input_term is not None
             and details.list_has_input_term is not None
@@ -1199,27 +1710,27 @@ def output_entity_results(
                 )
                 return ResultType.ERROR, ErrorReason.WRITE_ERROR
 
-    entity_agg.number_of_unique_activity_units = len(entity_agg.set_activities)
+    entity_agg.number_of_unique_activity_units = len(entity_agg.unique_activities)
     entity_agg.number_of_unique_gene_product_enablers = len(
-        entity_agg.set_enabled_by_gene_product
+        entity_agg.unique_enabled_by_gene_product
     )
-    entity_agg.number_of_unique_references = len(entity_agg.set_references)
-    entity_agg.number_of_unique_pmid = _count_pmids(entity_agg.set_references)
+    entity_agg.number_of_unique_references = len(entity_agg.unique_references)
+    entity_agg.number_of_unique_pmid = _count_pmids(entity_agg.unique_references)
     entity_agg.number_of_unique_activity_units_enabled_by_protein_complex_association = len(
-        entity_agg.set_activity_unit_protein_complex_enablers
+        entity_agg.unique_activity_unit_protein_complex_enablers
     )
     entity_agg.number_of_unique_activity_units_enabled_by_gene_product_association = (
-        len(entity_agg.set_activity_unit_gene_product_enablers)
+        len(entity_agg.unique_activity_unit_gene_product_enablers)
     )
     entity_agg.number_of_unique_protein_complex_terms = len(
-        entity_agg.set_protein_complex_in_activity_term
+        entity_agg.unique_protein_complex_in_activity_term
     )
     entity_agg.number_of_unique_member_protein_complex_genes = len(
-        entity_agg.set_protein_complex_genes
+        entity_agg.unique_protein_complex_genes
     )
     entity_agg.number_of_unique_gene_product_and_protein_complex_gene_enablers = len(
-        entity_agg.set_enabled_by_gene_product.union(
-            entity_agg.set_protein_complex_genes
+        entity_agg.unique_enabled_by_gene_product.union(
+            entity_agg.unique_protein_complex_genes
         )
     )
 
@@ -1274,28 +1785,28 @@ def output_summary(
     """
     model_aggregate.entity = "Model"
     model_aggregate.number_of_unique_gene_product_enablers = len(
-        model_aggregate.set_enabled_by_gene_product
+        model_aggregate.unique_enabled_by_gene_product
     )
-    model_aggregate.number_of_unique_references = len(model_aggregate.set_references)
+    model_aggregate.number_of_unique_references = len(model_aggregate.unique_references)
     model_aggregate.number_of_unique_activity_units = len(
-        model_aggregate.set_activities
+        model_aggregate.unique_activities
     )
     model_aggregate.number_of_unique_activity_units_enabled_by_protein_complex_association = len(
-        model_aggregate.set_activity_unit_protein_complex_enablers
+        model_aggregate.unique_activity_unit_protein_complex_enablers
     )
     model_aggregate.number_of_unique_activity_units_enabled_by_gene_product_association = len(
-        model_aggregate.set_activity_unit_gene_product_enablers
+        model_aggregate.unique_activity_unit_gene_product_enablers
     )
     model_aggregate.number_of_unique_protein_complex_terms = len(
-        model_aggregate.set_protein_complex_in_activity_term
+        model_aggregate.unique_protein_complex_in_activity_term
     )
     model_aggregate.number_of_unique_member_protein_complex_genes = len(
-        model_aggregate.set_protein_complex_genes
+        model_aggregate.unique_protein_complex_genes
     )
     model_aggregate.number_of_unique_gene_product_and_protein_complex_gene_enablers = (
         len(
-            model_aggregate.set_enabled_by_gene_product.union(
-                model_aggregate.set_protein_complex_genes
+            model_aggregate.unique_enabled_by_gene_product.union(
+                model_aggregate.unique_protein_complex_genes
             )
         )
     )
@@ -1314,7 +1825,7 @@ def output_summary(
             )
         )
 
-    model_aggregate.number_of_unique_pmid = _count_pmids(model_aggregate.set_references)
+    model_aggregate.number_of_unique_pmid = _count_pmids(model_aggregate.unique_references)
 
     if output_dir is not None:
         aggregate_stats_name = "aggregate_model_stats.json"
@@ -1350,6 +1861,21 @@ def output_summary(
         entity_sub_dir="stats_by_group",
         entity_agg_file_name="aggregate_group_stats.json",
     )
+
+    # Write member variable definitions to output directory
+    if output_dir is not None:
+        definitions_file = output_dir / "member_variable_definitions.json"
+        try:
+            with open(definitions_file, "w") as f:
+                json.dump(MEMBER_VARIABLE_DEFINITIONS, f, indent=2)
+            logger.info(
+                f"Successfully wrote member variable definitions to {definitions_file}"
+            )
+        except Exception as e:
+            logger.error(
+                f"Error writing member variable definitions to {definitions_file}",
+                exc_info=e,
+            )
 
     total_count = len(results)
     success_count = sum(
