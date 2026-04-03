@@ -290,6 +290,11 @@ MEMBER_VARIABLE_DEFINITIONS = [
         "variable": "unique_activities",
         "description": "List of unique activity IDs in this model.",
     },
+    {
+        "class": "ModelDetails",
+        "variable": "model_status",
+        "description": "Status of the GO-CAM model (e.g. 'production', 'development', 'review'). Null if not set.",
+    },
     # --- AggregateInfo ---
     {
         "class": "AggregateInfo",
@@ -300,6 +305,11 @@ MEMBER_VARIABLE_DEFINITIONS = [
         "class": "AggregateInfo",
         "variable": "total_number_of_entities_processed",
         "description": "Count of unique models, curators, or groups aggregated.",
+    },
+    {
+        "class": "AggregateInfo",
+        "variable": "number_of_models_by_status",
+        "description": "Count of models for each status value (e.g. production, development, unknown).",
     },
     {
         "class": "AggregateInfo",
@@ -514,6 +524,11 @@ MEMBER_VARIABLE_DEFINITIONS = [
     },
     {
         "class": "ProteinComplexActivityInfo",
+        "variable": "model_status",
+        "description": "Status of the GO-CAM model (e.g. 'production', 'development', 'review'). Null if not set.",
+    },
+    {
+        "class": "ProteinComplexActivityInfo",
         "variable": "unique_curators",
         "description": "List of unique curator (contributor) URIs from the enabled_by provenances.",
     },
@@ -608,6 +623,7 @@ class ModelDetails(ConfiguredBaseModel):
     model_id: str = ""
     model_name: str = ""
     unique_activities: Set[str] = set()
+    model_status: str | None = None
 
 
 class AggregateInfo(ConfiguredBaseModel):
@@ -619,6 +635,7 @@ class AggregateInfo(ConfiguredBaseModel):
 
     entity: str = ""
     total_number_of_entities_processed: int = 0
+    number_of_models_by_status: Dict[str, int] = {}
     number_of_unique_activity_units: int = 0
     number_of_unique_activity_units_enabled_by_gene_product_association: int = 0
     number_of_unique_activity_units_enabled_by_protein_complex_association: int = 0
@@ -674,6 +691,7 @@ class ProteinComplexActivityInfo(ConfiguredBaseModel):
     activity_id: str = ""
     protein_complex_term: str | None = None
     molecular_function: str | None = None
+    model_status: str | None = None
     unique_curators: Set[str] = set()
     unique_groups: Set[str] = set()
 
@@ -1260,6 +1278,12 @@ def process_gocam_model_file(
     model_details.file_name = json_file.name
     model_details.model_id = gocam_model.id
     model_details.model_name = gocam_model.title
+    if gocam_model.status is not None:
+        model_details.model_status = (
+            gocam_model.status.value
+            if hasattr(gocam_model.status, "value")
+            else str(gocam_model.status)
+        )
     if model_aggregate.list_model_details is not None:
         model_aggregate.list_model_details.append(model_details)
     stats_by_model.unique_models.add(gocam_model.id)
@@ -1329,6 +1353,14 @@ def process_gocam_model_file(
                         molecular_function=(
                             activity.molecular_function.term
                             if activity.molecular_function
+                            else None
+                        ),
+                        model_status=(
+                            gocam_model.status.value
+                            if gocam_model.status is not None
+                            and hasattr(gocam_model.status, "value")
+                            else str(gocam_model.status)
+                            if gocam_model.status is not None
                             else None
                         ),
                     )
@@ -1828,6 +1860,13 @@ def output_summary(
     model_aggregate.number_of_unique_pmid = _count_pmids(
         model_aggregate.unique_references
     )
+
+    status_counts: Dict[str, int] = {}
+    if model_aggregate.list_model_details:
+        for md in model_aggregate.list_model_details:
+            key = md.model_status if md.model_status is not None else "unknown"
+            status_counts[key] = status_counts.get(key, 0) + 1
+    model_aggregate.number_of_models_by_status = status_counts
 
     if output_dir is not None:
         aggregate_stats_name = "aggregate_model_stats.json"
