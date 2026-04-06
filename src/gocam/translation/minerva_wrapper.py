@@ -703,6 +703,8 @@ class MinervaTranslator:
             subject=individual_id, property=Relation.HAPPENS_DURING
         ):
             phase_association = self._build_phase_association(happens_during_fact)
+            if phase_association is None:
+                continue
             if association.happens_during is None:
                 association.happens_during = phase_association
             else:
@@ -757,6 +759,8 @@ class MinervaTranslator:
             subject=individual_id, property=Relation.PART_OF
         ):
             cell_type_association = self._build_cell_type_association(part_of_fact)
+            if cell_type_association is None:
+                continue
             if association.part_of is None:
                 association.part_of = cell_type_association
             else:
