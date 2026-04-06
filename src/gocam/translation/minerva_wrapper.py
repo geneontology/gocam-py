@@ -240,7 +240,7 @@ class MinervaView:
         label = obj.label
         formatted = f"{label} [{term_id}]" if label else term_id
         types = self._individual_id_to_root_types.get(individual_id, [])
-        if types:
+        if types and types[0].label:
             # Show the first one because it is the most relevant one
             formatted += f" ({types[0].label})"
         return formatted
