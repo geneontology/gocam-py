@@ -385,6 +385,7 @@ class MinervaTranslator:
                 )
             )
         for enabled_by_fact in enabled_by_facts:
+            evs, prov = self._process_fact(enabled_by_fact)
             enabled_by_subject = enabled_by_fact.subject
             enabled_by_object = enabled_by_fact.object
             subject_term = self.view.get_term(enabled_by_subject)
@@ -397,7 +398,6 @@ class MinervaTranslator:
                 self._add_missing_term_warning(enabled_by_object, enabled_by_fact)
                 continue
 
-            evs, prov = self._process_fact(enabled_by_fact)
             enabled_by_association = self._build_enabled_by_association(
                 enabled_by_object, object_term, evs, prov
             )
@@ -502,6 +502,7 @@ class MinervaTranslator:
         if visited is None:
             visited = frozenset()
 
+        evs, prov = self._process_fact(fact)
         part_id = fact.object
         part_term = self.view.get_term(part_id)
 
@@ -509,7 +510,6 @@ class MinervaTranslator:
             self._add_missing_term_warning(part_id, fact)
             return None
 
-        evs, prov = self._process_fact(fact)
         has_part_association = ProteinComplexHasPartAssociation(
             term=part_term,
             evidence=evs,
@@ -547,13 +547,13 @@ class MinervaTranslator:
         if visited is None:
             visited = frozenset()
 
+        evs, prov = self._process_fact(fact)
         complex_id = fact.object
         complex_term = self.view.get_term(complex_id)
         if complex_term is None:
             self._add_missing_term_warning(complex_id, fact)
             return None
 
-        evs, prov = self._process_fact(fact)
         part_of_association = PartOfProteinComplexAssociation(
             term=complex_term,
             evidence=evs,
@@ -672,9 +672,11 @@ class MinervaTranslator:
         self, fact: Fact, visited: frozenset[str] | None = None
     ) -> BiologicalProcessAssociation | None:
         """Recursively build a BiologicalProcessAssociation."""
+        evidence, provenance = self._process_fact(fact)
         individual_id = fact.object
 
-        if self.view.get_term(individual_id) is None:
+        term = self.view.get_term(individual_id)
+        if term is None:
             self._add_missing_term_warning(individual_id, fact)
             return None
 
@@ -691,8 +693,6 @@ class MinervaTranslator:
             return None
         next_visited = visited.union({individual_id})
 
-        term = self.view.get_term(individual_id)
-        evidence, provenance = self._process_fact(fact)
         association = BiologicalProcessAssociation(
             term=term,
             evidence=evidence,
@@ -727,12 +727,12 @@ class MinervaTranslator:
 
     def _build_phase_association(self, fact: Fact) -> PhaseAssociation | None:
         """Build a PhaseAssociation."""
+        evidence, provenance = self._process_fact(fact)
         individual_id = fact.object
         term = self.view.get_term(individual_id)
         if term is None:
             self._add_missing_term_warning(individual_id, fact)
             return None
-        evidence, provenance = self._process_fact(fact)
         return PhaseAssociation(
             term=term,
             evidence=evidence,
@@ -743,12 +743,12 @@ class MinervaTranslator:
         self, fact: Fact
     ) -> CellularAnatomicalEntityAssociation | None:
         """Build a CellularAnatomicalEntityAssociation."""
+        evidence, provenance = self._process_fact(fact)
         individual_id = fact.object
         term = self.view.get_term(individual_id)
         if term is None:
             self._add_missing_term_warning(individual_id, fact)
             return None
-        evidence, provenance = self._process_fact(fact)
         association = CellularAnatomicalEntityAssociation(
             term=term,
             evidence=evidence,
@@ -770,12 +770,12 @@ class MinervaTranslator:
 
     def _build_cell_type_association(self, fact: Fact) -> CellTypeAssociation | None:
         """Build a CellTypeAssociation."""
+        evidence, provenance = self._process_fact(fact)
         individual_id = fact.object
         term = self.view.get_term(individual_id)
         if term is None:
             self._add_missing_term_warning(individual_id, fact)
             return None
-        evidence, provenance = self._process_fact(fact)
         association = CellTypeAssociation(
             term=term,
             evidence=evidence,
@@ -801,6 +801,7 @@ class MinervaTranslator:
         self, fact: Fact, visited: frozenset[str] | None = None
     ) -> GrossAnatomyAssociation | None:
         """Recursively build a GrossAnatomyAssociation."""
+        evidence, provenance = self._process_fact(fact)
         individual_id = fact.object
 
         if visited is None:
@@ -821,7 +822,6 @@ class MinervaTranslator:
             self._add_missing_term_warning(individual_id, fact)
             return None
 
-        evidence, provenance = self._process_fact(fact)
         association = GrossAnatomyAssociation(
             term=term,
             evidence=evidence,
