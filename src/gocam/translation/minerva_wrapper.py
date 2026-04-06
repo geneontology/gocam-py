@@ -193,14 +193,14 @@ class MinervaView:
         """Check if an individual has a specific root type."""
         return type_uri in self.get_root_types(individual_id)
 
-    def get_annotations(self, id_or_dict: str | Fact | MinervaObject) -> dict[str, str]:
+    def get_annotations(self, id_or_dict: str | Annotated) -> dict[str, str]:
         """Get single-valued annotations for an individual (by ID) or a fact (by dict)."""
         if isinstance(id_or_dict, str):
             return self._individual_id_to_annotations.get(id_or_dict, {})
         return self._extract_annotations(id_or_dict)
 
     def get_annotations_multivalued(
-        self, id_or_dict: str | Fact | MinervaObject
+        self, id_or_dict: str | Annotated
     ) -> dict[str, list[str]]:
         """Get multivalued annotations for an individual (by ID) or a fact (by dict)."""
         if isinstance(id_or_dict, str):
