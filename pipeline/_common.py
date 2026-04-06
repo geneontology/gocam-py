@@ -111,7 +111,7 @@ class SuccessResult(PipelineResult):
     """Result for successful processing."""
 
     data: Any = None
-    warnings: list[str] = field(default_factory=list)
+    warnings: list[Any] = field(default_factory=list)
 
     @property
     def status(self) -> str:

@@ -14,7 +14,7 @@ The models which pass the connectivity criteria are written to the output direct
 not be True GO-CAM models. This output set is designed for QC analysis and further downstream
 filtering.
 """
-
+import dataclasses
 import json
 import logging
 from pathlib import Path
@@ -88,7 +88,7 @@ def process_minerva_model_file(
     try:
         translation_result = MinervaWrapper.translate(minerva_model)
         gocam_model = translation_result.result
-        translation_warnings = [w.message for w in translation_result.warnings]
+        translation_warnings = [dataclasses.asdict(w) for w in translation_result.warnings]
         logger.debug(
             f"Successfully converted Minerva model to GO-CAM model for {json_file}"
         )
