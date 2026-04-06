@@ -11,6 +11,8 @@ from gocam.datamodel import (
 from gocam.translation.minerva_wrapper import (
     MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES,
     MOLECULAR_ASSOCIATION_PROPERTIES,
+    Fact,
+    MinervaObject,
     MinervaView,
     MinervaWrapper,
 )
@@ -468,7 +470,7 @@ def test_translation_warning_missing_term():
         (w for w in warnings if w.type == WarningType.MISSING_TERM), None
     )
     assert missing_term_warning is not None
-    assert "Missing term for individual" in missing_term_warning.message
+    assert "object could not be mapped to a term" in missing_term_warning.message
     assert (
         missing_term_warning.entity_id == "gomodel:663d668500002178/object_missing_term"
     )
@@ -728,40 +730,41 @@ def test_deeply_nested_complex_parts():
 
 def test_minerva_view_get_facts():
     """Test that the MinervaView.get_facts method correctly retrieves facts for a given subject."""
-    minerva_object = {
-        "facts": [
-            {
-                "subject": "S1",
-                "property": "P1",
-                "object": "O1",
-            },
-            {
-                "subject": "S1",
-                "property": "P2",
-                "object": "O2",
-            },
-            {
-                "subject": "S2",
-                "property": "P1",
-                "object": "O3",
-            },
-            {
-                "subject": "S2",
-                "property": "P1",
-                "object": "O4",
-            },
-            {
-                "subject": "S3",
-                "property": "P1",
-                "object": "O3",
-            },
-            {
-                "subject": "S2",
-                "property": "P3",
-                "object": "O3",
-            },
-        ]
-    }
+    minerva_object = MinervaObject(
+        id="test_view",
+        facts=[
+            Fact(
+                subject="S1",
+                property="P1",
+                object="O1",
+            ),
+            Fact(
+                subject="S1",
+                property="P2",
+                object="O2",
+            ),
+            Fact(
+                subject="S2",
+                property="P1",
+                object="O3",
+            ),
+            Fact(
+                subject="S2",
+                property="P1",
+                object="O4",
+            ),
+            Fact(
+                subject="S3",
+                property="P1",
+                object="O3",
+            ),
+            Fact(
+                subject="S2",
+                property="P3",
+                object="O3",
+            ),
+        ],
+    )
     view = MinervaView(minerva_object)
     assert len(view.get_facts()) == 6
     assert len(view.get_facts(property="P1")) == 4
