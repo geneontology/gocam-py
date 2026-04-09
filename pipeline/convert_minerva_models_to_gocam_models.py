@@ -14,6 +14,7 @@ The models which pass the connectivity criteria are written to the output direct
 not be True GO-CAM models. This output set is designed for QC analysis and further downstream
 filtering.
 """
+
 import dataclasses
 import json
 import logging
@@ -85,10 +86,17 @@ def process_minerva_model_file(
         return ErrorResult(reason=ErrorReason.READ_ERROR, details=str(e))
 
     # Convert Minerva model to GO-CAM model
+    meta = None
     try:
         translation_result = MinervaWrapper.translate(minerva_model)
         gocam_model = translation_result.result
-        translation_warnings = [dataclasses.asdict(w) for w in translation_result.warnings]
+        translation_warnings = [
+            dataclasses.asdict(w) for w in translation_result.warnings
+        ]
+        meta = {
+            "title": gocam_model.title,
+            "status": gocam_model.status,
+        }
         logger.debug(
             f"Successfully converted Minerva model to GO-CAM model for {json_file}"
         )
@@ -104,21 +112,21 @@ def process_minerva_model_file(
     has_activity_edge = graph.number_of_edges() > 0
     if not has_activity_edge:
         logger.info(f"GO-CAM model {gocam_model.id} has no activity edges; skipping.")
-        return FilteredResult(reason=FilterReason.NO_ACTIVITY_EDGE)
+        return FilteredResult(reason=FilterReason.NO_ACTIVITY_EDGE, meta=meta)
 
     # Detect if the Minerva model uses complement constructs. If so, skip writing the model.
     if minerva_model_uses_complement(minerva_model):
         logger.info(
             f"Minerva model for GO-CAM model {gocam_model.id} uses complement constructs; skipping."
         )
-        return FilteredResult(reason=FilterReason.USES_COMPLEMENT)
+        return FilteredResult(reason=FilterReason.USES_COMPLEMENT, meta=meta)
 
     # If dry run is enabled, skip writing the output file
     if output_dir is None:
         logger.info(
             f"Dry run enabled; skipping write for GO-CAM model {gocam_model.id}"
         )
-        return SuccessResult(warnings=translation_warnings)
+        return SuccessResult(warnings=translation_warnings, meta=meta)
 
     # Write GO-CAM model to output directory
     output_file = output_dir / json_file.name
@@ -132,7 +140,7 @@ def process_minerva_model_file(
         return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
     # If we reach here, the conversion and writing were successful
-    return SuccessResult(warnings=translation_warnings)
+    return SuccessResult(warnings=translation_warnings, meta=meta)
 
 
 @app.command()

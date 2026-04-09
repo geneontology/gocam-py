@@ -170,3 +170,26 @@ Generates a single JSON file containing search documents optimized for the GO-CA
 python pipeline/generate_go_cam_browser_search_docs.py --input-dir /path/to/indexed_models --output search.json
 ```
 
+## generate_log_summary.py
+
+Generates an Excel summary of pipeline run results based on JSONL log files produced by other
+pipeline steps.
+
+**Inputs:**
+
+- `--logs-dir`: Directory containing step JSONL report files (e.g., reports generated via
+  `--report-file` in other scripts)
+- `--output`: File to write the generated Excel summary to (must have `.xlsx` extension)
+
+**Options:**
+
+- `--log-file-extension`: File extension used to find log files (default: `.jsonl`)
+- `--verbose` / `-v`: Increase verbosity level (`-v` for INFO, `-vv` for DEBUG)
+- `--limit N`: Limit the number of models included in the summary (0 = no limit)
+
+**Usage:**
+
+```bash
+python pipeline/generate_log_summary.py --logs-dir /path/to/logs --output summary.xlsx
+```
+
