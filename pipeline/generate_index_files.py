@@ -18,6 +18,7 @@ from _common import (
     ResultSummary,
     SuccessResult,
     get_json_files,
+    normalize_model_id,
     setup_logger,
 )
 from rich import print
@@ -60,7 +61,7 @@ class IndexReport(ABC):
             key: The key to index the model under.
             model: The GO-CAM model to add to the index.
         """
-        model_id = model.id.removeprefix("gomodel:")
+        model_id = normalize_model_id(model.id)
         self.index[key].add(model_id)
 
     def write(self, output_directory: Path) -> None:
