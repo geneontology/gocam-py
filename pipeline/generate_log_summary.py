@@ -258,7 +258,8 @@ def main(
     with Progress() as progress:
         progress.add_task(description="Writing summary file...", total=None)
         # Add filters to the header row
-        ws.auto_filter.ref = f"A1:L{row}"
+        last_column_letter = get_column_letter(len(columns))
+        ws.auto_filter.ref = f"A1:{last_column_letter}{row}"
 
         # Apply text wrapping and alignment to all cells
         for row in ws.iter_rows():
