@@ -134,7 +134,7 @@ def main(
     limit: Annotated[
         int,
         typer.Option(
-            help="Limit the number of model files loaded from the models directory."
+            help="Limit the number of models included in the generated summary."
         ),
     ] = 0,
 ) -> None:
