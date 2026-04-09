@@ -96,7 +96,7 @@ class PipelineResult(ABC):
         """Return the status string for this result."""
         pass
 
-    def get_report_entry(self, model_id: str) -> dict[str, str | list[str]]:
+    def get_report_entry(self, model_id: str) -> dict[str, Any]:
         """Get a report entry for this result.
 
         Args:
