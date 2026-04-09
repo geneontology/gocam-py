@@ -9,6 +9,7 @@ import pystow
 import yaml
 from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import IS_A, PART_OF
+from pystow.utils.download import RequestKwargs
 
 from gocam.datamodel import (
     Activity,
@@ -268,7 +269,8 @@ class Indexer:
             path = self._goc_groups_yaml_path
         else:
             path = _PYSTOW_MODULE.ensure(
-                url=_CURRENT_GROUPS_YAML_URL, download_kwargs={"backend": "requests"}
+                url=_CURRENT_GROUPS_YAML_URL,
+                download_kwargs={"backend": "requests"},  # type: ignore https://github.com/cthoyt/pystow/issues/145
             )
         with open(path) as f:
             groups = yaml.safe_load(f)
