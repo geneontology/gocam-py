@@ -69,8 +69,10 @@ model is defined as a model where all of the following criteria are met:
 Models are classified and moved based on these criteria:
 
 - **Status**: Only models with a "production" status are considered.
-- **Connectivity**: Models must be "pathway-like", meaning they have a path of at least three
-  activities connected via causal associations or shared chemical inputs/outputs.
+- **Connectivity**: Models must have at least two activities that are connected by a causal
+  association, either
+  directly or indirectly via shared chemical entities. Models may not have any activities that are
+  completely disconnected from all other activities in the model.
 
 **Outputs:**
 
