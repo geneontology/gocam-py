@@ -2,9 +2,11 @@
 """
 Filter a collection of models by whether they pass the True GO-CAM model criteria.
 
-A True GO-CAM model is defined as a production GO-CAM model that is pathway-like, meaning it
-contains at least three activities connected in sequence. The connection can be either a direct
-causal association or an indirect association via shared chemical inputs/outputs.
+A True GO-CAM model is defined as a model where all of the following criteria are met:
+  - The model is in production status.
+  - The model has at least two activities that are connected by a causal association, either
+    directly or indirectly via shared chemical entities.
+  - The model has no activities that are disconnected from all other activities in the model.
 """
 
 import logging
@@ -12,7 +14,6 @@ import shutil
 from pathlib import Path
 from typing import Annotated
 
-import networkx as nx
 import typer
 from _common import (
     ErrorReason,
@@ -35,31 +36,33 @@ app = typer.Typer()
 logger = logging.getLogger(__name__)
 
 
-def is_model_pathway_like(model: Model) -> bool:
-    """Determine if a model is pathway-like based on its graph representation.
-
-    A model is considered pathway-like if there are at least three activities connected in sequence.
+def is_true_gocam(model: Model) -> PipelineResult:
+    """Determine if a GO-CAM model meets the criteria for being a True GO-CAM model.
 
     Args:
         model: The model to evaluate.
 
     Returns:
-        True if the model is pathway-like, False otherwise.
+        PipelineResult: A SuccessResult if the model is a True GO-CAM model, or a FilteredResult
+        with the reason for filtering if it is not.
     """
 
+    # Check if model is in production status
+    if model.status != ModelStateEnum.production:
+        return FilteredResult(reason=FilterReason.NOT_PRODUCTION_MODEL)
+
     graph = model_to_digraph(model)
-    for node in graph.nodes():
-        for other_node in graph.nodes():
-            if node != other_node:
-                try:
-                    shortest_path = nx.shortest_path(
-                        graph, source=node, target=other_node
-                    )
-                except nx.NetworkXNoPath:
-                    continue
-                if len(shortest_path) >= 3:
-                    return True
-    return False
+
+    # Check for at least one edge (causal association) between activities
+    if graph.number_of_edges() < 1:
+        return FilteredResult(reason=FilterReason.NO_ACTIVITY_EDGE)
+
+    # Check for nodes with degree 0 (disconnected activities)
+    for _, degree in graph.degree():
+        if degree == 0:
+            return FilteredResult(reason=FilterReason.DISCONNECTED_ACTIVITY)
+
+    return SuccessResult()
 
 
 def process_gocam_model_file(
@@ -84,25 +87,25 @@ def process_gocam_model_file(
         logger.error(f"Error reading model from {json_file}: {e}")
         return ErrorResult(reason=ErrorReason.READ_ERROR, details=str(e))
 
-    if model.status != ModelStateEnum.production:
-        return FilteredResult(reason=FilterReason.NOT_PRODUCTION_MODEL)
-
-    if is_model_pathway_like(model):
+    result = is_true_gocam(model)
+    if isinstance(result, SuccessResult):
         if output_dir:
             try:
                 shutil.copy(json_file, output_dir)
             except Exception as e:
                 logger.error(f"Error copying file to {output_dir}: {e}")
                 return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
-        return SuccessResult()
-    else:
-        if pseudo_gocam_output_dir:
+    elif isinstance(result, FilteredResult):
+        if (
+            pseudo_gocam_output_dir
+            and result.reason != FilterReason.NOT_PRODUCTION_MODEL
+        ):
             try:
                 shutil.copy(json_file, pseudo_gocam_output_dir)
             except Exception as e:
                 logger.error(f"Error copying file to {pseudo_gocam_output_dir}: {e}")
                 return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
-        return FilteredResult(reason=FilterReason.NOT_PATHWAY_LIKE)
+    return result
 
 
 @app.command()
@@ -166,9 +169,10 @@ def main(
     ] = 0,
 ):
     """
-    Filter input models based on production status and pathway-like connectivity. Models that pass
-    the True GO-CAM criteria are copied to the specified output directory, while those that do not
-    are copied to the pseudo-GO-CAM output directory.
+    Filter input models based on True GO-CAM criteria. Models that pass the True GO-CAM criteria are
+    copied to the specified output directory, while those that do not are copied to the
+    pseudo-GO-CAM output directory. Models that do not have production status are not copied to
+    either output directory.
     """
     setup_logger(verbose)
 

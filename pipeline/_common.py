@@ -74,7 +74,7 @@ class FilterReason(str, Enum):
     NO_ACTIVITY_EDGE = "Model has 0 connected activities"
     USES_COMPLEMENT = "Model uses complement"
     NOT_PRODUCTION_MODEL = "Model status is not 'production'"
-    NOT_PATHWAY_LIKE = "Model does not have at least 3 connected activities"
+    DISCONNECTED_ACTIVITY = "Model has at least one activity with no causal relations"
 
 
 class ErrorReason(str, Enum):
