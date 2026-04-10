@@ -66,7 +66,10 @@ def process_gocam_model_file(
             "groups": [o.label for o in model.query_index.flattened_provided_by]
             if model.query_index.flattened_provided_by
             else None,
-            "longest_path": model.query_index.length_of_longest_causal_association_path,
+            "longest_path": model.query_index.length_of_longest_causal_association_path
+            + 1
+            if model.query_index.length_of_longest_causal_association_path is not None
+            else None,
         }
     return SuccessResult(meta=meta)
 

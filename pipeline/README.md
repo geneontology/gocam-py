@@ -48,17 +48,21 @@ python pipeline/convert_minerva_models_to_gocam_models.py --input-dir /path/to/m
 
 ## filter_true_gocam_models.py
 
-Filters a collection of models based on whether they meet the "True GO-CAM" criteria. A True GO-CAM
-model is defined as a production model that is pathway-like (containing at least three activities
-connected in sequence).
+Filters a collection of models based on whether they meet the True GO-CAM criteria. A True GO-CAM
+model is defined as a model where all of the following criteria are met:
+
+- The model is in production status.
+- The model has at least two activities that are connected by a causal association, either
+  directly or indirectly via shared chemical entities.
+- The model has no activities that are disconnected from all other activities in the model.
 
 **Inputs:**
 
 - `--input-dir`: Directory containing GO-CAM model JSON files
 - `--output-dir`: Directory to save production True GO-CAM models (required unless using
   `--dry-run`)
-- `--pseudo-gocam-output-dir`: Directory to save production pseudo-GO-CAM models (required unless
-  using `--dry-run`)
+- `--pseudo-gocam-output-dir`: Directory to save models that have production status but do not
+  otherwise meet True GO-CAM criteria (required unless using `--dry-run`)
 
 **Filtering:**
 
