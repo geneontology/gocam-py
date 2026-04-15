@@ -524,7 +524,7 @@ class MinervaTranslator:
                 self.translation_warnings.add(
                     TranslationWarning(
                         type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
-                        message=f"Circular relationship detected for {part_of_object}",
+                        message=f"Circular relationship detected for {self.view.get_individual_label(part_of_object)}",
                         entity_id=part_of_object,
                     )
                 )
@@ -568,7 +568,7 @@ class MinervaTranslator:
                 self.translation_warnings.add(
                     TranslationWarning(
                         type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
-                        message=f"Circular relationship detected for {has_part_object}",
+                        message=f"Circular relationship detected for {self.view.get_individual_label(has_part_object)}",
                         entity_id=has_part_object,
                     )
                 )
@@ -686,7 +686,7 @@ class MinervaTranslator:
             self.translation_warnings.add(
                 TranslationWarning(
                     type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
-                    message=f"Circular relationship detected for {individual_id}",
+                    message=f"Circular relationship detected for {self.view.get_individual_label(individual_id)}",
                     entity_id=individual_id,
                 )
             )
@@ -810,7 +810,7 @@ class MinervaTranslator:
             self.translation_warnings.add(
                 TranslationWarning(
                     type=WarningType.INVALID_CIRCULAR_RELATIONSHIP,
-                    message=f"Circular relationship detected for {individual_id}",
+                    message=f"Circular relationship detected for {self.view.get_individual_label(individual_id)}",
                     entity_id=individual_id,
                 )
             )
@@ -929,7 +929,7 @@ class MinervaTranslator:
                 self.translation_warnings.add(
                     TranslationWarning(
                         type=WarningType.MULTIPLE_ACTIVITIES,
-                        message=f"Multiple activities for subject {fact_subject}",
+                        message=f"Multiple activities for subject {self.view.get_individual_label(fact_subject)}",
                         entity_id=fact_subject,
                     )
                 )
@@ -937,7 +937,7 @@ class MinervaTranslator:
                 self.translation_warnings.add(
                     TranslationWarning(
                         type=WarningType.MULTIPLE_ACTIVITIES,
-                        message=f"Multiple activities for object {fact_object}",
+                        message=f"Multiple activities for object {self.view.get_individual_label(fact_object)}",
                         entity_id=fact_object,
                     )
                 )
