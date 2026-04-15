@@ -865,6 +865,9 @@ enums:
         description: The model has been marked for curator review.
       internal_test:
         description: The model is not intended for use public use; it is likely to be used for internal testing.
+      template:
+        description: The model is a template that is not intended to represent a specific biological scenario, but
+          rather to be used as a template for building other models.
       closed:
         description: TBD
 

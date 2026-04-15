@@ -172,6 +172,10 @@ class ModelStateEnum(str, Enum):
     """
     The model is not intended for use public use; it is likely to be used for internal testing.
     """
+    template = "template"
+    """
+    The model is a template that is not intended to represent a specific biological scenario, but rather to be used as a template for building other models.
+    """
     closed = "closed"
     """
     TBD
