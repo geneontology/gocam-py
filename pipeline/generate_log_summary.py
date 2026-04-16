@@ -4,7 +4,8 @@
 import itertools
 import json
 import logging
-from collections import defaultdict
+from collections import defaultdict, namedtuple
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any, Iterable
 
@@ -14,6 +15,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 from rich.progress import Progress, track
+
+from gocam import __version__
 
 app = typer.Typer()
 
@@ -90,7 +93,7 @@ def format_warning(warning: Any) -> str:
     elif isinstance(warning, dict):
         warning_type = warning.get("type", "")
         message = warning.get("message", "")
-        return f"{warning_type}{':' if warning_type else ''}{message}"
+        return f"{warning_type}{': ' if warning_type else ''}{message}"
     else:
         return str(warning)
 
@@ -137,6 +140,12 @@ def main(
             help="Limit the number of models included in the generated summary."
         ),
     ] = 0,
+    metadata: Annotated[
+        list[str] | None,
+        typer.Option(
+            help="Additional info to include in the metadata sheet, in 'Key=Value' format. Can be used multiple times.",
+        ),
+    ] = None,
 ) -> None:
     setup_logger(verbose)
 
@@ -154,30 +163,73 @@ def main(
         for model_id, entry in iter_log_results(step_file):
             step_results_by_model_id[model_id].append(entry)
 
-    # tuple of (column name, column width) for the header row
+    Column = namedtuple("Column", ["name", "width", "definition"])
     columns = [
-        ("Model ID", 25),
-        ("VPE", 10),
-        ("Graph Editor", 15),
-        ("Minerva JSON", 15),
-        ("Title", 55),
-        ("Model Status", 13),
-        ("Pipeline Status", 14),
-        ("Pipeline Status Details", 35),
-        ("Groups", 13),
-        ("Longest Path", 14),
-        ("Warning Count", 15),
-        ("Warnings", 200),
+        Column(
+            "Model ID",
+            25,
+            "The unique identifier for the model, without the `gomodel:` prefix.",
+        ),
+        Column(
+            "VPE", 10, "Link to view the model in the Noctua Visual Pathway Editor."
+        ),
+        Column(
+            "Graph Editor", 15, "Link to view the model in the Noctua Graph Editor."
+        ),
+        Column("Minerva JSON", 15, "Link to download the model's Minerva JSON file."),
+        Column("Title", 55, "The title of the model"),
+        Column("Model State", 13, "The state of the model"),
+        Column(
+            "Pipeline Status",
+            14,
+            "The final status of the model after running through the pipeline. "
+            "Values can be 'error' (meaning something unexpected happened while processing the "
+            "model that caused a pipeline step to not complete), 'filtered' (meaning the model was "
+            "processed by a pipeline step but did not meet our criteria to continue to the next "
+            "pipeline step), or 'success' (meaning the model was processed successfully through all "
+            "steps of the pipeline).",
+        ),
+        Column(
+            "Pipeline Status Details",
+            35,
+            "Additional details about the pipeline status, such as error or filtering messages if "
+            "the pipeline did not complete successfully.",
+        ),
+        Column(
+            "Groups",
+            13,
+            "All groups that contributed to the model. Note that this information is computed late "
+            "in the pipeline, so if a model was filtered out by an earlier step, this information may not be available.",
+        ),
+        Column(
+            "Longest Path",
+            14,
+            "The number of activities in the longest causal path through the model. Note that this "
+            "information is computed late in the pipeline, so if a model was filtered out by an "
+            "earlier step, this information may not be available.",
+        ),
+        Column(
+            "Warning Count",
+            15,
+            "The total number of warnings generated for the model across all pipeline steps.",
+        ),
+        Column(
+            "Warnings",
+            200,
+            "All warnings generated for the model across all pipeline steps, concatenated into "
+            "a single cell with each warning on a new line.",
+        ),
     ]
 
     wb = Workbook()
-    ws = wb.active
+    summary_sheet = wb.active
+    summary_sheet.title = "Pipeline Summary"
     # Write header row
-    ws.append([col[0] for col in columns])
+    summary_sheet.append([col.name for col in columns])
 
     # Set column widths
-    for i, (_, width) in enumerate(columns, start=1):
-        ws.column_dimensions[get_column_letter(i)].width = width
+    for i, col in enumerate(columns, start=1):
+        summary_sheet.column_dimensions[get_column_letter(i)].width = col.width
 
     # Style values for use later
     fill_green = PatternFill(
@@ -226,7 +278,7 @@ def main(
         formatted_warnings = (
             "\n".join(format_warning(w) for w in warnings) if warnings else None
         )
-        ws.append(
+        summary_sheet.append(
             [
                 model_id,
                 hyperlink_formula(
@@ -252,22 +304,55 @@ def main(
             ]
         )
         if pipeline_status == "success":
-            for cell in ws[row]:
+            for cell in summary_sheet[row]:
                 cell.fill = fill_green
+
+    # Create the Metadata worksheet
+    metadata_sheet = wb.create_sheet("Metadata")
+    metadata_sheet.column_dimensions["A"].width = 20
+    metadata_sheet.column_dimensions["B"].width = 60
+
+    # Add Provenance section with generation timestamp, software version, and any additional \
+    # metadata provided via command-line arguments
+    metadata_sheet.append(["Provenance"])
+    for cell in metadata_sheet[metadata_sheet.max_row]:
+        cell.font = font_bold
+    metadata_sheet.append(
+        ["Generated on", datetime.now().isoformat(timespec="seconds")]
+    )
+    metadata_sheet.append(["gocam-py version", __version__])
+    if metadata:
+        for item in metadata:
+            if "=" in item:
+                key, value = item.split("=", 1)
+                metadata_sheet.append([key.strip(), value.strip()])
+            else:
+                metadata_sheet.append([item.strip(), ""])
+
+    # Add column definitions section
+    metadata_sheet.append([])
+    metadata_sheet.append(["Column Definitions"])
+    for cell in metadata_sheet[metadata_sheet.max_row]:
+        cell.font = font_bold
+    for col in columns:
+        metadata_sheet.append([col.name, col.definition])
+
+    for cell in metadata_sheet["B"]:
+        cell.alignment = alignment_wrapped
 
     with Progress() as progress:
         progress.add_task(description="Writing summary file...", total=None)
         # Add filters to the header row
         last_column_letter = get_column_letter(len(columns))
-        ws.auto_filter.ref = f"A1:{last_column_letter}{row}"
+        summary_sheet.auto_filter.ref = f"A1:{last_column_letter}{row}"
 
         # Apply text wrapping and alignment to all cells
-        for row in ws.iter_rows():
+        for row in summary_sheet.iter_rows():
             for cell in row:
                 cell.alignment = alignment_wrapped
 
         # Make the header row bold
-        for cell in ws[1]:
+        for cell in summary_sheet[1]:
             cell.font = font_bold
 
         # Save the workbook to the specified output file
