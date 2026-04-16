@@ -5,7 +5,7 @@ import itertools
 import json
 import logging
 from collections import defaultdict, namedtuple
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated, Any, Iterable
 
@@ -318,7 +318,7 @@ def main(
     for cell in metadata_sheet[metadata_sheet.max_row]:
         cell.font = font_bold
     metadata_sheet.append(
-        ["Generated on", datetime.now().isoformat(timespec="seconds")]
+        ["Generated on", datetime.now(timezone.utc).isoformat(timespec="seconds")]
     )
     metadata_sheet.append(["gocam-py version", __version__])
     if metadata:
