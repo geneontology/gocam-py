@@ -323,11 +323,12 @@ def main(
     metadata_sheet.append(["gocam-py version", __version__])
     if metadata:
         for item in metadata:
-            if "=" in item:
-                key, value = item.split("=", 1)
-                metadata_sheet.append([key.strip(), value.strip()])
-            else:
-                metadata_sheet.append([item.strip(), ""])
+            if "=" not in item:
+                raise typer.BadParameter(
+                    f"Invalid metadata entry {item!r}. Expected format: Key=Value."
+                )
+            key, value = item.split("=", 1)
+            metadata_sheet.append([key.strip(), value.strip()])
 
     # Add column definitions section
     metadata_sheet.append([])
