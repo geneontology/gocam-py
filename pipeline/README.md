@@ -43,7 +43,9 @@ Models are filtered out and not written if they:
 **Usage:**
 
 ```bash
-python pipeline/convert_minerva_models_to_gocam_models.py --input-dir /path/to/minerva/models --output-dir /path/to/gocam/models
+python pipeline/convert_minerva_models_to_gocam_models.py \
+  --input-dir /path/to/minerva/models \
+  --output-dir /path/to/gocam/models
 ```
 
 ## filter_true_gocam_models.py
@@ -90,7 +92,10 @@ Models are classified and moved based on these criteria:
 **Usage:**
 
 ```bash
-python pipeline/filter_true_gocam_models.py --input-dir /path/to/input --output-dir /path/to/true_models --pseudo-gocam-output-dir /path/to/pseudo_models
+python pipeline/filter_true_gocam_models.py \
+  --input-dir /path/to/input \
+  --output-dir /path/to/true_models \
+  --pseudo-gocam-output-dir /path/to/pseudo_models
 ```
 
 ## add_query_index_to_models.py
@@ -117,7 +122,9 @@ querying and indexing.
 **Usage:**
 
 ```bash
-python pipeline/add_query_index_to_models.py --input-dir /path/to/models --output-dir /path/to/indexed_models
+python pipeline/add_query_index_to_models.py \
+  --input-dir /path/to/models \
+  --output-dir /path/to/indexed_models
 ```
 
 ## generate_index_files.py
@@ -151,7 +158,9 @@ Generates the following JSON index files in the output directory:
 **Usage:**
 
 ```bash
-python pipeline/generate_index_files.py --input-dir /path/to/indexed_models --output-dir /path/to/indices
+python pipeline/generate_index_files.py \
+  --input-dir /path/to/indexed_models \
+  --output-dir /path/to/indices
 ```
 
 ## generate_go_cam_browser_search_docs.py
@@ -173,7 +182,9 @@ Generates a single JSON file containing search documents optimized for the GO-CA
 **Usage:**
 
 ```bash
-python pipeline/generate_go_cam_browser_search_docs.py --input-dir /path/to/indexed_models --output search.json
+python pipeline/generate_go_cam_browser_search_docs.py \
+  --input-dir /path/to/indexed_models \
+  --output search.json
 ```
 
 ## generate_log_summary.py
@@ -189,6 +200,8 @@ pipeline steps.
 
 **Options:**
 
+- `--metadata`: Additional info to include in the metadata sheet, in 'Key=Value' format. Can be used
+  multiple times.
 - `--log-file-extension`: File extension used to find log files (default: `.jsonl`)
 - `--verbose` / `-v`: Increase verbosity level (`-v` for INFO, `-vv` for DEBUG)
 - `--limit N`: Limit the number of models included in the summary (0 = no limit)
@@ -196,6 +209,9 @@ pipeline steps.
 **Usage:**
 
 ```bash
-python pipeline/generate_log_summary.py --logs-dir /path/to/logs --output summary.xlsx
+python pipeline/generate_log_summary.py \
+  --logs-dir /path/to/logs \
+  --output summary.xlsx \
+  --metadata "Release date=1970-01-01"
 ```
 
