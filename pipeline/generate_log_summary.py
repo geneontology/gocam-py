@@ -348,8 +348,8 @@ def main(
         summary_sheet.auto_filter.ref = f"A1:{last_column_letter}{row}"
 
         # Apply text wrapping and alignment to all cells
-        for row in summary_sheet.iter_rows():
-            for cell in row:
+        for row_cells in summary_sheet.iter_rows():
+            for cell in row_cells:
                 cell.alignment = alignment_wrapped
 
         # Make the header row bold
