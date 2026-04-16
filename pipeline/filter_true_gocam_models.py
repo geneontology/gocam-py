@@ -7,6 +7,7 @@ A True GO-CAM model is defined as a model where all of the following criteria ar
   - The model has at least two activities that are connected by a causal association, either
     directly or indirectly via shared chemical entities.
   - The model has no activities that are disconnected from all other activities in the model.
+  - The model contains evidence for at least one assertion.
 """
 
 import logging
@@ -29,7 +30,7 @@ from _common import (
 from rich.progress import track
 
 from gocam.datamodel import Model, ModelStateEnum
-from gocam.utils import model_to_digraph
+from gocam.utils import all_evidence, model_to_digraph
 
 app = typer.Typer()
 
@@ -61,6 +62,12 @@ def is_true_gocam(model: Model) -> PipelineResult:
     for _, degree in graph.degree():
         if degree == 0:
             return FilteredResult(reason=FilterReason.DISCONNECTED_ACTIVITY)
+
+    # Check that the model contains evidence for at least one assertion
+    try:
+        next(all_evidence(model))
+    except StopIteration:
+        return FilteredResult(reason=FilterReason.NO_EVIDENCE)
 
     return SuccessResult()
 

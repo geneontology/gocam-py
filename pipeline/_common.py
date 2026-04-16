@@ -71,10 +71,11 @@ def normalize_model_id(model_id: str) -> str:
 
 
 class FilterReason(str, Enum):
-    NO_ACTIVITY_EDGE = "Model has 0 connected activities"
-    USES_COMPLEMENT = "Model uses complement"
-    NOT_PRODUCTION_MODEL = "Model status is not 'production'"
     DISCONNECTED_ACTIVITY = "Model has at least one activity with no causal relations"
+    NOT_PRODUCTION_MODEL = "Model status is not 'production'"
+    NO_ACTIVITY_EDGE = "Model has 0 connected activities"
+    NO_EVIDENCE = "Model has no evidence for any assertions"
+    USES_COMPLEMENT = "Model uses complement"
 
 
 class ErrorReason(str, Enum):
