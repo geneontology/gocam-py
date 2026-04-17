@@ -194,7 +194,7 @@ def all_provenance(model: Model) -> Iterator[ProvenanceInfo]: ...
 def all_provenance(association: Association) -> Iterator[ProvenanceInfo]: ...
 def all_provenance(obj) -> Iterator[ProvenanceInfo]:
     """
-    Extract all ProvenanceInfo object from a given object
+    Extract all ProvenanceInfo objects from a given object
 
     Args:
         obj: The object to extract provenance information from. Can be a Model or any Association
