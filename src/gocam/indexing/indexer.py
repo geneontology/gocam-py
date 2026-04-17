@@ -1,185 +1,32 @@
 import logging
-from collections.abc import Iterable
 from functools import cached_property, lru_cache
 from pathlib import Path
-from typing import Any, Collection, List, Optional, Tuple, overload
+from typing import Collection, List, Optional, Tuple
 
 import networkx as nx
 import pystow
 import yaml
 from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import IS_A, PART_OF
-from pystow.utils.download import RequestKwargs
 
 from gocam.datamodel import (
-    Activity,
-    Association,
-    BiologicalProcessAssociation,
-    CellTypeAssociation,
-    CellularAnatomicalEntityAssociation,
-    EnabledByAssociation,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
-    EvidenceItem,
     EvidenceTermObject,
-    GrossAnatomyAssociation,
     Model,
     MoleculeNode,
     Object,
-    PartOfProteinComplexAssociation,
-    ProteinComplexHasPartAssociation,
-    ProvenanceInfo,
     PublicationObject,
     QueryIndex,
     TermObject,
 )
-from gocam.utils import model_to_digraph
+from gocam.utils import all_evidence, all_provenance, model_to_digraph
 from gocam.vocabulary import Relation
 
 logger = logging.getLogger(__name__)
 
 _PYSTOW_MODULE = pystow.module("gocam")
 _CURRENT_GROUPS_YAML_URL = "https://current.geneontology.org/metadata/groups.yaml"
-
-
-def _iter_association_provenances(
-    association: Association | None,
-) -> Iterable[ProvenanceInfo]:
-    """
-    Extract all ProvenanceInfo objects from an Association and its evidence.
-
-    Returns:
-        Iterable[ProvenanceInfo]: Iterable over ProvenanceInfo objects extracted from the association and its evidence.
-    """
-    if association is None:
-        return
-    if association.provenances:
-        yield from association.provenances
-    if association.evidence:
-        for evidence in association.evidence:
-            if evidence.provenances:
-                yield from evidence.provenances
-
-
-@overload
-def _iter_associations(obj: Model) -> Iterable[Association]: ...
-@overload
-def _iter_associations(obj: Activity) -> Iterable[Association]: ...
-@overload
-def _iter_associations(obj: MoleculeNode) -> Iterable[Association]: ...
-@overload
-def _iter_associations(obj: EnabledByAssociation) -> Iterable[Association]: ...
-@overload
-def _iter_associations(obj: BiologicalProcessAssociation) -> Iterable[Association]: ...
-@overload
-def _iter_associations(
-    obj: CellularAnatomicalEntityAssociation,
-) -> Iterable[Association]: ...
-@overload
-def _iter_associations(obj: CellTypeAssociation) -> Iterable[Association]: ...
-@overload
-def _iter_associations(obj: GrossAnatomyAssociation) -> Iterable[Association]: ...
-@overload
-def _iter_associations(obj: Association) -> Iterable[Association]: ...
-def _iter_associations(obj: Any) -> Iterable[Association]:
-    """
-    Extract all Association objects from a given object.
-
-    Returns:
-        Iterable[Association]: Iterable over Association objects extracted from the object.
-    """
-    match obj:
-        case Model():
-            for activity in obj.activities or []:
-                yield from _iter_associations(activity)
-            for molecule in obj.molecules or []:
-                yield from _iter_associations(molecule)
-
-        case Activity():
-            if obj.enabled_by:
-                yield from _iter_associations(obj.enabled_by)
-            if obj.molecular_function:
-                yield from _iter_associations(obj.molecular_function)
-            if obj.part_of:
-                yield from _iter_associations(obj.part_of)
-            if obj.occurs_in:
-                yield from _iter_associations(obj.occurs_in)
-            if obj.happens_during:
-                yield from _iter_associations(obj.happens_during)
-            for molecule_association in obj.molecular_associations or []:
-                yield from _iter_associations(molecule_association)
-            for causal_association in obj.causal_associations or []:
-                yield from _iter_associations(causal_association)
-
-        case MoleculeNode():
-            if obj.located_in:
-                yield from _iter_associations(obj.located_in)
-
-        case EnabledByGeneProductAssociation() | ProteinComplexHasPartAssociation():
-            yield obj
-            if obj.part_of:
-                for assoc in obj.part_of:
-                    yield from _iter_associations(assoc)
-
-        case EnabledByProteinComplexAssociation() | PartOfProteinComplexAssociation():
-            yield obj
-            if obj.has_part:
-                for assoc in obj.has_part:
-                    yield from _iter_associations(assoc)
-
-        case BiologicalProcessAssociation():
-            yield obj
-            if obj.happens_during:
-                yield from _iter_associations(obj.happens_during)
-            if obj.part_of:
-                yield from _iter_associations(obj.part_of)
-
-        case (
-            CellularAnatomicalEntityAssociation()
-            | CellTypeAssociation()
-            | GrossAnatomyAssociation()
-        ):
-            yield obj
-            if obj.part_of:
-                yield from _iter_associations(obj.part_of)
-
-        case Association():
-            yield obj
-
-        case _:
-            raise ValueError(f"Unsupported object type: {type(obj)}")
-
-
-def _iter_model_provenances(model: Model) -> Iterable[ProvenanceInfo]:
-    """
-    Extract all ProvenanceInfo objects from a Model.
-
-    Returns:
-        Iterable[ProvenanceInfo]: Iterable over ProvenanceInfo objects extracted from the model,
-            its activities, and all associations within those activities.
-    """
-    if model.provenances:
-        yield from model.provenances
-    for activity in model.activities or []:
-        if activity.provenances:
-            yield from activity.provenances
-    for association in _iter_associations(model):
-        yield from _iter_association_provenances(association)
-
-
-def _iter_model_evidence(model: Model) -> Iterable[EvidenceItem]:
-    """
-    Extract all EvidenceItem objects from a Model.
-
-    Args:
-        model: The GO-CAM model to extract evidence from.
-
-    Returns:
-        Iterable[EvidenceItem]: Iterable over EvidenceItem objects extracted from the model's associations.
-    """
-    for association in _iter_associations(model):
-        if association.evidence:
-            yield from association.evidence
 
 
 class Indexer:
@@ -469,7 +316,7 @@ class Indexer:
 
         all_provided_bys = set()
         all_contributors = set()
-        for prov in _iter_model_provenances(model):
+        for prov in all_provenance(model):
             if prov.provided_by:
                 all_provided_bys.update(prov.provided_by)
             if prov.contributor:
@@ -490,7 +337,7 @@ class Indexer:
 
         all_refs = set()
         all_evidence_terms = set()
-        for evidence in _iter_model_evidence(model):
+        for evidence in all_evidence(model):
             if evidence.term:
                 all_evidence_terms.add(evidence.term)
             if evidence.reference:
