@@ -46,8 +46,8 @@ dev = [
     "openpyxl>=3.1.5",
     "pytest>=8.2.2,<10",
     "requests-mock>=1.12.1,<2",
-    "ruff==0.15.10",
-    "ty==0.0.29",
+    "ruff==0.15.11",
+    "ty==0.0.31",
 ]
 
 [tool.hatch.build.targets.sdist]
