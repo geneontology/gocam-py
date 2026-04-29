@@ -1,0 +1,44 @@
+id: gomodel:00000000000000000
+title: test_indexer_populates_model_chemical_terms_model
+comments:
+  - A test model to verify that the model_chemical_terms field is populated
+taxon: NCBITaxon:10090
+activities:
+  - id: gomodel:00000000000000000/activity1
+    enabled_by:
+      type: EnabledByGeneProductAssociation
+      term: MGI:MGI:107508
+    molecular_function:
+      type: MolecularFunctionAssociation
+      term: GO:0048018
+    molecular_associations:
+      - type: MoleculeAssociation
+        predicate: RO:0002233
+        molecule: gomodel:00000000000000000/chemical1
+      - type: MoleculeAssociation
+        predicate: RO:0002233
+        molecule: gomodel:00000000000000000/chemical2
+      - type: MoleculeAssociation
+        predicate: RO:0002233
+        molecule: gomodel:00000000000000000/protein1
+molecules:
+  - id: gomodel:00000000000000000/chemical1
+    term: CHEBI:12345
+    is_chemical_entity: true
+    is_information_biomacromolecule: false
+  - id: gomodel:00000000000000000/chemical2
+    term: CHEBI:67890
+    is_chemical_entity: true
+    is_information_biomacromolecule: false
+  - id: gomodel:5fce9b7300000030/protein1
+    term: UniProtKB:Q99836
+    is_chemical_entity: true
+    is_information_biomacromolecule: true
+objects:
+  - id: CHEBI:12345
+    label: Chemical 1
+  - id: CHEBI:67890
+    label: Chemical 2
+  - id: UniProtKB:Q99836
+    label: some protein
+    type: gocam:Object
