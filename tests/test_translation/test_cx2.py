@@ -131,6 +131,8 @@ def test_issue_65_protein_inputs_filtered(get_model: Callable[[str], Model]):
             molecule_node = MoleculeNode(
                 id="gomodel:63f809ec00000701/test-protein",
                 term=other_activity.enabled_by.term or "UNKNOWN",
+                is_chemical_entity=True,
+                is_information_biomacromolecule=True,
             )
             if model.molecules is None:
                 model.molecules = []

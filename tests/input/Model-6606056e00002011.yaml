@@ -3,7 +3,9 @@ id: gomodel:6606056e00002011
 title: CD72 and BCR co-stimulation by sn/RNP self antigen (Human)
 taxon: NCBITaxon:9606
 status: production
-date_modified: '2024-05-07'
+date_modified: '2026-03-12'
+comments:
+- 'Automated change 2026-03-12: GO:0005615 replaced by GO:0005576'
 activities:
 - id: gomodel:6606056e00002011/662af8fa00002857
   enabled_by:
@@ -421,8 +423,12 @@ activities:
 molecules:
 - id: gomodel:6606056e00002011/662af8fa00002875
   term: UniProtKB:P21854
+  is_chemical_entity: true
+  is_information_biomacromolecule: true
 - id: gomodel:6606056e00002011/662af8fa00002871
   term: CHEBI:166824
+  is_chemical_entity: true
+  is_information_biomacromolecule: false
   located_in:
     type: CellularAnatomicalEntityAssociation
     evidence: []
@@ -432,12 +438,14 @@ molecules:
       date: '2024-05-07'
       provided_by:
       - https://www.uniprot.org
-    term: GO:0005615
+    term: GO:0005576
 - id: gomodel:6606056e00002011/662af8fa00002864
   term: UniProtKB:P07948
+  is_chemical_entity: true
+  is_information_biomacromolecule: true
 objects:
-- id: GO:0005615
-  label: extracellular space
+- id: GO:0005576
+  label: extracellular region
   type: gocam:Object
 - id: GO:0004888
   label: transmembrane signaling receptor activity
@@ -493,7 +501,7 @@ objects:
 provenances:
 - contributor:
   - https://orcid.org/0000-0001-7646-0052
-  date: '2024-05-07'
+  date: '2026-03-12'
   provided_by:
   - https://www.uniprot.org
 
