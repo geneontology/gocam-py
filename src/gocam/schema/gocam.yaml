@@ -237,6 +237,15 @@ classes:
         description: The molecule term associated with the molecule node
         range: MoleculeTermObject
         required: true
+      is_chemical_entity:
+        description: A flag indicating whether the molecule is a small molecule chemical entity
+          (e.g. a substrate or product) or an information biomacromolecule (e.g. a gene product or
+          complex).
+        range: boolean
+      is_information_biomacromolecule:
+        description: A flag indicating whether the molecule is an information biomacromolecule (e.g.
+          a gene product or complex).
+        range: boolean
       located_in:
         description: The cellular location in which the molecule is located
         range: CellularAnatomicalEntityAssociation
