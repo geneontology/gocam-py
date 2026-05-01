@@ -313,6 +313,11 @@ classes:
   EnabledByGeneProductAssociation:
     description: An association between an activity and an individual gene product
     is_a: EnabledByAssociation
+    attributes:
+      part_of:
+        description: Associations between the gene product and protein complexes it is a part of.
+        range: PartOfProteinComplexAssociation
+        multivalued: true
     slot_usage:
       term:
         description: A "term" that is an entity database object representing an individual gene product.
@@ -354,9 +359,9 @@ classes:
               required: true
     is_a: EnabledByAssociation
     attributes:
-      members:
-        description: Associations between the complex and its members.
-        range: ProteinComplexMemberAssociation
+      has_part:
+        description: Associations between the complex and gene products that are part of it.
+        range: ProteinComplexHasPartAssociation
         multivalued: true
     slot_usage:
       term:
@@ -368,12 +373,30 @@ classes:
           - value: ComplexPortal:CPX-969
             description: The human Caspase-2 complex
 
-  ProteinComplexMemberAssociation:
-    description: An association between a protein complex and one of its members.
+  PartOfProteinComplexAssociation:
+    description: An association between a gene product and a protein complex that it is a part of.
     is_a: TermAssociation
+    attributes:
+      has_part:
+        description: Associations between the complex and gene products that are part of it.
+        range: ProteinComplexHasPartAssociation
+        multivalued: true
     slot_usage:
       term:
-        description: The member gene product that is part of the protein complex.
+        description: The protein complex that the gene product is a part of.
+        range: ProteinComplexTermObject
+
+  ProteinComplexHasPartAssociation:
+    description: An association between a protein complex and one of its parts.
+    is_a: TermAssociation
+    attributes:
+      part_of:
+        description: Associations between the gene product and protein complexes it is a part of.
+        range: PartOfProteinComplexAssociation
+        multivalued: true
+    slot_usage:
+      term:
+        description: The gene product that is part of the protein complex.
         range: GeneProductTermObject
 
   CausalAssociation:
@@ -842,6 +865,9 @@ enums:
         description: The model has been marked for curator review.
       internal_test:
         description: The model is not intended for use public use; it is likely to be used for internal testing.
+      template:
+        description: The model is a template that is not intended to represent a specific biological scenario, but
+          rather to be used as a template for building other models.
       closed:
         description: TBD
 

@@ -231,10 +231,10 @@ def model_to_cx2(
 
         if (
             isinstance(activity.enabled_by, EnabledByProteinComplexAssociation)
-            and activity.enabled_by.members
+            and activity.enabled_by.has_part
         ):
             node_attributes["member"] = []
-            for member in activity.enabled_by.members:
+            for member in activity.enabled_by.has_part:
                 member_name = _get_object_label(member.term)
                 if (
                     validate_iquery_gene_symbol_pattern

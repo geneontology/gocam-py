@@ -43,30 +43,38 @@ Models are filtered out and not written if they:
 **Usage:**
 
 ```bash
-python pipeline/convert_minerva_models_to_gocam_models.py --input-dir /path/to/minerva/models --output-dir /path/to/gocam/models
+python pipeline/convert_minerva_models_to_gocam_models.py \
+  --input-dir /path/to/minerva/models \
+  --output-dir /path/to/gocam/models
 ```
 
 ## filter_true_gocam_models.py
 
-Filters a collection of models based on whether they meet the "True GO-CAM" criteria. A True GO-CAM
-model is defined as a production model that is pathway-like (containing at least three activities
-connected in sequence).
+Filters a collection of models based on whether they meet the True GO-CAM criteria. A True GO-CAM
+model is defined as a model where all of the following criteria are met:
+
+- The model is in production status.
+- The model has at least two activities that are connected by a causal association, either
+  directly or indirectly via shared chemical entities.
+- The model has no activities that are disconnected from all other activities in the model.
 
 **Inputs:**
 
 - `--input-dir`: Directory containing GO-CAM model JSON files
 - `--output-dir`: Directory to save production True GO-CAM models (required unless using
   `--dry-run`)
-- `--pseudo-gocam-output-dir`: Directory to save production pseudo-GO-CAM models (required unless
-  using `--dry-run`)
+- `--pseudo-gocam-output-dir`: Directory to save models that have production status but do not
+  otherwise meet True GO-CAM criteria (required unless using `--dry-run`)
 
 **Filtering:**
 
 Models are classified and moved based on these criteria:
 
 - **Status**: Only models with a "production" status are considered.
-- **Connectivity**: Models must be "pathway-like", meaning they have a path of at least three
-  activities connected via causal associations or shared chemical inputs/outputs.
+- **Connectivity**: Models must have at least two activities that are connected by a causal
+  association, either
+  directly or indirectly via shared chemical entities. Models may not have any activities that are
+  completely disconnected from all other activities in the model.
 
 **Outputs:**
 
@@ -84,7 +92,10 @@ Models are classified and moved based on these criteria:
 **Usage:**
 
 ```bash
-python pipeline/filter_true_gocam_models.py --input-dir /path/to/input --output-dir /path/to/true_models --pseudo-gocam-output-dir /path/to/pseudo_models
+python pipeline/filter_true_gocam_models.py \
+  --input-dir /path/to/input \
+  --output-dir /path/to/true_models \
+  --pseudo-gocam-output-dir /path/to/pseudo_models
 ```
 
 ## add_query_index_to_models.py
@@ -111,7 +122,9 @@ querying and indexing.
 **Usage:**
 
 ```bash
-python pipeline/add_query_index_to_models.py --input-dir /path/to/models --output-dir /path/to/indexed_models
+python pipeline/add_query_index_to_models.py \
+  --input-dir /path/to/models \
+  --output-dir /path/to/indexed_models
 ```
 
 ## generate_index_files.py
@@ -145,7 +158,9 @@ Generates the following JSON index files in the output directory:
 **Usage:**
 
 ```bash
-python pipeline/generate_index_files.py --input-dir /path/to/indexed_models --output-dir /path/to/indices
+python pipeline/generate_index_files.py \
+  --input-dir /path/to/indexed_models \
+  --output-dir /path/to/indices
 ```
 
 ## generate_go_cam_browser_search_docs.py
@@ -167,6 +182,36 @@ Generates a single JSON file containing search documents optimized for the GO-CA
 **Usage:**
 
 ```bash
-python pipeline/generate_go_cam_browser_search_docs.py --input-dir /path/to/indexed_models --output search.json
+python pipeline/generate_go_cam_browser_search_docs.py \
+  --input-dir /path/to/indexed_models \
+  --output search.json
+```
+
+## generate_log_summary.py
+
+Generates an Excel summary of pipeline run results based on JSONL log files produced by other
+pipeline steps.
+
+**Inputs:**
+
+- `--logs-dir`: Directory containing step JSONL report files (e.g., reports generated via
+  `--report-file` in other scripts)
+- `--output`: File to write the generated Excel summary to (must have `.xlsx` extension)
+
+**Options:**
+
+- `--metadata`: Additional info to include in the metadata sheet, in 'Key=Value' format. Can be used
+  multiple times.
+- `--log-file-extension`: File extension used to find log files (default: `.jsonl`)
+- `--verbose` / `-v`: Increase verbosity level (`-v` for INFO, `-vv` for DEBUG)
+- `--limit N`: Limit the number of models included in the summary (0 = no limit)
+
+**Usage:**
+
+```bash
+python pipeline/generate_log_summary.py \
+  --logs-dir /path/to/logs \
+  --output summary.xlsx \
+  --metadata "Release date=1970-01-01"
 ```
 

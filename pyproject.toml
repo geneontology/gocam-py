@@ -43,10 +43,11 @@ dev = [
     "linkml>=1.10.0,<2",
     "mkdocs-material>=8.2.8,<10",
     "mkdocs-mermaid2-plugin>=1.1.1",
+    "openpyxl>=3.1.5",
     "pytest>=8.2.2,<10",
     "requests-mock>=1.12.1,<2",
-    "ruff==0.15.6",
-    "ty==0.0.23",
+    "ruff==0.15.12",
+    "ty==0.0.32",
 ]
 
 [tool.hatch.build.targets.sdist]

@@ -58,11 +58,24 @@ def get_json_files(
     return files
 
 
+def normalize_model_id(model_id: str) -> str:
+    """Normalize a model ID by removing the "gomodel:" prefix if present.
+
+    Args:
+        model_id: The model ID to normalize.
+
+    Returns:
+        The normalized model ID without the "gomodel:" prefix.
+    """
+    return model_id.removeprefix("gomodel:")
+
+
 class FilterReason(str, Enum):
-    NO_ACTIVITY_EDGE = "No activity edge"
-    USES_COMPLEMENT = "Uses complement"
+    DISCONNECTED_ACTIVITY = "Model has at least one activity with no causal relations"
     NOT_PRODUCTION_MODEL = "Model status is not 'production'"
-    NOT_PATHWAY_LIKE = "Model is not pathway-like"
+    NO_ACTIVITY_EDGE = "Model has 0 connected activities"
+    NO_EVIDENCE = "Model has no evidence for any assertions"
+    USES_COMPLEMENT = "Model uses complement"
 
 
 class ErrorReason(str, Enum):
@@ -72,8 +85,11 @@ class ErrorReason(str, Enum):
     WRITE_ERROR = "Write error"
 
 
+@dataclass(frozen=True, kw_only=True)
 class PipelineResult(ABC):
     """Base class for pipeline results."""
+
+    meta: dict[str, Any] | None = None
 
     @property
     @abstractmethod
@@ -81,7 +97,7 @@ class PipelineResult(ABC):
         """Return the status string for this result."""
         pass
 
-    def get_report_entry(self, model_id: str) -> dict[str, str | list[str]]:
+    def get_report_entry(self, model_id: str) -> dict[str, Any]:
         """Get a report entry for this result.
 
         Args:
@@ -90,10 +106,13 @@ class PipelineResult(ABC):
         Returns:
             A dictionary representing the report entry.
         """
-        return {
+        entry: dict[str, Any] = {
             "model_id": model_id,
             "status": self.status,
         }
+        if self.meta:
+            entry["meta"] = self.meta
+        return entry
 
     def write_to_file(self, file: io.TextIOWrapper, model_id: str) -> None:
         """Write the result as a line of JSON to the given file.
@@ -106,12 +125,12 @@ class PipelineResult(ABC):
         file.write(json.dumps(entry) + "\n")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class SuccessResult(PipelineResult):
     """Result for successful processing."""
 
     data: Any = None
-    warnings: list[str] = field(default_factory=list)
+    warnings: list[Any] = field(default_factory=list)
 
     @property
     def status(self) -> str:
@@ -124,7 +143,7 @@ class SuccessResult(PipelineResult):
         return entry
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class FilteredResult(PipelineResult):
     """Result for models filtered out during processing."""
 
@@ -140,7 +159,7 @@ class FilteredResult(PipelineResult):
         return entry
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True)
 class ErrorResult(PipelineResult):
     """Result for models that failed to process."""
 

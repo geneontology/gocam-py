@@ -9,7 +9,7 @@ downstream pipeline scripts.
 """
 
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 from _common import (
@@ -60,7 +60,18 @@ def process_gocam_model_file(
         except Exception as e:
             return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
-    return SuccessResult()
+    meta: dict[str, Any] | None = None
+    if model.query_index is not None:
+        meta = {
+            "groups": [o.label for o in model.query_index.flattened_provided_by]
+            if model.query_index.flattened_provided_by
+            else None,
+            "longest_path": model.query_index.length_of_longest_causal_association_path
+            + 1
+            if model.query_index.length_of_longest_causal_association_path is not None
+            else None,
+        }
+    return SuccessResult(meta=meta)
 
 
 @app.command()

@@ -33,6 +33,8 @@ from gocam.datamodel import (
     GrossAnatomyAssociation,
     Model,
     MoleculeAssociation,
+    PartOfProteinComplexAssociation,
+    ProteinComplexHasPartAssociation,
 )
 from gocam.vocabulary import Relation
 
@@ -135,28 +137,18 @@ class TBoxTranslator:
         yield from self.add_edge(activity.id, IS_A, "gocam:Activity")
 
         eb = activity.enabled_by
-        if eb and eb.term:
+        if eb:
             if isinstance(eb, EnabledByProteinComplexAssociation):
-                pc_id = self.make_id(
-                    model, eb.term, *(m.term for m in (eb.members or []))
-                )
-                yield from self.add_edge(activity.id, Relation.ENABLED_BY, pc_id)
-                member_labels: list[str] = []
-                if eb.members:
-                    for m in eb.members:
-                        yield from self.add_edge(pc_id, HAS_PART, m.term)
-                        member_labels.append(self._label(model, m.term))
-                eb_label = f"{self._label(model, eb.term)}[{' '.join(member_labels)}]"
+                yield from self.translate_protein_complex(model, activity, mf_label, eb)
             elif isinstance(eb, EnabledByGeneProductAssociation):
-                yield from self.add_edge(activity.id, Relation.ENABLED_BY, eb.term)
-                eb_label = self._label(model, eb.term)
+                yield from self.translate_gene_product(model, activity, mf_label, eb)
             else:
                 raise NotImplementedError(f"Cannot handle {eb}")
         else:
-            eb_label = "UNKNOWN"
-        yield from self.add_annotation(
-            activity.id, RDFS_LABEL, f"{eb_label} ({mf_label})"
-        )
+            yield from self.add_annotation(
+                activity.id, RDFS_LABEL, f"UNKNOWN ({mf_label})"
+            )
+
         if activity.causal_associations:
             for ca in activity.causal_associations:
                 predicate = ca.predicate
@@ -176,6 +168,71 @@ class TBoxTranslator:
             )
         for ma in activity.molecular_associations or []:
             yield from self.translate_io(activity.id, ma, ma.predicate)
+
+    def translate_protein_complex(
+        self,
+        model: Model,
+        activity: Activity,
+        mf_label: str,
+        eb: EnabledByProteinComplexAssociation,
+    ) -> Iterator[SIMPLE_AXIOM]:
+        if not eb.term:
+            return
+        pc_id = self.make_id(model, eb.term, *(m.term for m in (eb.has_part or [])))
+        yield from self.add_edge(activity.id, Relation.ENABLED_BY, pc_id)
+        member_labels: list[str] = []
+        if eb.has_part:
+            for m in eb.has_part:
+                yield from self.translate_protein_complex_part(model, pc_id, m)
+                member_labels.append(self._label(model, m.term))
+        eb_label = f"{self._label(model, eb.term)}[{' '.join(member_labels)}]"
+        yield from self.add_annotation(
+            activity.id, RDFS_LABEL, f"{eb_label} ({mf_label})"
+        )
+
+    def translate_gene_product(
+        self,
+        model: Model,
+        activity: Activity,
+        mf_label: str,
+        eb: EnabledByGeneProductAssociation,
+    ) -> Iterator[SIMPLE_AXIOM]:
+        if not eb.term:
+            return
+        yield from self.add_edge(activity.id, Relation.ENABLED_BY, eb.term)
+        if eb.part_of:
+            for p in eb.part_of:
+                yield from self.translate_part_of_protein_complex(model, eb.term, p)
+        eb_label = self._label(model, eb.term)
+        yield from self.add_annotation(
+            activity.id, RDFS_LABEL, f"{eb_label} ({mf_label})"
+        )
+
+    def translate_protein_complex_part(
+        self, model: Model, child: str, ta: ProteinComplexHasPartAssociation
+    ):
+        if not ta.term:
+            return
+        gp_term_id = ta.term
+        gp_id = self.make_id(model, gp_term_id)
+        yield from self.add_edge(child, HAS_PART, gp_id)
+        yield from self.add_edge(gp_id, PART_OF, child)
+        if ta.part_of:
+            for p in ta.part_of:
+                yield from self.translate_part_of_protein_complex(model, ta.term, p)
+
+    def translate_part_of_protein_complex(
+        self, model: Model, child: str, ta: PartOfProteinComplexAssociation
+    ):
+        if not ta.term:
+            return
+        complex_term_id = ta.term
+        complex_id = self.make_id(model, complex_term_id)
+        yield from self.add_edge(child, PART_OF, complex_id)
+        yield from self.add_edge(complex_id, HAS_PART, child)
+        if ta.has_part:
+            for m in ta.has_part:
+                yield from self.translate_protein_complex_part(model, ta.term, m)
 
     def translate_biological_process(
         self, model: Model, child: str, ta: BiologicalProcessAssociation

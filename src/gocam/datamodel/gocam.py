@@ -172,6 +172,10 @@ class ModelStateEnum(str, Enum):
     """
     The model is not intended for use public use; it is likely to be used for internal testing.
     """
+    template = "template"
+    """
+    The model is a template that is not intended to represent a specific biological scenario, but rather to be used as a template for building other models.
+    """
     closed = "closed"
     """
     TBD
@@ -278,6 +282,8 @@ class Activity(ConfiguredBaseModel):
                    'MolecularFunctionAssociation']} })
     occurs_in: Optional[CellularAnatomicalEntityAssociation] = Field(default=None, description="""The cellular location in which the activity occurs""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity'], 'recommended': True} })
     part_of: Optional[BiologicalProcessAssociation] = Field(default=None, description="""The larger biological process in which the activity is a part""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity',
+                       'EnabledByGeneProductAssociation',
+                       'ProteinComplexHasPartAssociation',
                        'BiologicalProcessAssociation',
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
@@ -408,6 +414,13 @@ class EnabledByGeneProductAssociation(EnabledByAssociation):
                                  'name': 'term',
                                  'range': 'GeneProductTermObject'}}})
 
+    part_of: Optional[list[PartOfProteinComplexAssociation]] = Field(default=None, description="""Associations between the gene product and protein complexes it is a part of.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity',
+                       'EnabledByGeneProductAssociation',
+                       'ProteinComplexHasPartAssociation',
+                       'BiologicalProcessAssociation',
+                       'CellularAnatomicalEntityAssociation',
+                       'CellTypeAssociation',
+                       'GrossAnatomyAssociation']} })
     term: Optional[str] = Field(default=None, description="""A \"term\" that is an entity database object representing an individual gene product.""", json_schema_extra = { "linkml_meta": {'comments': ['In the context of the GO workflow, the allowed values for this '
                       'field come from the GPI file from an authoritative source. For '
                       'example, the authoritative source for human is the EBI GOA '
@@ -468,7 +481,8 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
                                  'name': 'term',
                                  'range': 'ProteinComplexTermObject'}}})
 
-    members: Optional[list[ProteinComplexMemberAssociation]] = Field(default=None, description="""Associations between the complex and its members.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EnabledByProteinComplexAssociation']} })
+    has_part: Optional[list[ProteinComplexHasPartAssociation]] = Field(default=None, description="""Associations between the complex and gene products that are part of it.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EnabledByProteinComplexAssociation',
+                       'PartOfProteinComplexAssociation']} })
     term: Optional[str] = Field(default=None, description="""The gene product or complex that carries out the activity""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
                        'EvidenceItem',
                        'EnabledByAssociation',
@@ -524,21 +538,53 @@ class TermAssociation(Association):
     provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
 
 
-class ProteinComplexMemberAssociation(TermAssociation):
+class PartOfProteinComplexAssociation(TermAssociation):
     """
-    An association between a protein complex and one of its members.
+    An association between a gene product and a protein complex that it is a part of.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
-         'slot_usage': {'term': {'description': 'The member gene product that is part '
-                                                'of the protein complex.',
+         'slot_usage': {'term': {'description': 'The protein complex that the gene '
+                                                'product is a part of.',
                                  'name': 'term',
-                                 'range': 'GeneProductTermObject'}}})
+                                 'range': 'ProteinComplexTermObject'}}})
 
-    term: Optional[str] = Field(default=None, description="""The member gene product that is part of the protein complex.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+    has_part: Optional[list[ProteinComplexHasPartAssociation]] = Field(default=None, description="""Associations between the complex and gene products that are part of it.""", json_schema_extra = { "linkml_meta": {'domain_of': ['EnabledByProteinComplexAssociation',
+                       'PartOfProteinComplexAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The protein complex that the gene product is a part of.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
                        'EvidenceItem',
                        'EnabledByAssociation',
                        'TermAssociation']} })
-    type: Literal["ProteinComplexMemberAssociation"] = Field(default="ProteinComplexMemberAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
+    type: Literal["PartOfProteinComplexAssociation"] = Field(default="PartOfProteinComplexAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
+                      "languages, it isn't necessary to populate this, it is "
+                      'auto-populated from the object class.'],
+         'designates_type': True,
+         'domain_of': ['Association', 'Object']} })
+    evidence: Optional[list[EvidenceItem]] = Field(default=None, description="""The set of evidence items that support the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Association']} })
+    provenances: Optional[list[ProvenanceInfo]] = Field(default=None, description="""The set of provenance objects that provide metadata about who made the association.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Model', 'Activity', 'EvidenceItem', 'Association']} })
+
+
+class ProteinComplexHasPartAssociation(TermAssociation):
+    """
+    An association between a protein complex and one of its parts.
+    """
+    linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
+         'slot_usage': {'term': {'description': 'The gene product that is part of the '
+                                                'protein complex.',
+                                 'name': 'term',
+                                 'range': 'GeneProductTermObject'}}})
+
+    part_of: Optional[list[PartOfProteinComplexAssociation]] = Field(default=None, description="""Associations between the gene product and protein complexes it is a part of.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity',
+                       'EnabledByGeneProductAssociation',
+                       'ProteinComplexHasPartAssociation',
+                       'BiologicalProcessAssociation',
+                       'CellularAnatomicalEntityAssociation',
+                       'CellTypeAssociation',
+                       'GrossAnatomyAssociation']} })
+    term: Optional[str] = Field(default=None, description="""The gene product that is part of the protein complex.""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+                       'EvidenceItem',
+                       'EnabledByAssociation',
+                       'TermAssociation']} })
+    type: Literal["ProteinComplexHasPartAssociation"] = Field(default="ProteinComplexHasPartAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
                       'auto-populated from the object class.'],
          'designates_type': True,
@@ -579,6 +625,8 @@ class BiologicalProcessAssociation(TermAssociation):
 
     happens_during: Optional[PhaseAssociation] = Field(default=None, description="""Optional extension describing the phase during which the BP takes place""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'BiologicalProcessAssociation']} })
     part_of: Optional[BiologicalProcessAssociation] = Field(default=None, description="""Optional extension allowing hierarchical nesting of BPs""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity',
+                       'EnabledByGeneProductAssociation',
+                       'ProteinComplexHasPartAssociation',
                        'BiologicalProcessAssociation',
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
@@ -632,6 +680,8 @@ class CellularAnatomicalEntityAssociation(TermAssociation):
                                  'range': 'CellularAnatomicalEntityTermObject'}}})
 
     part_of: Optional[CellTypeAssociation] = Field(default=None, description="""Optional extension allowing hierarchical nesting of CCs""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity',
+                       'EnabledByGeneProductAssociation',
+                       'ProteinComplexHasPartAssociation',
                        'BiologicalProcessAssociation',
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
@@ -660,6 +710,8 @@ class CellTypeAssociation(TermAssociation):
          'slot_usage': {'term': {'name': 'term', 'range': 'CellTypeTermObject'}}})
 
     part_of: Optional[GrossAnatomyAssociation] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Activity',
+                       'EnabledByGeneProductAssociation',
+                       'ProteinComplexHasPartAssociation',
                        'BiologicalProcessAssociation',
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
@@ -686,6 +738,8 @@ class GrossAnatomyAssociation(TermAssociation):
                                  'range': 'GrossAnatomicalStructureTermObject'}}})
 
     part_of: Optional[GrossAnatomyAssociation] = Field(default=None, json_schema_extra = { "linkml_meta": {'domain_of': ['Activity',
+                       'EnabledByGeneProductAssociation',
+                       'ProteinComplexHasPartAssociation',
                        'BiologicalProcessAssociation',
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
@@ -1007,7 +1061,8 @@ EnabledByGeneProductAssociation.model_rebuild()
 EnabledByProteinComplexAssociation.model_rebuild()
 CausalAssociation.model_rebuild()
 TermAssociation.model_rebuild()
-ProteinComplexMemberAssociation.model_rebuild()
+PartOfProteinComplexAssociation.model_rebuild()
+ProteinComplexHasPartAssociation.model_rebuild()
 MolecularFunctionAssociation.model_rebuild()
 BiologicalProcessAssociation.model_rebuild()
 PhaseAssociation.model_rebuild()
