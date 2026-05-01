@@ -820,10 +820,10 @@ def _update_entity_gene_stats(
             entity_info.unique_protein_complex_in_activity_term.add(
                 activity.enabled_by.term
             )
-        if activity.enabled_by.members:
-            for member in activity.enabled_by.members:
-                if member.term and member.term not in obsolete_ids:
-                    entity_info.unique_protein_complex_genes.add(member.term)
+        if activity.enabled_by.has_part:
+            for protein_complex_has_part_association in activity.enabled_by.has_part:
+                if protein_complex_has_part_association.term and protein_complex_has_part_association.term not in obsolete_ids:
+                    entity_info.unique_protein_complex_genes.add(protein_complex_has_part_association.term)
                     entity_info.number_of_genes += 1
     entity_info.unique_activities.add(activity.id)
     entity_info.unique_models.add(gocam_model_id)
@@ -857,10 +857,10 @@ def _iter_activity_associations(
     ):
         associations.append(activity.enabled_by)
         if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-            if activity.enabled_by.members:
-                for member in activity.enabled_by.members:
-                    if not _is_association_obsolete(member, obsolete_ids):
-                        associations.append(member)
+            if activity.enabled_by.has_part:
+                for protein_complex_has_part_association in activity.enabled_by.has_part:
+                    if not _is_association_obsolete(protein_complex_has_part_association, obsolete_ids):
+                        associations.append(protein_complex_has_part_association)
     if activity.molecular_function and not _is_association_obsolete(
         activity.molecular_function, obsolete_ids
     ):
@@ -1137,10 +1137,10 @@ def _get_activity_genes(
         if activity.enabled_by.term and activity.enabled_by.term not in obsolete_ids:
             genes.append(activity.enabled_by.term)
     elif isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-        if activity.enabled_by.members:
-            for member in activity.enabled_by.members:
-                if member.term and member.term not in obsolete_ids:
-                    genes.append(member.term)
+        if activity.enabled_by.has_part:
+            for protein_complex_has_part_association in activity.enabled_by.has_part:
+                if protein_complex_has_part_association.term and protein_complex_has_part_association.term not in obsolete_ids:
+                    genes.append(protein_complex_has_part_association.term)
     return genes
 
 
@@ -1334,12 +1334,12 @@ def process_gocam_model_file(
                     model_aggregate.unique_protein_complex_in_activity_term.add(
                         activity.enabled_by.term
                     )
-                if activity.enabled_by.members:
-                    for member in activity.enabled_by.members:
-                        if member.term and member.term not in obsolete_ids:
-                            stats_by_model.unique_protein_complex_genes.add(member.term)
+                if activity.enabled_by.has_part:
+                    for protein_complex_has_part_association in activity.enabled_by.has_part:
+                        if protein_complex_has_part_association.term and protein_complex_has_part_association.term not in obsolete_ids:
+                            stats_by_model.unique_protein_complex_genes.add(protein_complex_has_part_association.term)
                             model_aggregate.unique_protein_complex_genes.add(
-                                member.term
+                                protein_complex_has_part_association.term
                             )
                             stats_by_model.number_of_genes += 1
 
