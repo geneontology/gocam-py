@@ -157,10 +157,8 @@ def model_to_cx2(
                 }
             # Filter proteins at CX2 level (per issue #65)
             # Skip if the term is an INFORMATION_BIOMACROMOLECULE
-            # We check if it's already in activity_nodes_by_enabled_by_id as a simple
-            # proxy for identifying proteins/gene products
             if (
-                molecule.term in activity_nodes_by_enabled_by_id
+                molecule.is_information_biomacromolecule
                 and "has input" in edge_attributes["name"]
             ):
                 continue

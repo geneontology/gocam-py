@@ -337,8 +337,12 @@ activities:
 molecules:
 - id: gomodel:63f809ec00000701/63f809ec00000733
   term: CHEBI:10668
+  is_chemical_entity: true
+  is_information_biomacromolecule: false
 - id: gomodel:63f809ec00000701/63f809ec00000710
   term: CHEBI:17732
+  is_chemical_entity: true
+  is_information_biomacromolecule: true
 objects:
 - id: GO:1904678
   label: alpha-aminoacyl-tRNA binding

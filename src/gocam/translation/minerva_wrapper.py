@@ -597,6 +597,10 @@ class MinervaTranslator:
         molecule_node = MoleculeNode(
             id=individual_id,
             term=term,
+            is_chemical_entity=self.view.is_type(individual_id, CHEMICAL_ENTITY),
+            is_information_biomacromolecule=self.view.is_type(
+                individual_id, INFORMATION_BIOMACROMOLECULE
+            ),
         )
 
         for located_in_fact in self.view.get_facts(

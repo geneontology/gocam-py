@@ -417,6 +417,17 @@ class Indexer:
 
         qi.annoton_terms = all_annoton_terms
 
+        unique_chemical_terms: set[str] = set(
+            node.term
+            for node in model.molecules or []
+            if node.is_chemical_entity
+            and not node.is_information_biomacromolecule
+            and node.term is not None
+        )
+        qi.model_chemical_terms = [
+            TermObject(id=term, label=_label(term)) for term in unique_chemical_terms
+        ]
+
         if model.taxon:
             qi.taxon_label = self._ncbi_taxon_label(model.taxon)
 

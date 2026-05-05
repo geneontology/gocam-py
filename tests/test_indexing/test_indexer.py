@@ -328,3 +328,26 @@ def test_indexer_populates_flattened_evidence_terms():
         "Test Evidence 2",
         "Test Evidence 3",
     }
+
+
+def test_indexer_populates_model_chemical_terms():
+    """Test that the indexer populates model_chemical_terms correctly."""
+    with open(
+        INPUT_DIR / "test_indexer_populates_model_chemical_terms_model.yaml"
+    ) as f:
+        model = Model.model_validate(yaml.safe_load(f))
+
+    indexer = Indexer()
+    indexer.index_model(model)
+
+    assert model.query_index is not None
+    assert model.query_index.model_chemical_terms is not None
+    assert len(model.query_index.model_chemical_terms) == 2
+    assert {chem.id for chem in model.query_index.model_chemical_terms} == {
+        "CHEBI:12345",
+        "CHEBI:67890",
+    }
+    assert {chem.label for chem in model.query_index.model_chemical_terms} == {
+        "Chemical 1",
+        "Chemical 2",
+    }

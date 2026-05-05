@@ -4,10 +4,11 @@ title: Antibacterial innate immune response in the intestine via MAPK cascade (C
   elegans)
 taxon: NCBITaxon:6239
 status: production
-date_modified: '2025-12-11'
+date_modified: '2026-03-12'
 comments:
 - 'Automated change 2023-03-16: RO:0002212 replaced by RO:0002630'
 - 'Automated change 2023-03-16: RO:0002213 replaced by RO:0002629'
+- 'Automated change 2026-03-12: GO:0005615 replaced by GO:0005576'
 activities:
 - id: gomodel:568b0f9600000284/57ec3a7e00000079
   enabled_by:
@@ -129,7 +130,7 @@ activities:
       date: '2025-12-03'
       provided_by:
       - http://www.wormbase.org
-    term: GO:0005615
+    term: GO:0005576
   part_of:
     type: BiologicalProcessAssociation
     evidence:
@@ -944,12 +945,20 @@ activities:
 molecules:
 - id: gomodel:568b0f9600000284/5f46c3b700003608
   term: WB:WBGene00004758
+  is_chemical_entity: true
+  is_information_biomacromolecule: true
 - id: gomodel:568b0f9600000284/5f46c3b700003610
   term: WB:WBGene00004055
+  is_chemical_entity: true
+  is_information_biomacromolecule: true
 - id: gomodel:568b0f9600000284/5f46c3b700003606
   term: WB:WBGene00004055
+  is_chemical_entity: true
+  is_information_biomacromolecule: true
 - id: gomodel:568b0f9600000284/5f46c3b700003602
   term: WB:WBGene00000223
+  is_chemical_entity: true
+  is_information_biomacromolecule: true
 objects:
 - id: WB:WBGene00006599
   label: tpa-1 Cele
@@ -1062,8 +1071,8 @@ objects:
 - id: ECO:0000270
   label: expression pattern evidence used in manual assertion
   type: gocam:Object
-- id: GO:0005615
-  label: extracellular space
+- id: GO:0005576
+  label: extracellular region
   type: gocam:Object
 - id: ECO:0000255
   label: match to sequence model evidence used in manual assertion
@@ -1072,7 +1081,7 @@ provenances:
 - contributor:
   - https://orcid.org/0000-0002-1706-4196
   - https://orcid.org/0000-0002-3013-9906
-  date: '2025-12-11'
+  date: '2026-03-12'
   provided_by:
   - http://www.wormbase.org
 

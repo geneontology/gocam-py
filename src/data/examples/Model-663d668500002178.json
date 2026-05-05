@@ -1961,11 +1961,15 @@
   "molecules": [
     {
       "id": "gomodel:663d668500002178/66c7d41500001893",
-      "term": "CHEBI:16749"
+      "term": "CHEBI:16749",
+      "is_chemical_entity": true,
+      "is_information_biomacromolecule": false
     },
     {
       "id": "gomodel:663d668500002178/67b1629100003514",
       "term": "CHEBI:17268",
+      "is_chemical_entity": true,
+      "is_information_biomacromolecule": false,
       "located_in": {
         "type": "CellularAnatomicalEntityAssociation",
         "evidence": [],
@@ -1986,6 +1990,8 @@
     {
       "id": "gomodel:663d668500002178/67c10cc400004789",
       "term": "CHEBI:17268",
+      "is_chemical_entity": true,
+      "is_information_biomacromolecule": false,
       "located_in": {
         "type": "CellularAnatomicalEntityAssociation",
         "evidence": [],
@@ -2005,7 +2011,9 @@
     },
     {
       "id": "gomodel:663d668500002178/67b1629100003513",
-      "term": "CHEBI:58332"
+      "term": "CHEBI:58332",
+      "is_chemical_entity": true,
+      "is_information_biomacromolecule": false
     }
   ],
   "objects": [
