@@ -21,7 +21,7 @@ from gocam.datamodel import (
     TermObject,
 )
 from gocam.utils import all_evidence, all_provenance, model_to_digraph
-from gocam.vocabulary import Relation
+from gocam.vocabulary import CHEMICAL_ENTITY, INFORMATION_BIOMACROMOLECULE, Relation
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,7 @@ class Indexer:
         go_adapter_descriptor: str = "sqlite:obo:go",
         goc_groups_yaml_path: Optional[str | Path] = None,
         ncbi_taxon_adapter_descriptor: str = "sqlite:obo:ncbitaxon",
+        chebi_adapter_descriptor: str = "sqlite:obo:chebi",
     ):
         """
         Initialize the Indexer.
@@ -57,11 +58,13 @@ class Indexer:
                 If not provided, fetches from https://current.geneontology.org/metadata/groups.yaml.
                 The YAML file should be a list of group dictionaries, each with an "id" key and other metadata.
             ncbi_taxon_adapter_descriptor: OAK adapter descriptor for NCBI Taxonomy. Defaults to "sqlite:obo:ncbitaxon".
+            chebi_adapter_descriptor: OAK adapter descriptor for ChEBI. Defaults to "sqlite:obo:chebi".
         """
         self._subsets = subsets if subsets is not None else ["goslim_generic"]
         self._go_adapter_descriptor = go_adapter_descriptor
         self._goc_groups_yaml_path = goc_groups_yaml_path
         self._ncbi_taxon_adapter_descriptor = ncbi_taxon_adapter_descriptor
+        self._chebi_adapter_descriptor = chebi_adapter_descriptor
 
     @cached_property
     def go_adapter(self):
@@ -82,6 +85,16 @@ class Indexer:
             An OboGraphInterface implementation for the NCBI Taxonomy database
         """
         return get_adapter(self._ncbi_taxon_adapter_descriptor)
+
+    @cached_property
+    def chebi_adapter(self):
+        """
+        Get the ChEBI ontology adapter.
+
+        Returns:
+            An OboGraphInterface implementation for the ChEBI database
+        """
+        return get_adapter(self._chebi_adapter_descriptor)
 
     @cached_property
     def goc_groups(self) -> dict[str, dict]:
@@ -160,6 +173,25 @@ class Indexer:
             Optional[str]: The label for the NCBI Taxonomy term, or None if not found.
         """
         return self.ncbi_taxon_adapter.label(id)
+
+    @lru_cache(maxsize=10_000)
+    def _is_chemical_term(self, id: str) -> bool:
+        """
+        Check if a term ID corresponds to a chemical term in ChEBI.
+
+        Args:
+            id: The term ID to check.
+
+        Returns:
+            bool: True if the term is a chemical term in ChEBI, False otherwise.
+        """
+        if not id.startswith("CHEBI:"):
+            return False
+        ancestors = self.chebi_adapter.ancestors(id, predicates=[IS_A])
+        return (
+            CHEMICAL_ENTITY in ancestors
+            and INFORMATION_BIOMACROMOLECULE not in ancestors
+        )
 
     def _get_closures(
         self, terms: Collection[str]
@@ -416,6 +448,15 @@ class Indexer:
         qi.model_activity_has_input_rollup = rollup(has_inputs_closure)
 
         qi.annoton_terms = all_annoton_terms
+
+        unique_chemical_terms: set[str] = set(
+            node.term
+            for node in model.molecules or []
+            if node.term and self._is_chemical_term(node.term)
+        )
+        qi.model_chemical_terms = [
+            TermObject(id=term, label=_label(term)) for term in unique_chemical_terms
+        ]
 
         if model.taxon:
             qi.taxon_label = self._ncbi_taxon_label(model.taxon)

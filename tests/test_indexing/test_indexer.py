@@ -7,6 +7,7 @@ import yaml
 from gocam.datamodel import Model, QueryIndex
 from gocam.indexing.indexer import Indexer
 from gocam.utils import model_to_digraph
+from gocam.vocabulary import CHEMICAL_ENTITY, INFORMATION_BIOMACROMOLECULE
 from tests import EXAMPLES_DIR
 from tests.test_indexing import INPUT_DIR
 
@@ -39,6 +40,30 @@ def mock_oaklib_adapters(monkeypatch):
             if args and args[0] == "NCBITaxon:9606":
                 return "Human"
             return "Test Taxon"
+
+    class MockChebiAdapter:
+        def ancestors(self, id, *args, **kwargs):
+            mock_ancestors = {
+                "CHEBI:12345": [
+                    "CHEBI:11111",
+                    INFORMATION_BIOMACROMOLECULE,
+                    "CHEBI:22222",
+                    CHEMICAL_ENTITY,
+                ],
+                "CHEBI:67890": ["CHEBI:77777", "CHEBI:88888", CHEMICAL_ENTITY],
+            }
+            return mock_ancestors.get(id, [])
+
+        def label(self, id, *args, **kwargs):
+            mock_labels = {
+                "CHEBI:12345": "Chemical 1",
+                "CHEBI:67890": "Chemical 2",
+                "CHEBI:11111": "Ancestor Chemical 1",
+                "CHEBI:22222": "Ancestor Chemical 2",
+                "CHEBI:77777": "Ancestor Chemical 3",
+                "CHEBI:88888": "Ancestor Chemical 4",
+            }
+            return mock_labels.get(id, "Test Chemical")
 
     monkeypatch.setattr(Indexer, "go_adapter", MockGoAdapter())
     monkeypatch.setattr(Indexer, "ncbi_taxon_adapter", MockNcbiTaxonAdapter())
@@ -327,4 +352,25 @@ def test_indexer_populates_flattened_evidence_terms():
         "Test Evidence 1",
         "Test Evidence 2",
         "Test Evidence 3",
+    }
+
+
+def test_indexer_populates_model_chemical_terms():
+    """Test that the indexer populates model_chemical_terms correctly."""
+    with open(
+        INPUT_DIR / "test_indexer_populates_model_chemical_terms_model.yaml"
+    ) as f:
+        model = Model.model_validate(yaml.safe_load(f))
+
+    indexer = Indexer()
+    indexer.index_model(model)
+
+    assert model.query_index is not None
+    assert model.query_index.model_chemical_terms is not None
+    assert len(model.query_index.model_chemical_terms) == 1
+    assert {chem.id for chem in model.query_index.model_chemical_terms} == {
+        "CHEBI:67890",
+    }
+    assert {chem.label for chem in model.query_index.model_chemical_terms} == {
+        "Chemical 2",
     }

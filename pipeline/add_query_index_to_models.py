@@ -120,6 +120,12 @@ def main(
             help="OAK adapter descriptor for the NCBITaxon ontology. See: https://incatools.github.io/ontology-access-kit/packages/selectors.html#ontology-adapter-selectors",
         ),
     ] = "sqlite:obo:ncbitaxon",
+    chebi_adapter_descriptor: Annotated[
+        str,
+        typer.Option(
+            help="OAK adapter descriptor for ChEBI. See: https://incatools.github.io/ontology-access-kit/packages/selectors.html#ontology-adapter-selectors",
+        ),
+    ] = "sqlite:obo:chebi",
     goc_groups_yaml: Annotated[
         Path | None,
         typer.Option(
@@ -162,6 +168,7 @@ def main(
         go_adapter_descriptor=go_adapter_descriptor,
         ncbi_taxon_adapter_descriptor=ncbi_taxon_adapter_descriptor,
         goc_groups_yaml_path=goc_groups_yaml,
+        chebi_adapter_descriptor=chebi_adapter_descriptor,
     )
 
     # Process each JSON file
