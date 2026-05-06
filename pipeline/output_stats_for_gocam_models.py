@@ -3,7 +3,9 @@ Output statistics information about GO-CAM models.
 
 This module processes GO-CAM model JSON files and calculates a variety of
 statistics at the per-model, per-contributor, per-provider, and aggregate
-levels. Statistics include:
+levels. By default only models with ``status == "production"`` are
+included; pass ``--no-production-only`` to process every model regardless
+of status. Statistics include:
 
 - Activity unit counts (total, enabled by gene product, enabled by protein complex)
 - Gene product and protein complex enabler counts (total and unique)
@@ -50,6 +52,7 @@ from gocam.datamodel import (
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     Model,
+    ModelStateEnum,
     QueryIndex,
 )
 from gocam.indexing.indexer import Indexer
@@ -191,8 +194,8 @@ MEMBER_VARIABLE_DEFINITIONS = [
     },
     {
         "class": "GocamStats",
-        "variable": "number_of_unique_inferred_relations",
-        "description": "Count of inferred relations (activity pairs connected via shared chemical molecules).",
+        "variable": "total_number_of_inferred_relations",
+        "description": "Total count of inferred relations (activity pairs connected via shared chemical molecules).",
     },
     {
         "class": "GocamStats",
@@ -433,8 +436,8 @@ MEMBER_VARIABLE_DEFINITIONS = [
     },
     {
         "class": "AggregateInfo",
-        "variable": "number_of_unique_inferred_relations",
-        "description": "Count of unique inferred relations across all entities.",
+        "variable": "total_number_of_inferred_relations",
+        "description": "Total count of inferred relations across all entities.",
     },
     {
         "class": "AggregateInfo",
@@ -550,6 +553,7 @@ class FilterReason(str, Enum):
     """Reason a GO-CAM model was filtered out during processing."""
 
     NO_MODEL = "No model"
+    NOT_PRODUCTION = "Not a production model"
 
 
 class ErrorReason(str, Enum):
@@ -593,7 +597,7 @@ class GocamStats(ConfiguredBaseModel):
     number_of_unique_other_outputs: int = 0
     number_of_go_terms: int = 0
     number_of_unique_go_terms: int = 0
-    number_of_unique_inferred_relations: int = 0
+    total_number_of_inferred_relations: int = 0
     list_inferred_relations: List[Dict[str, Any]] | None = []
 
     unique_models: Set[str] = set()
@@ -663,7 +667,7 @@ class AggregateInfo(ConfiguredBaseModel):
     number_of_unique_other_outputs: int = 0
     number_of_go_terms: int = 0
     number_of_unique_go_terms: int = 0
-    number_of_unique_inferred_relations: int = 0
+    total_number_of_inferred_relations: int = 0
     list_inferred_relations: List[Dict[str, Any]] | None = []
 
     unique_activities: Set[str] = set()
@@ -700,9 +704,18 @@ class ProteinComplexActivityInfo(ConfiguredBaseModel):
 #: A 3-tuple of (result_type, query_index_or_none, reason_or_none).
 ProcessingResult: TypeAlias = (
     tuple[Literal[ResultType.SUCCESS], QueryIndex, None]
-    | tuple[Literal[ResultType.FILTERED], QueryIndex, FilterReason]
+    | tuple[Literal[ResultType.FILTERED], QueryIndex | None, FilterReason]
     | tuple[Literal[ResultType.ERROR], None, ErrorReason]
 )
+
+
+def _is_production(gocam_model: Model) -> bool:
+    """Return True iff the model's status is exactly ``production``.
+
+    Models with no status set, or any other status (development, review,
+    delete, internal_test, template), are treated as non-production.
+    """
+    return gocam_model.status == ModelStateEnum.production
 
 
 def setup_logger(verbose: int) -> None:
@@ -1220,6 +1233,7 @@ def process_gocam_model_file(
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
+    production_only: bool = True,
 ) -> ProcessingResult:
     """Process a single GO-CAM model JSON file and compute statistics.
 
@@ -1235,6 +1249,9 @@ def process_gocam_model_file(
         model_aggregate: Accumulator for cross-model aggregate statistics.
         contributor_lookup: Mapping of contributor URI to per-contributor stats.
         provider_lookup: Mapping of provider URI to per-provider stats.
+        production_only: When True (default), models whose status is not
+            ``production`` are skipped before any indexing or accumulation;
+            they are returned as a FILTERED result.
 
     Returns:
         A ProcessingResult 3-tuple of (result_type, query_index_or_none,
@@ -1253,6 +1270,15 @@ def process_gocam_model_file(
     except Exception as e:
         logger.error(f"Error reading file {json_file}", exc_info=e)
         return ResultType.ERROR, None, ErrorReason.READ_ERROR
+
+    # Skip non-production models before any indexing or accumulation so
+    # contributor/provider/aggregate state stays free of non-production data.
+    if production_only and not _is_production(gocam_model):
+        logger.info(
+            f"Skipping non-production model {gocam_model.id} "
+            f"(status={gocam_model.status}) from {json_file}"
+        )
+        return ResultType.FILTERED, None, FilterReason.NOT_PRODUCTION
 
     # Populate the model with indexing information
     indexer.index_model(gocam_model)
@@ -1466,7 +1492,7 @@ def process_gocam_model_file(
             gocam_model.activities, obsolete_ids, molecule_lookup
         )
         stats_by_model.list_inferred_relations = inferred
-        stats_by_model.number_of_unique_inferred_relations = len(inferred)
+        stats_by_model.total_number_of_inferred_relations = len(inferred)
         if model_aggregate.list_inferred_relations is not None:
             model_aggregate.list_inferred_relations.extend(inferred)
 
@@ -1635,7 +1661,7 @@ def output_entity_results(
     """
     # Inferred relations are only meaningful at the model level, not per-entity
     _exclude_inferred = {
-        "number_of_unique_inferred_relations": True,
+        "total_number_of_inferred_relations": True,
         "list_inferred_relations": True,
     }
 
@@ -1844,7 +1870,7 @@ def output_summary(
     )
     compute_molecule_and_term_counts(model_aggregate)
 
-    model_aggregate.number_of_unique_inferred_relations = len(
+    model_aggregate.total_number_of_inferred_relations = len(
         model_aggregate.list_inferred_relations or []
     )
 
@@ -1939,7 +1965,10 @@ def output_summary(
     success_count = sum(
         1 for _, (result, _, _) in results if result == ResultType.SUCCESS
     )
-    failure_count = total_count - success_count
+    filtered_count = sum(
+        1 for _, (result, _, _) in results if result == ResultType.FILTERED
+    )
+    error_count = sum(1 for _, (result, _, _) in results if result == ResultType.ERROR)
 
     tree = Tree(f"[bold]Processed {total_count} models[/bold]")
     if success_count > 0:
@@ -1948,9 +1977,15 @@ def output_summary(
             style="green",
         )
 
-    if failure_count > 0:
+    if filtered_count > 0:
         tree.add(
-            f"Did not output stats for  [b]{failure_count}[/b] models", style="red"
+            f"Skipped  [b]{filtered_count}[/b] non-production models",
+            style="yellow",
+        )
+
+    if error_count > 0:
+        tree.add(
+            f"Did not output stats for  [b]{error_count}[/b] models", style="red"
         )
     print(tree)
 
@@ -1998,6 +2033,17 @@ def main(
             help="Limit the number of models to process. 0 means no limit.",
         ),
     ] = 0,
+    production_only: Annotated[
+        bool,
+        typer.Option(
+            "--production-only/--no-production-only",
+            help=(
+                "Only process models whose status is 'production'. "
+                "Models with any other status (or no status) are skipped. "
+                "Default: enabled."
+            ),
+        ),
+    ] = True,
 ):
     """CLI entry point: process GO-CAM model JSON files and output statistics."""
     setup_logger(verbose)
@@ -2038,6 +2084,7 @@ def main(
             contributor_lookup=contributor_lookup,
             provider_lookup=provider_lookup,
             protein_complex_activities=protein_complex_activities,
+            production_only=production_only,
         )
         results.append((json_file, result))
 
