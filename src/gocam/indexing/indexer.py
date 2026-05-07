@@ -192,7 +192,7 @@ class Indexer:
         """
         if not id.startswith("CHEBI:"):
             return False
-        ancestors = list(self.chebi_adapter.ancestors(id, predicates=[IS_A]))
+        ancestors = set(self.chebi_adapter.ancestors(id, predicates=[IS_A]))
         return (
             CHEMICAL_ENTITY in ancestors
             and INFORMATION_BIOMACROMOLECULE not in ancestors
