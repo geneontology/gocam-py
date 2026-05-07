@@ -21,7 +21,12 @@ from gocam.datamodel import (
     TermObject,
 )
 from gocam.utils import all_evidence, all_provenance, model_to_digraph
-from gocam.vocabulary import CHEMICAL_ENTITY, INFORMATION_BIOMACROMOLECULE, Relation
+from gocam.vocabulary import (
+    CHEMICAL_ENTITY,
+    INFORMATION_BIOMACROMOLECULE,
+    PROTEIN,
+    Relation,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -429,7 +434,7 @@ class Indexer:
         qi.model_activity_enabled_by_genes = [
             TermObject(id=gene, label=_label(gene))
             for gene in all_enabled_by_genes
-            if gene and gene not in ("CHEBI:36080", "CHEBI:33695")
+            if gene and gene not in (PROTEIN, INFORMATION_BIOMACROMOLECULE)
         ]
 
         parts_ofs_direct, parts_ofs_closure = self._get_closures(all_parts_ofs)
