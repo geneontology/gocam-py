@@ -23,15 +23,15 @@ activities:
         molecule: gomodel:00000000000000000/protein1
 molecules:
   - id: gomodel:00000000000000000/chemical1
-    term: CHEBI:12345
+    term: CHEBI:mock1
   - id: gomodel:00000000000000000/chemical2
-    term: CHEBI:67890
-  - id: gomodel:5fce9b7300000030/protein1
+    term: CHEBI:mock2
+  - id: gomodel:00000000000000000/protein1
     term: UniProtKB:Q99836
 objects:
-  - id: CHEBI:12345
+  - id: CHEBI:mock1
     label: Chemical 1
-  - id: CHEBI:67890
+  - id: CHEBI:mock2
     label: Chemical 2
   - id: UniProtKB:Q99836
     label: some protein

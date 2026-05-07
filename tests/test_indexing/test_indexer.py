@@ -44,29 +44,19 @@ def mock_oaklib_adapters(monkeypatch):
     class MockChebiAdapter:
         def ancestors(self, id, *args, **kwargs):
             mock_ancestors = {
-                "CHEBI:12345": [
-                    "CHEBI:11111",
+                "CHEBI:mock1": [
+                    "CHEBI:mock3",
                     INFORMATION_BIOMACROMOLECULE,
-                    "CHEBI:22222",
+                    "CHEBI:mock4",
                     CHEMICAL_ENTITY,
                 ],
-                "CHEBI:67890": ["CHEBI:77777", "CHEBI:88888", CHEMICAL_ENTITY],
+                "CHEBI:mock2": ["CHEBI:mock5", "CHEBI:mock6", CHEMICAL_ENTITY],
             }
             return mock_ancestors.get(id, [])
 
-        def label(self, id, *args, **kwargs):
-            mock_labels = {
-                "CHEBI:12345": "Chemical 1",
-                "CHEBI:67890": "Chemical 2",
-                "CHEBI:11111": "Ancestor Chemical 1",
-                "CHEBI:22222": "Ancestor Chemical 2",
-                "CHEBI:77777": "Ancestor Chemical 3",
-                "CHEBI:88888": "Ancestor Chemical 4",
-            }
-            return mock_labels.get(id, "Test Chemical")
-
     monkeypatch.setattr(Indexer, "go_adapter", MockGoAdapter())
     monkeypatch.setattr(Indexer, "ncbi_taxon_adapter", MockNcbiTaxonAdapter())
+    monkeypatch.setattr(Indexer, "chebi_adapter", MockChebiAdapter())
 
 
 @pytest.fixture(autouse=True)
@@ -369,7 +359,7 @@ def test_indexer_populates_model_chemical_terms():
     assert model.query_index.model_chemical_terms is not None
     assert len(model.query_index.model_chemical_terms) == 1
     assert {chem.id for chem in model.query_index.model_chemical_terms} == {
-        "CHEBI:67890",
+        "CHEBI:mock2",
     }
     assert {chem.label for chem in model.query_index.model_chemical_terms} == {
         "Chemical 2",
