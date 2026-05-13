@@ -135,7 +135,7 @@ class Indexer:
         else:
             path = _PYSTOW_MODULE.ensure(
                 url=_CURRENT_GROUPS_YAML_URL,
-                download_kwargs={"backend": "requests"},  # type: ignore https://github.com/cthoyt/pystow/issues/145
+                download_kwargs={"backend": "requests"},
             )
         with open(path) as f:
             groups = yaml.safe_load(f)
