@@ -29,16 +29,13 @@ from gocam.datamodel import (
     ProvenanceInfo,
 )
 from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
-from gocam.vocabulary import Relation, TaxonVocabulary
-
-MOLECULAR_FUNCTION = "GO:0003674"
-BIOLOGICAL_PROCESS = "GO:0008150"
-CELLULAR_COMPONENT = "GO:0005575"
-INFORMATION_BIOMACROMOLECULE = "CHEBI:33695"
-PROTEIN_CONTAINING_COMPLEX = "GO:0032991"
-EVIDENCE = "ECO:0000000"
-CHEMICAL_ENTITY = "CHEBI:24431"
-ANATOMICAL_ENTITY = "UBERON:0001062"
+from gocam.vocabulary import (
+    INFORMATION_BIOMACROMOLECULE,
+    MOLECULAR_FUNCTION,
+    PROTEIN_CONTAINING_COMPLEX,
+    Relation,
+    TaxonVocabulary,
+)
 
 # These are properties which occur in facts that represent associations between molecular functions
 # and molecules, where the subject is the molecular function and the object is the molecule. These
