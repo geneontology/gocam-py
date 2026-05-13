@@ -494,6 +494,17 @@
 
 
 
+      QueryIndex : model_chemical_terms
+
+
+
+
+
+        QueryIndex --&gt; "*" TermObject : model_chemical_terms
+        click TermObject href "../TermObject/"
+
+
+
       QueryIndex : model_taxon
 
 
@@ -735,6 +746,12 @@
 <td><a href="../model_activity_has_input_rollup/">model_activity_has_input_rollup</a></td>
 <td>* <br/> <a href="../TermObject/">TermObject</a></td>
 <td>The rollup of <code>model_activity_has_input_closure</code> to a GO subset or slim</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../model_chemical_terms/">model_chemical_terms</a></td>
+<td>* <br/> <a href="../TermObject/">TermObject</a></td>
+<td>All molecule terms in the model that are chemical entities (e</td>
 <td>direct</td>
 </tr>
 <tr>
@@ -1173,6 +1190,19 @@ attributes:
     name: model_activity_has_input_rollup
     description: The rollup of `model_activity_has_input_closure` to a GO subset or
       slim.
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - QueryIndex
+    range: TermObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  model_chemical_terms:
+    name: model_chemical_terms
+    description: All molecule terms in the model that are chemical entities (e.g.
+      substrates or products) and not information biomacromolecules (e.g. gene products
+      or complexes).
     from_schema: https://w3id.org/gocam
     rank: 1000
     domain_of:
@@ -1681,6 +1711,21 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     alias: model_activity_has_input_rollup
+    owner: QueryIndex
+    domain_of:
+    - QueryIndex
+    range: TermObject
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  model_chemical_terms:
+    name: model_chemical_terms
+    description: All molecule terms in the model that are chemical entities (e.g.
+      substrates or products) and not information biomacromolecules (e.g. gene products
+      or complexes).
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    alias: model_chemical_terms
     owner: QueryIndex
     domain_of:
     - QueryIndex
