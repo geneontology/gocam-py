@@ -782,6 +782,12 @@ classes:
         range: TermObject
         multivalued: true
         inlined_as_list: true
+      model_chemical_terms:
+        description: All molecule terms in the model that are chemical entities (e.g. substrates or products)
+          and not information biomacromolecules (e.g. gene products or complexes).
+        range: TermObject
+        multivalued: true
+        inlined_as_list: true
       model_taxon:
         description: The primary taxon term for the model, over the NCBITaxon:subClassOf relationship type.
           This is used to determine the primary taxon that the model is relevant to.

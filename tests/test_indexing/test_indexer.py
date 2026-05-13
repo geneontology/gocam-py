@@ -7,6 +7,7 @@ import yaml
 from gocam.datamodel import Model, QueryIndex
 from gocam.indexing.indexer import Indexer
 from gocam.utils import model_to_digraph
+from gocam.vocabulary import CHEMICAL_ENTITY, INFORMATION_BIOMACROMOLECULE
 from tests import EXAMPLES_DIR
 from tests.test_indexing import INPUT_DIR
 
@@ -40,8 +41,22 @@ def mock_oaklib_adapters(monkeypatch):
                 return "Human"
             return "Test Taxon"
 
+    class MockChebiAdapter:
+        def ancestors(self, id, *args, **kwargs):
+            mock_ancestors = {
+                "CHEBI:mock1": [
+                    "CHEBI:mock3",
+                    INFORMATION_BIOMACROMOLECULE,
+                    "CHEBI:mock4",
+                    CHEMICAL_ENTITY,
+                ],
+                "CHEBI:mock2": ["CHEBI:mock5", "CHEBI:mock6", CHEMICAL_ENTITY],
+            }
+            return mock_ancestors.get(id, [])
+
     monkeypatch.setattr(Indexer, "go_adapter", MockGoAdapter())
     monkeypatch.setattr(Indexer, "ncbi_taxon_adapter", MockNcbiTaxonAdapter())
+    monkeypatch.setattr(Indexer, "chebi_adapter", MockChebiAdapter())
 
 
 @pytest.fixture(autouse=True)
@@ -327,4 +342,25 @@ def test_indexer_populates_flattened_evidence_terms():
         "Test Evidence 1",
         "Test Evidence 2",
         "Test Evidence 3",
+    }
+
+
+def test_indexer_populates_model_chemical_terms():
+    """Test that the indexer populates model_chemical_terms correctly."""
+    with open(
+        INPUT_DIR / "test_indexer_populates_model_chemical_terms_model.yaml"
+    ) as f:
+        model = Model.model_validate(yaml.safe_load(f))
+
+    indexer = Indexer()
+    indexer.index_model(model)
+
+    assert model.query_index is not None
+    assert model.query_index.model_chemical_terms is not None
+    assert len(model.query_index.model_chemical_terms) == 1
+    assert {chem.id for chem in model.query_index.model_chemical_terms} == {
+        "CHEBI:mock2",
+    }
+    assert {chem.label for chem in model.query_index.model_chemical_terms} == {
+        "Chemical 2",
     }

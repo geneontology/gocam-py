@@ -43,6 +43,8 @@ spec = {
         Iter("label").filter().map(remove_species_code_suffix).all(),
     ),
     "enabled_by_gene_ids": ("query_index.model_activity_enabled_by_genes", ["id"]),
+    "chemical_labels": ("query_index.model_chemical_terms", ["label"]),
+    "chemical_ids": ("query_index.model_chemical_terms", ["id"]),
     "occurs_in_rollup": ("query_index.model_activity_occurs_in_rollup", ["label"]),
     "occurs_in_term_labels": (
         "query_index.model_activity_occurs_in_terms",
