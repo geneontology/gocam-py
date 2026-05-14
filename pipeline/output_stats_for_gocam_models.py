@@ -20,6 +20,11 @@ of status. Statistics include:
 
 Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
+Two flat lookup tables are also emitted alongside the aggregate files:
+``gene_id_to_label.json`` and ``chebi_id_to_label.json``. Each maps the
+identifiers seen in the stats outputs (gene-product enablers plus protein
+complex member genes; CHEBI input/output molecules) to their human-readable
+labels as carried on the model's ``objects``.
 """
 
 import json
@@ -838,8 +843,13 @@ def _update_entity_gene_stats(
                 )
         if activity.enabled_by.has_part:
             for protein_complex_has_part_association in activity.enabled_by.has_part:
-                if protein_complex_has_part_association.term and protein_complex_has_part_association.term not in obsolete_ids:
-                    entity_info.unique_protein_complex_genes.add(protein_complex_has_part_association.term)
+                if (
+                    protein_complex_has_part_association.term
+                    and protein_complex_has_part_association.term not in obsolete_ids
+                ):
+                    entity_info.unique_protein_complex_genes.add(
+                        protein_complex_has_part_association.term
+                    )
                     entity_info.number_of_genes += 1
     entity_info.unique_activities.add(activity.id)
     entity_info.unique_models.add(gocam_model_id)
@@ -874,8 +884,12 @@ def _iter_activity_associations(
         associations.append(activity.enabled_by)
         if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
             if activity.enabled_by.has_part:
-                for protein_complex_has_part_association in activity.enabled_by.has_part:
-                    if not _is_association_obsolete(protein_complex_has_part_association, obsolete_ids):
+                for (
+                    protein_complex_has_part_association
+                ) in activity.enabled_by.has_part:
+                    if not _is_association_obsolete(
+                        protein_complex_has_part_association, obsolete_ids
+                    ):
                         associations.append(protein_complex_has_part_association)
     if activity.molecular_function and not _is_association_obsolete(
         activity.molecular_function, obsolete_ids
@@ -1155,7 +1169,10 @@ def _get_activity_genes(
     elif isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
         if activity.enabled_by.has_part:
             for protein_complex_has_part_association in activity.enabled_by.has_part:
-                if protein_complex_has_part_association.term and protein_complex_has_part_association.term not in obsolete_ids:
+                if (
+                    protein_complex_has_part_association.term
+                    and protein_complex_has_part_association.term not in obsolete_ids
+                ):
                     genes.append(protein_complex_has_part_association.term)
     return genes
 
@@ -1229,6 +1246,57 @@ def _compute_inferred_relations(
     return relations
 
 
+def _collect_labels(
+    gocam_model: Model,
+    stats_by_model: GocamStats,
+    gene_label_lookup: Dict[str, str] | None,
+    chebi_label_lookup: Dict[str, str] | None,
+) -> None:
+    """Populate gene and CHEBI id→label lookups from the model's ``objects``.
+
+    Restricted to identifiers that actually appear as gene enablers, protein
+    complex member genes, or CHEBI input/output molecules in this model, so
+    the resulting files only contain labels relevant to the stats outputs.
+    The first non-empty label seen wins, keeping output stable across runs.
+    """
+    if gene_label_lookup is None and chebi_label_lookup is None:
+        return
+
+    objects_by_id: Dict[str, Any] = {}
+    for obj in gocam_model.objects or []:
+        if obj.id and not _is_obsolete(obj):
+            objects_by_id[obj.id] = obj
+
+    if gene_label_lookup is not None:
+        gene_ids = (
+            stats_by_model.unique_enabled_by_gene_product
+            | stats_by_model.unique_protein_complex_genes
+        )
+        for gene_id in gene_ids:
+            if gene_id in gene_label_lookup:
+                continue
+            obj = objects_by_id.get(gene_id)
+            label = getattr(obj, "label", None) if obj is not None else None
+            if label:
+                gene_label_lookup[gene_id] = label
+
+    if chebi_label_lookup is not None:
+        chebi_ids: set[str] = set()
+        for term in stats_by_model.list_has_input_term or []:
+            if term.upper().startswith("CHEBI:"):
+                chebi_ids.add(term)
+        for term in stats_by_model.list_has_output_term or []:
+            if term.upper().startswith("CHEBI:"):
+                chebi_ids.add(term)
+        for chebi_id in chebi_ids:
+            if chebi_id in chebi_label_lookup:
+                continue
+            obj = objects_by_id.get(chebi_id)
+            label = getattr(obj, "label", None) if obj is not None else None
+            if label:
+                chebi_label_lookup[chebi_id] = label
+
+
 def process_gocam_model_file(
     json_file: Path,
     output_dir: Path | None,
@@ -1237,6 +1305,8 @@ def process_gocam_model_file(
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
     production_only: bool = True,
+    gene_label_lookup: Dict[str, str] | None = None,
+    chebi_label_lookup: Dict[str, str] | None = None,
 ) -> ProcessingResult:
     """Process a single GO-CAM model JSON file and compute statistics.
 
@@ -1255,6 +1325,10 @@ def process_gocam_model_file(
         production_only: When True (default), models whose status is not
             ``production`` are skipped before any indexing or accumulation;
             they are returned as a FILTERED result.
+        gene_label_lookup: Optional accumulator mapping gene/gene-product CURIEs
+            (enablers + protein complex member genes) to labels.
+        chebi_label_lookup: Optional accumulator mapping CHEBI CURIEs seen as
+            input/output molecules to labels.
 
     Returns:
         A ProcessingResult 3-tuple of (result_type, query_index_or_none,
@@ -1368,9 +1442,17 @@ def process_gocam_model_file(
                         activity.enabled_by.term
                     )
                 if activity.enabled_by.has_part:
-                    for protein_complex_has_part_association in activity.enabled_by.has_part:
-                        if protein_complex_has_part_association.term and protein_complex_has_part_association.term not in obsolete_ids:
-                            stats_by_model.unique_protein_complex_genes.add(protein_complex_has_part_association.term)
+                    for (
+                        protein_complex_has_part_association
+                    ) in activity.enabled_by.has_part:
+                        if (
+                            protein_complex_has_part_association.term
+                            and protein_complex_has_part_association.term
+                            not in obsolete_ids
+                        ):
+                            stats_by_model.unique_protein_complex_genes.add(
+                                protein_complex_has_part_association.term
+                            )
                             model_aggregate.unique_protein_complex_genes.add(
                                 protein_complex_has_part_association.term
                             )
@@ -1543,6 +1625,14 @@ def process_gocam_model_file(
     if stats_by_model.list_enabled_by_protein_complex is not None:
         stats_by_model.list_enabled_by_protein_complex.sort()
     compute_molecule_and_term_counts(stats_by_model)
+
+    # Populate id→label lookups for genes and CHEBI molecules seen in this model
+    _collect_labels(
+        gocam_model,
+        stats_by_model,
+        gene_label_lookup,
+        chebi_label_lookup,
+    )
 
     # Update aggregate model data
     model_aggregate.total_number_of_entities_processed += 1
@@ -1830,6 +1920,8 @@ def output_summary(
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
+    gene_label_lookup: Dict[str, str] | None = None,
+    chebi_label_lookup: Dict[str, str] | None = None,
 ) -> tuple[ResultType, ErrorReason] | None:
     """Finalize aggregate statistics and write all summary output files.
 
@@ -1853,8 +1945,8 @@ def output_summary(
     model_aggregate.number_of_unique_activity_units = len(
         model_aggregate.unique_activities
     )
-    model_aggregate.number_of_activity_units_enabled_by_protein_complex_association = len(
-        model_aggregate.unique_activity_unit_protein_complex_enablers
+    model_aggregate.number_of_activity_units_enabled_by_protein_complex_association = (
+        len(model_aggregate.unique_activity_unit_protein_complex_enablers)
     )
     model_aggregate.number_of_activity_units_enabled_by_gene_product_association = len(
         model_aggregate.unique_activity_unit_gene_product_enablers
@@ -1956,6 +2048,37 @@ def output_summary(
                 exc_info=e,
             )
 
+    # Write id→label lookup files for genes and CHEBI molecules
+    if output_dir is not None and gene_label_lookup is not None:
+        gene_lookup_file = output_dir / "gene_id_to_label.json"
+        try:
+            sorted_gene_lookup = dict(sorted(gene_label_lookup.items()))
+            with open(gene_lookup_file, "w") as f:
+                json.dump(sorted_gene_lookup, f, indent=2)
+            logger.info(
+                f"Successfully wrote gene id→label lookup to {gene_lookup_file}"
+            )
+        except Exception as e:
+            logger.error(
+                f"Error writing gene id→label lookup to {gene_lookup_file}",
+                exc_info=e,
+            )
+
+    if output_dir is not None and chebi_label_lookup is not None:
+        chebi_lookup_file = output_dir / "chebi_id_to_label.json"
+        try:
+            sorted_chebi_lookup = dict(sorted(chebi_label_lookup.items()))
+            with open(chebi_lookup_file, "w") as f:
+                json.dump(sorted_chebi_lookup, f, indent=2)
+            logger.info(
+                f"Successfully wrote CHEBI id→label lookup to {chebi_lookup_file}"
+            )
+        except Exception as e:
+            logger.error(
+                f"Error writing CHEBI id→label lookup to {chebi_lookup_file}",
+                exc_info=e,
+            )
+
     total_count = len(results)
     success_count = sum(
         1 for _, (result, _, _) in results if result == ResultType.SUCCESS
@@ -1979,9 +2102,7 @@ def output_summary(
         )
 
     if error_count > 0:
-        tree.add(
-            f"Did not output stats for  [b]{error_count}[/b] models", style="red"
-        )
+        tree.add(f"Did not output stats for  [b]{error_count}[/b] models", style="red")
     print(tree)
 
 
@@ -2067,6 +2188,8 @@ def main(
     contributor_lookup: Dict[str, GocamStats] = {}
     provider_lookup: Dict[str, GocamStats] = {}
     protein_complex_activities: list[ProteinComplexActivityInfo] = []
+    gene_label_lookup: Dict[str, str] = {}
+    chebi_label_lookup: Dict[str, str] = {}
 
     for json_file in track(
         json_files, description="Processing GO-CAM models and calculating statistics..."
@@ -2080,6 +2203,8 @@ def main(
             provider_lookup=provider_lookup,
             protein_complex_activities=protein_complex_activities,
             production_only=production_only,
+            gene_label_lookup=gene_label_lookup,
+            chebi_label_lookup=chebi_label_lookup,
         )
         results.append((json_file, result))
 
@@ -2091,6 +2216,8 @@ def main(
         contributor_lookup=contributor_lookup,
         provider_lookup=provider_lookup,
         protein_complex_activities=protein_complex_activities,
+        gene_label_lookup=gene_label_lookup,
+        chebi_label_lookup=chebi_label_lookup,
     )
 
 
