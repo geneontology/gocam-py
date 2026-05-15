@@ -830,6 +830,14 @@ def _update_entity_gene_stats(
             #     print("Activity id " + activity.id + " has enabled by chebi " + activity.enabled_by.term)
             entity_info.unique_enabled_by_gene_product.add(activity.enabled_by.term)
             entity_info.genes += 1
+
+        if (activity.enabled_by.part_of):
+            for (part_of_protein_complex_association) in activity.enabled_by.part_of:
+                if (part_of_protein_complex_association.term and part_of_protein_complex_association.term not in obsolete_ids):
+                    entity_info.unique_protein_complex_in_activity_term.add(
+                        part_of_protein_complex_association.term
+                    )            
+            
     if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
         entity_info.unique_activity_unit_protein_complex_enablers.add(activity.id)
         if activity.enabled_by.term and activity.enabled_by.term not in obsolete_ids:
@@ -1418,6 +1426,16 @@ def process_gocam_model_file(
                     model_aggregate.unique_enabled_by_gene_product.add(
                         activity.enabled_by.term
                     )
+
+                if (activity.enabled_by.part_of):
+                    for (part_of_protein_complex_association) in activity.enabled_by.part_of:
+                        if (part_of_protein_complex_association.term and part_of_protein_complex_association.term not in obsolete_ids):
+                            stats_by_model.unique_protein_complex_in_activity_term.add(
+                                part_of_protein_complex_association.term
+                            )
+                            model_aggregate.unique_protein_complex_in_activity_term.add(
+                                part_of_protein_complex_association.term
+                            )
 
             elif isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
                 stats_by_model.unique_activity_unit_protein_complex_enablers.add(
