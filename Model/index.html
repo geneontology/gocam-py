@@ -150,105 +150,6 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#slots">
-<span class="md-ellipsis">
-      
-        Slots
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#rules">
-<span class="md-ellipsis">
-      
-        Rules
-      
-    </span>
-</a>
-<nav aria-label="Rules" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#production-rules-must-have-at-least-one-activity">
-<span class="md-ellipsis">
-      
-        Production rules must have at least one activity
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#identifier-and-mapping-information">
-<span class="md-ellipsis">
-      
-        Identifier and Mapping Information
-      
-    </span>
-</a>
-<nav aria-label="Identifier and Mapping Information" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#schema-source">
-<span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#mappings">
-<span class="md-ellipsis">
-      
-        Mappings
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#linkml-source">
-<span class="md-ellipsis">
-      
-        LinkML Source
-      
-    </span>
-</a>
-<nav aria-label="LinkML Source" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#direct">
-<span class="md-ellipsis">
-      
-        Direct
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#induced">
-<span class="md-ellipsis">
-      
-        Induced
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-</ul>
 </nav>
 </div>
 </div>
@@ -257,7 +158,17 @@
 <article class="md-content__inner md-typeset">
 <h1 id="class-model">Class: Model</h1>
 <p><em>A model of a biological program consisting of a set of causally connected activities.</em></p>
-<p>URI: <a href="https://w3id.org/gocam/Model">gocam:Model</a></p>
+<div data-search-exclude="" markdown="1">
+
+
+
+URI: [gocam:Model](https://w3id.org/gocam/Model)
+
+
+
+
+
+
 <div class="mermaid"> classDiagram
     class Model
     click Model href "../Model/"
@@ -360,138 +271,82 @@
 
 </div>
 <!-- no inheritance hierarchy -->
-<h2 id="slots">Slots</h2>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Cardinality and Range</th>
-<th>Description</th>
-<th>Inheritance</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../id/">id</a></td>
-<td>1 <br/> <a href="../Uriorcurie/">Uriorcurie</a></td>
-<td>The identifier of the model</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../title/">title</a></td>
-<td>1 <br/> <a href="../String/">String</a></td>
-<td>The human-readable descriptive title of the model</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../taxon/">taxon</a></td>
-<td>0..1 <br/> <a href="../TaxonTermObject/">TaxonTermObject</a></td>
-<td>The primary taxon that the model is about</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../additional_taxa/">additional_taxa</a></td>
-<td>* <br/> <a href="../TaxonTermObject/">TaxonTermObject</a></td>
-<td>Additional taxa that the model is about</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../status/">status</a></td>
-<td>0..1 <br/> <a href="../ModelStateEnum/">ModelStateEnum</a></td>
-<td>The status of the model in terms of its progression along the developmental l...</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../date_modified/">date_modified</a></td>
-<td>0..1 <br/> <a href="../String/">String</a></td>
-<td>The date that the model was last modified</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../comments/">comments</a></td>
-<td>* <br/> <a href="../String/">String</a></td>
-<td>Curator-provided comments about the model</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../activities/">activities</a></td>
-<td>* <br/> <a href="../Activity/">Activity</a></td>
-<td>All of the activities that are part of the model</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../molecules/">molecules</a></td>
-<td>* <br/> <a href="../MoleculeNode/">MoleculeNode</a></td>
-<td>All of the molecule nodes that are part of the model</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../objects/">objects</a></td>
-<td>* <br/> <a href="../Object/">Object</a></td>
-<td>All of the objects that are part of the model</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../provenances/">provenances</a></td>
-<td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
-<td>Model-level provenance information</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../query_index/">query_index</a></td>
-<td>0..1 <br/> <a href="../QueryIndex/">QueryIndex</a></td>
-<td>An optional object that contains the results of indexing a model with various...</td>
-<td>direct</td>
-</tr>
-</tbody>
-</table>
-<h2 id="rules">Rules</h2>
-<h3 id="production-rules-must-have-at-least-one-activity">Production rules must have at least one activity</h3>
-<table>
-<thead>
-<tr>
-<th>Rule Applied</th>
-<th>Preconditions</th>
-<th>Postconditions</th>
-<th>Elseconditions</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>slot_conditions</td>
-<td><code>{'status': {'equals_string': 'production'}}</code></td>
-<td><code>{'activities': {'required': True}}</code></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
-<h2 id="mappings">Mappings</h2>
-<table>
-<thead>
-<tr>
-<th>Mapping Type</th>
-<th>Mapped Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>self</td>
-<td>gocam:Model</td>
-</tr>
-<tr>
-<td>native</td>
-<td>gocam:Model</td>
-</tr>
-</tbody>
-</table>
-<h2 id="linkml-source">LinkML Source</h2>
+
+## Slots
+
+| Name | Cardinality and Range | Description | Inheritance |
+| ---  | --- | --- | --- |
+| [id](id.md) | 1 <br/> [Uriorcurie](Uriorcurie.md) | The identifier of the model | direct |
+| [title](title.md) | 1 <br/> [String](String.md) | The human-readable descriptive title of the model | direct |
+| [taxon](taxon.md) | 0..1 <br/> [TaxonTermObject](TaxonTermObject.md) | The primary taxon that the model is about | direct |
+| [additional_taxa](additional_taxa.md) | * <br/> [TaxonTermObject](TaxonTermObject.md) | Additional taxa that the model is about | direct |
+| [status](status.md) | 0..1 <br/> [ModelStateEnum](ModelStateEnum.md) | The status of the model in terms of its progression along the developmental l... | direct |
+| [date_modified](date_modified.md) | 0..1 <br/> [String](String.md) | The date that the model was last modified | direct |
+| [comments](comments.md) | * <br/> [String](String.md) | Curator-provided comments about the model | direct |
+| [activities](activities.md) | * <br/> [Activity](Activity.md) | All of the activities that are part of the model | direct |
+| [molecules](molecules.md) | * <br/> [MoleculeNode](MoleculeNode.md) | All of the molecule nodes that are part of the model | direct |
+| [objects](objects.md) | * <br/> [Object](Object.md) | All of the objects that are part of the model | direct |
+| [provenances](provenances.md) | * <br/> [ProvenanceInfo](ProvenanceInfo.md) | Model-level provenance information | direct |
+| [query_index](query_index.md) | 0..1 <br/> [QueryIndex](QueryIndex.md) | An optional object that contains the results of indexing a model with various... | direct |
+
+
+
+
+
+
+
+## Rules
+
+
+### Production rules must have at least one activity
+
+| Rule Applied | Preconditions | Postconditions | Elseconditions |
+|--------------|---------------|----------------|----------------|
+| slot_conditions |```{'status': {'equals_string': 'production'}}``` |```{'activities': {'required': True}}``` | |
+
+
+
+
+
+
+
+
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+### Schema Source
+
+
+* from schema: https://w3id.org/gocam
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | gocam:Model |
+| native | gocam:Model |
+
+
+
+
+
+
+## LinkML Source
+
 <!-- TODO: investigate https://stackoverflow.com/questions/37606292/how-to-create-tabbed-code-blocks-in-mkdocs-or-sphinx -->
-<h3 id="direct">Direct</h3>
+
+### Direct
+
 <details>
 <pre><code class="language-yaml">name: Model
 description: A model of a biological program consisting of a set of causally connected
@@ -515,7 +370,6 @@ attributes:
     - MoleculeNode
     - Object
     range: uriorcurie
-    required: true
   title:
     name: title
     description: The human-readable descriptive title of the model
@@ -585,7 +439,6 @@ attributes:
     - Model
     range: Activity
     multivalued: true
-    inlined: true
     inlined_as_list: true
   molecules:
     name: molecules
@@ -596,7 +449,6 @@ attributes:
     - Model
     range: MoleculeNode
     multivalued: true
-    inlined: true
     inlined_as_list: true
   objects:
     name: objects
@@ -610,7 +462,6 @@ attributes:
     - Model
     range: Object
     multivalued: true
-    inlined: true
     inlined_as_list: true
   provenances:
     name: provenances
@@ -623,7 +474,6 @@ attributes:
     - Association
     range: ProvenanceInfo
     multivalued: true
-    inlined: true
     inlined_as_list: true
   query_index:
     name: query_index
@@ -654,7 +504,9 @@ rules:
 
 </code></pre>
 </details>
-<h3 id="induced">Induced</h3>
+
+### Induced
+
 <details>
 <pre><code class="language-yaml">name: Model
 description: A model of a biological program consisting of a set of causally connected
@@ -672,7 +524,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     identifier: true
-    alias: id
     owner: Model
     domain_of:
     - Model
@@ -680,13 +531,13 @@ attributes:
     - MoleculeNode
     - Object
     range: uriorcurie
+    required: true
   title:
     name: title
     description: The human-readable descriptive title of the model
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: dct:title
-    alias: title
     owner: Model
     domain_of:
     - Model
@@ -697,7 +548,6 @@ attributes:
     description: The primary taxon that the model is about
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: taxon
     owner: Model
     domain_of:
     - Model
@@ -707,7 +557,6 @@ attributes:
     description: Additional taxa that the model is about
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: additional_taxa
     owner: Model
     domain_of:
     - Model
@@ -722,7 +571,6 @@ attributes:
     - model state
     rank: 1000
     slot_uri: pav:status
-    alias: status
     owner: Model
     domain_of:
     - Model
@@ -733,7 +581,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: dct:date
-    alias: date_modified
     owner: Model
     domain_of:
     - Model
@@ -744,7 +591,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: rdfs:comment
-    alias: comments
     owner: Model
     domain_of:
     - Model
@@ -760,24 +606,24 @@ attributes:
       rule.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: activities
     owner: Model
     domain_of:
     - Model
     range: Activity
     multivalued: true
+    inlined: true
     inlined_as_list: true
   molecules:
     name: molecules
     description: All of the molecule nodes that are part of the model.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: molecules
     owner: Model
     domain_of:
     - Model
     range: MoleculeNode
     multivalued: true
+    inlined: true
     inlined_as_list: true
   objects:
     name: objects
@@ -787,18 +633,17 @@ attributes:
       refreshed from outside.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: objects
     owner: Model
     domain_of:
     - Model
     range: Object
     multivalued: true
+    inlined: true
     inlined_as_list: true
   provenances:
     name: provenances
     description: Model-level provenance information
     from_schema: https://w3id.org/gocam
-    alias: provenances
     owner: Model
     domain_of:
     - Model
@@ -807,6 +652,7 @@ attributes:
     - Association
     range: ProvenanceInfo
     multivalued: true
+    inlined: true
     inlined_as_list: true
   query_index:
     name: query_index
@@ -819,7 +665,6 @@ attributes:
       for generating reports, or for indexing in web applications.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: query_index
     owner: Model
     domain_of:
     - Model
@@ -838,7 +683,7 @@ rules:
   title: Production rules must have at least one activity
 
 </code></pre>
-</details>
+</details></div>
 </article>
 </div>
 <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>

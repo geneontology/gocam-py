@@ -285,114 +285,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#applicable-classes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Applicable Classes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#properties" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Properties
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Properties">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#type-and-range" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type and Range
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cardinality-and-requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cardinality and Requirements
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#identifier-and-mapping-information" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Identifier and Mapping Information
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Identifier and Mapping Information">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#schema-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mappings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mappings
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#linkml-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LinkML Source
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -413,105 +305,85 @@
 
 <h1 id="slot-flattened_evidence_terms">Slot: flattened_evidence_terms</h1>
 <p><em>All evidence term objects from the model across different levels combined in one place</em></p>
-<p>URI: <a href="https://w3id.org/gocam/flattened_evidence_terms">gocam:flattened_evidence_terms</a>
-Alias: flattened_evidence_terms</p>
+<div data-search-exclude markdown="1">
+
+
+
+URI: [gocam:flattened_evidence_terms](https://w3id.org/gocam/flattened_evidence_terms)
 <!-- no inheritance hierarchy -->
 
-<h2 id="applicable-classes">Applicable Classes</h2>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-<th>Modifies Slot</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-<td>An index that is optionally placed on a model in order to support common quer...</td>
-<td>no</td>
-</tr>
-</tbody>
-</table>
-<h2 id="properties">Properties</h2>
-<h3 id="type-and-range">Type and Range</h3>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Range</td>
-<td><a href="../EvidenceTermObject/">EvidenceTermObject</a></td>
-</tr>
-<tr>
-<td>Domain Of</td>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-</tr>
-</tbody>
-</table>
-<h3 id="cardinality-and-requirements">Cardinality and Requirements</h3>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Multivalued</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>### Slot Characteristics</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Owner</td>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
-<h2 id="mappings">Mappings</h2>
-<table>
-<thead>
-<tr>
-<th>Mapping Type</th>
-<th>Mapped Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>self</td>
-<td>gocam:flattened_evidence_terms</td>
-</tr>
-<tr>
-<td>native</td>
-<td>gocam:flattened_evidence_terms</td>
-</tr>
-</tbody>
-</table>
-<h2 id="linkml-source">LinkML Source</h2>
+
+
+
+
+## Applicable Classes
+
+| Name | Description | Modifies Slot |
+| --- | --- | --- |
+| [QueryIndex](QueryIndex.md) | An index that is optionally placed on a model in order to support common quer... |  no  |
+
+
+
+
+
+
+## Properties
+
+### Type and Range
+
+| Property | Value |
+| --- | --- |
+| Range | [EvidenceTermObject](EvidenceTermObject.md) |
+| Domain Of | [QueryIndex](QueryIndex.md) |
+
+### Cardinality and Requirements
+
+| Property | Value |
+| --- | --- |
+| Multivalued | Yes |
+### Slot Characteristics
+
+| Property | Value |
+| --- | --- |
+| Owner | [QueryIndex](QueryIndex.md) |
+
+
+
+
+
+
+
+
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+### Schema Source
+
+
+* from schema: https://w3id.org/gocam
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | gocam:flattened_evidence_terms |
+| native | gocam:flattened_evidence_terms |
+
+
+
+
+## LinkML Source
+
 <details>
 
 <pre><code class="language-yaml">name: flattened_evidence_terms
@@ -519,7 +391,6 @@ description: All evidence term objects from the model across different levels co
   in one place
 from_schema: https://w3id.org/gocam
 rank: 1000
-alias: flattened_evidence_terms
 owner: QueryIndex
 domain_of:
 - QueryIndex
@@ -530,13 +401,16 @@ inlined_as_list: true
 
 </code></pre>
 
-</details>
+</details></div>
 
 
 
 
 
 
+
+  
+  
 
 
 

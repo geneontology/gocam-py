@@ -285,125 +285,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#applicable-classes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Applicable Classes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#properties" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Properties
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Properties">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#type-and-range" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type and Range
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cardinality-and-requirements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cardinality and Requirements
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#identifier-and-mapping-information" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Identifier and Mapping Information
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Identifier and Mapping Information">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#annotations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Annotations
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#schema-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mappings" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mappings
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#linkml-source" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LinkML Source
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -424,120 +305,92 @@
 
 <h1 id="slot-model_activity_enabled_by_closure">Slot: model_activity_enabled_by_closure</h1>
 <p><em>The reflexive transitive closure of <code>model_activity_enabled_by_terms</code>, over the is_a and part_of relationship types</em></p>
-<p>URI: <a href="https://w3id.org/gocam/model_activity_enabled_by_closure">gocam:model_activity_enabled_by_closure</a>
-Alias: model_activity_enabled_by_closure</p>
+<div data-search-exclude markdown="1">
+
+
+
+URI: [gocam:model_activity_enabled_by_closure](https://w3id.org/gocam/model_activity_enabled_by_closure)
 <!-- no inheritance hierarchy -->
 
-<h2 id="applicable-classes">Applicable Classes</h2>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-<th>Modifies Slot</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-<td>An index that is optionally placed on a model in order to support common quer...</td>
-<td>no</td>
-</tr>
-</tbody>
-</table>
-<h2 id="properties">Properties</h2>
-<h3 id="type-and-range">Type and Range</h3>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Range</td>
-<td><a href="../TermObject/">TermObject</a></td>
-</tr>
-<tr>
-<td>Domain Of</td>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-</tr>
-</tbody>
-</table>
-<h3 id="cardinality-and-requirements">Cardinality and Requirements</h3>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Multivalued</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>### Slot Characteristics</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Owner</td>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="annotations">Annotations</h3>
-<table>
-<thead>
-<tr>
-<th>property</th>
-<th>value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>closure_computed_over</td>
-<td>[rdfs:subClassOf, BFO:0000050]</td>
-</tr>
-</tbody>
-</table>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
-<h2 id="mappings">Mappings</h2>
-<table>
-<thead>
-<tr>
-<th>Mapping Type</th>
-<th>Mapped Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>self</td>
-<td>gocam:model_activity_enabled_by_closure</td>
-</tr>
-<tr>
-<td>native</td>
-<td>gocam:model_activity_enabled_by_closure</td>
-</tr>
-</tbody>
-</table>
-<h2 id="linkml-source">LinkML Source</h2>
+
+
+
+
+## Applicable Classes
+
+| Name | Description | Modifies Slot |
+| --- | --- | --- |
+| [QueryIndex](QueryIndex.md) | An index that is optionally placed on a model in order to support common quer... |  no  |
+
+
+
+
+
+
+## Properties
+
+### Type and Range
+
+| Property | Value |
+| --- | --- |
+| Range | [TermObject](TermObject.md) |
+| Domain Of | [QueryIndex](QueryIndex.md) |
+
+### Cardinality and Requirements
+
+| Property | Value |
+| --- | --- |
+| Multivalued | Yes |
+### Slot Characteristics
+
+| Property | Value |
+| --- | --- |
+| Owner | [QueryIndex](QueryIndex.md) |
+
+
+
+
+
+
+
+
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+### Annotations
+
+| property | value |
+| --- | --- |
+| closure_computed_over | [rdfs:subClassOf, BFO:0000050] |
+
+
+
+
+### Schema Source
+
+
+* from schema: https://w3id.org/gocam
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | gocam:model_activity_enabled_by_closure |
+| native | gocam:model_activity_enabled_by_closure |
+
+
+
+
+## LinkML Source
+
 <details>
 
 <pre><code class="language-yaml">name: model_activity_enabled_by_closure
@@ -549,7 +402,6 @@ description: The reflexive transitive closure of `model_activity_enabled_by_term
   over the is_a and part_of relationship types
 from_schema: https://w3id.org/gocam
 rank: 1000
-alias: model_activity_enabled_by_closure
 owner: QueryIndex
 domain_of:
 - QueryIndex
@@ -560,13 +412,16 @@ inlined_as_list: true
 
 </code></pre>
 
-</details>
+</details></div>
 
 
 
 
 
 
+
+  
+  
 
 
 

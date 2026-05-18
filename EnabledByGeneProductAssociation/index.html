@@ -150,92 +150,6 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#inheritance">
-<span class="md-ellipsis">
-      
-        Inheritance
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#slots">
-<span class="md-ellipsis">
-      
-        Slots
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#identifier-and-mapping-information">
-<span class="md-ellipsis">
-      
-        Identifier and Mapping Information
-      
-    </span>
-</a>
-<nav aria-label="Identifier and Mapping Information" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#schema-source">
-<span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#mappings">
-<span class="md-ellipsis">
-      
-        Mappings
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#linkml-source">
-<span class="md-ellipsis">
-      
-        LinkML Source
-      
-    </span>
-</a>
-<nav aria-label="LinkML Source" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#direct">
-<span class="md-ellipsis">
-      
-        Direct
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#induced">
-<span class="md-ellipsis">
-      
-        Induced
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-</ul>
 </nav>
 </div>
 </div>
@@ -244,7 +158,17 @@
 <article class="md-content__inner md-typeset">
 <h1 id="class-enabledbygeneproductassociation">Class: EnabledByGeneProductAssociation</h1>
 <p><em>An association between an activity and an individual gene product</em></p>
-<p>URI: <a href="https://w3id.org/gocam/EnabledByGeneProductAssociation">gocam:EnabledByGeneProductAssociation</a></p>
+<div data-search-exclude="" markdown="1">
+
+
+
+URI: [gocam:EnabledByGeneProductAssociation](https://w3id.org/gocam/EnabledByGeneProductAssociation)
+
+
+
+
+
+
 <div class="mermaid"> classDiagram
     class EnabledByGeneProductAssociation
     click EnabledByGeneProductAssociation href "../EnabledByGeneProductAssociation/"
@@ -299,86 +223,74 @@
 
 
 </div>
-<h2 id="inheritance">Inheritance</h2>
-<ul>
-<li><a href="../Association/">Association</a><ul>
-<li><a href="../EnabledByAssociation/">EnabledByAssociation</a><ul>
-<li><strong>EnabledByGeneProductAssociation</strong></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="slots">Slots</h2>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Cardinality and Range</th>
-<th>Description</th>
-<th>Inheritance</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../part_of/">part_of</a></td>
-<td>* <br/> <a href="../PartOfProteinComplexAssociation/">PartOfProteinComplexAssociation</a></td>
-<td>Associations between the gene product and protein complexes it is a part of</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../term/">term</a></td>
-<td>0..1 <br/> <a href="../GeneProductTermObject/">GeneProductTermObject</a></td>
-<td>A "term" that is an entity database object representing an individual gene pr...</td>
-<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
-</tr>
-<tr>
-<td><a href="../type/">type</a></td>
-<td>0..1 <br/> <a href="../String/">String</a></td>
-<td>The type of association</td>
-<td><a href="../Association/">Association</a></td>
-</tr>
-<tr>
-<td><a href="../evidence/">evidence</a></td>
-<td>* <br/> <a href="../EvidenceItem/">EvidenceItem</a></td>
-<td>The set of evidence items that support the association</td>
-<td><a href="../Association/">Association</a></td>
-</tr>
-<tr>
-<td><a href="../provenances/">provenances</a></td>
-<td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
-<td>The set of provenance objects that provide metadata about who made the associ...</td>
-<td><a href="../Association/">Association</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
-<h2 id="mappings">Mappings</h2>
-<table>
-<thead>
-<tr>
-<th>Mapping Type</th>
-<th>Mapped Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>self</td>
-<td>gocam:EnabledByGeneProductAssociation</td>
-</tr>
-<tr>
-<td>native</td>
-<td>gocam:EnabledByGeneProductAssociation</td>
-</tr>
-</tbody>
-</table>
-<h2 id="linkml-source">LinkML Source</h2>
+
+
+
+
+
+
+## Inheritance
+* [Association](Association.md)
+    * [EnabledByAssociation](EnabledByAssociation.md)
+        * **EnabledByGeneProductAssociation**
+
+
+## Slots
+
+| Name | Cardinality and Range | Description | Inheritance |
+| ---  | --- | --- | --- |
+| [part_of](part_of.md) | * <br/> [PartOfProteinComplexAssociation](PartOfProteinComplexAssociation.md) | Associations between the gene product and protein complexes it is a part of | direct |
+| [term](term.md) | 0..1 <br/> [GeneProductTermObject](GeneProductTermObject.md) | A "term" that is an entity database object representing an individual gene pr... | [EnabledByAssociation](EnabledByAssociation.md) |
+| [type](type.md) | 0..1 <br/> [String](String.md) | The type of association | [Association](Association.md) |
+| [evidence](evidence.md) | * <br/> [EvidenceItem](EvidenceItem.md) | The set of evidence items that support the association | [Association](Association.md) |
+| [provenances](provenances.md) | * <br/> [ProvenanceInfo](ProvenanceInfo.md) | The set of provenance objects that provide metadata about who made the associ... | [Association](Association.md) |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+### Schema Source
+
+
+* from schema: https://w3id.org/gocam
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | gocam:EnabledByGeneProductAssociation |
+| native | gocam:EnabledByGeneProductAssociation |
+
+
+
+
+
+
+## LinkML Source
+
 <!-- TODO: investigate https://stackoverflow.com/questions/37606292/how-to-create-tabbed-code-blocks-in-mkdocs-or-sphinx -->
-<h3 id="direct">Direct</h3>
+
+### Direct
+
 <details>
 <pre><code class="language-yaml">name: EnabledByGeneProductAssociation
 description: An association between an activity and an individual gene product
@@ -423,7 +335,9 @@ attributes:
 
 </code></pre>
 </details>
-<h3 id="induced">Induced</h3>
+
+### Induced
+
 <details>
 <pre><code class="language-yaml">name: EnabledByGeneProductAssociation
 description: An association between an activity and an individual gene product
@@ -455,7 +369,6 @@ attributes:
     description: Associations between the gene product and protein complexes it is
       a part of.
     from_schema: https://w3id.org/gocam
-    alias: part_of
     owner: EnabledByGeneProductAssociation
     domain_of:
     - Activity
@@ -486,7 +399,6 @@ attributes:
     - value: RNAcentral:URS00026A1FBE_9606
       description: An RNA product of this RNA central gene
     from_schema: https://w3id.org/gocam
-    alias: term
     owner: EnabledByGeneProductAssociation
     domain_of:
     - MoleculeNode
@@ -503,7 +415,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     designates_type: true
-    alias: type
     owner: EnabledByGeneProductAssociation
     domain_of:
     - Association
@@ -514,7 +425,6 @@ attributes:
     description: The set of evidence items that support the association.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: evidence
     owner: EnabledByGeneProductAssociation
     domain_of:
     - Association
@@ -526,7 +436,6 @@ attributes:
     description: The set of provenance objects that provide metadata about who made
       the association.
     from_schema: https://w3id.org/gocam
-    alias: provenances
     owner: EnabledByGeneProductAssociation
     domain_of:
     - Model
@@ -539,7 +448,7 @@ attributes:
     inlined_as_list: true
 
 </code></pre>
-</details>
+</details></div>
 </article>
 </div>
 <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>

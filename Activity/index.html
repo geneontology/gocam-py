@@ -150,101 +150,6 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#slots">
-<span class="md-ellipsis">
-      
-        Slots
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#usages">
-<span class="md-ellipsis">
-      
-        Usages
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#aliases">
-<span class="md-ellipsis">
-      
-        Aliases
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#identifier-and-mapping-information">
-<span class="md-ellipsis">
-      
-        Identifier and Mapping Information
-      
-    </span>
-</a>
-<nav aria-label="Identifier and Mapping Information" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#schema-source">
-<span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#mappings">
-<span class="md-ellipsis">
-      
-        Mappings
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#linkml-source">
-<span class="md-ellipsis">
-      
-        LinkML Source
-      
-    </span>
-</a>
-<nav aria-label="LinkML Source" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#direct">
-<span class="md-ellipsis">
-      
-        Direct
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#induced">
-<span class="md-ellipsis">
-      
-        Induced
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-</ul>
 </nav>
 </div>
 </div>
@@ -253,7 +158,17 @@
 <article class="md-content__inner md-typeset">
 <h1 id="class-activity">Class: Activity</h1>
 <p><em>An individual activity in a causal model, representing the individual molecular activity of a single gene product or complex in the context of a particular model</em></p>
-<p>URI: <a href="https://w3id.org/gocam/Activity">gocam:Activity</a></p>
+<div data-search-exclude="" markdown="1">
+
+
+
+URI: [gocam:Activity](https://w3id.org/gocam/Activity)
+
+
+
+
+
+
 <div class="mermaid"> classDiagram
     class Activity
     click Activity href "../Activity/"
@@ -350,153 +265,84 @@
 
 </div>
 <!-- no inheritance hierarchy -->
-<h2 id="slots">Slots</h2>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Cardinality and Range</th>
-<th>Description</th>
-<th>Inheritance</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../id/">id</a></td>
-<td>1 <br/> <a href="../Uriorcurie/">Uriorcurie</a></td>
-<td>Identifier of the activity unit</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../enabled_by/">enabled_by</a></td>
-<td>0..1 <em>recommended</em> <br/> <a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
-<td>The gene product or complex that carries out the activity</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../molecular_function/">molecular_function</a></td>
-<td>0..1 <em>recommended</em> <br/> <a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
-<td>The molecular function that is carried out by the gene product or complex</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../occurs_in/">occurs_in</a></td>
-<td>0..1 <em>recommended</em> <br/> <a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
-<td>The cellular location in which the activity occurs</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../part_of/">part_of</a></td>
-<td>0..1 <em>recommended</em> <br/> <a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
-<td>The larger biological process in which the activity is a part</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../happens_during/">happens_during</a></td>
-<td>0..1 <br/> <a href="../PhaseAssociation/">PhaseAssociation</a></td>
-<td>The phase during which the activity takes place</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../molecular_associations/">molecular_associations</a></td>
-<td>* <br/> <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
-<td>Associations between the activity and molecules that are relevant to it</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../causal_associations/">causal_associations</a></td>
-<td>* <br/> <a href="../CausalAssociation/">CausalAssociation</a></td>
-<td>The causal associations that flow out of this activity</td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../provenances/">provenances</a></td>
-<td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
-<td>Provenance information for the activity</td>
-<td>direct</td>
-</tr>
-</tbody>
-</table>
-<h2 id="usages">Usages</h2>
-<table>
-<thead>
-<tr>
-<th>used by</th>
-<th>used in</th>
-<th>type</th>
-<th>used</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../Model/">Model</a></td>
-<td><a href="../activities/">activities</a></td>
-<td>range</td>
-<td><a href="./">Activity</a></td>
-</tr>
-<tr>
-<td><a href="../CausalAssociation/">CausalAssociation</a></td>
-<td><a href="../downstream_activity/">downstream_activity</a></td>
-<td>range</td>
-<td><a href="./">Activity</a></td>
-</tr>
-<tr>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-<td><a href="../start_activities/">start_activities</a></td>
-<td>range</td>
-<td><a href="./">Activity</a></td>
-</tr>
-<tr>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-<td><a href="../end_activities/">end_activities</a></td>
-<td>range</td>
-<td><a href="./">Activity</a></td>
-</tr>
-<tr>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-<td><a href="../intermediate_activities/">intermediate_activities</a></td>
-<td>range</td>
-<td><a href="./">Activity</a></td>
-</tr>
-<tr>
-<td><a href="../QueryIndex/">QueryIndex</a></td>
-<td><a href="../singleton_activities/">singleton_activities</a></td>
-<td>range</td>
-<td><a href="./">Activity</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="aliases">Aliases</h2>
-<ul>
-<li>annoton</li>
-</ul>
-<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
-<h2 id="mappings">Mappings</h2>
-<table>
-<thead>
-<tr>
-<th>Mapping Type</th>
-<th>Mapped Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>self</td>
-<td>gocam:Activity</td>
-</tr>
-<tr>
-<td>native</td>
-<td>gocam:Activity</td>
-</tr>
-</tbody>
-</table>
-<h2 id="linkml-source">LinkML Source</h2>
+
+## Slots
+
+| Name | Cardinality and Range | Description | Inheritance |
+| ---  | --- | --- | --- |
+| [id](id.md) | 1 <br/> [Uriorcurie](Uriorcurie.md) | Identifier of the activity unit | direct |
+| [enabled_by](enabled_by.md) | 0..1 _recommended_ <br/> [EnabledByAssociation](EnabledByAssociation.md) | The gene product or complex that carries out the activity | direct |
+| [molecular_function](molecular_function.md) | 0..1 _recommended_ <br/> [MolecularFunctionAssociation](MolecularFunctionAssociation.md) | The molecular function that is carried out by the gene product or complex | direct |
+| [occurs_in](occurs_in.md) | 0..1 _recommended_ <br/> [CellularAnatomicalEntityAssociation](CellularAnatomicalEntityAssociation.md) | The cellular location in which the activity occurs | direct |
+| [part_of](part_of.md) | 0..1 _recommended_ <br/> [BiologicalProcessAssociation](BiologicalProcessAssociation.md) | The larger biological process in which the activity is a part | direct |
+| [happens_during](happens_during.md) | 0..1 <br/> [PhaseAssociation](PhaseAssociation.md) | The phase during which the activity takes place | direct |
+| [molecular_associations](molecular_associations.md) | * <br/> [MoleculeAssociation](MoleculeAssociation.md) | Associations between the activity and molecules that are relevant to it | direct |
+| [causal_associations](causal_associations.md) | * <br/> [CausalAssociation](CausalAssociation.md) | The causal associations that flow out of this activity | direct |
+| [provenances](provenances.md) | * <br/> [ProvenanceInfo](ProvenanceInfo.md) | Provenance information for the activity | direct |
+
+
+
+
+
+## Usages
+
+| used by | used in | type | used |
+| ---  | --- | --- | --- |
+| [Model](Model.md) | [activities](activities.md) | range | [Activity](Activity.md) |
+| [CausalAssociation](CausalAssociation.md) | [downstream_activity](downstream_activity.md) | range | [Activity](Activity.md) |
+| [QueryIndex](QueryIndex.md) | [start_activities](start_activities.md) | range | [Activity](Activity.md) |
+| [QueryIndex](QueryIndex.md) | [end_activities](end_activities.md) | range | [Activity](Activity.md) |
+| [QueryIndex](QueryIndex.md) | [intermediate_activities](intermediate_activities.md) | range | [Activity](Activity.md) |
+| [QueryIndex](QueryIndex.md) | [singleton_activities](singleton_activities.md) | range | [Activity](Activity.md) |
+
+
+
+
+
+
+
+
+
+## Aliases
+
+
+* annoton
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+### Schema Source
+
+
+* from schema: https://w3id.org/gocam
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | gocam:Activity |
+| native | gocam:Activity |
+
+
+
+
+
+
+## LinkML Source
+
 <!-- TODO: investigate https://stackoverflow.com/questions/37606292/how-to-create-tabbed-code-blocks-in-mkdocs-or-sphinx -->
-<h3 id="direct">Direct</h3>
+
+### Direct
+
 <details>
 <pre><code class="language-yaml">name: Activity
 description: An individual activity in a causal model, representing the individual
@@ -526,7 +372,6 @@ attributes:
     - MoleculeNode
     - Object
     range: uriorcurie
-    required: true
   enabled_by:
     name: enabled_by
     description: The gene product or complex that carries out the activity
@@ -596,7 +441,6 @@ attributes:
     - Activity
     range: MoleculeAssociation
     multivalued: true
-    inlined: true
     inlined_as_list: true
   causal_associations:
     name: causal_associations
@@ -612,7 +456,6 @@ attributes:
     - Activity
     range: CausalAssociation
     multivalued: true
-    inlined: true
     inlined_as_list: true
   provenances:
     name: provenances
@@ -625,12 +468,13 @@ attributes:
     - Association
     range: ProvenanceInfo
     multivalued: true
-    inlined: true
     inlined_as_list: true
 
 </code></pre>
 </details>
-<h3 id="induced">Induced</h3>
+
+### Induced
+
 <details>
 <pre><code class="language-yaml">name: Activity
 description: An individual activity in a causal model, representing the individual
@@ -654,7 +498,6 @@ attributes:
         enabled by NEMF
     from_schema: https://w3id.org/gocam
     identifier: true
-    alias: id
     owner: Activity
     domain_of:
     - Model
@@ -668,7 +511,6 @@ attributes:
     description: The gene product or complex that carries out the activity
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: enabled_by
     owner: Activity
     domain_of:
     - Activity
@@ -683,7 +525,6 @@ attributes:
     - currently BP, CC etc are at the level of the activity, not the MolecularFunctionAssociation
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: molecular_function
     owner: Activity
     domain_of:
     - Activity
@@ -695,7 +536,6 @@ attributes:
     description: The cellular location in which the activity occurs
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: occurs_in
     owner: Activity
     domain_of:
     - Activity
@@ -706,7 +546,6 @@ attributes:
     name: part_of
     description: The larger biological process in which the activity is a part
     from_schema: https://w3id.org/gocam
-    alias: part_of
     owner: Activity
     domain_of:
     - Activity
@@ -724,7 +563,6 @@ attributes:
     description: The phase during which the activity takes place
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: happens_during
     owner: Activity
     domain_of:
     - Activity
@@ -738,7 +576,6 @@ attributes:
       the activity.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: molecular_associations
     owner: Activity
     domain_of:
     - Activity
@@ -756,7 +593,6 @@ attributes:
       activities, it is an initial activity.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: causal_associations
     owner: Activity
     domain_of:
     - Activity
@@ -768,7 +604,6 @@ attributes:
     name: provenances
     description: Provenance information for the activity
     from_schema: https://w3id.org/gocam
-    alias: provenances
     owner: Activity
     domain_of:
     - Model
@@ -781,7 +616,7 @@ attributes:
     inlined_as_list: true
 
 </code></pre>
-</details>
+</details></div>
 </article>
 </div>
 <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>

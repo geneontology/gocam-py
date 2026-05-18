@@ -150,110 +150,6 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#inheritance">
-<span class="md-ellipsis">
-      
-        Inheritance
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#slots">
-<span class="md-ellipsis">
-      
-        Slots
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#usages">
-<span class="md-ellipsis">
-      
-        Usages
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#todos">
-<span class="md-ellipsis">
-      
-        TODOs
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#identifier-and-mapping-information">
-<span class="md-ellipsis">
-      
-        Identifier and Mapping Information
-      
-    </span>
-</a>
-<nav aria-label="Identifier and Mapping Information" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#schema-source">
-<span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#mappings">
-<span class="md-ellipsis">
-      
-        Mappings
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#linkml-source">
-<span class="md-ellipsis">
-      
-        LinkML Source
-      
-    </span>
-</a>
-<nav aria-label="LinkML Source" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#direct">
-<span class="md-ellipsis">
-      
-        Direct
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#induced">
-<span class="md-ellipsis">
-      
-        Induced
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-</ul>
 </nav>
 </div>
 </div>
@@ -262,7 +158,17 @@
 <article class="md-content__inner md-typeset">
 <h1 id="class-molecularfunctionassociation">Class: MolecularFunctionAssociation</h1>
 <p><em>An association between an activity and a molecular function term</em></p>
-<p>URI: <a href="https://w3id.org/gocam/MolecularFunctionAssociation">gocam:MolecularFunctionAssociation</a></p>
+<div data-search-exclude="" markdown="1">
+
+
+
+URI: [gocam:MolecularFunctionAssociation](https://w3id.org/gocam/MolecularFunctionAssociation)
+
+
+
+
+
+
 <div class="mermaid"> classDiagram
     class MolecularFunctionAssociation
     click MolecularFunctionAssociation href "../MolecularFunctionAssociation/"
@@ -306,103 +212,84 @@
 
 
 </div>
-<h2 id="inheritance">Inheritance</h2>
-<ul>
-<li><a href="../Association/">Association</a><ul>
-<li><a href="../TermAssociation/">TermAssociation</a><ul>
-<li><strong>MolecularFunctionAssociation</strong></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="slots">Slots</h2>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Cardinality and Range</th>
-<th>Description</th>
-<th>Inheritance</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../term/">term</a></td>
-<td>0..1 <br/> <a href="../MolecularFunctionTermObject/">MolecularFunctionTermObject</a></td>
-<td>The ontology term that describes the nature of the association</td>
-<td><a href="../TermAssociation/">TermAssociation</a></td>
-</tr>
-<tr>
-<td><a href="../type/">type</a></td>
-<td>0..1 <br/> <a href="../String/">String</a></td>
-<td>The type of association</td>
-<td><a href="../Association/">Association</a></td>
-</tr>
-<tr>
-<td><a href="../evidence/">evidence</a></td>
-<td>* <br/> <a href="../EvidenceItem/">EvidenceItem</a></td>
-<td>The set of evidence items that support the association</td>
-<td><a href="../Association/">Association</a></td>
-</tr>
-<tr>
-<td><a href="../provenances/">provenances</a></td>
-<td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
-<td>The set of provenance objects that provide metadata about who made the associ...</td>
-<td><a href="../Association/">Association</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="usages">Usages</h2>
-<table>
-<thead>
-<tr>
-<th>used by</th>
-<th>used in</th>
-<th>type</th>
-<th>used</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../Activity/">Activity</a></td>
-<td><a href="../molecular_function/">molecular_function</a></td>
-<td>range</td>
-<td><a href="./">MolecularFunctionAssociation</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="todos">TODOs</h2>
-<ul>
-<li>account for non-MF activity types in Reactome (MolecularEvent)</li>
-</ul>
-<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
-<h2 id="mappings">Mappings</h2>
-<table>
-<thead>
-<tr>
-<th>Mapping Type</th>
-<th>Mapped Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>self</td>
-<td>gocam:MolecularFunctionAssociation</td>
-</tr>
-<tr>
-<td>native</td>
-<td>gocam:MolecularFunctionAssociation</td>
-</tr>
-</tbody>
-</table>
-<h2 id="linkml-source">LinkML Source</h2>
+
+
+
+
+
+
+## Inheritance
+* [Association](Association.md)
+    * [TermAssociation](TermAssociation.md)
+        * **MolecularFunctionAssociation**
+
+
+## Slots
+
+| Name | Cardinality and Range | Description | Inheritance |
+| ---  | --- | --- | --- |
+| [term](term.md) | 0..1 <br/> [MolecularFunctionTermObject](MolecularFunctionTermObject.md) | The ontology term that describes the nature of the association | [TermAssociation](TermAssociation.md) |
+| [type](type.md) | 0..1 <br/> [String](String.md) | The type of association | [Association](Association.md) |
+| [evidence](evidence.md) | * <br/> [EvidenceItem](EvidenceItem.md) | The set of evidence items that support the association | [Association](Association.md) |
+| [provenances](provenances.md) | * <br/> [ProvenanceInfo](ProvenanceInfo.md) | The set of provenance objects that provide metadata about who made the associ... | [Association](Association.md) |
+
+
+
+
+
+## Usages
+
+| used by | used in | type | used |
+| ---  | --- | --- | --- |
+| [Activity](Activity.md) | [molecular_function](molecular_function.md) | range | [MolecularFunctionAssociation](MolecularFunctionAssociation.md) |
+
+
+
+
+
+
+
+
+
+
+## TODOs
+
+* account for non-MF activity types in Reactome (MolecularEvent)
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+### Schema Source
+
+
+* from schema: https://w3id.org/gocam
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | gocam:MolecularFunctionAssociation |
+| native | gocam:MolecularFunctionAssociation |
+
+
+
+
+
+
+## LinkML Source
+
 <!-- TODO: investigate https://stackoverflow.com/questions/37606292/how-to-create-tabbed-code-blocks-in-mkdocs-or-sphinx -->
-<h3 id="direct">Direct</h3>
+
+### Direct
+
 <details>
 <pre><code class="language-yaml">name: MolecularFunctionAssociation
 description: An association between an activity and a molecular function term
@@ -417,7 +304,9 @@ slot_usage:
 
 </code></pre>
 </details>
-<h3 id="induced">Induced</h3>
+
+### Induced
+
 <details>
 <pre><code class="language-yaml">name: MolecularFunctionAssociation
 description: An association between an activity and a molecular function term
@@ -434,7 +323,6 @@ attributes:
     name: term
     description: The ontology term that describes the nature of the association
     from_schema: https://w3id.org/gocam
-    alias: term
     owner: MolecularFunctionAssociation
     domain_of:
     - MoleculeNode
@@ -451,7 +339,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     designates_type: true
-    alias: type
     owner: MolecularFunctionAssociation
     domain_of:
     - Association
@@ -462,7 +349,6 @@ attributes:
     description: The set of evidence items that support the association.
     from_schema: https://w3id.org/gocam
     rank: 1000
-    alias: evidence
     owner: MolecularFunctionAssociation
     domain_of:
     - Association
@@ -474,7 +360,6 @@ attributes:
     description: The set of provenance objects that provide metadata about who made
       the association.
     from_schema: https://w3id.org/gocam
-    alias: provenances
     owner: MolecularFunctionAssociation
     domain_of:
     - Model
@@ -487,7 +372,7 @@ attributes:
     inlined_as_list: true
 
 </code></pre>
-</details>
+</details></div>
 </article>
 </div>
 <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>

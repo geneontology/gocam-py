@@ -150,92 +150,6 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">
-<span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#slots">
-<span class="md-ellipsis">
-      
-        Slots
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#usages">
-<span class="md-ellipsis">
-      
-        Usages
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#identifier-and-mapping-information">
-<span class="md-ellipsis">
-      
-        Identifier and Mapping Information
-      
-    </span>
-</a>
-<nav aria-label="Identifier and Mapping Information" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#schema-source">
-<span class="md-ellipsis">
-      
-        Schema Source
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#mappings">
-<span class="md-ellipsis">
-      
-        Mappings
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#linkml-source">
-<span class="md-ellipsis">
-      
-        LinkML Source
-      
-    </span>
-</a>
-<nav aria-label="LinkML Source" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#direct">
-<span class="md-ellipsis">
-      
-        Direct
-      
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#induced">
-<span class="md-ellipsis">
-      
-        Induced
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-</ul>
 </nav>
 </div>
 </div>
@@ -244,7 +158,17 @@
 <article class="md-content__inner md-typeset">
 <h1 id="class-provenanceinfo">Class: ProvenanceInfo</h1>
 <p><em>Provenance information for an object</em></p>
-<p>URI: <a href="https://w3id.org/gocam/ProvenanceInfo">gocam:ProvenanceInfo</a></p>
+<div data-search-exclude="" markdown="1">
+
+
+
+URI: [gocam:ProvenanceInfo](https://w3id.org/gocam/ProvenanceInfo)
+
+
+
+
+
+
 <div class="mermaid"> classDiagram
     class ProvenanceInfo
     click ProvenanceInfo href "../ProvenanceInfo/"
@@ -259,191 +183,86 @@
 
 </div>
 <!-- no inheritance hierarchy -->
-<h2 id="slots">Slots</h2>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Cardinality and Range</th>
-<th>Description</th>
-<th>Inheritance</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../contributor/">contributor</a></td>
-<td>* <br/> <a href="../String/">String</a></td>
-<td></td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../created/">created</a></td>
-<td>0..1 <br/> <a href="../String/">String</a></td>
-<td></td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../date/">date</a></td>
-<td>0..1 <br/> <a href="../String/">String</a></td>
-<td></td>
-<td>direct</td>
-</tr>
-<tr>
-<td><a href="../provided_by/">provided_by</a></td>
-<td>* <br/> <a href="../String/">String</a></td>
-<td></td>
-<td>direct</td>
-</tr>
-</tbody>
-</table>
-<h2 id="usages">Usages</h2>
-<table>
-<thead>
-<tr>
-<th>used by</th>
-<th>used in</th>
-<th>type</th>
-<th>used</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../Model/">Model</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../Activity/">Activity</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../EvidenceItem/">EvidenceItem</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../Association/">Association</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../PartOfProteinComplexAssociation/">PartOfProteinComplexAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../ProteinComplexHasPartAssociation/">ProteinComplexHasPartAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../CausalAssociation/">CausalAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../TermAssociation/">TermAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../PhaseAssociation/">PhaseAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../GrossAnatomyAssociation/">GrossAnatomyAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-<tr>
-<td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
-<td><a href="../provenances/">provenances</a></td>
-<td>range</td>
-<td><a href="./">ProvenanceInfo</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
-<h3 id="schema-source">Schema Source</h3>
-<ul>
-<li>from schema: https://w3id.org/gocam</li>
-</ul>
-<h2 id="mappings">Mappings</h2>
-<table>
-<thead>
-<tr>
-<th>Mapping Type</th>
-<th>Mapped Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>self</td>
-<td>gocam:ProvenanceInfo</td>
-</tr>
-<tr>
-<td>native</td>
-<td>gocam:ProvenanceInfo</td>
-</tr>
-</tbody>
-</table>
-<h2 id="linkml-source">LinkML Source</h2>
+
+## Slots
+
+| Name | Cardinality and Range | Description | Inheritance |
+| ---  | --- | --- | --- |
+| [contributor](contributor.md) | * <br/> [String](String.md) |  | direct |
+| [created](created.md) | 0..1 <br/> [String](String.md) |  | direct |
+| [date](date.md) | 0..1 <br/> [String](String.md) |  | direct |
+| [provided_by](provided_by.md) | * <br/> [String](String.md) |  | direct |
+
+
+
+
+
+## Usages
+
+| used by | used in | type | used |
+| ---  | --- | --- | --- |
+| [Model](Model.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [Activity](Activity.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [EvidenceItem](EvidenceItem.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [Association](Association.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [EnabledByAssociation](EnabledByAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [EnabledByGeneProductAssociation](EnabledByGeneProductAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [EnabledByProteinComplexAssociation](EnabledByProteinComplexAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [PartOfProteinComplexAssociation](PartOfProteinComplexAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [ProteinComplexHasPartAssociation](ProteinComplexHasPartAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [CausalAssociation](CausalAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [TermAssociation](TermAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [MolecularFunctionAssociation](MolecularFunctionAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [BiologicalProcessAssociation](BiologicalProcessAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [PhaseAssociation](PhaseAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [CellularAnatomicalEntityAssociation](CellularAnatomicalEntityAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [CellTypeAssociation](CellTypeAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [GrossAnatomyAssociation](GrossAnatomyAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+| [MoleculeAssociation](MoleculeAssociation.md) | [provenances](provenances.md) | range | [ProvenanceInfo](ProvenanceInfo.md) |
+
+
+
+
+
+
+
+
+
+
+
+
+## Identifier and Mapping Information
+
+
+
+
+
+### Schema Source
+
+
+* from schema: https://w3id.org/gocam
+
+
+
+
+## Mappings
+
+| Mapping Type | Mapped Value |
+| ---  | ---  |
+| self | gocam:ProvenanceInfo |
+| native | gocam:ProvenanceInfo |
+
+
+
+
+
+
+## LinkML Source
+
 <!-- TODO: investigate https://stackoverflow.com/questions/37606292/how-to-create-tabbed-code-blocks-in-mkdocs-or-sphinx -->
-<h3 id="direct">Direct</h3>
+
+### Direct
+
 <details>
 <pre><code class="language-yaml">name: ProvenanceInfo
 description: Provenance information for an object
@@ -484,7 +303,9 @@ attributes:
 
 </code></pre>
 </details>
-<h3 id="induced">Induced</h3>
+
+### Induced
+
 <details>
 <pre><code class="language-yaml">name: ProvenanceInfo
 description: Provenance information for an object
@@ -495,7 +316,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: dct:contributor
-    alias: contributor
     owner: ProvenanceInfo
     domain_of:
     - ProvenanceInfo
@@ -506,7 +326,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: dct:created
-    alias: created
     owner: ProvenanceInfo
     domain_of:
     - ProvenanceInfo
@@ -518,7 +337,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: dct:date
-    alias: date
     owner: ProvenanceInfo
     domain_of:
     - ProvenanceInfo
@@ -528,7 +346,6 @@ attributes:
     from_schema: https://w3id.org/gocam
     rank: 1000
     slot_uri: pav:providedBy
-    alias: provided_by
     owner: ProvenanceInfo
     domain_of:
     - ProvenanceInfo
@@ -536,7 +353,7 @@ attributes:
     multivalued: true
 
 </code></pre>
-</details>
+</details></div>
 </article>
 </div>
 <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
