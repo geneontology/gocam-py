@@ -150,6 +150,92 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#slots">
+<span class="md-ellipsis">
+      
+        Slots
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#usages">
+<span class="md-ellipsis">
+      
+        Usages
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identifier-and-mapping-information">
+<span class="md-ellipsis">
+      
+        Identifier and Mapping Information
+      
+    </span>
+</a>
+<nav aria-label="Identifier and Mapping Information" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#schema-source">
+<span class="md-ellipsis">
+      
+        Schema Source
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mappings">
+<span class="md-ellipsis">
+      
+        Mappings
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#linkml-source">
+<span class="md-ellipsis">
+      
+        LinkML Source
+      
+    </span>
+</a>
+<nav aria-label="LinkML Source" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#direct">
+<span class="md-ellipsis">
+      
+        Direct
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#induced">
+<span class="md-ellipsis">
+      
+        Induced
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
 </nav>
 </div>
 </div>
@@ -158,17 +244,8 @@
 <article class="md-content__inner md-typeset">
 <h1 id="class-evidenceitem">Class: EvidenceItem</h1>
 <p><em>An individual piece of evidence that is associated with an assertion in a model</em></p>
-<div data-search-exclude="" markdown="1">
-
-
-
-URI: [gocam:EvidenceItem](https://w3id.org/gocam/EvidenceItem)
-
-
-
-
-
-
+<div>
+<p>URI: <a href="https://w3id.org/gocam/EvidenceItem">gocam:EvidenceItem</a></p>
 <div class="mermaid"> classDiagram
     class EvidenceItem
     click EvidenceItem href "../EvidenceItem/"
@@ -219,83 +296,173 @@ URI: [gocam:EvidenceItem](https://w3id.org/gocam/EvidenceItem)
 
 </div>
 <!-- no inheritance hierarchy -->
-
-## Slots
-
-| Name | Cardinality and Range | Description | Inheritance |
-| ---  | --- | --- | --- |
-| [term](term.md) | 0..1 <br/> [EvidenceTermObject](EvidenceTermObject.md) | The ECO term representing the type of evidence | direct |
-| [reference](reference.md) | 0..1 <br/> [PublicationObject](PublicationObject.md) | The publication of reference that describes the evidence | direct |
-| [with_objects](with_objects.md) | * <br/> [Object](Object.md) | Supporting database entities or terms | direct |
-| [provenances](provenances.md) | * <br/> [ProvenanceInfo](ProvenanceInfo.md) | Provenance about the assertion, e | direct |
-
-
-
-
-
-## Usages
-
-| used by | used in | type | used |
-| ---  | --- | --- | --- |
-| [Association](Association.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [EnabledByAssociation](EnabledByAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [EnabledByGeneProductAssociation](EnabledByGeneProductAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [EnabledByProteinComplexAssociation](EnabledByProteinComplexAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [PartOfProteinComplexAssociation](PartOfProteinComplexAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [ProteinComplexHasPartAssociation](ProteinComplexHasPartAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [CausalAssociation](CausalAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [TermAssociation](TermAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [MolecularFunctionAssociation](MolecularFunctionAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [BiologicalProcessAssociation](BiologicalProcessAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [PhaseAssociation](PhaseAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [CellularAnatomicalEntityAssociation](CellularAnatomicalEntityAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [CellTypeAssociation](CellTypeAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [GrossAnatomyAssociation](GrossAnatomyAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-| [MoleculeAssociation](MoleculeAssociation.md) | [evidence](evidence.md) | range | [EvidenceItem](EvidenceItem.md) |
-
-
-
-
-
-
-
-
-
-
-
-
-## Identifier and Mapping Information
-
-
-
-
-
-### Schema Source
-
-
-* from schema: https://w3id.org/gocam
-
-
-
-
-## Mappings
-
-| Mapping Type | Mapped Value |
-| ---  | ---  |
-| self | gocam:EvidenceItem |
-| native | gocam:EvidenceItem |
-
-
-
-
-
-
-## LinkML Source
-
+<h2 id="slots">Slots</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Cardinality and Range</th>
+<th>Description</th>
+<th>Inheritance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../term/">term</a></td>
+<td>0..1 <br/> <a href="../EvidenceTermObject/">EvidenceTermObject</a></td>
+<td>The ECO term representing the type of evidence</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../reference/">reference</a></td>
+<td>0..1 <br/> <a href="../PublicationObject/">PublicationObject</a></td>
+<td>The publication of reference that describes the evidence</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../with_objects/">with_objects</a></td>
+<td>* <br/> <a href="../Object/">Object</a></td>
+<td>Supporting database entities or terms</td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../provenances/">provenances</a></td>
+<td>* <br/> <a href="../ProvenanceInfo/">ProvenanceInfo</a></td>
+<td>Provenance about the assertion, e</td>
+<td>direct</td>
+</tr>
+</tbody>
+</table>
+<h2 id="usages">Usages</h2>
+<table>
+<thead>
+<tr>
+<th>used by</th>
+<th>used in</th>
+<th>type</th>
+<th>used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../Association/">Association</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../EnabledByAssociation/">EnabledByAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../EnabledByGeneProductAssociation/">EnabledByGeneProductAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../EnabledByProteinComplexAssociation/">EnabledByProteinComplexAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../PartOfProteinComplexAssociation/">PartOfProteinComplexAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../ProteinComplexHasPartAssociation/">ProteinComplexHasPartAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../CausalAssociation/">CausalAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../TermAssociation/">TermAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../MolecularFunctionAssociation/">MolecularFunctionAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../BiologicalProcessAssociation/">BiologicalProcessAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../PhaseAssociation/">PhaseAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../CellularAnatomicalEntityAssociation/">CellularAnatomicalEntityAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../CellTypeAssociation/">CellTypeAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../GrossAnatomyAssociation/">GrossAnatomyAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+<tr>
+<td><a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td><a href="../evidence/">evidence</a></td>
+<td>range</td>
+<td><a href="./">EvidenceItem</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
+<h3 id="schema-source">Schema Source</h3>
+<ul>
+<li>from schema: https://w3id.org/gocam</li>
+</ul>
+<h2 id="mappings">Mappings</h2>
+<table>
+<thead>
+<tr>
+<th>Mapping Type</th>
+<th>Mapped Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>self</td>
+<td>gocam:EvidenceItem</td>
+</tr>
+<tr>
+<td>native</td>
+<td>gocam:EvidenceItem</td>
+</tr>
+</tbody>
+</table>
+<h2 id="linkml-source">LinkML Source</h2>
 <!-- TODO: investigate https://stackoverflow.com/questions/37606292/how-to-create-tabbed-code-blocks-in-mkdocs-or-sphinx -->
-
-### Direct
-
+<h3 id="direct">Direct</h3>
 <details>
 <pre><code class="language-yaml">name: EvidenceItem
 description: An individual piece of evidence that is associated with an assertion
@@ -358,9 +525,7 @@ attributes:
 
 </code></pre>
 </details>
-
-### Induced
-
+<h3 id="induced">Induced</h3>
 <details>
 <pre><code class="language-yaml">name: EvidenceItem
 description: An individual piece of evidence that is associated with an assertion
@@ -427,7 +592,8 @@ attributes:
     inlined_as_list: true
 
 </code></pre>
-</details></div>
+</details>
+</div>
 </article>
 </div>
 <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>

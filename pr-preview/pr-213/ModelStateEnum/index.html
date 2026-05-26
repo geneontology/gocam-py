@@ -285,6 +285,75 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#permissible-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permissible Values
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#slots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slots
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifier-and-mapping-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identifier and Mapping Information
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Identifier and Mapping Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#schema-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Schema Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linkml-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LinkML Source
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -305,57 +374,76 @@
 
 <h1 id="enum-modelstateenum">Enum: ModelStateEnum</h1>
 <p><em>A term describing where the model is in the development life cycle.</em></p>
-<div data-search-exclude markdown="1">
-
-URI: [gocam:ModelStateEnum](https://w3id.org/gocam/ModelStateEnum)
-
-## Permissible Values
-| Value | Meaning | Description |
-| --- | --- | --- |
-| development | None | Used when the curator is still working on the model |
-| production | None | Used when the curator has declared the model is ready for public consumption |
-| delete | None | When the curator has marked for future deletion |
-| review | None | The model has been marked for curator review |
-| internal_test | None | The model is not intended for use public use; it is likely to be used for int... |
-| template | None | The model is a template that is not intended to represent a specific biologic... |
-| closed | None | TBD |
-
-
-
-
-## Slots
-
-| Name | Description |
-| ---  | --- |
-| [status](status.md) | The status of the model in terms of its progression along the developmental l... |
-
-
-
-
-
-
-
-
-
-
-## Identifier and Mapping Information
-
-
-
-
-
-### Schema Source
-
-
-* from schema: https://w3id.org/gocam
-
-
-
-
-
-
-## LinkML Source
-
+<div>
+<p>URI: <a href="https://w3id.org/gocam/ModelStateEnum">gocam:ModelStateEnum</a></p>
+<h2 id="permissible-values">Permissible Values</h2>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>development</td>
+<td>None</td>
+<td>Used when the curator is still working on the model</td>
+</tr>
+<tr>
+<td>production</td>
+<td>None</td>
+<td>Used when the curator has declared the model is ready for public consumption</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>None</td>
+<td>When the curator has marked for future deletion</td>
+</tr>
+<tr>
+<td>review</td>
+<td>None</td>
+<td>The model has been marked for curator review</td>
+</tr>
+<tr>
+<td>internal_test</td>
+<td>None</td>
+<td>The model is not intended for use public use; it is likely to be used for int...</td>
+</tr>
+<tr>
+<td>template</td>
+<td>None</td>
+<td>The model is a template that is not intended to represent a specific biologic...</td>
+</tr>
+<tr>
+<td>closed</td>
+<td>None</td>
+<td>TBD</td>
+</tr>
+</tbody>
+</table>
+<h2 id="slots">Slots</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../status/">status</a></td>
+<td>The status of the model in terms of its progression along the developmental l...</td>
+</tr>
+</tbody>
+</table>
+<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
+<h3 id="schema-source">Schema Source</h3>
+<ul>
+<li>from schema: https://w3id.org/gocam</li>
+</ul>
+<h2 id="linkml-source">LinkML Source</h2>
 <details>
 
 <pre><code class="language-yaml">name: ModelStateEnum
@@ -399,7 +487,6 @@ permissible_values:
 </code></pre>
 
 </details>
-
 </div>
 
 

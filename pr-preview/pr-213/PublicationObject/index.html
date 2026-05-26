@@ -150,6 +150,110 @@
 <div class="md-sidebar__scrollwrap">
 <div class="md-sidebar__inner">
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#inheritance">
+<span class="md-ellipsis">
+      
+        Inheritance
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#slots">
+<span class="md-ellipsis">
+      
+        Slots
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#usages">
+<span class="md-ellipsis">
+      
+        Usages
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#identifier-and-mapping-information">
+<span class="md-ellipsis">
+      
+        Identifier and Mapping Information
+      
+    </span>
+</a>
+<nav aria-label="Identifier and Mapping Information" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#valid-id-prefixes">
+<span class="md-ellipsis">
+      
+        Valid ID Prefixes
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#schema-source">
+<span class="md-ellipsis">
+      
+        Schema Source
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mappings">
+<span class="md-ellipsis">
+      
+        Mappings
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#linkml-source">
+<span class="md-ellipsis">
+      
+        LinkML Source
+      
+    </span>
+</a>
+<nav aria-label="LinkML Source" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#direct">
+<span class="md-ellipsis">
+      
+        Direct
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#induced">
+<span class="md-ellipsis">
+      
+        Induced
+      
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
 </nav>
 </div>
 </div>
@@ -158,17 +262,8 @@
 <article class="md-content__inner md-typeset">
 <h1 id="class-publicationobject">Class: PublicationObject</h1>
 <p><em>An object that represents a publication or other kind of reference</em></p>
-<div data-search-exclude="" markdown="1">
-
-
-
-URI: [gocam:PublicationObject](https://w3id.org/gocam/PublicationObject)
-
-
-
-
-
-
+<div>
+<p>URI: <a href="https://w3id.org/gocam/PublicationObject">gocam:PublicationObject</a></p>
 <div class="mermaid"> classDiagram
     class PublicationObject
     click PublicationObject href "../PublicationObject/"
@@ -189,94 +284,127 @@ URI: [gocam:PublicationObject](https://w3id.org/gocam/PublicationObject)
 
 
 </div>
-
-
-
-
-
-
-## Inheritance
-* [Object](Object.md)
-    * **PublicationObject**
-
-
-## Slots
-
-| Name | Cardinality and Range | Description | Inheritance |
-| ---  | --- | --- | --- |
-| [abstract_text](abstract_text.md) | 0..1 <br/> [String](String.md) |  | direct |
-| [full_text](full_text.md) | 0..1 <br/> [String](String.md) |  | direct |
-| [id](id.md) | 1 <br/> [Uriorcurie](Uriorcurie.md) |  | [Object](Object.md) |
-| [label](label.md) | 0..1 <br/> [String](String.md) |  | [Object](Object.md) |
-| [type](type.md) | 0..1 <br/> [Uriorcurie](Uriorcurie.md) |  | [Object](Object.md) |
-| [obsolete](obsolete.md) | 0..1 <br/> [Boolean](Boolean.md) |  | [Object](Object.md) |
-
-
-
-
-
-## Usages
-
-| used by | used in | type | used |
-| ---  | --- | --- | --- |
-| [EvidenceItem](EvidenceItem.md) | [reference](reference.md) | range | [PublicationObject](PublicationObject.md) |
-| [QueryIndex](QueryIndex.md) | [flattened_references](flattened_references.md) | range | [PublicationObject](PublicationObject.md) |
-
-
-
-
-
-
-
-
-
-
-
-
-## Identifier and Mapping Information
-
-### Valid ID Prefixes
-
-Instances of this class *should* have identifiers with one of the following prefixes:
-
-* PMID
-
-* GOREF
-
-* DOI
-
-
-
-
-
-
-
-### Schema Source
-
-
-* from schema: https://w3id.org/gocam
-
-
-
-
-## Mappings
-
-| Mapping Type | Mapped Value |
-| ---  | ---  |
-| self | gocam:PublicationObject |
-| native | gocam:PublicationObject |
-
-
-
-
-
-
-## LinkML Source
-
+<h2 id="inheritance">Inheritance</h2>
+<ul>
+<li><a href="../Object/">Object</a><ul>
+<li><strong>PublicationObject</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="slots">Slots</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Cardinality and Range</th>
+<th>Description</th>
+<th>Inheritance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../abstract_text/">abstract_text</a></td>
+<td>0..1 <br/> <a href="../String/">String</a></td>
+<td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../full_text/">full_text</a></td>
+<td>0..1 <br/> <a href="../String/">String</a></td>
+<td></td>
+<td>direct</td>
+</tr>
+<tr>
+<td><a href="../id/">id</a></td>
+<td>1 <br/> <a href="../Uriorcurie/">Uriorcurie</a></td>
+<td></td>
+<td><a href="../Object/">Object</a></td>
+</tr>
+<tr>
+<td><a href="../label/">label</a></td>
+<td>0..1 <br/> <a href="../String/">String</a></td>
+<td></td>
+<td><a href="../Object/">Object</a></td>
+</tr>
+<tr>
+<td><a href="../type/">type</a></td>
+<td>0..1 <br/> <a href="../Uriorcurie/">Uriorcurie</a></td>
+<td></td>
+<td><a href="../Object/">Object</a></td>
+</tr>
+<tr>
+<td><a href="../obsolete/">obsolete</a></td>
+<td>0..1 <br/> <a href="../Boolean/">Boolean</a></td>
+<td></td>
+<td><a href="../Object/">Object</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="usages">Usages</h2>
+<table>
+<thead>
+<tr>
+<th>used by</th>
+<th>used in</th>
+<th>type</th>
+<th>used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../EvidenceItem/">EvidenceItem</a></td>
+<td><a href="../reference/">reference</a></td>
+<td>range</td>
+<td><a href="./">PublicationObject</a></td>
+</tr>
+<tr>
+<td><a href="../QueryIndex/">QueryIndex</a></td>
+<td><a href="../flattened_references/">flattened_references</a></td>
+<td>range</td>
+<td><a href="./">PublicationObject</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
+<h3 id="valid-id-prefixes">Valid ID Prefixes</h3>
+<p>Instances of this class <em>should</em> have identifiers with one of the following prefixes:</p>
+<ul>
+<li>
+<p>PMID</p>
+</li>
+<li>
+<p>GOREF</p>
+</li>
+<li>
+<p>DOI</p>
+</li>
+</ul>
+<h3 id="schema-source">Schema Source</h3>
+<ul>
+<li>from schema: https://w3id.org/gocam</li>
+</ul>
+<h2 id="mappings">Mappings</h2>
+<table>
+<thead>
+<tr>
+<th>Mapping Type</th>
+<th>Mapped Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>self</td>
+<td>gocam:PublicationObject</td>
+</tr>
+<tr>
+<td>native</td>
+<td>gocam:PublicationObject</td>
+</tr>
+</tbody>
+</table>
+<h2 id="linkml-source">LinkML Source</h2>
 <!-- TODO: investigate https://stackoverflow.com/questions/37606292/how-to-create-tabbed-code-blocks-in-mkdocs-or-sphinx -->
-
-### Direct
-
+<h3 id="direct">Direct</h3>
 <details>
 <pre><code class="language-yaml">name: PublicationObject
 id_prefixes:
@@ -302,9 +430,7 @@ attributes:
 
 </code></pre>
 </details>
-
-### Induced
-
+<h3 id="induced">Induced</h3>
 <details>
 <pre><code class="language-yaml">name: PublicationObject
 id_prefixes:
@@ -371,7 +497,8 @@ attributes:
     range: boolean
 
 </code></pre>
-</details></div>
+</details>
+</div>
 </article>
 </div>
 <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
