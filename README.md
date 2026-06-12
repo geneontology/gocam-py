@@ -509,6 +509,23 @@ objects:
 
 ```
 
+## Building
+Install uv.  Instructions are available from https://berkeleybop.org/best_practice/python_environments
+Install Graphviz.  Instructions are available from https://pygraphviz.github.io/documentation/stable/install.html#recommended
+```
+git clone https://github.com/geneontology/gocam-py
+cd gocam-py
+uv sync --all-extras
+source .venv/bin/activate
+```
+
+## Running Tests
+Use pytest command
+```
+pytest tests/test_data.py
+```
+
+
 ## CX2 Conversion
 
 Additional dependencies are required for CX2 conversion. Install them with the `cx2` extras:
