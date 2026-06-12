@@ -192,22 +192,42 @@ class InformationBiomacromoleculeCategory(str, Enum):
     Unknown = "Unknown"
 
 
+class DirectnessEnum(str, Enum):
+    """
+    A term describing whether a causal relationship is direct or indirect
+    """
+    DIRECT = "DIRECT"
+    INDIRECT = "INDIRECT"
+
+
+class EffectDirectionEnum(str, Enum):
+    """
+    A term describing whether a causal relationship is positive or negative
+    """
+    POSITIVE = "POSITIVE"
+    NEGATIVE = "NEGATIVE"
+
+
 class CausalPredicateEnum(str, Enum):
     """
     A term describing the causal relationship between two activities. All terms are drawn from the "causally upstream or within" (RO:0002418) branch of the Relation Ontology (RO).
     """
+    constitutively_upstream_of = "constitutively upstream of"
+    provides_input_for = "provides input for"
+    removes_input_for = "removes input for"
+    causally_upstream_of = "causally upstream of"
     causally_upstream_of_positive_effect = "causally upstream of, positive effect"
     causally_upstream_of_negative_effect = "causally upstream of, negative effect"
-    causally_upstream_of = "causally upstream of"
-    immediately_causally_upstream_of = "immediately causally upstream of"
-    causally_upstream_of_or_within = "causally upstream of or within"
-    causally_upstream_of_or_within_negative_effect = "causally upstream of or within, negative effect"
-    causally_upstream_of_or_within_positive_effect = "causally upstream of or within, positive effect"
     regulates = "regulates"
     negatively_regulates = "negatively regulates"
     positively_regulates = "positively regulates"
-    provides_input_for = "provides input for"
-    removes_input_for = "removes input for"
+    directly_negatively_regulates = "directly negatively regulates"
+    indirectly_negatively_regulates = "indirectly negatively regulates"
+    directly_positively_regulates = "directly positively regulates"
+    indirectly_positively_regulates = "indirectly positively regulates"
+    is_small_molecule_regulator_of = "is small molecule regulator of"
+    is_small_molecule_activator_of = "is small molecule activator of"
+    is_small_molecule_inhibitor_of = "is small molecule inhibitor of"
 
 
 class EvidenceCodeEnum(str):
@@ -217,9 +237,30 @@ class EvidenceCodeEnum(str):
     pass
 
 
+class MolecularFunctionEnum(str):
+    """
+    A term from the molecular function branch of GO
+    """
+    pass
+
+
+class BiologicalProcessEnum(str):
+    """
+    A term from the biological process branch of GO
+    """
+    pass
+
+
 class CellularAnatomicalEntityEnum(str):
     """
     A term from the subset of the cellular anatomical entity branch of GO CC
+    """
+    pass
+
+
+class PhaseEnum(str):
+    """
+    A term from either the phase branch of GO or the phase branch of an anatomy ontology
     """
     pass
 
@@ -508,7 +549,10 @@ class CausalAssociation(Association):
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam'})
 
-    predicate: Optional[str] = Field(default=None, description="""The RO relation that represents the type of relationship""", json_schema_extra = { "linkml_meta": {'domain_of': ['CausalAssociation', 'MoleculeAssociation']} })
+    predicate: Optional[str] = Field(default=None, description="""The RO relation that represents the type of relationship""", json_schema_extra = { "linkml_meta": {'bindings': [{'binds_value_of': 'id',
+                       'obligation_level': 'REQUIRED',
+                       'range': 'CausalPredicateEnum'}],
+         'domain_of': ['CausalAssociation', 'MoleculeAssociation']} })
     downstream_activity: Optional[str] = Field(default=None, description="""The activity unit that is downstream of this one""", json_schema_extra = { "linkml_meta": {'aliases': ['object'], 'domain_of': ['CausalAssociation']} })
     type: Literal["CausalAssociation"] = Field(default="CausalAssociation", description="""The type of association.""", json_schema_extra = { "linkml_meta": {'comments': ['when instantiating Association objects in Python and other '
                       "languages, it isn't necessary to populate this, it is "
@@ -598,11 +642,17 @@ class MolecularFunctionAssociation(TermAssociation):
     An association between an activity and a molecular function term
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
-         'slot_usage': {'term': {'name': 'term',
+         'slot_usage': {'term': {'bindings': [{'binds_value_of': 'id',
+                                               'obligation_level': 'REQUIRED',
+                                               'range': 'MolecularFunctionEnum'}],
+                                 'name': 'term',
                                  'range': 'MolecularFunctionTermObject'}},
          'todos': ['account for non-MF activity types in Reactome (MolecularEvent)']})
 
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'bindings': [{'binds_value_of': 'id',
+                       'obligation_level': 'REQUIRED',
+                       'range': 'MolecularFunctionEnum'}],
+         'domain_of': ['MoleculeNode',
                        'EvidenceItem',
                        'EnabledByAssociation',
                        'TermAssociation']} })
@@ -620,7 +670,10 @@ class BiologicalProcessAssociation(TermAssociation):
     An association between an activity and a biological process term
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
-         'slot_usage': {'term': {'name': 'term',
+         'slot_usage': {'term': {'bindings': [{'binds_value_of': 'id',
+                                               'obligation_level': 'REQUIRED',
+                                               'range': 'BiologicalProcessEnum'}],
+                                 'name': 'term',
                                  'range': 'BiologicalProcessTermObject'}}})
 
     happens_during: Optional[PhaseAssociation] = Field(default=None, description="""Optional extension describing the phase during which the BP takes place""", json_schema_extra = { "linkml_meta": {'domain_of': ['Activity', 'BiologicalProcessAssociation']} })
@@ -631,7 +684,10 @@ class BiologicalProcessAssociation(TermAssociation):
                        'CellularAnatomicalEntityAssociation',
                        'CellTypeAssociation',
                        'GrossAnatomyAssociation']} })
-    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+    term: Optional[str] = Field(default=None, description="""The ontology term that describes the nature of the association""", json_schema_extra = { "linkml_meta": {'bindings': [{'binds_value_of': 'id',
+                       'obligation_level': 'REQUIRED',
+                       'range': 'BiologicalProcessEnum'}],
+         'domain_of': ['MoleculeNode',
                        'EvidenceItem',
                        'EnabledByAssociation',
                        'TermAssociation']} })
@@ -649,13 +705,19 @@ class PhaseAssociation(TermAssociation):
     An association between an activity or biological process and a phase term
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/gocam',
-         'slot_usage': {'term': {'description': 'The phase ontology term associated '
+         'slot_usage': {'term': {'bindings': [{'binds_value_of': 'id',
+                                               'obligation_level': 'REQUIRED',
+                                               'range': 'PhaseEnum'}],
+                                 'description': 'The phase ontology term associated '
                                                 'with the biological process (not the '
                                                 'relation type)',
                                  'name': 'term',
                                  'range': 'PhaseTermObject'}}})
 
-    term: Optional[str] = Field(default=None, description="""The phase ontology term associated with the biological process (not the relation type)""", json_schema_extra = { "linkml_meta": {'domain_of': ['MoleculeNode',
+    term: Optional[str] = Field(default=None, description="""The phase ontology term associated with the biological process (not the relation type)""", json_schema_extra = { "linkml_meta": {'bindings': [{'binds_value_of': 'id',
+                       'obligation_level': 'REQUIRED',
+                       'range': 'PhaseEnum'}],
+         'domain_of': ['MoleculeNode',
                        'EvidenceItem',
                        'EnabledByAssociation',
                        'TermAssociation']} })

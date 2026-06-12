@@ -406,6 +406,10 @@ classes:
       predicate:
         description: The RO relation that represents the type of relationship
         range: PredicateTermObject
+        bindings:
+          - binds_value_of: id
+            range: CausalPredicateEnum
+            obligation_level: REQUIRED
       downstream_activity:
         description: The activity unit that is downstream of this one
         aliases:
@@ -431,6 +435,10 @@ classes:
     slot_usage:
       term:
         range: MolecularFunctionTermObject
+        bindings:
+          - binds_value_of: id
+            range: MolecularFunctionEnum
+            obligation_level: REQUIRED
 
   BiologicalProcessAssociation:
     description: An association between an activity and a biological process term
@@ -446,6 +454,10 @@ classes:
     slot_usage:
       term:
         range: BiologicalProcessTermObject
+        bindings:
+          - binds_value_of: id
+            range: BiologicalProcessEnum
+            obligation_level: REQUIRED
 
   PhaseAssociation:
     description: An association between an activity or biological process and a phase term
@@ -454,6 +466,10 @@ classes:
       term:
         description: The phase ontology term associated with the biological process (not the relation type)
         range: PhaseTermObject
+        bindings:
+          - binds_value_of: id
+            range: PhaseEnum
+            obligation_level: REQUIRED
 
   CellularAnatomicalEntityAssociation:
     description: An association between an activity and a cellular anatomical entity term
@@ -881,40 +897,127 @@ enums:
       MacromolecularComplex:
       Unknown:
 
+  DirectnessEnum:
+    description: A term describing whether a causal relationship is direct or indirect
+    permissible_values:
+      DIRECT:
+      INDIRECT:
+
+  EffectDirectionEnum:
+    description: A term describing whether a causal relationship is positive or negative
+    permissible_values:
+      POSITIVE:
+      NEGATIVE:
+
   CausalPredicateEnum:
     description: A term describing the causal relationship between two activities. All terms are drawn from
       the "causally upstream or within" (RO:0002418) branch of the Relation Ontology (RO).
     permissible_values:
-      causally upstream of, positive effect:
-        meaning: RO:0002304
-      causally upstream of, negative effect:
-        meaning: RO:0002305
-      causally upstream of:
-        meaning: RO:0002411
-      immediately causally upstream of:
-        meaning: RO:0002412
-      causally upstream of or within:
-        meaning: RO:0002418
-      causally upstream of or within, negative effect:
-        meaning: RO:0004046
-      causally upstream of or within, positive effect:
-        meaning: RO:0004047
-      regulates:
-        meaning: RO:0002211
-      negatively regulates:
-        meaning: RO:0002212
-      positively regulates:
-        meaning: RO:0002213
+      constitutively upstream of:
+        meaning: RO:0012009
       provides input for:
         meaning: RO:0002413
       removes input for:
         meaning: RO:0012010
+      causally upstream of:
+        meaning: RO:0002411
+        aliases:
+         - undetermined
+        annotations:
+          abstract: true
+      causally upstream of, positive effect:
+        is_a: causally upstream of
+        meaning: RO:0002304
+        annotations:
+          symbol: "+"
+          direction: POSITIVE
+      causally upstream of, negative effect:
+        is_a: causally upstream of
+        meaning: RO:0002305
+        annotations:
+          symbol: "-"
+          direction: NEGATIVE
+      regulates:
+        is_a: causally upstream of
+        meaning: RO:0002211
+        annotations:
+          abstract: true
+          symbol: "R"
+      negatively regulates:
+        is_a: regulates
+        meaning: RO:0002212
+        annotations:
+          abstract: true
+          symbol: "-R"
+          direction: NEGATIVE
+      positively regulates:
+        is_a: regulates
+        meaning: RO:0002213
+        annotations:
+          abstract: true
+          symbol: "+R"
+          direction: POSITIVE
+      directly negatively regulates:
+        is_a: negatively regulates
+        meaning: RO:0002630
+        annotations:
+          directness: DIRECT
+          direction: NEGATIVE
+      indirectly negatively regulates:
+        is_a: negatively regulates
+        meaning: RO:0002409
+        annotations:
+          directness: INDIRECT
+          direction: NEGATIVE
+      directly positively regulates:
+        is_a: positively regulates
+        meaning: RO:0002629
+        annotations:
+          directness: DIRECT
+          direction: POSITIVE
+      indirectly positively regulates:
+        is_a: positively regulates
+        meaning: RO:0002407
+        annotations:
+          directness: INDIRECT
+          direction: POSITIVE
+      is small molecule regulator of:
+        meaning: RO:0012004
+      is small molecule activator of:
+        is_a: is small molecule regulator of
+        meaning: RO:0012005
+        annotations:
+          direction: POSITIVE
+      is small molecule inhibitor of:
+        is_a: is small molecule regulator of
+        meaning: RO:0012006
+        annotations:
+          direction: NEGATIVE
+
 
   EvidenceCodeEnum:
     description: A term from the subset of ECO that maps up to a GAF evidence code
     reachable_from:
       source_nodes:
         - ECO:0000000
+      is_direct: false
+      relationship_types:
+        - rdfs:subClassOf
+
+  MolecularFunctionEnum:
+    description: A term from the molecular function branch of GO
+    reachable_from:
+      source_nodes:
+        - GO:0003674 # molecular_function
+      is_direct: false
+      relationship_types:
+        - rdfs:subClassOf
+
+  BiologicalProcessEnum:
+    description: A term from the biological process branch of GO
+    reachable_from:
+      source_nodes:
+        - GO:0008150 # biological_process
       is_direct: false
       relationship_types:
         - rdfs:subClassOf
@@ -928,20 +1031,18 @@ enums:
       relationship_types:
         - rdfs:subClassOf
 
-# This enum is not currently used, but it causes issues for `gen-doc` in linkml 1.10.0.
-# See: https://github.com/linkml/linkml/issues/3242
-#  PhaseEnum:
-#    description: A term from either the phase branch of GO or the phase branch of an anatomy ontology
-#    include:
-#      - reachable_from:
-#          source_nodes:
-#            - GO:0044848 # biological phase
-#          is_direct: false
-#          relationship_types:
-#            - rdfs:subClassOf
-#      - reachable_from:
-#          source_nodes:
-#            - UBERON:0000105 # life cycle stage
-#          is_direct: false
-#          relationship_types:
-#            - rdfs:subClassOf
+  PhaseEnum:
+    description: A term from either the phase branch of GO or the phase branch of an anatomy ontology
+    include:
+      - reachable_from:
+          source_nodes:
+            - GO:0044848 # biological phase
+          is_direct: false
+          relationship_types:
+            - rdfs:subClassOf
+      - reachable_from:
+          source_nodes:
+            - UBERON:0000105 # life cycle stage
+          is_direct: false
+          relationship_types:
+            - rdfs:subClassOf
