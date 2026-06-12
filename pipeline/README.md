@@ -234,16 +234,15 @@ references/PMIDs, and inferred relations (activity pairs connected via shared ch
 - `aggregate_group_stats.json` — cross-group aggregate statistics
 - `aggregate_protein_complex.json` — one record per activity enabled by a protein complex
 - `member_variable_definitions.json` — descriptions for every field used in the outputs above
-- `gene_id_to_label.json` — flat `{ gene_id: label }` lookup for every gene-product enabler and
-  protein-complex member gene encountered (e.g. `UniProtKB:P12345 → "TP53"`). Useful for rendering
+- `id_to_label.json` — flat `{ id: label }` lookup for every identifier in the models' `objects`
+  indexes (gene products, protein complexes, molecule inputs/outputs, CHEBI molecules, GO terms,
+  etc.; e.g. `UniProtKB:P12345 → "TP53"`, `CHEBI:58199 → "(R)-malate(2-)"`). Useful for rendering
   the bare CURIEs in the stats outputs without re-querying an ontology service.
-- `chebi_id_to_label.json` — flat `{ chebi_id: label }` lookup for every CHEBI molecule that
-  appears as an input or output (e.g. `CHEBI:58199 → "(R)-malate(2-)"`).
 - `calculated_aggregate_values_by_model/` — per-model query-index dump (one file per input)
 - `stats_by_model/` — per-model detailed statistics (one file per input)
 - `stats_by_curator/`, `stats_by_group/` — per-entity detailed statistics
 
-Both id→label lookups are sorted by key and indented for stable diffs. Labels are sourced from the
+The id→label lookup is sorted by key and indented for stable diffs. Labels are sourced from the
 model's `objects` and reflect the labels current at the moment the stats were computed.
 
 **Options:**

@@ -20,11 +20,10 @@ of status. Statistics include:
 
 Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
-Two flat lookup tables are also emitted alongside the aggregate files:
-``gene_id_to_label.json`` and ``chebi_id_to_label.json``. Each maps the
-identifiers seen in the stats outputs (gene-product enablers plus protein
-complex member genes; CHEBI input/output molecules) to their human-readable
-labels as carried on the model's ``objects``.
+A flat lookup table, ``id_to_label.json``, is also emitted alongside the
+aggregate files: it maps every identifier in the models' ``objects`` indexes
+(gene products, protein complexes, molecule inputs/outputs, CHEBI molecules,
+GO terms, etc.) to its human-readable label.
 """
 
 import json
@@ -1255,18 +1254,17 @@ def _compute_inferred_relations(
 
 def _collect_labels(
     gocam_model: Model,
-    stats_by_model: GocamStats,
-    gene_label_lookup: Dict[str, str] | None,
-    chebi_label_lookup: Dict[str, str] | None,
+    id_label_lookup: Dict[str, str] | None,
 ) -> None:
-    """Populate gene and CHEBI id→label lookups from the model's ``objects``.
+    """Populate the id→label lookup from the model's ``objects`` index.
 
-    Restricted to identifiers that actually appear as gene enablers, protein
-    complex member genes, or CHEBI input/output molecules in this model, so
-    the resulting files only contain labels relevant to the stats outputs.
-    The first non-empty label seen wins, keeping output stable across runs.
+    The lookup is populated from every non-obsolete object in the model's
+    ``objects`` index, which already carries labels for all terms (gene
+    products, protein complexes, molecule inputs/outputs, CHEBI molecules,
+    GO terms, etc.). The first non-empty label seen wins, keeping output
+    stable across runs.
     """
-    if gene_label_lookup is None and chebi_label_lookup is None:
+    if id_label_lookup is None:
         return
 
     objects_by_id: Dict[str, Any] = {}
@@ -1274,34 +1272,12 @@ def _collect_labels(
         if obj.id and not _is_obsolete(obj):
             objects_by_id[obj.id] = obj
 
-    if gene_label_lookup is not None:
-        gene_ids = (
-            stats_by_model.unique_enabled_by_gene_product
-            | stats_by_model.list_of_unique_protein_complex_genes
-        )
-        for gene_id in gene_ids:
-            if gene_id in gene_label_lookup:
-                continue
-            obj = objects_by_id.get(gene_id)
-            label = getattr(obj, "label", None) if obj is not None else None
-            if label:
-                gene_label_lookup[gene_id] = label
-
-    if chebi_label_lookup is not None:
-        chebi_ids: set[str] = set()
-        for term in stats_by_model.list_has_input_term or []:
-            if term.upper().startswith("CHEBI:"):
-                chebi_ids.add(term)
-        for term in stats_by_model.list_has_output_term or []:
-            if term.upper().startswith("CHEBI:"):
-                chebi_ids.add(term)
-        for chebi_id in chebi_ids:
-            if chebi_id in chebi_label_lookup:
-                continue
-            obj = objects_by_id.get(chebi_id)
-            label = getattr(obj, "label", None) if obj is not None else None
-            if label:
-                chebi_label_lookup[chebi_id] = label
+    for obj_id, obj in objects_by_id.items():
+        if obj_id in id_label_lookup:
+            continue
+        label = getattr(obj, "label", None)
+        if label:
+            id_label_lookup[obj_id] = label
 
 
 def process_gocam_model_file(
@@ -1312,8 +1288,7 @@ def process_gocam_model_file(
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
     production_only: bool = True,
-    gene_label_lookup: Dict[str, str] | None = None,
-    chebi_label_lookup: Dict[str, str] | None = None,
+    id_label_lookup: Dict[str, str] | None = None,
 ) -> ProcessingResult:
     """Process a single GO-CAM model JSON file and compute statistics.
 
@@ -1332,10 +1307,8 @@ def process_gocam_model_file(
         production_only: When True (default), models whose status is not
             ``production`` are skipped before any indexing or accumulation;
             they are returned as a FILTERED result.
-        gene_label_lookup: Optional accumulator mapping gene/gene-product CURIEs
-            (enablers + protein complex member genes) to labels.
-        chebi_label_lookup: Optional accumulator mapping CHEBI CURIEs seen as
-            input/output molecules to labels.
+        id_label_lookup: Optional accumulator mapping every object CURIE in the
+            model's ``objects`` index to its label.
 
     Returns:
         A ProcessingResult 3-tuple of (result_type, query_index_or_none,
@@ -1641,12 +1614,10 @@ def process_gocam_model_file(
         stats_by_model.list_enabled_by_protein_complex.sort()
     compute_molecule_and_term_counts(stats_by_model)
 
-    # Populate id→label lookups for genes and CHEBI molecules seen in this model
+    # Populate the id→label lookup from every object seen in this model
     _collect_labels(
         gocam_model,
-        stats_by_model,
-        gene_label_lookup,
-        chebi_label_lookup,
+        id_label_lookup,
     )
 
     # Update aggregate model data
@@ -1930,8 +1901,7 @@ def output_summary(
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
-    gene_label_lookup: Dict[str, str] | None = None,
-    chebi_label_lookup: Dict[str, str] | None = None,
+    id_label_lookup: Dict[str, str] | None = None,
 ) -> tuple[ResultType, ErrorReason] | None:
     """Finalize aggregate statistics and write all summary output files.
 
@@ -2054,34 +2024,18 @@ def output_summary(
                 exc_info=e,
             )
 
-    # Write id→label lookup files for genes and CHEBI molecules
-    if output_dir is not None and gene_label_lookup is not None:
-        gene_lookup_file = output_dir / "gene_id_to_label.json"
+    # Write the unified id→label lookup covering all objects (genes, protein
+    # complexes, molecule inputs/outputs, CHEBI molecules, GO terms, etc.)
+    if output_dir is not None and id_label_lookup is not None:
+        id_lookup_file = output_dir / "id_to_label.json"
         try:
-            sorted_gene_lookup = dict(sorted(gene_label_lookup.items()))
-            with open(gene_lookup_file, "w") as f:
-                json.dump(sorted_gene_lookup, f, indent=2)
-            logger.info(
-                f"Successfully wrote gene id→label lookup to {gene_lookup_file}"
-            )
+            sorted_id_lookup = dict(sorted(id_label_lookup.items()))
+            with open(id_lookup_file, "w") as f:
+                json.dump(sorted_id_lookup, f, indent=2)
+            logger.info(f"Successfully wrote id→label lookup to {id_lookup_file}")
         except Exception as e:
             logger.error(
-                f"Error writing gene id→label lookup to {gene_lookup_file}",
-                exc_info=e,
-            )
-
-    if output_dir is not None and chebi_label_lookup is not None:
-        chebi_lookup_file = output_dir / "chebi_id_to_label.json"
-        try:
-            sorted_chebi_lookup = dict(sorted(chebi_label_lookup.items()))
-            with open(chebi_lookup_file, "w") as f:
-                json.dump(sorted_chebi_lookup, f, indent=2)
-            logger.info(
-                f"Successfully wrote CHEBI id→label lookup to {chebi_lookup_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing CHEBI id→label lookup to {chebi_lookup_file}",
+                f"Error writing id→label lookup to {id_lookup_file}",
                 exc_info=e,
             )
 
@@ -2194,8 +2148,7 @@ def main(
     contributor_lookup: Dict[str, GocamStats] = {}
     provider_lookup: Dict[str, GocamStats] = {}
     protein_complex_activities: list[ProteinComplexActivityInfo] = []
-    gene_label_lookup: Dict[str, str] = {}
-    chebi_label_lookup: Dict[str, str] = {}
+    id_label_lookup: Dict[str, str] = {}
 
     for json_file in track(
         json_files, description="Processing GO-CAM models and calculating statistics..."
@@ -2209,8 +2162,7 @@ def main(
             provider_lookup=provider_lookup,
             protein_complex_activities=protein_complex_activities,
             production_only=production_only,
-            gene_label_lookup=gene_label_lookup,
-            chebi_label_lookup=chebi_label_lookup,
+            id_label_lookup=id_label_lookup,
         )
         results.append((json_file, result))
 
@@ -2222,8 +2174,7 @@ def main(
         contributor_lookup=contributor_lookup,
         provider_lookup=provider_lookup,
         protein_complex_activities=protein_complex_activities,
-        gene_label_lookup=gene_label_lookup,
-        chebi_label_lookup=chebi_label_lookup,
+        id_label_lookup=id_label_lookup,
     )
 
 
