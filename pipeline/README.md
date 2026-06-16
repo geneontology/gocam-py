@@ -215,3 +215,49 @@ python pipeline/generate_log_summary.py \
   --metadata "Release date=1970-01-01"
 ```
 
+## output_stats_for_gocam_models.py
+
+Computes per-model, per-contributor (curator), per-provider (group), and aggregate statistics
+across a directory of GO-CAM model JSON files. Counts include activity units, gene-product and
+protein-complex enablers, causal relations, input/output molecules (chemical vs. other), GO terms,
+references/PMIDs, and inferred relations (activity pairs connected via shared chemical molecules).
+
+**Inputs:**
+
+- `--input-dir`: Directory containing GO-CAM model JSON files
+- `--output-dir`: Directory to save statistics JSON files (required unless using `--dry-run`)
+
+**Outputs:**
+
+- `aggregate_model_stats.json` — cross-model aggregate statistics
+- `aggregate_curator_stats.json` — cross-curator aggregate statistics
+- `aggregate_group_stats.json` — cross-group aggregate statistics
+- `aggregate_protein_complex.json` — one record per activity enabled by a protein complex
+- `member_variable_definitions.json` — descriptions for every field used in the outputs above
+- `id_to_label.json` — flat `{ id: label }` lookup for every identifier in the models' `objects`
+  indexes (gene products, protein complexes, molecule inputs/outputs, CHEBI molecules, GO terms,
+  etc.; e.g. `UniProtKB:P12345 → "TP53"`, `CHEBI:58199 → "(R)-malate(2-)"`). Useful for rendering
+  the bare CURIEs in the stats outputs without re-querying an ontology service.
+- `calculated_aggregate_values_by_model/` — per-model query-index dump (one file per input)
+- `stats_by_model/` — per-model detailed statistics (one file per input)
+- `stats_by_curator/`, `stats_by_group/` — per-entity detailed statistics
+
+The id→label lookup is sorted by key and indented for stable diffs. Labels are sourced from the
+model's `objects` and reflect the labels current at the moment the stats were computed.
+
+**Options:**
+
+- `--production-only` / `--no-production-only`: Only process models with `status == "production"`
+  (default: enabled). Non-production models are filtered out before indexing or accumulation.
+- `--dry-run`: Compute statistics without writing any output files
+- `--verbose` / `-v`: Increase verbosity (`-v` for INFO, `-vv` for DEBUG)
+- `--limit N`: Limit processing to first N models (0 = no limit)
+
+**Usage:**
+
+```bash
+python pipeline/output_stats_for_gocam_models.py \
+  --input-dir /path/to/indexed_models \
+  --output-dir /path/to/stats
+```
+
