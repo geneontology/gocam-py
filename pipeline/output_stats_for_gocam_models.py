@@ -17,6 +17,11 @@ of status. Statistics include:
   activity A produces chemical outputs (CHEBI terms) that are consumed as
   inputs by another activity B. Each inferred relation records the pair of
   activity IDs along with the genes that enable each activity.
+- Constitutively-upstream relations: pairs of activities connected by the
+  ``constitutively upstream of`` (RO:0012009) causal relation. Each record
+  captures the upstream and downstream activity IDs/labels along with the
+  curators and groups that asserted the relation (written to
+  ``aggregate_constitutively_upstream.json``).
 
 Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
@@ -549,6 +554,57 @@ MEMBER_VARIABLE_DEFINITIONS = [
         "variable": "unique_groups",
         "description": "List of unique group (provided_by) URIs from the enabled_by provenances.",
     },
+    # --- ConstitutivelyUpstreamActivityInfo ---
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "model_id",
+        "description": "The GO-CAM model ID containing this 'constitutively upstream of' relation.",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "model_name",
+        "description": "Human-readable title/name of the GO-CAM model (from Model.title).",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "upstream_activity_id",
+        "description": "The activity unit ID that is constitutively upstream (the source of the causal relation).",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "upstream_activity_label",
+        "description": "Human-readable label of the upstream activity (enabler label and molecular function label).",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "downstream_activity_id",
+        "description": "The downstream activity unit ID (the target of the causal relation).",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "downstream_activity_label",
+        "description": "Human-readable label of the downstream activity (enabler label and molecular function label).",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "model_status",
+        "description": "Status of the GO-CAM model (e.g. 'production', 'development', 'review'). Null if not set.",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "unique_curators",
+        "description": "List of unique curator (contributor) URIs from the causal association provenances.",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "unique_groups",
+        "description": "List of unique group (provided_by) URIs from the causal association provenances.",
+    },
+    {
+        "class": "ConstitutivelyUpstreamActivityInfo",
+        "variable": "comment",
+        "description": "Free-text comment column for manual curator additions (empty by default).",
+    },
 ]
 
 
@@ -708,6 +764,21 @@ class ProteinComplexActivityInfo(ConfiguredBaseModel):
     unique_groups: Set[str] = set()
 
 
+class ConstitutivelyUpstreamActivityInfo(ConfiguredBaseModel):
+    """A single 'constitutively upstream of' (RO:0012009) relation between two activities."""
+
+    model_id: str = ""
+    model_name: str = ""
+    upstream_activity_id: str = ""
+    upstream_activity_label: str = ""
+    downstream_activity_id: str = ""
+    downstream_activity_label: str = ""
+    model_status: str | None = None
+    unique_curators: Set[str] = set()
+    unique_groups: Set[str] = set()
+    comment: str = ""
+
+
 #: Return type for :func:`process_gocam_model_file`.
 #: A 3-tuple of (result_type, query_index_or_none, reason_or_none).
 ProcessingResult: TypeAlias = (
@@ -830,13 +901,16 @@ def _update_entity_gene_stats(
             entity_info.unique_enabled_by_gene_product.add(activity.enabled_by.term)
             entity_info.genes += 1
 
-        if (activity.enabled_by.part_of):
-            for (part_of_protein_complex_association) in activity.enabled_by.part_of:
-                if (part_of_protein_complex_association.term and part_of_protein_complex_association.term not in obsolete_ids):
+        if activity.enabled_by.part_of:
+            for part_of_protein_complex_association in activity.enabled_by.part_of:
+                if (
+                    part_of_protein_complex_association.term
+                    and part_of_protein_complex_association.term not in obsolete_ids
+                ):
                     entity_info.unique_protein_complex_in_activity_term.add(
                         part_of_protein_complex_association.term
-                    )            
-            
+                    )
+
     if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
         entity_info.unique_activity_unit_protein_complex_enablers.add(activity.id)
         if activity.enabled_by.term and activity.enabled_by.term not in obsolete_ids:
@@ -1183,6 +1257,28 @@ def _get_activity_genes(
     return genes
 
 
+def _activity_label(activity, label_lookup: Dict[str, str]) -> str:
+    """Build a human-readable label for an activity from its enabler and molecular function.
+
+    Combines the label of the enabling gene product / protein complex with the
+    label of the molecular-function term, resolving each ID via ``label_lookup``
+    (falling back to the raw ID when no label is known). Returns an empty string
+    when the activity has neither.
+    """
+    if activity is None:
+        return ""
+    parts: list[str] = []
+    enabled_by = getattr(activity, "enabled_by", None)
+    enabler_term = getattr(enabled_by, "term", None) if enabled_by else None
+    if enabler_term:
+        parts.append(label_lookup.get(enabler_term, enabler_term))
+    molecular_function = getattr(activity, "molecular_function", None)
+    mf_term = getattr(molecular_function, "term", None) if molecular_function else None
+    if mf_term:
+        parts.append(label_lookup.get(mf_term, mf_term))
+    return " - ".join(parts)
+
+
 def _compute_inferred_relations(
     activities: list,
     obsolete_ids: set[str],
@@ -1287,6 +1383,9 @@ def process_gocam_model_file(
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
+    constitutively_upstream_activities: (
+        list[ConstitutivelyUpstreamActivityInfo] | None
+    ) = None,
     production_only: bool = True,
     id_label_lookup: Dict[str, str] | None = None,
 ) -> ProcessingResult:
@@ -1349,6 +1448,19 @@ def process_gocam_model_file(
         if mol_node.id and mol_node.term:
             molecule_lookup[mol_node.id] = mol_node.term
 
+    # Build id → label lookup (for resolving activity labels) and an
+    # activity-by-id map (for resolving downstream activities of causal relations)
+    model_label_lookup: Dict[str, str] = {}
+    for obj in gocam_model.objects or []:
+        if not obj.id or _is_obsolete(obj) or obj.id in model_label_lookup:
+            continue
+        label = getattr(obj, "label", None)
+        if label:
+            model_label_lookup[obj.id] = label
+    activities_by_id = {
+        activity.id: activity for activity in gocam_model.activities or []
+    }
+
     # Get model statistics information
     calculated_aggregate_values_by_model = gocam_model.query_index
     if calculated_aggregate_values_by_model is None:
@@ -1400,9 +1512,15 @@ def process_gocam_model_file(
                         activity.enabled_by.term
                     )
 
-                if (activity.enabled_by.part_of):
-                    for (part_of_protein_complex_association) in activity.enabled_by.part_of:
-                        if (part_of_protein_complex_association.term and part_of_protein_complex_association.term not in obsolete_ids):
+                if activity.enabled_by.part_of:
+                    for (
+                        part_of_protein_complex_association
+                    ) in activity.enabled_by.part_of:
+                        if (
+                            part_of_protein_complex_association.term
+                            and part_of_protein_complex_association.term
+                            not in obsolete_ids
+                        ):
                             stats_by_model.unique_protein_complex_in_activity_term.add(
                                 part_of_protein_complex_association.term
                             )
@@ -1515,6 +1633,40 @@ def process_gocam_model_file(
                     stats_by_model.list_of_unique_explicit_causal_relations.add(
                         activity.id
                     )
+
+                    # Collect 'constitutively upstream of' relations
+                    if (
+                        constitutively_upstream_activities is not None
+                        and causal_association.predicate
+                        == Relation.CONSTITUTIVELY_UPSTREAM_OF.value
+                    ):
+                        downstream_id = causal_association.downstream_activity
+                        downstream_activity = (
+                            activities_by_id.get(downstream_id)
+                            if downstream_id
+                            else None
+                        )
+                        cu_info = ConstitutivelyUpstreamActivityInfo(
+                            model_id=gocam_model.id,
+                            model_name=gocam_model.title,
+                            upstream_activity_id=activity.id,
+                            upstream_activity_label=_activity_label(
+                                activity, model_label_lookup
+                            ),
+                            downstream_activity_id=downstream_id or "",
+                            downstream_activity_label=_activity_label(
+                                downstream_activity, model_label_lookup
+                            ),
+                            model_status=model_details.model_status,
+                        )
+                        if causal_association.provenances:
+                            for prov in causal_association.provenances:
+                                if prov.contributor:
+                                    cu_info.unique_curators.update(prov.contributor)
+                                if prov.provided_by:
+                                    cu_info.unique_groups.update(prov.provided_by)
+                        constitutively_upstream_activities.append(cu_info)
+
                     if causal_association.provenances:
                         for provenance in causal_association.provenances:
                             if provenance.contributor:
@@ -1901,6 +2053,9 @@ def output_summary(
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
+    constitutively_upstream_activities: (
+        list[ConstitutivelyUpstreamActivityInfo] | None
+    ) = None,
     id_label_lookup: Dict[str, str] | None = None,
 ) -> tuple[ResultType, ErrorReason] | None:
     """Finalize aggregate statistics and write all summary output files.
@@ -1916,6 +2071,8 @@ def output_summary(
         contributor_lookup: Mapping of contributor URI to per-contributor stats.
         provider_lookup: Mapping of provider URI to per-provider stats.
         protein_complex_activities: List of protein complex activity records to write.
+        constitutively_upstream_activities: List of 'constitutively upstream of'
+            relation records to write.
     """
     model_aggregate.entity = "Model"
     model_aggregate.unique_gene_product_enablers = len(
@@ -2021,6 +2178,26 @@ def output_summary(
         except Exception as e:
             logger.error(
                 f"Error writing protein complex activity info to {pc_file}",
+                exc_info=e,
+            )
+
+    # Write aggregate 'constitutively upstream of' relation info
+    if output_dir is not None and constitutively_upstream_activities is not None:
+        cu_file = output_dir / "aggregate_constitutively_upstream.json"
+        try:
+            sorted_cu = sorted(
+                constitutively_upstream_activities,
+                key=lambda x: (x.model_id, x.upstream_activity_id),
+            )
+            cu_data = [item.model_dump(exclude_none=True) for item in sorted_cu]
+            with open(cu_file, "w") as f:
+                json.dump(cu_data, f, indent=2, default=list)
+            logger.info(
+                f"Successfully wrote constitutively upstream relation info to {cu_file}"
+            )
+        except Exception as e:
+            logger.error(
+                f"Error writing constitutively upstream relation info to {cu_file}",
                 exc_info=e,
             )
 
@@ -2148,6 +2325,7 @@ def main(
     contributor_lookup: Dict[str, GocamStats] = {}
     provider_lookup: Dict[str, GocamStats] = {}
     protein_complex_activities: list[ProteinComplexActivityInfo] = []
+    constitutively_upstream_activities: list[ConstitutivelyUpstreamActivityInfo] = []
     id_label_lookup: Dict[str, str] = {}
 
     for json_file in track(
@@ -2161,6 +2339,7 @@ def main(
             contributor_lookup=contributor_lookup,
             provider_lookup=provider_lookup,
             protein_complex_activities=protein_complex_activities,
+            constitutively_upstream_activities=constitutively_upstream_activities,
             production_only=production_only,
             id_label_lookup=id_label_lookup,
         )
@@ -2174,6 +2353,7 @@ def main(
         contributor_lookup=contributor_lookup,
         provider_lookup=provider_lookup,
         protein_complex_activities=protein_complex_activities,
+        constitutively_upstream_activities=constitutively_upstream_activities,
         id_label_lookup=id_label_lookup,
     )
 
