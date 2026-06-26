@@ -74,6 +74,12 @@ logger = logging.getLogger(__name__)
 INPUT_PREDICATES = {Relation.HAS_INPUT.value, Relation.HAS_PRIMARY_INPUT.value}
 OUTPUT_PREDICATES = {Relation.HAS_OUTPUT.value, Relation.HAS_PRIMARY_OUTPUT.value}
 
+# Filenames for the two TSV-backing aggregate files. These names are a shared
+# contract with the go-site renderer (reports-go-cam-stats.py); keep them in
+# sync if either is renamed.
+PROTEIN_COMPLEX_FILENAME = "aggregate_protein_complex.json"
+CONSTITUTIVELY_UPSTREAM_FILENAME = "aggregate_constitutively_upstream.json"
+
 MEMBER_VARIABLE_DEFINITIONS = [
     # --- GocamStats ---
     {
@@ -896,8 +902,6 @@ def _update_entity_gene_stats(
                 entity_info.list_enabled_by_gene_product.append(
                     activity.enabled_by.term
                 )
-            # if activity.enabled_by.term.startswith("CHEBI:"):
-            #     print("Activity id " + activity.id + " has enabled by chebi " + activity.enabled_by.term)
             entity_info.unique_enabled_by_gene_product.add(activity.enabled_by.term)
             entity_info.genes += 1
 
@@ -1376,6 +1380,153 @@ def _collect_labels(
             id_label_lookup[obj_id] = label
 
 
+def _model_status_str(gocam_model: Model) -> str | None:
+    """Return the model's status as a plain string, or None when unset."""
+    if gocam_model.status is None:
+        return None
+    return (
+        gocam_model.status.value
+        if hasattr(gocam_model.status, "value")
+        else str(gocam_model.status)
+    )
+
+
+def _collect_protein_complex_records(
+    gocam_model: Model,
+) -> list[ProteinComplexActivityInfo]:
+    """Collect protein-complex-enabled activity records for a single model.
+
+    This mirrors the per-activity record built inline in
+    ``process_gocam_model_file`` but computes only the TSV-backing records,
+    independent of the production filter and of aggregate accumulation. It is
+    used to build the all-models TSV output (every model, regardless of status).
+    """
+    records: list[ProteinComplexActivityInfo] = []
+    model_status = _model_status_str(gocam_model)
+    for activity in gocam_model.activities or []:
+        if not isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
+            continue
+        pc_info = ProteinComplexActivityInfo(
+            model_id=gocam_model.id,
+            model_name=gocam_model.title,
+            activity_id=activity.id,
+            protein_complex_term=activity.enabled_by.term,
+            molecular_function=(
+                activity.molecular_function.term
+                if activity.molecular_function
+                else None
+            ),
+            model_status=model_status,
+        )
+        if activity.enabled_by.provenances:
+            for prov in activity.enabled_by.provenances:
+                if prov.contributor:
+                    pc_info.unique_curators.update(prov.contributor)
+                if prov.provided_by:
+                    pc_info.unique_groups.update(prov.provided_by)
+        records.append(pc_info)
+    return records
+
+
+def _collect_constitutively_upstream_records(
+    gocam_model: Model,
+) -> list[ConstitutivelyUpstreamActivityInfo]:
+    """Collect 'constitutively upstream of' relation records for a single model.
+
+    Independent of the production filter and aggregate accumulation; used to
+    build the all-models TSV output (every model, regardless of status).
+    """
+    records: list[ConstitutivelyUpstreamActivityInfo] = []
+    model_status = _model_status_str(gocam_model)
+    model_label_lookup: Dict[str, str] = {}
+    for obj in gocam_model.objects or []:
+        if not obj.id or _is_obsolete(obj) or obj.id in model_label_lookup:
+            continue
+        label = getattr(obj, "label", None)
+        if label:
+            model_label_lookup[obj.id] = label
+    activities_by_id = {
+        activity.id: activity for activity in gocam_model.activities or []
+    }
+    for activity in gocam_model.activities or []:
+        if not activity.causal_associations:
+            continue
+        for causal_association in activity.causal_associations:
+            if (
+                causal_association.predicate
+                != Relation.CONSTITUTIVELY_UPSTREAM_OF.value
+            ):
+                continue
+            downstream_id = causal_association.downstream_activity
+            downstream_activity = (
+                activities_by_id.get(downstream_id) if downstream_id else None
+            )
+            cu_info = ConstitutivelyUpstreamActivityInfo(
+                model_id=gocam_model.id,
+                model_name=gocam_model.title,
+                upstream_activity_id=activity.id,
+                upstream_activity_label=_activity_label(
+                    activity, model_label_lookup
+                ),
+                downstream_activity_id=downstream_id or "",
+                downstream_activity_label=_activity_label(
+                    downstream_activity, model_label_lookup
+                ),
+                model_status=model_status,
+            )
+            if causal_association.provenances:
+                for prov in causal_association.provenances:
+                    if prov.contributor:
+                        cu_info.unique_curators.update(prov.contributor)
+                    if prov.provided_by:
+                        cu_info.unique_groups.update(prov.provided_by)
+            records.append(cu_info)
+    return records
+
+
+def write_tsv_aggregate_files(
+    output_dir: Path,
+    protein_complex_activities: list[ProteinComplexActivityInfo],
+    constitutively_upstream_activities: list[ConstitutivelyUpstreamActivityInfo],
+) -> None:
+    """Write the two TSV-backing aggregate JSON files into ``output_dir``.
+
+    Shared by the production stats output and the all-models TSV output so both
+    use identical sorting and serialization. Creates ``output_dir`` if needed.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    pc_file = output_dir / PROTEIN_COMPLEX_FILENAME
+    try:
+        sorted_pc = sorted(protein_complex_activities, key=lambda x: x.model_id)
+        pc_data = [item.model_dump(exclude_none=True) for item in sorted_pc]
+        with open(pc_file, "w") as f:
+            json.dump(pc_data, f, indent=2, default=list)
+        logger.info(f"Successfully wrote protein complex activity info to {pc_file}")
+    except Exception as e:
+        logger.error(
+            f"Error writing protein complex activity info to {pc_file}", exc_info=e
+        )
+
+    cu_file = output_dir / CONSTITUTIVELY_UPSTREAM_FILENAME
+    try:
+        sorted_cu = sorted(
+            constitutively_upstream_activities,
+            key=lambda x: (x.model_id, x.upstream_activity_id),
+        )
+        cu_data = [item.model_dump(exclude_none=True) for item in sorted_cu]
+        with open(cu_file, "w") as f:
+            json.dump(cu_data, f, indent=2, default=list)
+        logger.info(
+            f"Successfully wrote constitutively upstream relation info to {cu_file}"
+        )
+    except Exception as e:
+        logger.error(
+            f"Error writing constitutively upstream relation info to {cu_file}",
+            exc_info=e,
+        )
+
+
 def process_gocam_model_file(
     json_file: Path,
     output_dir: Path | None,
@@ -1388,6 +1539,12 @@ def process_gocam_model_file(
     ) = None,
     production_only: bool = True,
     id_label_lookup: Dict[str, str] | None = None,
+    all_models_protein_complex_activities: (
+        list[ProteinComplexActivityInfo] | None
+    ) = None,
+    all_models_constitutively_upstream_activities: (
+        list[ConstitutivelyUpstreamActivityInfo] | None
+    ) = None,
 ) -> ProcessingResult:
     """Process a single GO-CAM model JSON file and compute statistics.
 
@@ -1408,6 +1565,13 @@ def process_gocam_model_file(
             they are returned as a FILTERED result.
         id_label_lookup: Optional accumulator mapping every object CURIE in the
             model's ``objects`` index to its label.
+        all_models_protein_complex_activities: Optional accumulator for
+            protein-complex activity records covering ALL models regardless of
+            status. When provided, records are collected before the production
+            filter is applied. Used for the all-models TSV output.
+        all_models_constitutively_upstream_activities: Optional accumulator for
+            'constitutively upstream of' relation records covering ALL models
+            regardless of status, collected before the production filter.
 
     Returns:
         A ProcessingResult 3-tuple of (result_type, query_index_or_none,
@@ -1417,15 +1581,23 @@ def process_gocam_model_file(
     # Read GO-CAM JSON file
     try:
         with open(json_file, "r") as f:
-            # json_content = f.read()
-            # data = json.loads(json_content)
-            # model_json = json.dumps(data)
-            # gocam_model = Model.model_validate_json(model_json)
             gocam_model = Model.model_validate_json(f.read())
         logger.debug(f"Successfully read GO-CAM model from {json_file}")
     except Exception as e:
         logger.error(f"Error reading file {json_file}", exc_info=e)
         return ResultType.ERROR, None, ErrorReason.READ_ERROR
+
+    # Collect TSV-backing records for the all-models output. This runs for every
+    # model, regardless of production status, and is independent of the
+    # production stats accumulation below (which still honors production_only).
+    if all_models_protein_complex_activities is not None:
+        all_models_protein_complex_activities.extend(
+            _collect_protein_complex_records(gocam_model)
+        )
+    if all_models_constitutively_upstream_activities is not None:
+        all_models_constitutively_upstream_activities.extend(
+            _collect_constitutively_upstream_records(gocam_model)
+        )
 
     # Skip non-production models before any indexing or accumulation so
     # contributor/provider/aggregate state stays free of non-production data.
@@ -2164,42 +2336,18 @@ def output_summary(
                 exc_info=e,
             )
 
-    # Write aggregate protein complex activity info
-    if output_dir is not None and protein_complex_activities is not None:
-        pc_file = output_dir / "aggregate_protein_complex.json"
-        try:
-            sorted_pc = sorted(protein_complex_activities, key=lambda x: x.model_id)
-            pc_data = [item.model_dump(exclude_none=True) for item in sorted_pc]
-            with open(pc_file, "w") as f:
-                json.dump(pc_data, f, indent=2, default=list)
-            logger.info(
-                f"Successfully wrote protein complex activity info to {pc_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing protein complex activity info to {pc_file}",
-                exc_info=e,
-            )
-
-    # Write aggregate 'constitutively upstream of' relation info
-    if output_dir is not None and constitutively_upstream_activities is not None:
-        cu_file = output_dir / "aggregate_constitutively_upstream.json"
-        try:
-            sorted_cu = sorted(
-                constitutively_upstream_activities,
-                key=lambda x: (x.model_id, x.upstream_activity_id),
-            )
-            cu_data = [item.model_dump(exclude_none=True) for item in sorted_cu]
-            with open(cu_file, "w") as f:
-                json.dump(cu_data, f, indent=2, default=list)
-            logger.info(
-                f"Successfully wrote constitutively upstream relation info to {cu_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing constitutively upstream relation info to {cu_file}",
-                exc_info=e,
-            )
+    # Write the TSV-backing aggregate files (protein complex + constitutively
+    # upstream) for the production stats output.
+    if (
+        output_dir is not None
+        and protein_complex_activities is not None
+        and constitutively_upstream_activities is not None
+    ):
+        write_tsv_aggregate_files(
+            output_dir,
+            protein_complex_activities,
+            constitutively_upstream_activities,
+        )
 
     # Write the unified id→label lookup covering all objects (genes, protein
     # complexes, molecule inputs/outputs, CHEBI molecules, GO terms, etc.)
@@ -2297,6 +2445,23 @@ def main(
             ),
         ),
     ] = True,
+    all_models_tsv_dir: Annotated[
+        Path | None,
+        typer.Option(
+            "--all-models-tsv-dir",
+            file_okay=False,
+            dir_okay=True,
+            writable=True,
+            help=(
+                "If set, additionally collect protein-complex and "
+                "'constitutively upstream of' records for ALL GO-CAM models "
+                "(regardless of status) and write the two TSV-backing "
+                "aggregate JSON files into this directory. The main "
+                "production stats output is unaffected. The directory is "
+                "created if it does not exist."
+            ),
+        ),
+    ] = None,
 ):
     """CLI entry point: process GO-CAM model JSON files and output statistics."""
     setup_logger(verbose)
@@ -2328,6 +2493,14 @@ def main(
     constitutively_upstream_activities: list[ConstitutivelyUpstreamActivityInfo] = []
     id_label_lookup: Dict[str, str] = {}
 
+    # All-models TSV record accumulators. Populated only when --all-models-tsv-dir
+    # is set; they cover every model regardless of production status.
+    all_models_protein_complex_activities: list[ProteinComplexActivityInfo] = []
+    all_models_constitutively_upstream_activities: list[
+        ConstitutivelyUpstreamActivityInfo
+    ] = []
+    collect_all_models = all_models_tsv_dir is not None
+
     for json_file in track(
         json_files, description="Processing GO-CAM models and calculating statistics..."
     ):
@@ -2342,6 +2515,14 @@ def main(
             constitutively_upstream_activities=constitutively_upstream_activities,
             production_only=production_only,
             id_label_lookup=id_label_lookup,
+            all_models_protein_complex_activities=(
+                all_models_protein_complex_activities if collect_all_models else None
+            ),
+            all_models_constitutively_upstream_activities=(
+                all_models_constitutively_upstream_activities
+                if collect_all_models
+                else None
+            ),
         )
         results.append((json_file, result))
 
@@ -2356,6 +2537,18 @@ def main(
         constitutively_upstream_activities=constitutively_upstream_activities,
         id_label_lookup=id_label_lookup,
     )
+
+    # Write the all-models TSV-backing aggregate files into a separate directory,
+    # leaving the production stats output untouched.
+    if collect_all_models and not dry_run:
+        write_tsv_aggregate_files(
+            all_models_tsv_dir,
+            all_models_protein_complex_activities,
+            all_models_constitutively_upstream_activities,
+        )
+        logger.info(
+            f"Wrote all-models TSV aggregate files to {all_models_tsv_dir}"
+        )
 
 
 if __name__ == "__main__":
