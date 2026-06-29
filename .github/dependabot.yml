@@ -4,6 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     allow:
       # Allow both direct and indirect updates for all packages
       - dependency-type: "all"
@@ -21,6 +23,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     assignees:
       - "pkalita-lbl"
     groups:
