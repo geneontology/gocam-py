@@ -3,7 +3,8 @@ name: Dependency security
 on:
   pull_request:
   schedule:
-    - cron: "13 0 * * 1"
+    # Run every Monday at 13:15 UTC (5:15 AM PST / 6:15 AM PDT)
+    - cron: "15 13 * * 1"
   workflow_dispatch:
 
 permissions:
