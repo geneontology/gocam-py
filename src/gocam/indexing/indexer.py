@@ -8,6 +8,7 @@ import pystow
 import yaml
 from oaklib import get_adapter
 from oaklib.datamodels.vocabulary import IS_A, PART_OF
+from oaklib.interfaces import OboGraphInterface
 
 from gocam.datamodel import (
     EnabledByGeneProductAssociation,
@@ -72,34 +73,36 @@ class Indexer:
         self._chebi_adapter_descriptor = chebi_adapter_descriptor
 
     @cached_property
-    def go_adapter(self):
+    def go_adapter(self) -> OboGraphInterface:
         """
         Get the GO ontology adapter.
 
         Returns:
             An OboGraphInterface implementation for GO
         """
-        return get_adapter(self._go_adapter_descriptor)
+        return get_adapter(self._go_adapter_descriptor, implements=OboGraphInterface)
 
     @cached_property
-    def ncbi_taxon_adapter(self):
+    def ncbi_taxon_adapter(self) -> OboGraphInterface:
         """
         Get the NCBI Taxonomy ontology adapter.
 
         Returns:
             An OboGraphInterface implementation for the NCBI Taxonomy database
         """
-        return get_adapter(self._ncbi_taxon_adapter_descriptor)
+        return get_adapter(
+            self._ncbi_taxon_adapter_descriptor, implements=OboGraphInterface
+        )
 
     @cached_property
-    def chebi_adapter(self):
+    def chebi_adapter(self) -> OboGraphInterface:
         """
         Get the ChEBI ontology adapter.
 
         Returns:
             An OboGraphInterface implementation for the ChEBI database
         """
-        return get_adapter(self._chebi_adapter_descriptor)
+        return get_adapter(self._chebi_adapter_descriptor, implements=OboGraphInterface)
 
     @cached_property
     def goc_groups(self) -> dict[str, dict]:
@@ -199,7 +202,7 @@ class Indexer:
         )
 
     def _get_closures(
-        self, terms: Collection[str]
+        self, terms: Collection[str | None]
     ) -> Tuple[List[TermObject], List[TermObject]]:
         """
         Get direct terms and their transitive closure.
@@ -215,14 +218,17 @@ class Indexer:
         if not terms:
             return [], []
 
-        ancs = self.go_adapter.ancestors(list(terms), predicates=[IS_A, PART_OF])
+        terms_excluding_none = [t for t in terms if t is not None]
+
+        ancs = self.go_adapter.ancestors(
+            terms_excluding_none, predicates=[IS_A, PART_OF]
+        )
         objs = [
             TermObject(
                 id=t,
                 label=self._go_label(t),
             )
-            for t in terms
-            if t is not None
+            for t in terms_excluding_none
         ]
         closure = [
             TermObject(
