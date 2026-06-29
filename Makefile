@@ -83,8 +83,7 @@ install:
 	UV_MALWARE_CHECK=1 uv sync --frozen --all-extras
 .PHONY: install
 
-audit:
-	UV_MALWARE_CHECK=1 uv sync --frozen --all-extras
+audit: install
 	uv audit --frozen
 
 # ---
