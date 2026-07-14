@@ -20,8 +20,7 @@ of status. Statistics include:
 - Constitutively-upstream relations: pairs of activities connected by the
   ``constitutively upstream of`` (RO:0012009) causal relation. Each record
   captures the upstream and downstream activity IDs/labels along with the
-  curators and groups that asserted the relation (written to
-  ``aggregate_constitutively_upstream.json``).
+  curators and groups that asserted the relation.
 
 Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
@@ -29,6 +28,16 @@ A flat lookup table, ``id_to_label.json``, is also emitted alongside the
 aggregate files: it maps every identifier in the models' ``objects`` indexes
 (gene products, protein complexes, molecule inputs/outputs, CHEBI molecules,
 GO terms, etc.) to its human-readable label.
+
+The protein-complex and constitutively-upstream aggregate files
+(``aggregate_protein_complex.json`` and ``aggregate_constitutively_upstream.json``)
+are gated entirely behind ``--all-models``: without that flag they are not
+collected or written anywhere. Passing ``--all-models`` (with
+``--all-models-tsv-dir``) writes the production (status-filtered) versions into
+the main output directory AND versions computed across every model regardless
+of status into ``--all-models-tsv-dir``. When ``--all-models`` is off (the
+default), or when there are no such records, those files -- and the
+``--all-models-tsv-dir`` directory -- are not created.
 """
 
 import json
@@ -1465,9 +1474,7 @@ def _collect_constitutively_upstream_records(
                 model_id=gocam_model.id,
                 model_name=gocam_model.title,
                 upstream_activity_id=activity.id,
-                upstream_activity_label=_activity_label(
-                    activity, model_label_lookup
-                ),
+                upstream_activity_label=_activity_label(activity, model_label_lookup),
                 downstream_activity_id=downstream_id or "",
                 downstream_activity_label=_activity_label(
                     downstream_activity, model_label_lookup
@@ -1492,39 +1499,49 @@ def write_tsv_aggregate_files(
     """Write the two TSV-backing aggregate JSON files into ``output_dir``.
 
     Shared by the production stats output and the all-models TSV output so both
-    use identical sorting and serialization. Creates ``output_dir`` if needed.
+    use identical sorting and serialization. Each file is written only when its
+    record list is non-empty, and ``output_dir`` is created only when at least
+    one file will be written -- so a run with no records leaves behind no
+    directory and no empty files (which is what keeps the go-site renderer from
+    emitting links to empty pages).
     """
+    if not protein_complex_activities and not constitutively_upstream_activities:
+        return
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    pc_file = output_dir / PROTEIN_COMPLEX_FILENAME
-    try:
-        sorted_pc = sorted(protein_complex_activities, key=lambda x: x.model_id)
-        pc_data = [item.model_dump(exclude_none=True) for item in sorted_pc]
-        with open(pc_file, "w") as f:
-            json.dump(pc_data, f, indent=2, default=list)
-        logger.info(f"Successfully wrote protein complex activity info to {pc_file}")
-    except Exception as e:
-        logger.error(
-            f"Error writing protein complex activity info to {pc_file}", exc_info=e
-        )
+    if protein_complex_activities:
+        pc_file = output_dir / PROTEIN_COMPLEX_FILENAME
+        try:
+            sorted_pc = sorted(protein_complex_activities, key=lambda x: x.model_id)
+            pc_data = [item.model_dump(exclude_none=True) for item in sorted_pc]
+            with open(pc_file, "w") as f:
+                json.dump(pc_data, f, indent=2, default=list)
+            logger.info(
+                f"Successfully wrote protein complex activity info to {pc_file}"
+            )
+        except Exception as e:
+            logger.error(
+                f"Error writing protein complex activity info to {pc_file}", exc_info=e
+            )
 
-    cu_file = output_dir / CONSTITUTIVELY_UPSTREAM_FILENAME
-    try:
-        sorted_cu = sorted(
-            constitutively_upstream_activities,
-            key=lambda x: (x.model_id, x.upstream_activity_id),
-        )
-        cu_data = [item.model_dump(exclude_none=True) for item in sorted_cu]
-        with open(cu_file, "w") as f:
-            json.dump(cu_data, f, indent=2, default=list)
-        logger.info(
-            f"Successfully wrote constitutively upstream relation info to {cu_file}"
-        )
-    except Exception as e:
-        logger.error(
-            f"Error writing constitutively upstream relation info to {cu_file}",
-            exc_info=e,
-        )
+    if constitutively_upstream_activities:
+        cu_file = output_dir / CONSTITUTIVELY_UPSTREAM_FILENAME
+        try:
+            sorted_cu = sorted(
+                constitutively_upstream_activities,
+                key=lambda x: (x.model_id, x.upstream_activity_id),
+            )
+            cu_data = [item.model_dump(exclude_none=True) for item in sorted_cu]
+            with open(cu_file, "w") as f:
+                json.dump(cu_data, f, indent=2, default=list)
+            logger.info(
+                f"Successfully wrote constitutively upstream relation info to {cu_file}"
+            )
+        except Exception as e:
+            logger.error(
+                f"Error writing constitutively upstream relation info to {cu_file}",
+                exc_info=e,
+            )
 
 
 def process_gocam_model_file(
@@ -2445,6 +2462,21 @@ def main(
             ),
         ),
     ] = True,
+    all_models: Annotated[
+        bool,
+        typer.Option(
+            "--all-models/--no-all-models",
+            help=(
+                "Master switch for the protein-complex and 'constitutively "
+                "upstream of' aggregate files. When enabled, the production "
+                "(status-filtered) versions are written into the main output "
+                "directory AND versions covering ALL GO-CAM models (regardless "
+                "of status) are written into --all-models-tsv-dir. When disabled "
+                "(the default), these records are neither collected nor written "
+                "anywhere."
+            ),
+        ),
+    ] = False,
     all_models_tsv_dir: Annotated[
         Path | None,
         typer.Option(
@@ -2453,12 +2485,10 @@ def main(
             dir_okay=True,
             writable=True,
             help=(
-                "If set, additionally collect protein-complex and "
-                "'constitutively upstream of' records for ALL GO-CAM models "
-                "(regardless of status) and write the two TSV-backing "
-                "aggregate JSON files into this directory. The main "
-                "production stats output is unaffected. The directory is "
-                "created if it does not exist."
+                "Directory to write the all-models TSV-backing aggregate JSON "
+                "files into. Location only; generation is controlled by "
+                "--all-models. Required when --all-models is set. The directory "
+                "is created only when there are records to write."
             ),
         ),
     ] = None,
@@ -2469,6 +2499,12 @@ def main(
     if not dry_run and output_dir is None:
         raise typer.BadParameter(
             "Output directory must be specified unless --dry-run is used."
+        )
+
+    # --all-models is the authoritative on/off switch; the dir is location only.
+    if all_models and all_models_tsv_dir is None:
+        raise typer.BadParameter(
+            "--all-models-tsv-dir must be specified when --all-models is set."
         )
 
     # Get list of JSON files in the input directory, excluding hidden files, and sort them
@@ -2493,13 +2529,13 @@ def main(
     constitutively_upstream_activities: list[ConstitutivelyUpstreamActivityInfo] = []
     id_label_lookup: Dict[str, str] = {}
 
-    # All-models TSV record accumulators. Populated only when --all-models-tsv-dir
-    # is set; they cover every model regardless of production status.
+    # All-models TSV record accumulators. Populated only when --all-models
+    # is enabled; they cover every model regardless of production status.
     all_models_protein_complex_activities: list[ProteinComplexActivityInfo] = []
     all_models_constitutively_upstream_activities: list[
         ConstitutivelyUpstreamActivityInfo
     ] = []
-    collect_all_models = all_models_tsv_dir is not None
+    collect_all_models = all_models
 
     for json_file in track(
         json_files, description="Processing GO-CAM models and calculating statistics..."
@@ -2511,8 +2547,12 @@ def main(
             model_aggregate=model_aggregate,
             contributor_lookup=contributor_lookup,
             provider_lookup=provider_lookup,
-            protein_complex_activities=protein_complex_activities,
-            constitutively_upstream_activities=constitutively_upstream_activities,
+            protein_complex_activities=(
+                protein_complex_activities if collect_all_models else None
+            ),
+            constitutively_upstream_activities=(
+                constitutively_upstream_activities if collect_all_models else None
+            ),
             production_only=production_only,
             id_label_lookup=id_label_lookup,
             all_models_protein_complex_activities=(
@@ -2533,22 +2573,24 @@ def main(
         model_aggregate=model_aggregate,
         contributor_lookup=contributor_lookup,
         provider_lookup=provider_lookup,
-        protein_complex_activities=protein_complex_activities,
-        constitutively_upstream_activities=constitutively_upstream_activities,
+        protein_complex_activities=(
+            protein_complex_activities if collect_all_models else None
+        ),
+        constitutively_upstream_activities=(
+            constitutively_upstream_activities if collect_all_models else None
+        ),
         id_label_lookup=id_label_lookup,
     )
 
     # Write the all-models TSV-backing aggregate files into a separate directory,
     # leaving the production stats output untouched.
-    if collect_all_models and not dry_run:
+    if collect_all_models and all_models_tsv_dir is not None and not dry_run:
         write_tsv_aggregate_files(
             all_models_tsv_dir,
             all_models_protein_complex_activities,
             all_models_constitutively_upstream_activities,
         )
-        logger.info(
-            f"Wrote all-models TSV aggregate files to {all_models_tsv_dir}"
-        )
+        logger.info(f"Wrote all-models TSV aggregate files to {all_models_tsv_dir}")
 
 
 if __name__ == "__main__":
