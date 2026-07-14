@@ -1,13 +1,23 @@
-name: Build and test gocam
+name: Dependency security
 
-on: [pull_request]
+on:
+  pull_request:
+  schedule:
+    # Run every Monday at 13:15 UTC (5:15 AM PST / 6:15 AM PDT)
+    - cron: "15 13 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  audit:
+    name: Audit dependencies (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.13"]
+        python-version: [ "3.10", "3.13" ]
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -21,11 +31,5 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: UV_MALWARE_CHECK=1 uv sync --frozen --all-extras
-
-      - name: Type check
-        run: make type-check
-
-      - name: Run test suite
-        run: make test
+      - name: Run dependency security checks
+        run: make audit

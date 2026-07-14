@@ -52,7 +52,7 @@ endif
 
 
 # basename of a YAML file in model/
-.PHONY: all clean setup gen-project gen-examples gendoc git-init-add git-init git-add git-commit git-status lint lint-python lint-fix-python
+.PHONY: all clean setup gen-project gen-examples gendoc git-init-add git-init git-add git-commit git-status lint lint-python lint-fix-python audit
 
 # note: "help" MUST be the first target in the file,
 # when the user types "make" they should get help info
@@ -61,6 +61,7 @@ help: status
 	@echo "make setup -- initial setup (run this first)"
 	@echo "make site -- makes site locally"
 	@echo "make install -- install dependencies"
+	@echo "make audit -- scan dependencies for malware and known vulnerabilities"
 	@echo "make test -- runs tests"
 	@echo "make lint -- perform linting"
 	@echo "make testdoc -- builds docs and runs local test server"
@@ -79,8 +80,11 @@ setup: check-config git-init install gen-project gen-examples gendoc git-add git
 
 # install any dependencies required for building
 install:
-	uv sync --all-extras
+	UV_MALWARE_CHECK=1 uv sync --frozen --all-extras
 .PHONY: install
+
+audit: install
+	uv audit --frozen
 
 # ---
 # Project Synchronization
