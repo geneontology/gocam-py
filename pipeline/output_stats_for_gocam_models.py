@@ -30,7 +30,6 @@ import json
 import logging
 import os
 import re
-from enum import Enum
 from pathlib import Path
 from typing import (
     Annotated,
@@ -38,17 +37,23 @@ from typing import (
     Collection,
     Dict,
     List,
-    Literal,
     Set,
-    TypeAlias,
 )
 from urllib.parse import urlparse
 
 import typer
-from _common import get_json_files, setup_logger
-from rich import print
+from _common import (
+    ErrorReason,
+    ErrorResult,
+    FilteredResult,
+    FilterReason,
+    PipelineResult,
+    ResultSummary,
+    SuccessResult,
+    get_json_files,
+    setup_logger,
+)
 from rich.progress import track
-from rich.tree import Tree
 
 from gocam.datamodel import (
     Association,
@@ -57,7 +62,6 @@ from gocam.datamodel import (
     EnabledByProteinComplexAssociation,
     Model,
     ModelStateEnum,
-    QueryIndex,
 )
 from gocam.indexing.indexer import Indexer
 from gocam.vocabulary.relation import Relation
@@ -552,27 +556,6 @@ MEMBER_VARIABLE_DEFINITIONS = [
 ]
 
 
-class ResultType(str, Enum):
-    SUCCESS = "Success"
-    FILTERED = "Filtered"
-    ERROR = "Error"
-
-
-class FilterReason(str, Enum):
-    """Reason a GO-CAM model was filtered out during processing."""
-
-    NO_MODEL = "No model"
-    NOT_PRODUCTION = "Not a production model"
-
-
-class ErrorReason(str, Enum):
-    """Reason a GO-CAM model failed during processing."""
-
-    READ_ERROR = "Read error"
-    STATS_ERROR = "Error calculating statistics"
-    WRITE_ERROR = "Write error"
-
-
 class GocamStats(ConfiguredBaseModel):
     """Per-model or per-entity (contributor/provider) statistics for GO-CAM data.
 
@@ -706,15 +689,6 @@ class ProteinComplexActivityInfo(ConfiguredBaseModel):
     model_status: str | None = None
     unique_curators: Set[str] = set()
     unique_groups: Set[str] = set()
-
-
-#: Return type for :func:`process_gocam_model_file`.
-#: A 3-tuple of (result_type, query_index_or_none, reason_or_none).
-ProcessingResult: TypeAlias = (
-    tuple[Literal[ResultType.SUCCESS], QueryIndex, None]
-    | tuple[Literal[ResultType.FILTERED], QueryIndex | None, FilterReason]
-    | tuple[Literal[ResultType.ERROR], None, ErrorReason]
-)
 
 
 def _is_production(gocam_model: Model) -> bool:
@@ -1277,7 +1251,7 @@ def process_gocam_model_file(
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
     production_only: bool = True,
     id_label_lookup: Dict[str, str] | None = None,
-) -> ProcessingResult:
+) -> PipelineResult:
     """Process a single GO-CAM model JSON file and compute statistics.
 
     Reads the model, indexes it, collects per-activity counts (enablers,
@@ -1299,8 +1273,7 @@ def process_gocam_model_file(
             model's ``objects`` index to its label.
 
     Returns:
-        A ProcessingResult 3-tuple of (result_type, query_index_or_none,
-        reason_or_none).
+        A result describing whether processing succeeded, was filtered, or failed.
     """
     indexer = Indexer()
     # Read GO-CAM JSON file
@@ -1314,7 +1287,7 @@ def process_gocam_model_file(
         logger.debug(f"Successfully read GO-CAM model from {json_file}")
     except Exception as e:
         logger.error(f"Error reading file {json_file}", exc_info=e)
-        return ResultType.ERROR, None, ErrorReason.READ_ERROR
+        return ErrorResult(reason=ErrorReason.READ_ERROR, details=str(e))
 
     # Skip non-production models before any indexing or accumulation so
     # contributor/provider/aggregate state stays free of non-production data.
@@ -1323,7 +1296,7 @@ def process_gocam_model_file(
             f"Skipping non-production model {gocam_model.id} "
             f"(status={gocam_model.status}) from {json_file}"
         )
-        return ResultType.FILTERED, None, FilterReason.NOT_PRODUCTION
+        return FilteredResult(reason=FilterReason.NOT_PRODUCTION_MODEL)
 
     # Populate the model with indexing information
     indexer.index_model(gocam_model)
@@ -1341,7 +1314,10 @@ def process_gocam_model_file(
     calculated_aggregate_values_by_model = gocam_model.query_index
     if calculated_aggregate_values_by_model is None:
         logger.error(f"No query index for model {json_file}")
-        return ResultType.ERROR, None, ErrorReason.READ_ERROR
+        return ErrorResult(
+            reason=ErrorReason.INDEXING_ERROR,
+            details=f"No query index for model {json_file}",
+        )
 
     # Detailed model statistics information
     stats_by_model = GocamStats()
@@ -1627,7 +1603,7 @@ def process_gocam_model_file(
         logger.info(
             f"Dry run enabled; skipping write for GO-CAM model {gocam_model.id}"
         )
-        return ResultType.SUCCESS, calculated_aggregate_values_by_model, None
+        return SuccessResult(data=calculated_aggregate_values_by_model)
 
     # Write GO-CAM stats to output directory
     calculated_aggregate_values_by_model_subdir = "calculated_aggregate_values_by_model"
@@ -1669,10 +1645,10 @@ def process_gocam_model_file(
 
     except Exception as e:
         logger.error(f"An exception has occurred: {e}")
-        return ResultType.ERROR, None, ErrorReason.WRITE_ERROR
+        return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
     # If we reach here, the conversion and writing were successful
-    return ResultType.SUCCESS, calculated_aggregate_values_by_model, None
+    return SuccessResult(data=calculated_aggregate_values_by_model)
 
 
 def create_filename_from_url(url: str, replacement: str = "_") -> str:
@@ -1722,7 +1698,7 @@ def output_entity_results(
     entity_lookup: Dict[str, GocamStats],
     entity_sub_dir: str,
     entity_agg_file_name: str,
-) -> tuple[ResultType, ErrorReason] | None:
+) -> ErrorResult | None:
     """Compute final counts and write per-entity and aggregate statistics.
 
     Iterates over all entities (contributors or providers), finalizes their
@@ -1840,7 +1816,7 @@ def output_entity_results(
                     f"Error writing contributor model file {stats_by_curator_output_file}",
                     exc_info=e,
                 )
-                return ResultType.ERROR, ErrorReason.WRITE_ERROR
+                return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
     entity_agg.unique_activity_units = len(entity_agg.unique_activities)
     entity_agg.unique_gene_product_enablers = len(
@@ -1885,18 +1861,18 @@ def output_entity_results(
                 f"Error writing entity aggregate stats {aggregate_stats_name_output_file}",
                 exc_info=e,
             )
-            return ResultType.ERROR, ErrorReason.WRITE_ERROR
+            return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
 
 def output_summary(
-    results: list[tuple[Path, ProcessingResult]],
+    results: list[tuple[Path, PipelineResult]],
     output_dir: Path | None,
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
     id_label_lookup: Dict[str, str] | None = None,
-) -> tuple[ResultType, ErrorReason] | None:
+) -> ErrorResult | None:
     """Finalize aggregate statistics and write all summary output files.
 
     Computes final counts on the model-level aggregate, writes the
@@ -1904,7 +1880,7 @@ def output_summary(
     aggregate output, and prints a success/failure summary tree.
 
     Args:
-        results: List of (json_file, ProcessingResult) tuples from model processing.
+        results: List of (json_file, PipelineResult) tuples from model processing.
         output_dir: Directory to write JSON files. If None, no files are written.
         model_aggregate: Accumulated cross-model aggregate statistics.
         contributor_lookup: Mapping of contributor URI to per-contributor stats.
@@ -1968,7 +1944,7 @@ def output_summary(
                 f"Error writing model aggregate stats {aggregate_stats_name_output_file}",
                 exc_info=e,
             )
-            return ResultType.ERROR, ErrorReason.WRITE_ERROR
+            return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
     # Output information for contributor and provider
     output_entity_results(
@@ -2033,31 +2009,10 @@ def output_summary(
                 exc_info=e,
             )
 
-    total_count = len(results)
-    success_count = sum(
-        1 for _, (result, _, _) in results if result == ResultType.SUCCESS
-    )
-    filtered_count = sum(
-        1 for _, (result, _, _) in results if result == ResultType.FILTERED
-    )
-    error_count = sum(1 for _, (result, _, _) in results if result == ResultType.ERROR)
-
-    tree = Tree(f"[bold]Processed {total_count} models[/bold]")
-    if success_count > 0:
-        tree.add(
-            f"Successfully output stats for  [b]{success_count}[/b] models",
-            style="green",
-        )
-
-    if filtered_count > 0:
-        tree.add(
-            f"Skipped  [b]{filtered_count}[/b] non-production models",
-            style="yellow",
-        )
-
-    if error_count > 0:
-        tree.add(f"Did not output stats for  [b]{error_count}[/b] models", style="red")
-    print(tree)
+    result_summary = ResultSummary()
+    for json_file, result in results:
+        result_summary.add_result(json_file.stem, result)
+    result_summary.print()
 
 
 @app.command()
@@ -2126,7 +2081,7 @@ def main(
     json_files = get_json_files(input_dir, limit=limit)
 
     # Process each JSON file
-    results: list[tuple[Path, ProcessingResult]] = []
+    results: list[tuple[Path, PipelineResult]] = []
     model_aggregate = AggregateInfo()
     contributor_lookup: Dict[str, GocamStats] = {}
     provider_lookup: Dict[str, GocamStats] = {}
