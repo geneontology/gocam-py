@@ -1545,7 +1545,6 @@ def process_gocam_model_file(
 
     # Update aggregate model data
     model_aggregate.total_entities_processed += 1
-    model_aggregate.unique_activity_units += query_index.number_of_activities or 0
     model_aggregate.genes = model_aggregate.genes + stats_by_model.genes
     model_aggregate.explicit_causal_relations = (
         model_aggregate.explicit_causal_relations
@@ -1872,6 +1871,7 @@ def output_summary(
         model_aggregate.unique_enabled_by_gene_product
     )
     model_aggregate.unique_references = len(model_aggregate.list_of_unique_references)
+    model_aggregate.unique_activity_units = len(model_aggregate.unique_activities)
     model_aggregate.activity_units_enabled_by_protein_complex_association = len(
         model_aggregate.unique_activity_unit_protein_complex_enablers
     )
