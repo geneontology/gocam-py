@@ -768,6 +768,68 @@ def compute_molecule_and_term_counts(stats: GocamStats | AggregateInfo) -> None:
     stats.unique_go_terms = len(set(go_terms))
 
 
+def _finalize_gocam_stats(
+    stats: GocamStats,
+    *,
+    activity_units: int,
+    explicit_causal_relations: int | None = None,
+) -> None:
+    """Populate derived counts and sort lists on per-model or per-entity stats."""
+    stats.models = len(stats.unique_models)
+    stats.activity_units = activity_units
+    if explicit_causal_relations is not None:
+        stats.explicit_causal_relations = explicit_causal_relations
+    stats.unique_explicit_causal_relations = len(
+        stats.list_of_unique_explicit_causal_relations
+    )
+    stats.activity_units_enabled_by_gene_product = len(
+        stats.unique_activity_unit_gene_product_enablers
+    )
+    stats.activity_units_enabled_by_protein_complex = len(
+        stats.unique_activity_unit_protein_complex_enablers
+    )
+    stats.unique_gene_product_enablers = len(stats.unique_enabled_by_gene_product)
+    stats.unique_protein_complex_genes = len(stats.list_of_unique_protein_complex_genes)
+    stats.unique_gene_product_and_protein_complex_gene_enablers = len(
+        stats.unique_enabled_by_gene_product.union(
+            stats.list_of_unique_protein_complex_genes
+        )
+    )
+    stats.unique_references = len(stats.list_of_unique_references)
+    stats.unique_pmid = _count_pmids(stats.list_of_unique_references)
+    if stats.list_enabled_by_gene_product is not None:
+        stats.list_enabled_by_gene_product.sort()
+    if stats.list_enabled_by_protein_complex is not None:
+        stats.list_enabled_by_protein_complex.sort()
+    compute_molecule_and_term_counts(stats)
+
+
+def _finalize_aggregate_info(stats: AggregateInfo) -> None:
+    """Populate counts derived from the working collections on aggregate stats."""
+    stats.unique_activity_units = len(stats.unique_activities)
+    stats.unique_gene_product_enablers = len(stats.unique_enabled_by_gene_product)
+    stats.unique_references = len(stats.list_of_unique_references)
+    stats.unique_pmid = _count_pmids(stats.list_of_unique_references)
+    stats.activity_units_enabled_by_protein_complex_association = len(
+        stats.unique_activity_unit_protein_complex_enablers
+    )
+    stats.activity_units_enabled_by_gene_product_association = len(
+        stats.unique_activity_unit_gene_product_enablers
+    )
+    stats.unique_protein_complex_terms = len(
+        stats.unique_protein_complex_in_activity_term
+    )
+    stats.unique_member_protein_complex_genes = len(
+        stats.list_of_unique_protein_complex_genes
+    )
+    stats.unique_gene_product_and_protein_complex_gene_enablers = len(
+        stats.unique_enabled_by_gene_product.union(
+            stats.list_of_unique_protein_complex_genes
+        )
+    )
+    compute_molecule_and_term_counts(stats)
+
+
 def _update_entity_gene_stats(
     entity_info: GocamStats,
     activity,
@@ -828,9 +890,7 @@ def _update_entity_gene_stats(
     entity_info.unique_models.add(gocam_model_id)
 
 
-def _is_association_obsolete(
-    association: Association, obsolete_ids: set[str]
-) -> bool:
+def _is_association_obsolete(association: Association, obsolete_ids: set[str]) -> bool:
     """Check if an association references an obsolete term or molecule."""
     referenced_id: str | None
 
@@ -1289,7 +1349,6 @@ def process_gocam_model_file(
     if model_aggregate.list_model_details is not None:
         model_aggregate.list_model_details.append(model_details)
     stats_by_model.unique_models.add(gocam_model.id)
-    stats_by_model.models = len(stats_by_model.unique_models)
 
     if gocam_model.activities:
         for activity in gocam_model.activities:
@@ -1502,40 +1561,13 @@ def process_gocam_model_file(
         if model_aggregate.list_inferred_relations is not None:
             model_aggregate.list_inferred_relations.extend(inferred)
 
-    # Set fields, counts and sort data for current model
-    stats_by_model.explicit_causal_relations = len(
-        stats_by_model.list_explicit_causal_relations or []
+    _finalize_gocam_stats(
+        stats_by_model,
+        activity_units=query_index.number_of_activities or 0,
+        explicit_causal_relations=len(
+            stats_by_model.list_explicit_causal_relations or []
+        ),
     )
-    stats_by_model.unique_explicit_causal_relations = len(
-        stats_by_model.list_of_unique_explicit_causal_relations
-    )
-    stats_by_model.activity_units = query_index.number_of_activities or 0
-    stats_by_model.unique_references = len(stats_by_model.list_of_unique_references)
-    stats_by_model.unique_pmid = _count_pmids(stats_by_model.list_of_unique_references)
-
-    stats_by_model.activity_units_enabled_by_gene_product = len(
-        stats_by_model.unique_activity_unit_gene_product_enablers
-    )
-    stats_by_model.activity_units_enabled_by_protein_complex = len(
-        stats_by_model.unique_activity_unit_protein_complex_enablers
-    )
-
-    stats_by_model.unique_gene_product_enablers = len(
-        stats_by_model.unique_enabled_by_gene_product
-    )
-    stats_by_model.unique_protein_complex_genes = len(
-        stats_by_model.list_of_unique_protein_complex_genes
-    )
-    stats_by_model.unique_gene_product_and_protein_complex_gene_enablers = len(
-        stats_by_model.unique_enabled_by_gene_product.union(
-            stats_by_model.list_of_unique_protein_complex_genes
-        )
-    )
-    if stats_by_model.list_enabled_by_gene_product is not None:
-        stats_by_model.list_enabled_by_gene_product.sort()
-    if stats_by_model.list_enabled_by_protein_complex is not None:
-        stats_by_model.list_enabled_by_protein_complex.sort()
-    compute_molecule_and_term_counts(stats_by_model)
 
     # Populate the id→label lookup from every object seen in this model
     _collect_labels(
@@ -1715,39 +1747,11 @@ def output_entity_results(
 
     for entity, details in entity_lookup.items():
         logger.debug(f"Processing contributor: {entity}")
-        # Set numbers
         details.uri = entity
-        details.models = len(details.unique_models)
-        details.unique_gene_product_enablers = len(
-            details.unique_enabled_by_gene_product
+        _finalize_gocam_stats(
+            details,
+            activity_units=len(details.unique_activities),
         )
-        details.unique_protein_complex_genes = len(
-            details.list_of_unique_protein_complex_genes
-        )
-        details.unique_gene_product_and_protein_complex_gene_enablers = len(
-            details.unique_enabled_by_gene_product.union(
-                details.list_of_unique_protein_complex_genes
-            )
-        )
-        details.unique_references = len(details.list_of_unique_references)
-        details.activity_units = len(details.unique_activities)
-        details.activity_units_enabled_by_gene_product = len(
-            details.unique_activity_unit_gene_product_enablers
-        )
-        details.activity_units_enabled_by_protein_complex = len(
-            details.unique_activity_unit_protein_complex_enablers
-        )
-        details.unique_explicit_causal_relations = len(
-            details.list_of_unique_explicit_causal_relations
-        )
-        compute_molecule_and_term_counts(details)
-
-        # Sort lists
-        if details.list_enabled_by_gene_product is not None:
-            details.list_enabled_by_gene_product.sort()
-        if details.list_enabled_by_protein_complex is not None:
-            details.list_enabled_by_protein_complex.sort()
-        details.unique_pmid = _count_pmids(details.list_of_unique_references)
 
         entity_agg.genes = entity_agg.genes + details.genes
         entity_agg.explicit_causal_relations = (
@@ -1782,7 +1786,6 @@ def output_entity_results(
             entity_agg.list_has_output_term.extend(details.list_has_output_term)
         if entity_agg.list_go_terms is not None and details.list_go_terms is not None:
             entity_agg.list_go_terms.extend(details.list_go_terms)
-        compute_molecule_and_term_counts(entity_agg)
 
         if output_dir is not None:
             stats_by_entity_subdir = entity_sub_dir
@@ -1801,29 +1804,7 @@ def output_entity_results(
             )
             results.append((stats_by_entity_output_file, result))
 
-    entity_agg.unique_activity_units = len(entity_agg.unique_activities)
-    entity_agg.unique_gene_product_enablers = len(
-        entity_agg.unique_enabled_by_gene_product
-    )
-    entity_agg.unique_references = len(entity_agg.list_of_unique_references)
-    entity_agg.unique_pmid = _count_pmids(entity_agg.list_of_unique_references)
-    entity_agg.activity_units_enabled_by_protein_complex_association = len(
-        entity_agg.unique_activity_unit_protein_complex_enablers
-    )
-    entity_agg.activity_units_enabled_by_gene_product_association = len(
-        entity_agg.unique_activity_unit_gene_product_enablers
-    )
-    entity_agg.unique_protein_complex_terms = len(
-        entity_agg.unique_protein_complex_in_activity_term
-    )
-    entity_agg.unique_member_protein_complex_genes = len(
-        entity_agg.list_of_unique_protein_complex_genes
-    )
-    entity_agg.unique_gene_product_and_protein_complex_gene_enablers = len(
-        entity_agg.unique_enabled_by_gene_product.union(
-            entity_agg.list_of_unique_protein_complex_genes
-        )
-    )
+    _finalize_aggregate_info(entity_agg)
 
     if output_dir is not None:
         aggregate_stats_name = entity_agg_file_name
@@ -1867,36 +1848,10 @@ def output_summary(
     """
     output_results: list[tuple[Path, PipelineResult]] = []
     model_aggregate.entity = "Model"
-    model_aggregate.unique_gene_product_enablers = len(
-        model_aggregate.unique_enabled_by_gene_product
-    )
-    model_aggregate.unique_references = len(model_aggregate.list_of_unique_references)
-    model_aggregate.unique_activity_units = len(model_aggregate.unique_activities)
-    model_aggregate.activity_units_enabled_by_protein_complex_association = len(
-        model_aggregate.unique_activity_unit_protein_complex_enablers
-    )
-    model_aggregate.activity_units_enabled_by_gene_product_association = len(
-        model_aggregate.unique_activity_unit_gene_product_enablers
-    )
-    model_aggregate.unique_protein_complex_terms = len(
-        model_aggregate.unique_protein_complex_in_activity_term
-    )
-    model_aggregate.unique_member_protein_complex_genes = len(
-        model_aggregate.list_of_unique_protein_complex_genes
-    )
-    model_aggregate.unique_gene_product_and_protein_complex_gene_enablers = len(
-        model_aggregate.unique_enabled_by_gene_product.union(
-            model_aggregate.list_of_unique_protein_complex_genes
-        )
-    )
-    compute_molecule_and_term_counts(model_aggregate)
+    _finalize_aggregate_info(model_aggregate)
 
     model_aggregate.total_inferred_relations = len(
         model_aggregate.list_inferred_relations or []
-    )
-
-    model_aggregate.unique_pmid = _count_pmids(
-        model_aggregate.list_of_unique_references
     )
 
     status_counts: Dict[str, int] = {}
