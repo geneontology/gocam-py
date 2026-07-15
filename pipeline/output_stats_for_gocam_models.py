@@ -60,22 +60,23 @@ from rich.progress import track
 from rich.tree import Tree
 
 from gocam.datamodel import (
+    Activity,
     Association,
     ConfiguredBaseModel,
+    EnabledByAssociation,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     Model,
     ModelStateEnum,
+    MoleculeAssociation,
+    TermAssociation,
 )
 from gocam.indexing.indexer import Indexer
-from gocam.vocabulary.relation import Relation
+from gocam.utils import all_activity_inputs, all_activity_outputs, all_associations
 
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
-
-INPUT_PREDICATES = {Relation.HAS_INPUT.value, Relation.HAS_PRIMARY_INPUT.value}
-OUTPUT_PREDICATES = {Relation.HAS_OUTPUT.value, Relation.HAS_PRIMARY_OUTPUT.value}
 
 MEMBER_VARIABLE_DEFINITIONS = [
     # --- GocamStats ---
@@ -827,20 +828,30 @@ def _update_entity_gene_stats(
     entity_info.unique_models.add(gocam_model_id)
 
 
-def _is_association_obsolete(assoc: Association, obsolete_ids: set[str]) -> bool:
+def _is_association_obsolete(
+    association: Association, obsolete_ids: set[str]
+) -> bool:
     """Check if an association references an obsolete term or molecule."""
-    term = getattr(assoc, "term", None) or getattr(assoc, "molecule", None)
-    return isinstance(term, str) and term in obsolete_ids
+    referenced_id: str | None
+
+    if isinstance(association, MoleculeAssociation):
+        referenced_id = association.molecule
+    elif isinstance(association, (EnabledByAssociation, TermAssociation)):
+        referenced_id = association.term
+    else:
+        return False
+
+    return referenced_id is not None and referenced_id in obsolete_ids
 
 
 def _iter_activity_associations(
-    activity,
+    activity: Activity,
     obsolete_ids: set[str],
 ) -> list[Association]:
     """Collect all non-obsolete Association objects from an Activity.
 
-    Walks enabled_by, molecular_function, part_of, occurs_in, inputs,
-    outputs, and causal_associations, skipping any that reference obsolete terms.
+    Uses the shared model traversal and skips associations that reference obsolete
+    terms.
 
     Args:
         activity: An Activity from the GO-CAM model.
@@ -849,51 +860,11 @@ def _iter_activity_associations(
     Returns:
         List of non-obsolete Association objects.
     """
-    associations: list[Association] = []
-    if activity.enabled_by and not _is_association_obsolete(
-        activity.enabled_by, obsolete_ids
-    ):
-        associations.append(activity.enabled_by)
-        if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-            if activity.enabled_by.has_part:
-                for (
-                    protein_complex_has_part_association
-                ) in activity.enabled_by.has_part:
-                    if not _is_association_obsolete(
-                        protein_complex_has_part_association, obsolete_ids
-                    ):
-                        associations.append(protein_complex_has_part_association)
-    if activity.molecular_function and not _is_association_obsolete(
-        activity.molecular_function, obsolete_ids
-    ):
-        associations.append(activity.molecular_function)
-    if activity.part_of and not _is_association_obsolete(
-        activity.part_of, obsolete_ids
-    ):
-        associations.append(activity.part_of)
-        if activity.part_of.happens_during and not _is_association_obsolete(
-            activity.part_of.happens_during, obsolete_ids
-        ):
-            associations.append(activity.part_of.happens_during)
-        if activity.part_of.part_of and not _is_association_obsolete(
-            activity.part_of.part_of, obsolete_ids
-        ):
-            associations.append(activity.part_of.part_of)
-    if activity.occurs_in and not _is_association_obsolete(
-        activity.occurs_in, obsolete_ids
-    ):
-        associations.append(activity.occurs_in)
-        if activity.occurs_in.part_of and not _is_association_obsolete(
-            activity.occurs_in.part_of, obsolete_ids
-        ):
-            associations.append(activity.occurs_in.part_of)
-    for mol_assoc in activity.molecular_associations or []:
-        if not _is_association_obsolete(mol_assoc, obsolete_ids):
-            associations.append(mol_assoc)
-    for causal_association in activity.causal_associations or []:
-        if not _is_association_obsolete(causal_association, obsolete_ids):
-            associations.append(causal_association)
-    return associations
+    return [
+        association
+        for association in all_associations(activity)
+        if not _is_association_obsolete(association, obsolete_ids)
+    ]
 
 
 def _collect_references(
@@ -943,7 +914,7 @@ def _collect_references(
 
 
 def _collect_molecule_terms(
-    activity,
+    activity: Activity,
     stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
@@ -953,9 +924,8 @@ def _collect_molecule_terms(
 ) -> None:
     """Collect molecule input/output terms from MoleculeAssociation objects.
 
-    Iterates over molecular_associations for the given activity, classifying
-    each by its predicate into input or output, and attributes terms to
-    contributors and providers via association-level provenances.
+    Uses the shared input/output utilities and attributes terms to contributors
+    and providers via association-level provenances.
 
     Populates:
         stats_by_model.list_has_input_term / list_has_output_term
@@ -963,50 +933,41 @@ def _collect_molecule_terms(
         contributor_lookup[contributor].list_has_input_term / list_has_output_term
         provider_lookup[provider].list_has_input_term / list_has_output_term
     """
-    for ma in activity.molecular_associations or []:
-        molecule_id = ma.molecule
-        if not molecule_id or molecule_id in obsolete_ids:
-            continue
-        # Resolve molecule node ID to its actual term (e.g. CHEBI:58199)
-        molecule = (
-            molecule_lookup.get(molecule_id, molecule_id)
-            if molecule_lookup
-            else molecule_id
-        )
-        if not molecule or molecule in obsolete_ids:
-            continue
+    association_groups = (
+        (all_activity_inputs(activity), "list_has_input_term"),
+        (all_activity_outputs(activity), "list_has_output_term"),
+    )
+    for associations, target_attr in association_groups:
+        for association in associations:
+            molecule_id = association.molecule
+            if not molecule_id or molecule_id in obsolete_ids:
+                continue
+            molecule = (
+                molecule_lookup.get(molecule_id, molecule_id)
+                if molecule_lookup
+                else molecule_id
+            )
+            if not molecule or molecule in obsolete_ids:
+                continue
 
-        # Determine whether this is an input or output association
-        if ma.predicate in INPUT_PREDICATES:
-            target_attr = "list_has_input_term"
-        elif ma.predicate in OUTPUT_PREDICATES:
-            target_attr = "list_has_output_term"
-        else:
-            continue
+            for target in (stats_by_model, model_aggregate):
+                term_list = getattr(target, target_attr)
+                if term_list is not None:
+                    term_list.append(molecule)
 
-        for target in (stats_by_model, model_aggregate):
-            term_list = getattr(target, target_attr)
-            if term_list is not None:
-                term_list.append(molecule)
-
-        if ma.provenances:
-            for provenance in ma.provenances:
-                if provenance.contributor:
-                    for contributor in provenance.contributor:
-                        contributor_info = contributor_lookup.setdefault(
-                            contributor, GocamStats()
-                        )
-                        term_list = getattr(contributor_info, target_attr)
-                        if term_list is not None:
-                            term_list.append(molecule)
-                if provenance.provided_by:
-                    for provider in provenance.provided_by:
-                        provider_info = provider_lookup.setdefault(
-                            provider, GocamStats()
-                        )
-                        term_list = getattr(provider_info, target_attr)
-                        if term_list is not None:
-                            term_list.append(molecule)
+            for provenance in association.provenances or []:
+                for contributor in provenance.contributor or []:
+                    contributor_info = contributor_lookup.setdefault(
+                        contributor, GocamStats()
+                    )
+                    term_list = getattr(contributor_info, target_attr)
+                    if term_list is not None:
+                        term_list.append(molecule)
+                for provider in provenance.provided_by or []:
+                    provider_info = provider_lookup.setdefault(provider, GocamStats())
+                    term_list = getattr(provider_info, target_attr)
+                    if term_list is not None:
+                        term_list.append(molecule)
 
 
 def _collect_terms(
@@ -1085,28 +1046,23 @@ def _collect_terms(
 
 
 def _get_chemical_terms(
-    molecular_associations: list | None,
-    predicates: set[str],
+    molecular_associations: Collection[MoleculeAssociation],
     obsolete_ids: set[str],
     molecule_lookup: Dict[str, str] | None = None,
 ) -> set[str]:
-    """Extract CHEBI chemical terms from molecular associations matching given predicates.
+    """Extract CHEBI terms from input or output molecule associations.
 
-    Filters molecular_associations by predicate, then collects molecule values
-    that are CHEBI terms and not obsolete.
+    Collects CHEBI molecule values from already-classified associations.
 
     Args:
         molecular_associations: List of MoleculeAssociation objects from an activity.
-        predicates: Set of RO relation URIs to match (e.g. INPUT_PREDICATES or OUTPUT_PREDICATES).
         obsolete_ids: Set of object IDs marked as obsolete.
 
     Returns:
         A set of CHEBI molecule strings.
     """
     terms: set[str] = set()
-    for ma in molecular_associations or []:
-        if ma.predicate not in predicates:
-            continue
+    for ma in molecular_associations:
         molecule_id = ma.molecule
         if not molecule_id or molecule_id in obsolete_ids:
             continue
@@ -1126,7 +1082,7 @@ def _get_chemical_terms(
 
 
 def _get_activity_genes(
-    activity,
+    activity: Activity,
     obsolete_ids: set[str],
 ) -> list[str]:
     """Return the list of gene terms that enable an activity.
@@ -1150,7 +1106,7 @@ def _get_activity_genes(
 
 
 def _compute_inferred_relations(
-    activities: list,
+    activities: list[Activity],
     obsolete_ids: set[str],
     molecule_lookup: Dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
@@ -1177,8 +1133,7 @@ def _compute_inferred_relations(
         activity_genes[activity.id] = _get_activity_genes(activity, obsolete_ids)
 
         outputs = _get_chemical_terms(
-            activity.molecular_associations,
-            OUTPUT_PREDICATES,
+            all_activity_outputs(activity),
             obsolete_ids,
             molecule_lookup,
         )
@@ -1186,8 +1141,7 @@ def _compute_inferred_relations(
             activity_chem_outputs[activity.id] = outputs
 
         inputs = _get_chemical_terms(
-            activity.molecular_associations,
-            INPUT_PREDICATES,
+            all_activity_inputs(activity),
             obsolete_ids,
             molecule_lookup,
         )
