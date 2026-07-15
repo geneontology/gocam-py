@@ -45,8 +45,8 @@ from typing import (
 from urllib.parse import urlparse
 
 import typer
+from _common import get_json_files, setup_logger
 from rich import print
-from rich.logging import RichHandler
 from rich.progress import track
 from rich.tree import Tree
 
@@ -726,21 +726,6 @@ def _is_production(gocam_model: Model) -> bool:
     return gocam_model.status == ModelStateEnum.production
 
 
-def setup_logger(verbose: int) -> None:
-    """Set up the logger with the specified verbosity level.
-
-    Args:
-        verbose (int): Verbosity level (0: WARNING, 1: INFO, 2: DEBUG)
-    """
-    if verbose == 0:
-        level = logging.WARNING
-    elif verbose == 1:
-        level = logging.INFO
-    else:
-        level = logging.DEBUG
-    logging.basicConfig(level=level, format="%(message)s", handlers=[RichHandler()])
-
-
 def _count_pmids(references: Collection[str]) -> int:
     """Count the number of PMID references in a set of references."""
     return count_type_in_collection(references, "pmid")
@@ -830,13 +815,16 @@ def _update_entity_gene_stats(
             entity_info.unique_enabled_by_gene_product.add(activity.enabled_by.term)
             entity_info.genes += 1
 
-        if (activity.enabled_by.part_of):
-            for (part_of_protein_complex_association) in activity.enabled_by.part_of:
-                if (part_of_protein_complex_association.term and part_of_protein_complex_association.term not in obsolete_ids):
+        if activity.enabled_by.part_of:
+            for part_of_protein_complex_association in activity.enabled_by.part_of:
+                if (
+                    part_of_protein_complex_association.term
+                    and part_of_protein_complex_association.term not in obsolete_ids
+                ):
                     entity_info.unique_protein_complex_in_activity_term.add(
                         part_of_protein_complex_association.term
-                    )            
-            
+                    )
+
     if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
         entity_info.unique_activity_unit_protein_complex_enablers.add(activity.id)
         if activity.enabled_by.term and activity.enabled_by.term not in obsolete_ids:
@@ -1400,9 +1388,15 @@ def process_gocam_model_file(
                         activity.enabled_by.term
                     )
 
-                if (activity.enabled_by.part_of):
-                    for (part_of_protein_complex_association) in activity.enabled_by.part_of:
-                        if (part_of_protein_complex_association.term and part_of_protein_complex_association.term not in obsolete_ids):
+                if activity.enabled_by.part_of:
+                    for (
+                        part_of_protein_complex_association
+                    ) in activity.enabled_by.part_of:
+                        if (
+                            part_of_protein_complex_association.term
+                            and part_of_protein_complex_association.term
+                            not in obsolete_ids
+                        ):
                             stats_by_model.unique_protein_complex_in_activity_term.add(
                                 part_of_protein_complex_association.term
                             )
@@ -2129,18 +2123,7 @@ def main(
             "Output directory must be specified unless --dry-run is used."
         )
 
-    # Get list of JSON files in the input directory, excluding hidden files, and sort them
-    # for consistent processing order. Apply limit if specified.
-    json_files = sorted(
-        f for f in input_dir.glob("*.json") if not f.name.startswith(".")
-    )
-    if limit > 0:
-        json_files = json_files[:limit]
-
-    # If no JSON files found, log a warning and exit
-    if not json_files:
-        logger.warning(f"No JSON files found in the specified directory: {input_dir}")
-        raise typer.Exit(code=1)
+    json_files = get_json_files(input_dir, limit=limit)
 
     # Process each JSON file
     results: list[tuple[Path, ProcessingResult]] = []
