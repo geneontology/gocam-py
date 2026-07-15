@@ -1266,8 +1266,8 @@ def process_gocam_model_file(
             molecule_lookup[mol_node.id] = mol_node.term
 
     # Get model statistics information
-    calculated_aggregate_values_by_model = gocam_model.query_index
-    if calculated_aggregate_values_by_model is None:
+    query_index = gocam_model.query_index
+    if query_index is None:
         logger.error(f"No query index for model {json_file}")
         return ErrorResult(
             reason=ErrorReason.INDEXING_ERROR,
@@ -1509,9 +1509,7 @@ def process_gocam_model_file(
     stats_by_model.unique_explicit_causal_relations = len(
         stats_by_model.list_of_unique_explicit_causal_relations
     )
-    stats_by_model.activity_units = (
-        calculated_aggregate_values_by_model.number_of_activities or 0
-    )
+    stats_by_model.activity_units = query_index.number_of_activities or 0
     stats_by_model.unique_references = len(stats_by_model.list_of_unique_references)
     stats_by_model.unique_pmid = _count_pmids(stats_by_model.list_of_unique_references)
 
@@ -1547,6 +1545,7 @@ def process_gocam_model_file(
 
     # Update aggregate model data
     model_aggregate.total_entities_processed += 1
+    model_aggregate.unique_activity_units += query_index.number_of_activities or 0
     model_aggregate.genes = model_aggregate.genes + stats_by_model.genes
     model_aggregate.explicit_causal_relations = (
         model_aggregate.explicit_causal_relations
@@ -1558,7 +1557,7 @@ def process_gocam_model_file(
         logger.info(
             f"Dry run enabled; skipping write for GO-CAM model {gocam_model.id}"
         )
-        return SuccessResult(data=calculated_aggregate_values_by_model)
+        return SuccessResult(data=query_index)
 
     # Write GO-CAM stats to output directory
     calculated_aggregate_values_by_model_subdir = "calculated_aggregate_values_by_model"
@@ -1582,9 +1581,7 @@ def process_gocam_model_file(
     stats_by_model_output_file.parent.mkdir(parents=True, exist_ok=True)
 
     try:
-        model_stats_json = calculated_aggregate_values_by_model.model_dump_json(
-            exclude_none=True
-        )
+        model_stats_json = query_index.model_dump_json(exclude_none=True)
         with open(calculated_aggregate_values_by_model_name_file, "w") as f:
             f.write(model_stats_json)
         logger.info(
@@ -1603,7 +1600,7 @@ def process_gocam_model_file(
         return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
     # If we reach here, the conversion and writing were successful
-    return SuccessResult(data=calculated_aggregate_values_by_model)
+    return SuccessResult(data=query_index)
 
 
 def create_filename_from_url(url: str, replacement: str = "_") -> str:
@@ -1875,7 +1872,6 @@ def output_summary(
         model_aggregate.unique_enabled_by_gene_product
     )
     model_aggregate.unique_references = len(model_aggregate.list_of_unique_references)
-    model_aggregate.unique_activity_units = len(model_aggregate.unique_activities)
     model_aggregate.activity_units_enabled_by_protein_complex_association = len(
         model_aggregate.unique_activity_unit_protein_complex_enablers
     )
