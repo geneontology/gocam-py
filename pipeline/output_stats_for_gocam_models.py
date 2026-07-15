@@ -1560,35 +1560,41 @@ def process_gocam_model_file(
         / calculated_aggregate_values_by_model_subdir
         / calculated_aggregate_values_by_model_name
     )
-    calculated_aggregate_values_by_model_name_file.parent.mkdir(
-        parents=True, exist_ok=True
-    )
 
     stats_by_model_subdir = "stats_by_model"
     stats_by_model_name = "stats_by_model_" + json_file.name
     stats_by_model_output_file = (
         output_dir / stats_by_model_subdir / stats_by_model_name
     )
-    stats_by_model_output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    try:
-        model_stats_json = query_index.model_dump_json(exclude_none=True)
-        with open(calculated_aggregate_values_by_model_name_file, "w") as f:
-            f.write(model_stats_json)
-        logger.info(
-            f"Successfully wrote GO-CAM all_stats to {calculated_aggregate_values_by_model_name_file}"
+    output_results = [
+        (
+            calculated_aggregate_values_by_model_name_file,
+            _write_output_file(
+                calculated_aggregate_values_by_model_name_file,
+                lambda file: file.write(query_index.model_dump_json(exclude_none=True)),
+            ),
+        ),
+        (
+            stats_by_model_output_file,
+            _write_output_file(
+                stats_by_model_output_file,
+                lambda file: file.write(
+                    stats_by_model.model_dump_json(exclude_none=True)
+                ),
+            ),
+        ),
+    ]
+    errors = [
+        f"{output_file}: {result.details}"
+        for output_file, result in output_results
+        if isinstance(result, ErrorResult)
+    ]
+    if errors:
+        return ErrorResult(
+            reason=ErrorReason.WRITE_ERROR,
+            details="; ".join(errors),
         )
-
-        stats_by_model_json = stats_by_model.model_dump_json(exclude_none=True)
-        with open(stats_by_model_output_file, "w") as f:
-            f.write(stats_by_model_json)
-        logger.info(
-            f"Successfully wrote GO-CAM detailed_model_stats to {stats_by_model_output_file}"
-        )
-
-    except Exception as e:
-        logger.error(f"An exception has occurred: {e}")
-        return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
 
     # If we reach here, the conversion and writing were successful
     return SuccessResult(data=query_index)
