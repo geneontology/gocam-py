@@ -928,18 +928,16 @@ def _iter_activity_associations(
 
 
 def _collect_references(
-    gocam_model: Model,
+    associations: Collection[Association],
     stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
-    obsolete_ids: set[str],
 ) -> None:
-    """Collect reference objects from all evidence items in the model.
+    """Collect reference objects from evidence on the supplied associations.
 
-    Iterates over every association across all activities, extracts references
-    from evidence items, and attributes them to contributors and providers
-    via the evidence-level provenances.
+    Extracts references from evidence items and attributes them to contributors
+    and providers via the evidence-level provenances.
 
     Populates:
         stats_by_model.list_of_unique_references: all references for this model
@@ -947,30 +945,22 @@ def _collect_references(
         contributor_lookup[contributor].list_of_unique_references: references by contributor
         provider_lookup[provider].list_of_unique_references: references by provider
     """
-    for activity in gocam_model.activities or []:
-        for association in _iter_activity_associations(activity, obsolete_ids):
-            if not association.evidence:
+    for association in associations:
+        for evidence in association.evidence or []:
+            if not evidence.reference:
                 continue
-            for evidence in association.evidence:
-                if not evidence.reference:
-                    continue
-                ref = evidence.reference
-                stats_by_model.list_of_unique_references.add(ref)
-                model_aggregate.list_of_unique_references.add(ref)
-                if evidence.provenances:
-                    for provenance in evidence.provenances:
-                        if provenance.contributor:
-                            for contributor in provenance.contributor:
-                                contributor_info = contributor_lookup.setdefault(
-                                    contributor, GocamStats()
-                                )
-                                contributor_info.list_of_unique_references.add(ref)
-                        if provenance.provided_by:
-                            for provider in provenance.provided_by:
-                                provider_info = provider_lookup.setdefault(
-                                    provider, GocamStats()
-                                )
-                                provider_info.list_of_unique_references.add(ref)
+            ref = evidence.reference
+            stats_by_model.list_of_unique_references.add(ref)
+            model_aggregate.list_of_unique_references.add(ref)
+            for provenance in evidence.provenances or []:
+                for contributor in provenance.contributor or []:
+                    contributor_info = contributor_lookup.setdefault(
+                        contributor, GocamStats()
+                    )
+                    contributor_info.list_of_unique_references.add(ref)
+                for provider in provenance.provided_by or []:
+                    provider_info = provider_lookup.setdefault(provider, GocamStats())
+                    provider_info.list_of_unique_references.add(ref)
 
 
 def _collect_molecule_terms(
@@ -1031,21 +1021,18 @@ def _collect_molecule_terms(
 
 
 def _collect_terms(
-    activity,
+    associations: Collection[Association],
     stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
-    obsolete_ids: set[str],
 ) -> None:
-    """Collect GO terms from all objects within an activity.
+    """Collect GO terms from the supplied associations.
 
-    Recursively walks the entire activity object tree.  For every object
-    that has a ``term`` attribute whose value starts with "GO:"
-    (case-insensitive), the term is appended to list_go_terms on the
-    model-level, aggregate, contributor, and provider stats objects.
-    Contributor/provider attribution uses the ``provenances`` on the same
-    object that carries the term.
+    For every term-bearing association whose term starts with "GO:"
+    (case-insensitive), appends the term to model-level, aggregate,
+    contributor, and provider statistics. Contributor/provider attribution
+    uses the provenances on the association that carries the term.
 
     Populates:
         stats_by_model.list_go_terms
@@ -1054,55 +1041,27 @@ def _collect_terms(
         provider_lookup[provider].list_go_terms
     """
 
-    def _walk(obj) -> None:
-        if obj is None:
-            return
-        if not isinstance(obj, ConfiguredBaseModel):
-            return
-
-        # Skip obsolete objects and their subtrees
-        if _is_obsolete(obj):
-            return
-
-        # Check whether this object carries a GO term
-        term = getattr(obj, "term", None)
-        if isinstance(term, str) and term in obsolete_ids:
-            return
-        if isinstance(term, str) and term.upper().startswith("GO:"):
-            if stats_by_model.list_go_terms is not None:
-                stats_by_model.list_go_terms.append(term)
-            if model_aggregate.list_go_terms is not None:
-                model_aggregate.list_go_terms.append(term)
-            provenances = getattr(obj, "provenances", None)
-            if provenances:
-                for provenance in provenances:
-                    if provenance.contributor:
-                        for contributor in provenance.contributor:
-                            contributor_info = contributor_lookup.setdefault(
-                                contributor, GocamStats()
-                            )
-                            if contributor_info.list_go_terms is not None:
-                                contributor_info.list_go_terms.append(term)
-                    if provenance.provided_by:
-                        for provider in provenance.provided_by:
-                            provider_info = provider_lookup.setdefault(
-                                provider, GocamStats()
-                            )
-                            if provider_info.list_go_terms is not None:
-                                provider_info.list_go_terms.append(term)
-
-        # Recurse into all fields of this Pydantic model
-        for field_name in type(obj).model_fields:
-            value = getattr(obj, field_name, None)
-            if value is None:
-                continue
-            if isinstance(value, list):
-                for item in value:
-                    _walk(item)
-            else:
-                _walk(value)
-
-    _walk(activity)
+    for association in associations:
+        if not isinstance(association, (EnabledByAssociation, TermAssociation)):
+            continue
+        term = association.term
+        if not term or not term.upper().startswith("GO:"):
+            continue
+        if stats_by_model.list_go_terms is not None:
+            stats_by_model.list_go_terms.append(term)
+        if model_aggregate.list_go_terms is not None:
+            model_aggregate.list_go_terms.append(term)
+        for provenance in association.provenances or []:
+            for contributor in provenance.contributor or []:
+                contributor_info = contributor_lookup.setdefault(
+                    contributor, GocamStats()
+                )
+                if contributor_info.list_go_terms is not None:
+                    contributor_info.list_go_terms.append(term)
+            for provider in provenance.provided_by or []:
+                provider_info = provider_lookup.setdefault(provider, GocamStats())
+                if provider_info.list_go_terms is not None:
+                    provider_info.list_go_terms.append(term)
 
 
 def _get_chemical_terms(
@@ -1350,8 +1309,11 @@ def process_gocam_model_file(
         model_aggregate.list_model_details.append(model_details)
     stats_by_model.unique_models.add(gocam_model.id)
 
+    model_associations: list[Association] = []
     if gocam_model.activities:
         for activity in gocam_model.activities:
+            activity_associations = _iter_activity_associations(activity, obsolete_ids)
+            model_associations.extend(activity_associations)
             stats_by_model.unique_activities.add(activity.id)
             model_aggregate.unique_activities.add(activity.id)
             model_details.unique_activities.add(activity.id)
@@ -1533,22 +1495,20 @@ def process_gocam_model_file(
 
             # Collect GO terms from all associations
             _collect_terms(
-                activity,
+                activity_associations,
                 stats_by_model,
                 model_aggregate,
                 contributor_lookup,
                 provider_lookup,
-                obsolete_ids,
             )
 
     # Collect references from all evidence items across all associations
     _collect_references(
-        gocam_model,
+        model_associations,
         stats_by_model,
         model_aggregate,
         contributor_lookup,
         provider_lookup,
-        obsolete_ids,
     )
 
     # Compute inferred relations for the model
