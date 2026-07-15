@@ -1279,10 +1279,6 @@ def process_gocam_model_file(
     # Read GO-CAM JSON file
     try:
         with open(json_file, "r") as f:
-            # json_content = f.read()
-            # data = json.loads(json_content)
-            # model_json = json.dumps(data)
-            # gocam_model = Model.model_validate_json(model_json)
             gocam_model = Model.model_validate_json(f.read())
         logger.debug(f"Successfully read GO-CAM model from {json_file}")
     except Exception as e:
@@ -1298,8 +1294,9 @@ def process_gocam_model_file(
         )
         return FilteredResult(reason=FilterReason.NOT_PRODUCTION_MODEL)
 
-    # Populate the model with indexing information
-    indexer.index_model(gocam_model)
+    # Populate the model with indexing information if not already present
+    if gocam_model.query_index is None:
+        indexer.index_model(gocam_model)
 
     # Build set of obsolete object IDs to filter from statistics
     obsolete_ids = _build_obsolete_ids(gocam_model)
