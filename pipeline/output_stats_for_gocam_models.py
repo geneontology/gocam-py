@@ -34,10 +34,12 @@ from pathlib import Path
 from typing import (
     Annotated,
     Any,
+    Callable,
     Collection,
     Dict,
     List,
     Set,
+    TextIO,
 )
 from urllib.parse import urlparse
 
@@ -53,7 +55,9 @@ from _common import (
     get_json_files,
     setup_logger,
 )
+from rich import print
 from rich.progress import track
+from rich.tree import Tree
 
 from gocam.datamodel import (
     Association,
@@ -1689,13 +1693,52 @@ def create_filename_from_url(url: str, replacement: str = "_") -> str:
     return safe_filename
 
 
+def _write_output_file(
+    output_file: Path, write: Callable[[TextIO], object]
+) -> PipelineResult:
+    """Write one output file and capture any failure as a pipeline result."""
+    try:
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_file, "w") as file:
+            write(file)
+    except Exception as e:
+        logger.error(f"Error writing output file {output_file}", exc_info=e)
+        return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
+
+    logger.info(f"Successfully wrote output file {output_file}")
+    return SuccessResult()
+
+
+def _print_output_summary(results: list[tuple[Path, PipelineResult]]) -> None:
+    """Print successful and failed output files using the pipeline report style."""
+    if not results:
+        return
+
+    success_count = sum(1 for _, result in results if isinstance(result, SuccessResult))
+    tree = Tree(f"[b]Wrote {success_count} of {len(results)} output files[/b]")
+    success_branch: Tree | None = None
+    error_branch: Tree | None = None
+
+    for output_file, result in results:
+        if isinstance(result, SuccessResult):
+            if success_branch is None:
+                success_branch = tree.add("Successful outputs", style="green")
+            success_branch.add(output_file.name)
+        elif isinstance(result, ErrorResult):
+            if error_branch is None:
+                error_branch = tree.add("Outputs with errors", style="red")
+            error_branch.add(f"{output_file.name} (Error: {result.details})")
+
+    print(tree)
+
+
 def output_entity_results(
     output_dir: Path | None,
     entity_label: str,
     entity_lookup: Dict[str, GocamStats],
     entity_sub_dir: str,
     entity_agg_file_name: str,
-) -> ErrorResult | None:
+) -> list[tuple[Path, PipelineResult]]:
     """Compute final counts and write per-entity and aggregate statistics.
 
     Iterates over all entities (contributors or providers), finalizes their
@@ -1715,6 +1758,7 @@ def output_entity_results(
         "list_inferred_relations": True,
     }
 
+    results: list[tuple[Path, PipelineResult]] = []
     entity_agg = AggregateInfo()
     entity_agg.entity = entity_label
     entity_agg.total_entities_processed = len(entity_lookup)
@@ -1793,27 +1837,19 @@ def output_entity_results(
         if output_dir is not None:
             stats_by_entity_subdir = entity_sub_dir
             json_file_name = create_filename_from_url(entity + ".json")
-            stats_by_curator_name = entity_sub_dir + "_" + json_file_name
-            stats_by_curator_output_file = (
-                output_dir / stats_by_entity_subdir / stats_by_curator_name
+            stats_by_entity_name = entity_sub_dir + "_" + json_file_name
+            stats_by_entity_output_file = (
+                output_dir / stats_by_entity_subdir / stats_by_entity_name
             )
-            stats_by_curator_output_file.parent.mkdir(parents=True, exist_ok=True)
-
-            try:
-                contributor_model_json = details.model_dump_json(
-                    exclude_none=True, exclude=_exclude_inferred
-                )
-                with open(stats_by_curator_output_file, "w") as f:
-                    f.write(contributor_model_json)
-                logger.info(
-                    f"Successfully wrote contributor model to {stats_by_curator_output_file}"
-                )
-            except Exception as e:
-                logger.error(
-                    f"Error writing contributor model file {stats_by_curator_output_file}",
-                    exc_info=e,
-                )
-                return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
+            result = _write_output_file(
+                stats_by_entity_output_file,
+                lambda file, details=details: file.write(
+                    details.model_dump_json(
+                        exclude_none=True, exclude=_exclude_inferred
+                    )
+                ),
+            )
+            results.append((stats_by_entity_output_file, result))
 
     entity_agg.unique_activity_units = len(entity_agg.unique_activities)
     entity_agg.unique_gene_product_enablers = len(
@@ -1842,23 +1878,15 @@ def output_entity_results(
     if output_dir is not None:
         aggregate_stats_name = entity_agg_file_name
         aggregate_stats_name_output_file = output_dir / aggregate_stats_name
-        aggregate_stats_name_output_file.parent.mkdir(parents=True, exist_ok=True)
+        result = _write_output_file(
+            aggregate_stats_name_output_file,
+            lambda file: file.write(
+                entity_agg.model_dump_json(exclude_none=True, exclude=_exclude_inferred)
+            ),
+        )
+        results.append((aggregate_stats_name_output_file, result))
 
-        try:
-            aggregate_json = entity_agg.model_dump_json(
-                exclude_none=True, exclude=_exclude_inferred
-            )
-            with open(aggregate_stats_name_output_file, "w") as f:
-                f.write(aggregate_json)
-            logger.info(
-                f"Successfully wrote entity aggregate stats to {aggregate_stats_name_output_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing entity aggregate stats {aggregate_stats_name_output_file}",
-                exc_info=e,
-            )
-            return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
+    return results
 
 
 def output_summary(
@@ -1869,7 +1897,7 @@ def output_summary(
     provider_lookup: Dict[str, GocamStats],
     protein_complex_activities: list[ProteinComplexActivityInfo] | None = None,
     id_label_lookup: Dict[str, str] | None = None,
-) -> ErrorResult | None:
+) -> list[tuple[Path, PipelineResult]]:
     """Finalize aggregate statistics and write all summary output files.
 
     Computes final counts on the model-level aggregate, writes the
@@ -1883,7 +1911,11 @@ def output_summary(
         contributor_lookup: Mapping of contributor URI to per-contributor stats.
         provider_lookup: Mapping of provider URI to per-provider stats.
         protein_complex_activities: List of protein complex activity records to write.
+
+    Returns:
+        The result of each attempted output-file write.
     """
+    output_results: list[tuple[Path, PipelineResult]] = []
     model_aggregate.entity = "Model"
     model_aggregate.unique_gene_product_enablers = len(
         model_aggregate.unique_enabled_by_gene_product
@@ -1927,89 +1959,79 @@ def output_summary(
     if output_dir is not None:
         aggregate_stats_name = "aggregate_model_stats.json"
         aggregate_stats_name_output_file = output_dir / aggregate_stats_name
-        aggregate_stats_name_output_file.parent.mkdir(parents=True, exist_ok=True)
-
-        try:
-            aggregate_json = model_aggregate.model_dump_json(exclude_none=True)
-            with open(aggregate_stats_name_output_file, "w") as f:
-                f.write(aggregate_json)
-            logger.info(
-                f"Successfully wrote model aggregate stats to {aggregate_stats_name_output_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing model aggregate stats {aggregate_stats_name_output_file}",
-                exc_info=e,
-            )
-            return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
+        result = _write_output_file(
+            aggregate_stats_name_output_file,
+            lambda file: file.write(model_aggregate.model_dump_json(exclude_none=True)),
+        )
+        output_results.append((aggregate_stats_name_output_file, result))
 
     # Output information for contributor and provider
-    output_entity_results(
-        output_dir=output_dir,
-        entity_label="Curator",
-        entity_lookup=contributor_lookup,
-        entity_sub_dir="stats_by_curator",
-        entity_agg_file_name="aggregate_curator_stats.json",
+    output_results.extend(
+        output_entity_results(
+            output_dir=output_dir,
+            entity_label="Curator",
+            entity_lookup=contributor_lookup,
+            entity_sub_dir="stats_by_curator",
+            entity_agg_file_name="aggregate_curator_stats.json",
+        )
     )
-    output_entity_results(
-        output_dir=output_dir,
-        entity_label="Group",
-        entity_lookup=provider_lookup,
-        entity_sub_dir="stats_by_group",
-        entity_agg_file_name="aggregate_group_stats.json",
+    output_results.extend(
+        output_entity_results(
+            output_dir=output_dir,
+            entity_label="Group",
+            entity_lookup=provider_lookup,
+            entity_sub_dir="stats_by_group",
+            entity_agg_file_name="aggregate_group_stats.json",
+        )
     )
 
     # Write member variable definitions to output directory
     if output_dir is not None:
         definitions_file = output_dir / "member_variable_definitions.json"
-        try:
-            with open(definitions_file, "w") as f:
-                json.dump(MEMBER_VARIABLE_DEFINITIONS, f, indent=2)
-            logger.info(
-                f"Successfully wrote member variable definitions to {definitions_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing member variable definitions to {definitions_file}",
-                exc_info=e,
-            )
+        result = _write_output_file(
+            definitions_file,
+            lambda file: json.dump(MEMBER_VARIABLE_DEFINITIONS, file, indent=2),
+        )
+        output_results.append((definitions_file, result))
 
     # Write aggregate protein complex activity info
     if output_dir is not None and protein_complex_activities is not None:
         pc_file = output_dir / "aggregate_protein_complex.json"
-        try:
-            sorted_pc = sorted(protein_complex_activities, key=lambda x: x.model_id)
-            pc_data = [item.model_dump(exclude_none=True) for item in sorted_pc]
-            with open(pc_file, "w") as f:
-                json.dump(pc_data, f, indent=2, default=list)
-            logger.info(
-                f"Successfully wrote protein complex activity info to {pc_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing protein complex activity info to {pc_file}",
-                exc_info=e,
-            )
+        result = _write_output_file(
+            pc_file,
+            lambda file: json.dump(
+                [
+                    item.model_dump(exclude_none=True)
+                    for item in sorted(
+                        protein_complex_activities, key=lambda item: item.model_id
+                    )
+                ],
+                file,
+                indent=2,
+                default=list,
+            ),
+        )
+        output_results.append((pc_file, result))
 
     # Write the unified id→label lookup covering all objects (genes, protein
     # complexes, molecule inputs/outputs, CHEBI molecules, GO terms, etc.)
     if output_dir is not None and id_label_lookup is not None:
         id_lookup_file = output_dir / "id_to_label.json"
-        try:
-            sorted_id_lookup = dict(sorted(id_label_lookup.items()))
-            with open(id_lookup_file, "w") as f:
-                json.dump(sorted_id_lookup, f, indent=2)
-            logger.info(f"Successfully wrote id→label lookup to {id_lookup_file}")
-        except Exception as e:
-            logger.error(
-                f"Error writing id→label lookup to {id_lookup_file}",
-                exc_info=e,
-            )
+        result = _write_output_file(
+            id_lookup_file,
+            lambda file: json.dump(
+                dict(sorted(id_label_lookup.items())), file, indent=2
+            ),
+        )
+        output_results.append((id_lookup_file, result))
 
     result_summary = ResultSummary()
     for json_file, result in results:
         result_summary.add_result(json_file.stem, result)
     result_summary.print()
+    _print_output_summary(output_results)
+
+    return output_results
 
 
 @app.command()
@@ -2101,8 +2123,7 @@ def main(
         )
         results.append((json_file, result))
 
-    # Print result
-    output_summary(
+    output_results = output_summary(
         results,
         output_dir=output_dir,
         model_aggregate=model_aggregate,
@@ -2111,6 +2132,12 @@ def main(
         protein_complex_activities=protein_complex_activities,
         id_label_lookup=id_label_lookup,
     )
+
+    has_errors = any(
+        isinstance(result, ErrorResult) for _, result in results + output_results
+    )
+    if has_errors:
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":
