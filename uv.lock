@@ -701,7 +701,7 @@ requires-dist = [
     { name = "oaklib", marker = "extra == 'oaklib'" },
     { name = "prefixmaps", specifier = ">=0.2.6,<0.3" },
     { name = "py-horned-owl", marker = "extra == 'owl'" },
-    { name = "pydantic", specifier = ">=2,<3" },
+    { name = "pydantic", specifier = ">=2.7,<3" },
     { name = "pystow", specifier = ">=0.7.11" },
     { name = "pyyaml", specifier = ">=6,<7" },
     { name = "requests", specifier = ">=2,<3" },
