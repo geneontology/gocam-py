@@ -1,7 +1,6 @@
 name: Dependency security
 
 on:
-  pull_request:
   schedule:
     # Run every Monday at 13:15 UTC (5:15 AM PST / 6:15 AM PDT)
     - cron: "15 13 * * 1"
