@@ -57,6 +57,13 @@ required-version = ">=0.11.8"
 exclude-newer = "7 days"
 preview-features = ["audit-command", "malware-check"]
 
+[tool.uv.audit]
+ignore = [
+    # setuptools<82.0.0 is required for oaklib on Python<3.12, but it has a known security
+    # vulnerability. See: https://github.com/INCATools/ontology-access-kit/issues/852
+    "PYSEC-2026-3447",
+]
+
 [tool.hatch.build.targets.sdist]
 exclude = ["pipeline/"]
 
