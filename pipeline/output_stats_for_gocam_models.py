@@ -17,10 +17,6 @@ of status. Statistics include:
   activity A produces chemical outputs (CHEBI terms) that are consumed as
   inputs by another activity B. Each inferred relation records the pair of
   activity IDs along with the genes that enable each activity.
-- Constitutively-upstream relations: pairs of activities connected by the
-  ``constitutively upstream of`` (RO:0012009) causal relation. Each record
-  captures the upstream and downstream activity IDs/labels along with the
-  curators and groups that asserted the relation.
 
 Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
@@ -28,60 +24,60 @@ A flat lookup table, ``id_to_label.json``, is also emitted alongside the
 aggregate files: it maps every identifier in the models' ``objects`` indexes
 (gene products, protein complexes, molecule inputs/outputs, CHEBI molecules,
 GO terms, etc.) to its human-readable label.
-
-The protein-complex and constitutively-upstream aggregate files
-(``aggregate_protein_complex.json`` and ``aggregate_constitutively_upstream.json``)
-are gated entirely behind ``--all-models``: without that flag they are not
-collected or written anywhere. Passing ``--all-models`` (with
-``--all-models-tsv-dir``) writes the production (status-filtered) versions into
-the main output directory AND versions computed across every model regardless
-of status into ``--all-models-tsv-dir``. When ``--all-models`` is off (the
-default), or when there are no such records, those files -- and the
-``--all-models-tsv-dir`` directory -- are not created.
 """
 
 import json
 import logging
 import os
 import re
-from enum import Enum
 from pathlib import Path
 from typing import (
     Annotated,
     Any,
+    Callable,
     Collection,
     Dict,
     List,
-    Literal,
     Set,
-    TypeAlias,
+    TextIO,
 )
 from urllib.parse import urlparse
 
 import typer
+from _common import (
+    ErrorReason,
+    ErrorResult,
+    FilteredResult,
+    FilterReason,
+    PipelineResult,
+    ResultSummary,
+    SuccessResult,
+    get_json_files,
+    setup_logger,
+)
 from rich import print
-from rich.logging import RichHandler
 from rich.progress import track
 from rich.tree import Tree
 
 from gocam.datamodel import (
+    Activity,
     Association,
     ConfiguredBaseModel,
+    EnabledByAssociation,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     Model,
     ModelStateEnum,
-    QueryIndex,
+    MoleculeAssociation,
+    TermAssociation,
 )
 from gocam.indexing.indexer import Indexer
+from gocam.utils import all_activity_inputs, all_activity_outputs, all_associations
 from gocam.vocabulary.relation import Relation
 
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
-
-INPUT_PREDICATES = {Relation.HAS_INPUT.value, Relation.HAS_PRIMARY_INPUT.value}
-OUTPUT_PREDICATES = {Relation.HAS_OUTPUT.value, Relation.HAS_PRIMARY_OUTPUT.value}
 
 # Filenames for the two TSV-backing aggregate files. These names are a shared
 # contract with the go-site renderer (reports-go-cam-stats.py); keep them in
@@ -623,27 +619,6 @@ MEMBER_VARIABLE_DEFINITIONS = [
 ]
 
 
-class ResultType(str, Enum):
-    SUCCESS = "Success"
-    FILTERED = "Filtered"
-    ERROR = "Error"
-
-
-class FilterReason(str, Enum):
-    """Reason a GO-CAM model was filtered out during processing."""
-
-    NO_MODEL = "No model"
-    NOT_PRODUCTION = "Not a production model"
-
-
-class ErrorReason(str, Enum):
-    """Reason a GO-CAM model failed during processing."""
-
-    READ_ERROR = "Read error"
-    STATS_ERROR = "Error calculating statistics"
-    WRITE_ERROR = "Write error"
-
-
 class GocamStats(ConfiguredBaseModel):
     """Per-model or per-entity (contributor/provider) statistics for GO-CAM data.
 
@@ -794,15 +769,6 @@ class ConstitutivelyUpstreamActivityInfo(ConfiguredBaseModel):
     comment: str = ""
 
 
-#: Return type for :func:`process_gocam_model_file`.
-#: A 3-tuple of (result_type, query_index_or_none, reason_or_none).
-ProcessingResult: TypeAlias = (
-    tuple[Literal[ResultType.SUCCESS], QueryIndex, None]
-    | tuple[Literal[ResultType.FILTERED], QueryIndex | None, FilterReason]
-    | tuple[Literal[ResultType.ERROR], None, ErrorReason]
-)
-
-
 def _is_production(gocam_model: Model) -> bool:
     """Return True iff the model's status is exactly ``production``.
 
@@ -810,21 +776,6 @@ def _is_production(gocam_model: Model) -> bool:
     delete, internal_test, template), are treated as non-production.
     """
     return gocam_model.status == ModelStateEnum.production
-
-
-def setup_logger(verbose: int) -> None:
-    """Set up the logger with the specified verbosity level.
-
-    Args:
-        verbose (int): Verbosity level (0: WARNING, 1: INFO, 2: DEBUG)
-    """
-    if verbose == 0:
-        level = logging.WARNING
-    elif verbose == 1:
-        level = logging.INFO
-    else:
-        level = logging.DEBUG
-    logging.basicConfig(level=level, format="%(message)s", handlers=[RichHandler()])
 
 
 def _count_pmids(references: Collection[str]) -> int:
@@ -890,6 +841,68 @@ def compute_molecule_and_term_counts(stats: GocamStats | AggregateInfo) -> None:
     stats.unique_go_terms = len(set(go_terms))
 
 
+def _finalize_gocam_stats(
+    stats: GocamStats,
+    *,
+    activity_units: int,
+    explicit_causal_relations: int | None = None,
+) -> None:
+    """Populate derived counts and sort lists on per-model or per-entity stats."""
+    stats.models = len(stats.unique_models)
+    stats.activity_units = activity_units
+    if explicit_causal_relations is not None:
+        stats.explicit_causal_relations = explicit_causal_relations
+    stats.unique_explicit_causal_relations = len(
+        stats.list_of_unique_explicit_causal_relations
+    )
+    stats.activity_units_enabled_by_gene_product = len(
+        stats.unique_activity_unit_gene_product_enablers
+    )
+    stats.activity_units_enabled_by_protein_complex = len(
+        stats.unique_activity_unit_protein_complex_enablers
+    )
+    stats.unique_gene_product_enablers = len(stats.unique_enabled_by_gene_product)
+    stats.unique_protein_complex_genes = len(stats.list_of_unique_protein_complex_genes)
+    stats.unique_gene_product_and_protein_complex_gene_enablers = len(
+        stats.unique_enabled_by_gene_product.union(
+            stats.list_of_unique_protein_complex_genes
+        )
+    )
+    stats.unique_references = len(stats.list_of_unique_references)
+    stats.unique_pmid = _count_pmids(stats.list_of_unique_references)
+    if stats.list_enabled_by_gene_product is not None:
+        stats.list_enabled_by_gene_product.sort()
+    if stats.list_enabled_by_protein_complex is not None:
+        stats.list_enabled_by_protein_complex.sort()
+    compute_molecule_and_term_counts(stats)
+
+
+def _finalize_aggregate_info(stats: AggregateInfo) -> None:
+    """Populate counts derived from the working collections on aggregate stats."""
+    stats.unique_activity_units = len(stats.unique_activities)
+    stats.unique_gene_product_enablers = len(stats.unique_enabled_by_gene_product)
+    stats.unique_references = len(stats.list_of_unique_references)
+    stats.unique_pmid = _count_pmids(stats.list_of_unique_references)
+    stats.activity_units_enabled_by_protein_complex_association = len(
+        stats.unique_activity_unit_protein_complex_enablers
+    )
+    stats.activity_units_enabled_by_gene_product_association = len(
+        stats.unique_activity_unit_gene_product_enablers
+    )
+    stats.unique_protein_complex_terms = len(
+        stats.unique_protein_complex_in_activity_term
+    )
+    stats.unique_member_protein_complex_genes = len(
+        stats.list_of_unique_protein_complex_genes
+    )
+    stats.unique_gene_product_and_protein_complex_gene_enablers = len(
+        stats.unique_enabled_by_gene_product.union(
+            stats.list_of_unique_protein_complex_genes
+        )
+    )
+    compute_molecule_and_term_counts(stats)
+
+
 def _update_entity_gene_stats(
     entity_info: GocamStats,
     activity,
@@ -911,6 +924,8 @@ def _update_entity_gene_stats(
                 entity_info.list_enabled_by_gene_product.append(
                     activity.enabled_by.term
                 )
+            # if activity.enabled_by.term.startswith("CHEBI:"):
+            #     print("Activity id " + activity.id + " has enabled by chebi " + activity.enabled_by.term)
             entity_info.unique_enabled_by_gene_product.add(activity.enabled_by.term)
             entity_info.genes += 1
 
@@ -948,20 +963,28 @@ def _update_entity_gene_stats(
     entity_info.unique_models.add(gocam_model_id)
 
 
-def _is_association_obsolete(assoc: Association, obsolete_ids: set[str]) -> bool:
+def _is_association_obsolete(association: Association, obsolete_ids: set[str]) -> bool:
     """Check if an association references an obsolete term or molecule."""
-    term = getattr(assoc, "term", None) or getattr(assoc, "molecule", None)
-    return isinstance(term, str) and term in obsolete_ids
+    referenced_id: str | None
+
+    if isinstance(association, MoleculeAssociation):
+        referenced_id = association.molecule
+    elif isinstance(association, (EnabledByAssociation, TermAssociation)):
+        referenced_id = association.term
+    else:
+        return False
+
+    return referenced_id is not None and referenced_id in obsolete_ids
 
 
 def _iter_activity_associations(
-    activity,
+    activity: Activity,
     obsolete_ids: set[str],
 ) -> list[Association]:
     """Collect all non-obsolete Association objects from an Activity.
 
-    Walks enabled_by, molecular_function, part_of, occurs_in, inputs,
-    outputs, and causal_associations, skipping any that reference obsolete terms.
+    Uses the shared model traversal and skips associations that reference obsolete
+    terms.
 
     Args:
         activity: An Activity from the GO-CAM model.
@@ -970,66 +993,24 @@ def _iter_activity_associations(
     Returns:
         List of non-obsolete Association objects.
     """
-    associations: list[Association] = []
-    if activity.enabled_by and not _is_association_obsolete(
-        activity.enabled_by, obsolete_ids
-    ):
-        associations.append(activity.enabled_by)
-        if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
-            if activity.enabled_by.has_part:
-                for (
-                    protein_complex_has_part_association
-                ) in activity.enabled_by.has_part:
-                    if not _is_association_obsolete(
-                        protein_complex_has_part_association, obsolete_ids
-                    ):
-                        associations.append(protein_complex_has_part_association)
-    if activity.molecular_function and not _is_association_obsolete(
-        activity.molecular_function, obsolete_ids
-    ):
-        associations.append(activity.molecular_function)
-    if activity.part_of and not _is_association_obsolete(
-        activity.part_of, obsolete_ids
-    ):
-        associations.append(activity.part_of)
-        if activity.part_of.happens_during and not _is_association_obsolete(
-            activity.part_of.happens_during, obsolete_ids
-        ):
-            associations.append(activity.part_of.happens_during)
-        if activity.part_of.part_of and not _is_association_obsolete(
-            activity.part_of.part_of, obsolete_ids
-        ):
-            associations.append(activity.part_of.part_of)
-    if activity.occurs_in and not _is_association_obsolete(
-        activity.occurs_in, obsolete_ids
-    ):
-        associations.append(activity.occurs_in)
-        if activity.occurs_in.part_of and not _is_association_obsolete(
-            activity.occurs_in.part_of, obsolete_ids
-        ):
-            associations.append(activity.occurs_in.part_of)
-    for mol_assoc in activity.molecular_associations or []:
-        if not _is_association_obsolete(mol_assoc, obsolete_ids):
-            associations.append(mol_assoc)
-    for causal_association in activity.causal_associations or []:
-        if not _is_association_obsolete(causal_association, obsolete_ids):
-            associations.append(causal_association)
-    return associations
+    return [
+        association
+        for association in all_associations(activity)
+        if not _is_association_obsolete(association, obsolete_ids)
+    ]
 
 
 def _collect_references(
-    gocam_model: Model,
+    associations: Collection[Association],
     stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
-    obsolete_ids: set[str],
 ) -> None:
-    """Collect reference objects from all evidence items in the model.
+    """Collect reference objects from evidence on the supplied associations.
 
-    Iterates over every association across all activities, extracts references
-    from evidence items, and attributes them to contributors and providers
-    via the evidence-level provenances.
+    Extracts references from evidence items and attributes them to contributors
+    and providers via the evidence-level provenances.
 
     Populates:
         stats_by_model.list_of_unique_references: all references for this model
@@ -1037,34 +1018,26 @@ def _collect_references(
         contributor_lookup[contributor].list_of_unique_references: references by contributor
         provider_lookup[provider].list_of_unique_references: references by provider
     """
-    for activity in gocam_model.activities or []:
-        for association in _iter_activity_associations(activity, obsolete_ids):
-            if not association.evidence:
+    for association in associations:
+        for evidence in association.evidence or []:
+            if not evidence.reference:
                 continue
-            for evidence in association.evidence:
-                if not evidence.reference:
-                    continue
-                ref = evidence.reference
-                stats_by_model.list_of_unique_references.add(ref)
-                model_aggregate.list_of_unique_references.add(ref)
-                if evidence.provenances:
-                    for provenance in evidence.provenances:
-                        if provenance.contributor:
-                            for contributor in provenance.contributor:
-                                contributor_info = contributor_lookup.setdefault(
-                                    contributor, GocamStats()
-                                )
-                                contributor_info.list_of_unique_references.add(ref)
-                        if provenance.provided_by:
-                            for provider in provenance.provided_by:
-                                provider_info = provider_lookup.setdefault(
-                                    provider, GocamStats()
-                                )
-                                provider_info.list_of_unique_references.add(ref)
+            ref = evidence.reference
+            stats_by_model.list_of_unique_references.add(ref)
+            model_aggregate.list_of_unique_references.add(ref)
+            for provenance in evidence.provenances or []:
+                for contributor in provenance.contributor or []:
+                    contributor_info = contributor_lookup.setdefault(
+                        contributor, GocamStats()
+                    )
+                    contributor_info.list_of_unique_references.add(ref)
+                for provider in provenance.provided_by or []:
+                    provider_info = provider_lookup.setdefault(provider, GocamStats())
+                    provider_info.list_of_unique_references.add(ref)
 
 
 def _collect_molecule_terms(
-    activity,
+    activity: Activity,
     stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
@@ -1074,9 +1047,8 @@ def _collect_molecule_terms(
 ) -> None:
     """Collect molecule input/output terms from MoleculeAssociation objects.
 
-    Iterates over molecular_associations for the given activity, classifying
-    each by its predicate into input or output, and attributes terms to
-    contributors and providers via association-level provenances.
+    Uses the shared input/output utilities and attributes terms to contributors
+    and providers via association-level provenances.
 
     Populates:
         stats_by_model.list_has_input_term / list_has_output_term
@@ -1084,68 +1056,56 @@ def _collect_molecule_terms(
         contributor_lookup[contributor].list_has_input_term / list_has_output_term
         provider_lookup[provider].list_has_input_term / list_has_output_term
     """
-    for ma in activity.molecular_associations or []:
-        molecule_id = ma.molecule
-        if not molecule_id or molecule_id in obsolete_ids:
-            continue
-        # Resolve molecule node ID to its actual term (e.g. CHEBI:58199)
-        molecule = (
-            molecule_lookup.get(molecule_id, molecule_id)
-            if molecule_lookup
-            else molecule_id
-        )
-        if not molecule or molecule in obsolete_ids:
-            continue
+    association_groups = (
+        (all_activity_inputs(activity), "list_has_input_term"),
+        (all_activity_outputs(activity), "list_has_output_term"),
+    )
+    for associations, target_attr in association_groups:
+        for association in associations:
+            molecule_id = association.molecule
+            if not molecule_id or molecule_id in obsolete_ids:
+                continue
+            molecule = (
+                molecule_lookup.get(molecule_id, molecule_id)
+                if molecule_lookup
+                else molecule_id
+            )
+            if not molecule or molecule in obsolete_ids:
+                continue
 
-        # Determine whether this is an input or output association
-        if ma.predicate in INPUT_PREDICATES:
-            target_attr = "list_has_input_term"
-        elif ma.predicate in OUTPUT_PREDICATES:
-            target_attr = "list_has_output_term"
-        else:
-            continue
+            for target in (stats_by_model, model_aggregate):
+                term_list = getattr(target, target_attr)
+                if term_list is not None:
+                    term_list.append(molecule)
 
-        for target in (stats_by_model, model_aggregate):
-            term_list = getattr(target, target_attr)
-            if term_list is not None:
-                term_list.append(molecule)
-
-        if ma.provenances:
-            for provenance in ma.provenances:
-                if provenance.contributor:
-                    for contributor in provenance.contributor:
-                        contributor_info = contributor_lookup.setdefault(
-                            contributor, GocamStats()
-                        )
-                        term_list = getattr(contributor_info, target_attr)
-                        if term_list is not None:
-                            term_list.append(molecule)
-                if provenance.provided_by:
-                    for provider in provenance.provided_by:
-                        provider_info = provider_lookup.setdefault(
-                            provider, GocamStats()
-                        )
-                        term_list = getattr(provider_info, target_attr)
-                        if term_list is not None:
-                            term_list.append(molecule)
+            for provenance in association.provenances or []:
+                for contributor in provenance.contributor or []:
+                    contributor_info = contributor_lookup.setdefault(
+                        contributor, GocamStats()
+                    )
+                    term_list = getattr(contributor_info, target_attr)
+                    if term_list is not None:
+                        term_list.append(molecule)
+                for provider in provenance.provided_by or []:
+                    provider_info = provider_lookup.setdefault(provider, GocamStats())
+                    term_list = getattr(provider_info, target_attr)
+                    if term_list is not None:
+                        term_list.append(molecule)
 
 
 def _collect_terms(
-    activity,
+    associations: Collection[Association],
     stats_by_model: GocamStats,
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
     provider_lookup: Dict[str, GocamStats],
-    obsolete_ids: set[str],
 ) -> None:
-    """Collect GO terms from all objects within an activity.
+    """Collect GO terms from the supplied associations.
 
-    Recursively walks the entire activity object tree.  For every object
-    that has a ``term`` attribute whose value starts with "GO:"
-    (case-insensitive), the term is appended to list_go_terms on the
-    model-level, aggregate, contributor, and provider stats objects.
-    Contributor/provider attribution uses the ``provenances`` on the same
-    object that carries the term.
+    For every term-bearing association whose term starts with "GO:"
+    (case-insensitive), appends the term to model-level, aggregate,
+    contributor, and provider statistics. Contributor/provider attribution
+    uses the provenances on the association that carries the term.
 
     Populates:
         stats_by_model.list_go_terms
@@ -1154,80 +1114,47 @@ def _collect_terms(
         provider_lookup[provider].list_go_terms
     """
 
-    def _walk(obj) -> None:
-        if obj is None:
-            return
-        if not isinstance(obj, ConfiguredBaseModel):
-            return
-
-        # Skip obsolete objects and their subtrees
-        if _is_obsolete(obj):
-            return
-
-        # Check whether this object carries a GO term
-        term = getattr(obj, "term", None)
-        if isinstance(term, str) and term in obsolete_ids:
-            return
-        if isinstance(term, str) and term.upper().startswith("GO:"):
-            if stats_by_model.list_go_terms is not None:
-                stats_by_model.list_go_terms.append(term)
-            if model_aggregate.list_go_terms is not None:
-                model_aggregate.list_go_terms.append(term)
-            provenances = getattr(obj, "provenances", None)
-            if provenances:
-                for provenance in provenances:
-                    if provenance.contributor:
-                        for contributor in provenance.contributor:
-                            contributor_info = contributor_lookup.setdefault(
-                                contributor, GocamStats()
-                            )
-                            if contributor_info.list_go_terms is not None:
-                                contributor_info.list_go_terms.append(term)
-                    if provenance.provided_by:
-                        for provider in provenance.provided_by:
-                            provider_info = provider_lookup.setdefault(
-                                provider, GocamStats()
-                            )
-                            if provider_info.list_go_terms is not None:
-                                provider_info.list_go_terms.append(term)
-
-        # Recurse into all fields of this Pydantic model
-        for field_name in type(obj).model_fields:
-            value = getattr(obj, field_name, None)
-            if value is None:
-                continue
-            if isinstance(value, list):
-                for item in value:
-                    _walk(item)
-            else:
-                _walk(value)
-
-    _walk(activity)
+    for association in associations:
+        if not isinstance(association, (EnabledByAssociation, TermAssociation)):
+            continue
+        term = association.term
+        if not term or not term.upper().startswith("GO:"):
+            continue
+        if stats_by_model.list_go_terms is not None:
+            stats_by_model.list_go_terms.append(term)
+        if model_aggregate.list_go_terms is not None:
+            model_aggregate.list_go_terms.append(term)
+        for provenance in association.provenances or []:
+            for contributor in provenance.contributor or []:
+                contributor_info = contributor_lookup.setdefault(
+                    contributor, GocamStats()
+                )
+                if contributor_info.list_go_terms is not None:
+                    contributor_info.list_go_terms.append(term)
+            for provider in provenance.provided_by or []:
+                provider_info = provider_lookup.setdefault(provider, GocamStats())
+                if provider_info.list_go_terms is not None:
+                    provider_info.list_go_terms.append(term)
 
 
 def _get_chemical_terms(
-    molecular_associations: list | None,
-    predicates: set[str],
+    molecular_associations: Collection[MoleculeAssociation],
     obsolete_ids: set[str],
     molecule_lookup: Dict[str, str] | None = None,
 ) -> set[str]:
-    """Extract CHEBI chemical terms from molecular associations matching given predicates.
+    """Extract CHEBI terms from input or output molecule associations.
 
-    Filters molecular_associations by predicate, then collects molecule values
-    that are CHEBI terms and not obsolete.
+    Collects CHEBI molecule values from already-classified associations.
 
     Args:
         molecular_associations: List of MoleculeAssociation objects from an activity.
-        predicates: Set of RO relation URIs to match (e.g. INPUT_PREDICATES or OUTPUT_PREDICATES).
         obsolete_ids: Set of object IDs marked as obsolete.
 
     Returns:
         A set of CHEBI molecule strings.
     """
     terms: set[str] = set()
-    for ma in molecular_associations or []:
-        if ma.predicate not in predicates:
-            continue
+    for ma in molecular_associations:
         molecule_id = ma.molecule
         if not molecule_id or molecule_id in obsolete_ids:
             continue
@@ -1247,7 +1174,7 @@ def _get_chemical_terms(
 
 
 def _get_activity_genes(
-    activity,
+    activity: Activity,
     obsolete_ids: set[str],
 ) -> list[str]:
     """Return the list of gene terms that enable an activity.
@@ -1270,30 +1197,8 @@ def _get_activity_genes(
     return genes
 
 
-def _activity_label(activity, label_lookup: Dict[str, str]) -> str:
-    """Build a human-readable label for an activity from its enabler and molecular function.
-
-    Combines the label of the enabling gene product / protein complex with the
-    label of the molecular-function term, resolving each ID via ``label_lookup``
-    (falling back to the raw ID when no label is known). Returns an empty string
-    when the activity has neither.
-    """
-    if activity is None:
-        return ""
-    parts: list[str] = []
-    enabled_by = getattr(activity, "enabled_by", None)
-    enabler_term = getattr(enabled_by, "term", None) if enabled_by else None
-    if enabler_term:
-        parts.append(label_lookup.get(enabler_term, enabler_term))
-    molecular_function = getattr(activity, "molecular_function", None)
-    mf_term = getattr(molecular_function, "term", None) if molecular_function else None
-    if mf_term:
-        parts.append(label_lookup.get(mf_term, mf_term))
-    return " - ".join(parts)
-
-
 def _compute_inferred_relations(
-    activities: list,
+    activities: list[Activity],
     obsolete_ids: set[str],
     molecule_lookup: Dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
@@ -1320,8 +1225,7 @@ def _compute_inferred_relations(
         activity_genes[activity.id] = _get_activity_genes(activity, obsolete_ids)
 
         outputs = _get_chemical_terms(
-            activity.molecular_associations,
-            OUTPUT_PREDICATES,
+            all_activity_outputs(activity),
             obsolete_ids,
             molecule_lookup,
         )
@@ -1329,8 +1233,7 @@ def _compute_inferred_relations(
             activity_chem_outputs[activity.id] = outputs
 
         inputs = _get_chemical_terms(
-            activity.molecular_associations,
-            INPUT_PREDICATES,
+            all_activity_inputs(activity),
             obsolete_ids,
             molecule_lookup,
         )
@@ -1387,6 +1290,28 @@ def _collect_labels(
         label = getattr(obj, "label", None)
         if label:
             id_label_lookup[obj_id] = label
+
+
+def _activity_label(activity, label_lookup: Dict[str, str]) -> str:
+    """Build a human-readable label for an activity from its enabler and molecular function.
+
+    Combines the label of the enabling gene product / protein complex with the
+    label of the molecular-function term, resolving each ID via ``label_lookup``
+    (falling back to the raw ID when no label is known). Returns an empty string
+    when the activity has neither.
+    """
+    if activity is None:
+        return ""
+    parts: list[str] = []
+    enabled_by = getattr(activity, "enabled_by", None)
+    enabler_term = getattr(enabled_by, "term", None) if enabled_by else None
+    if enabler_term:
+        parts.append(label_lookup.get(enabler_term, enabler_term))
+    molecular_function = getattr(activity, "molecular_function", None)
+    mf_term = getattr(molecular_function, "term", None) if molecular_function else None
+    if mf_term:
+        parts.append(label_lookup.get(mf_term, mf_term))
+    return " - ".join(parts)
 
 
 def _model_status_str(gocam_model: Model) -> str | None:
@@ -1562,7 +1487,7 @@ def process_gocam_model_file(
     all_models_constitutively_upstream_activities: (
         list[ConstitutivelyUpstreamActivityInfo] | None
     ) = None,
-) -> ProcessingResult:
+) -> PipelineResult:
     """Process a single GO-CAM model JSON file and compute statistics.
 
     Reads the model, indexes it, collects per-activity counts (enablers,
@@ -1582,17 +1507,9 @@ def process_gocam_model_file(
             they are returned as a FILTERED result.
         id_label_lookup: Optional accumulator mapping every object CURIE in the
             model's ``objects`` index to its label.
-        all_models_protein_complex_activities: Optional accumulator for
-            protein-complex activity records covering ALL models regardless of
-            status. When provided, records are collected before the production
-            filter is applied. Used for the all-models TSV output.
-        all_models_constitutively_upstream_activities: Optional accumulator for
-            'constitutively upstream of' relation records covering ALL models
-            regardless of status, collected before the production filter.
 
     Returns:
-        A ProcessingResult 3-tuple of (result_type, query_index_or_none,
-        reason_or_none).
+        A result describing whether processing succeeded, was filtered, or failed.
     """
     indexer = Indexer()
     # Read GO-CAM JSON file
@@ -1602,7 +1519,7 @@ def process_gocam_model_file(
         logger.debug(f"Successfully read GO-CAM model from {json_file}")
     except Exception as e:
         logger.error(f"Error reading file {json_file}", exc_info=e)
-        return ResultType.ERROR, None, ErrorReason.READ_ERROR
+        return ErrorResult(reason=ErrorReason.READ_ERROR, details=str(e))
 
     # Collect TSV-backing records for the all-models output. This runs for every
     # model, regardless of production status, and is independent of the
@@ -1623,10 +1540,11 @@ def process_gocam_model_file(
             f"Skipping non-production model {gocam_model.id} "
             f"(status={gocam_model.status}) from {json_file}"
         )
-        return ResultType.FILTERED, None, FilterReason.NOT_PRODUCTION
+        return FilteredResult(reason=FilterReason.NOT_PRODUCTION_MODEL)
 
-    # Populate the model with indexing information
-    indexer.index_model(gocam_model)
+    # Populate the model with indexing information if not already present
+    if gocam_model.query_index is None:
+        indexer.index_model(gocam_model)
 
     # Build set of obsolete object IDs to filter from statistics
     obsolete_ids = _build_obsolete_ids(gocam_model)
@@ -1637,24 +1555,21 @@ def process_gocam_model_file(
         if mol_node.id and mol_node.term:
             molecule_lookup[mol_node.id] = mol_node.term
 
-    # Build id → label lookup (for resolving activity labels) and an
-    # activity-by-id map (for resolving downstream activities of causal relations)
-    model_label_lookup: Dict[str, str] = {}
-    for obj in gocam_model.objects or []:
-        if not obj.id or _is_obsolete(obj) or obj.id in model_label_lookup:
-            continue
-        label = getattr(obj, "label", None)
-        if label:
-            model_label_lookup[obj.id] = label
-    activities_by_id = {
-        activity.id: activity for activity in gocam_model.activities or []
-    }
-
     # Get model statistics information
-    calculated_aggregate_values_by_model = gocam_model.query_index
-    if calculated_aggregate_values_by_model is None:
+    query_index = gocam_model.query_index
+    if query_index is None:
         logger.error(f"No query index for model {json_file}")
-        return ResultType.ERROR, None, ErrorReason.READ_ERROR
+        return ErrorResult(
+            reason=ErrorReason.INDEXING_ERROR,
+            details=f"No query index for model {json_file}",
+        )
+
+    # Collect production 'constitutively upstream of' records for this model
+    # (only production models reach here when production_only is set).
+    if constitutively_upstream_activities is not None:
+        constitutively_upstream_activities.extend(
+            _collect_constitutively_upstream_records(gocam_model)
+        )
 
     # Detailed model statistics information
     stats_by_model = GocamStats()
@@ -1671,10 +1586,12 @@ def process_gocam_model_file(
     if model_aggregate.list_model_details is not None:
         model_aggregate.list_model_details.append(model_details)
     stats_by_model.unique_models.add(gocam_model.id)
-    stats_by_model.models = len(stats_by_model.unique_models)
 
+    model_associations: list[Association] = []
     if gocam_model.activities:
         for activity in gocam_model.activities:
+            activity_associations = _iter_activity_associations(activity, obsolete_ids)
+            model_associations.extend(activity_associations)
             stats_by_model.unique_activities.add(activity.id)
             model_aggregate.unique_activities.add(activity.id)
             model_details.unique_activities.add(activity.id)
@@ -1822,40 +1739,6 @@ def process_gocam_model_file(
                     stats_by_model.list_of_unique_explicit_causal_relations.add(
                         activity.id
                     )
-
-                    # Collect 'constitutively upstream of' relations
-                    if (
-                        constitutively_upstream_activities is not None
-                        and causal_association.predicate
-                        == Relation.CONSTITUTIVELY_UPSTREAM_OF.value
-                    ):
-                        downstream_id = causal_association.downstream_activity
-                        downstream_activity = (
-                            activities_by_id.get(downstream_id)
-                            if downstream_id
-                            else None
-                        )
-                        cu_info = ConstitutivelyUpstreamActivityInfo(
-                            model_id=gocam_model.id,
-                            model_name=gocam_model.title,
-                            upstream_activity_id=activity.id,
-                            upstream_activity_label=_activity_label(
-                                activity, model_label_lookup
-                            ),
-                            downstream_activity_id=downstream_id or "",
-                            downstream_activity_label=_activity_label(
-                                downstream_activity, model_label_lookup
-                            ),
-                            model_status=model_details.model_status,
-                        )
-                        if causal_association.provenances:
-                            for prov in causal_association.provenances:
-                                if prov.contributor:
-                                    cu_info.unique_curators.update(prov.contributor)
-                                if prov.provided_by:
-                                    cu_info.unique_groups.update(prov.provided_by)
-                        constitutively_upstream_activities.append(cu_info)
-
                     if causal_association.provenances:
                         for provenance in causal_association.provenances:
                             if provenance.contributor:
@@ -1890,22 +1773,20 @@ def process_gocam_model_file(
 
             # Collect GO terms from all associations
             _collect_terms(
-                activity,
+                activity_associations,
                 stats_by_model,
                 model_aggregate,
                 contributor_lookup,
                 provider_lookup,
-                obsolete_ids,
             )
 
     # Collect references from all evidence items across all associations
     _collect_references(
-        gocam_model,
+        model_associations,
         stats_by_model,
         model_aggregate,
         contributor_lookup,
         provider_lookup,
-        obsolete_ids,
     )
 
     # Compute inferred relations for the model
@@ -1918,42 +1799,13 @@ def process_gocam_model_file(
         if model_aggregate.list_inferred_relations is not None:
             model_aggregate.list_inferred_relations.extend(inferred)
 
-    # Set fields, counts and sort data for current model
-    stats_by_model.explicit_causal_relations = len(
-        stats_by_model.list_explicit_causal_relations or []
+    _finalize_gocam_stats(
+        stats_by_model,
+        activity_units=query_index.number_of_activities or 0,
+        explicit_causal_relations=len(
+            stats_by_model.list_explicit_causal_relations or []
+        ),
     )
-    stats_by_model.unique_explicit_causal_relations = len(
-        stats_by_model.list_of_unique_explicit_causal_relations
-    )
-    stats_by_model.activity_units = (
-        calculated_aggregate_values_by_model.number_of_activities or 0
-    )
-    stats_by_model.unique_references = len(stats_by_model.list_of_unique_references)
-    stats_by_model.unique_pmid = _count_pmids(stats_by_model.list_of_unique_references)
-
-    stats_by_model.activity_units_enabled_by_gene_product = len(
-        stats_by_model.unique_activity_unit_gene_product_enablers
-    )
-    stats_by_model.activity_units_enabled_by_protein_complex = len(
-        stats_by_model.unique_activity_unit_protein_complex_enablers
-    )
-
-    stats_by_model.unique_gene_product_enablers = len(
-        stats_by_model.unique_enabled_by_gene_product
-    )
-    stats_by_model.unique_protein_complex_genes = len(
-        stats_by_model.list_of_unique_protein_complex_genes
-    )
-    stats_by_model.unique_gene_product_and_protein_complex_gene_enablers = len(
-        stats_by_model.unique_enabled_by_gene_product.union(
-            stats_by_model.list_of_unique_protein_complex_genes
-        )
-    )
-    if stats_by_model.list_enabled_by_gene_product is not None:
-        stats_by_model.list_enabled_by_gene_product.sort()
-    if stats_by_model.list_enabled_by_protein_complex is not None:
-        stats_by_model.list_enabled_by_protein_complex.sort()
-    compute_molecule_and_term_counts(stats_by_model)
 
     # Populate the id→label lookup from every object seen in this model
     _collect_labels(
@@ -1974,7 +1826,7 @@ def process_gocam_model_file(
         logger.info(
             f"Dry run enabled; skipping write for GO-CAM model {gocam_model.id}"
         )
-        return ResultType.SUCCESS, calculated_aggregate_values_by_model, None
+        return SuccessResult(data=query_index)
 
     # Write GO-CAM stats to output directory
     calculated_aggregate_values_by_model_subdir = "calculated_aggregate_values_by_model"
@@ -1986,40 +1838,44 @@ def process_gocam_model_file(
         / calculated_aggregate_values_by_model_subdir
         / calculated_aggregate_values_by_model_name
     )
-    calculated_aggregate_values_by_model_name_file.parent.mkdir(
-        parents=True, exist_ok=True
-    )
 
     stats_by_model_subdir = "stats_by_model"
     stats_by_model_name = "stats_by_model_" + json_file.name
     stats_by_model_output_file = (
         output_dir / stats_by_model_subdir / stats_by_model_name
     )
-    stats_by_model_output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    try:
-        model_stats_json = calculated_aggregate_values_by_model.model_dump_json(
-            exclude_none=True
+    output_results = [
+        (
+            calculated_aggregate_values_by_model_name_file,
+            _write_output_file(
+                calculated_aggregate_values_by_model_name_file,
+                lambda file: file.write(query_index.model_dump_json(exclude_none=True)),
+            ),
+        ),
+        (
+            stats_by_model_output_file,
+            _write_output_file(
+                stats_by_model_output_file,
+                lambda file: file.write(
+                    stats_by_model.model_dump_json(exclude_none=True)
+                ),
+            ),
+        ),
+    ]
+    errors = [
+        f"{output_file}: {result.details}"
+        for output_file, result in output_results
+        if isinstance(result, ErrorResult)
+    ]
+    if errors:
+        return ErrorResult(
+            reason=ErrorReason.WRITE_ERROR,
+            details="; ".join(errors),
         )
-        with open(calculated_aggregate_values_by_model_name_file, "w") as f:
-            f.write(model_stats_json)
-        logger.info(
-            f"Successfully wrote GO-CAM all_stats to {calculated_aggregate_values_by_model_name_file}"
-        )
-
-        stats_by_model_json = stats_by_model.model_dump_json(exclude_none=True)
-        with open(stats_by_model_output_file, "w") as f:
-            f.write(stats_by_model_json)
-        logger.info(
-            f"Successfully wrote GO-CAM detailed_model_stats to {stats_by_model_output_file}"
-        )
-
-    except Exception as e:
-        logger.error(f"An exception has occurred: {e}")
-        return ResultType.ERROR, None, ErrorReason.WRITE_ERROR
 
     # If we reach here, the conversion and writing were successful
-    return ResultType.SUCCESS, calculated_aggregate_values_by_model, None
+    return SuccessResult(data=query_index)
 
 
 def create_filename_from_url(url: str, replacement: str = "_") -> str:
@@ -2063,13 +1919,52 @@ def create_filename_from_url(url: str, replacement: str = "_") -> str:
     return safe_filename
 
 
+def _write_output_file(
+    output_file: Path, write: Callable[[TextIO], object]
+) -> PipelineResult:
+    """Write one output file and capture any failure as a pipeline result."""
+    try:
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_file, "w") as file:
+            write(file)
+    except Exception as e:
+        logger.error(f"Error writing output file {output_file}", exc_info=e)
+        return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
+
+    logger.info(f"Successfully wrote output file {output_file}")
+    return SuccessResult()
+
+
+def _print_output_summary(results: list[tuple[Path, PipelineResult]]) -> None:
+    """Print successful and failed output files using the pipeline report style."""
+    if not results:
+        return
+
+    success_count = sum(1 for _, result in results if isinstance(result, SuccessResult))
+    tree = Tree(f"[b]Wrote {success_count} of {len(results)} output files[/b]")
+    success_branch: Tree | None = None
+    error_branch: Tree | None = None
+
+    for output_file, result in results:
+        if isinstance(result, SuccessResult):
+            if success_branch is None:
+                success_branch = tree.add("Successful outputs", style="green")
+            success_branch.add(output_file.name)
+        elif isinstance(result, ErrorResult):
+            if error_branch is None:
+                error_branch = tree.add("Outputs with errors", style="red")
+            error_branch.add(f"{output_file.name} (Error: {result.details})")
+
+    print(tree)
+
+
 def output_entity_results(
     output_dir: Path | None,
     entity_label: str,
     entity_lookup: Dict[str, GocamStats],
     entity_sub_dir: str,
     entity_agg_file_name: str,
-) -> tuple[ResultType, ErrorReason] | None:
+) -> list[tuple[Path, PipelineResult]]:
     """Compute final counts and write per-entity and aggregate statistics.
 
     Iterates over all entities (contributors or providers), finalizes their
@@ -2089,45 +1984,18 @@ def output_entity_results(
         "list_inferred_relations": True,
     }
 
+    results: list[tuple[Path, PipelineResult]] = []
     entity_agg = AggregateInfo()
     entity_agg.entity = entity_label
     entity_agg.total_entities_processed = len(entity_lookup)
 
     for entity, details in entity_lookup.items():
         logger.debug(f"Processing contributor: {entity}")
-        # Set numbers
         details.uri = entity
-        details.models = len(details.unique_models)
-        details.unique_gene_product_enablers = len(
-            details.unique_enabled_by_gene_product
+        _finalize_gocam_stats(
+            details,
+            activity_units=len(details.unique_activities),
         )
-        details.unique_protein_complex_genes = len(
-            details.list_of_unique_protein_complex_genes
-        )
-        details.unique_gene_product_and_protein_complex_gene_enablers = len(
-            details.unique_enabled_by_gene_product.union(
-                details.list_of_unique_protein_complex_genes
-            )
-        )
-        details.unique_references = len(details.list_of_unique_references)
-        details.activity_units = len(details.unique_activities)
-        details.activity_units_enabled_by_gene_product = len(
-            details.unique_activity_unit_gene_product_enablers
-        )
-        details.activity_units_enabled_by_protein_complex = len(
-            details.unique_activity_unit_protein_complex_enablers
-        )
-        details.unique_explicit_causal_relations = len(
-            details.list_of_unique_explicit_causal_relations
-        )
-        compute_molecule_and_term_counts(details)
-
-        # Sort lists
-        if details.list_enabled_by_gene_product is not None:
-            details.list_enabled_by_gene_product.sort()
-        if details.list_enabled_by_protein_complex is not None:
-            details.list_enabled_by_protein_complex.sort()
-        details.unique_pmid = _count_pmids(details.list_of_unique_references)
 
         entity_agg.genes = entity_agg.genes + details.genes
         entity_agg.explicit_causal_relations = (
@@ -2162,81 +2030,42 @@ def output_entity_results(
             entity_agg.list_has_output_term.extend(details.list_has_output_term)
         if entity_agg.list_go_terms is not None and details.list_go_terms is not None:
             entity_agg.list_go_terms.extend(details.list_go_terms)
-        compute_molecule_and_term_counts(entity_agg)
 
         if output_dir is not None:
             stats_by_entity_subdir = entity_sub_dir
             json_file_name = create_filename_from_url(entity + ".json")
-            stats_by_curator_name = entity_sub_dir + "_" + json_file_name
-            stats_by_curator_output_file = (
-                output_dir / stats_by_entity_subdir / stats_by_curator_name
+            stats_by_entity_name = entity_sub_dir + "_" + json_file_name
+            stats_by_entity_output_file = (
+                output_dir / stats_by_entity_subdir / stats_by_entity_name
             )
-            stats_by_curator_output_file.parent.mkdir(parents=True, exist_ok=True)
+            result = _write_output_file(
+                stats_by_entity_output_file,
+                lambda file, details=details: file.write(
+                    details.model_dump_json(
+                        exclude_none=True, exclude=_exclude_inferred
+                    )
+                ),
+            )
+            results.append((stats_by_entity_output_file, result))
 
-            try:
-                contributor_model_json = details.model_dump_json(
-                    exclude_none=True, exclude=_exclude_inferred
-                )
-                with open(stats_by_curator_output_file, "w") as f:
-                    f.write(contributor_model_json)
-                logger.info(
-                    f"Successfully wrote contributor model to {stats_by_curator_output_file}"
-                )
-            except Exception as e:
-                logger.error(
-                    f"Error writing contributor model file {stats_by_curator_output_file}",
-                    exc_info=e,
-                )
-                return ResultType.ERROR, ErrorReason.WRITE_ERROR
-
-    entity_agg.unique_activity_units = len(entity_agg.unique_activities)
-    entity_agg.unique_gene_product_enablers = len(
-        entity_agg.unique_enabled_by_gene_product
-    )
-    entity_agg.unique_references = len(entity_agg.list_of_unique_references)
-    entity_agg.unique_pmid = _count_pmids(entity_agg.list_of_unique_references)
-    entity_agg.activity_units_enabled_by_protein_complex_association = len(
-        entity_agg.unique_activity_unit_protein_complex_enablers
-    )
-    entity_agg.activity_units_enabled_by_gene_product_association = len(
-        entity_agg.unique_activity_unit_gene_product_enablers
-    )
-    entity_agg.unique_protein_complex_terms = len(
-        entity_agg.unique_protein_complex_in_activity_term
-    )
-    entity_agg.unique_member_protein_complex_genes = len(
-        entity_agg.list_of_unique_protein_complex_genes
-    )
-    entity_agg.unique_gene_product_and_protein_complex_gene_enablers = len(
-        entity_agg.unique_enabled_by_gene_product.union(
-            entity_agg.list_of_unique_protein_complex_genes
-        )
-    )
+    _finalize_aggregate_info(entity_agg)
 
     if output_dir is not None:
         aggregate_stats_name = entity_agg_file_name
         aggregate_stats_name_output_file = output_dir / aggregate_stats_name
-        aggregate_stats_name_output_file.parent.mkdir(parents=True, exist_ok=True)
+        result = _write_output_file(
+            aggregate_stats_name_output_file,
+            lambda file: file.write(
+                entity_agg.model_dump_json(exclude_none=True, exclude=_exclude_inferred)
+            ),
+        )
+        results.append((aggregate_stats_name_output_file, result))
 
-        try:
-            aggregate_json = entity_agg.model_dump_json(
-                exclude_none=True, exclude=_exclude_inferred
-            )
-            with open(aggregate_stats_name_output_file, "w") as f:
-                f.write(aggregate_json)
-            logger.info(
-                f"Successfully wrote entity aggregate stats to {aggregate_stats_name_output_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing entity aggregate stats {aggregate_stats_name_output_file}",
-                exc_info=e,
-            )
-            return ResultType.ERROR, ErrorReason.WRITE_ERROR
+    return results
 
 
 def output_summary(
-    results: list[tuple[Path, ProcessingResult]],
+    results: list[tuple[Path, PipelineResult]],
     output_dir: Path | None,
     model_aggregate: AggregateInfo,
     contributor_lookup: Dict[str, GocamStats],
@@ -2246,7 +2075,7 @@ def output_summary(
         list[ConstitutivelyUpstreamActivityInfo] | None
     ) = None,
     id_label_lookup: Dict[str, str] | None = None,
-) -> tuple[ResultType, ErrorReason] | None:
+) -> list[tuple[Path, PipelineResult]]:
     """Finalize aggregate statistics and write all summary output files.
 
     Computes final counts on the model-level aggregate, writes the
@@ -2254,46 +2083,22 @@ def output_summary(
     aggregate output, and prints a success/failure summary tree.
 
     Args:
-        results: List of (json_file, ProcessingResult) tuples from model processing.
+        results: List of (json_file, PipelineResult) tuples from model processing.
         output_dir: Directory to write JSON files. If None, no files are written.
         model_aggregate: Accumulated cross-model aggregate statistics.
         contributor_lookup: Mapping of contributor URI to per-contributor stats.
         provider_lookup: Mapping of provider URI to per-provider stats.
         protein_complex_activities: List of protein complex activity records to write.
-        constitutively_upstream_activities: List of 'constitutively upstream of'
-            relation records to write.
+
+    Returns:
+        The result of each attempted output-file write.
     """
+    output_results: list[tuple[Path, PipelineResult]] = []
     model_aggregate.entity = "Model"
-    model_aggregate.unique_gene_product_enablers = len(
-        model_aggregate.unique_enabled_by_gene_product
-    )
-    model_aggregate.unique_references = len(model_aggregate.list_of_unique_references)
-    model_aggregate.unique_activity_units = len(model_aggregate.unique_activities)
-    model_aggregate.activity_units_enabled_by_protein_complex_association = len(
-        model_aggregate.unique_activity_unit_protein_complex_enablers
-    )
-    model_aggregate.activity_units_enabled_by_gene_product_association = len(
-        model_aggregate.unique_activity_unit_gene_product_enablers
-    )
-    model_aggregate.unique_protein_complex_terms = len(
-        model_aggregate.unique_protein_complex_in_activity_term
-    )
-    model_aggregate.unique_member_protein_complex_genes = len(
-        model_aggregate.list_of_unique_protein_complex_genes
-    )
-    model_aggregate.unique_gene_product_and_protein_complex_gene_enablers = len(
-        model_aggregate.unique_enabled_by_gene_product.union(
-            model_aggregate.list_of_unique_protein_complex_genes
-        )
-    )
-    compute_molecule_and_term_counts(model_aggregate)
+    _finalize_aggregate_info(model_aggregate)
 
     model_aggregate.total_inferred_relations = len(
         model_aggregate.list_inferred_relations or []
-    )
-
-    model_aggregate.unique_pmid = _count_pmids(
-        model_aggregate.list_of_unique_references
     )
 
     status_counts: Dict[str, int] = {}
@@ -2306,55 +2111,45 @@ def output_summary(
     if output_dir is not None:
         aggregate_stats_name = "aggregate_model_stats.json"
         aggregate_stats_name_output_file = output_dir / aggregate_stats_name
-        aggregate_stats_name_output_file.parent.mkdir(parents=True, exist_ok=True)
-
-        try:
-            aggregate_json = model_aggregate.model_dump_json(exclude_none=True)
-            with open(aggregate_stats_name_output_file, "w") as f:
-                f.write(aggregate_json)
-            logger.info(
-                f"Successfully wrote model aggregate stats to {aggregate_stats_name_output_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing model aggregate stats {aggregate_stats_name_output_file}",
-                exc_info=e,
-            )
-            return ResultType.ERROR, ErrorReason.WRITE_ERROR
+        result = _write_output_file(
+            aggregate_stats_name_output_file,
+            lambda file: file.write(model_aggregate.model_dump_json(exclude_none=True)),
+        )
+        output_results.append((aggregate_stats_name_output_file, result))
 
     # Output information for contributor and provider
-    output_entity_results(
-        output_dir=output_dir,
-        entity_label="Curator",
-        entity_lookup=contributor_lookup,
-        entity_sub_dir="stats_by_curator",
-        entity_agg_file_name="aggregate_curator_stats.json",
+    output_results.extend(
+        output_entity_results(
+            output_dir=output_dir,
+            entity_label="Curator",
+            entity_lookup=contributor_lookup,
+            entity_sub_dir="stats_by_curator",
+            entity_agg_file_name="aggregate_curator_stats.json",
+        )
     )
-    output_entity_results(
-        output_dir=output_dir,
-        entity_label="Group",
-        entity_lookup=provider_lookup,
-        entity_sub_dir="stats_by_group",
-        entity_agg_file_name="aggregate_group_stats.json",
+    output_results.extend(
+        output_entity_results(
+            output_dir=output_dir,
+            entity_label="Group",
+            entity_lookup=provider_lookup,
+            entity_sub_dir="stats_by_group",
+            entity_agg_file_name="aggregate_group_stats.json",
+        )
     )
 
     # Write member variable definitions to output directory
     if output_dir is not None:
         definitions_file = output_dir / "member_variable_definitions.json"
-        try:
-            with open(definitions_file, "w") as f:
-                json.dump(MEMBER_VARIABLE_DEFINITIONS, f, indent=2)
-            logger.info(
-                f"Successfully wrote member variable definitions to {definitions_file}"
-            )
-        except Exception as e:
-            logger.error(
-                f"Error writing member variable definitions to {definitions_file}",
-                exc_info=e,
-            )
+        result = _write_output_file(
+            definitions_file,
+            lambda file: json.dump(MEMBER_VARIABLE_DEFINITIONS, file, indent=2),
+        )
+        output_results.append((definitions_file, result))
 
     # Write the TSV-backing aggregate files (protein complex + constitutively
-    # upstream) for the production stats output.
+    # upstream) for the production stats output. Gated on --all-models by the
+    # caller passing None for both lists when the flag is off; empty record
+    # lists are skipped so no empty files or directory are created.
     if (
         output_dir is not None
         and protein_complex_activities is not None
@@ -2370,42 +2165,21 @@ def output_summary(
     # complexes, molecule inputs/outputs, CHEBI molecules, GO terms, etc.)
     if output_dir is not None and id_label_lookup is not None:
         id_lookup_file = output_dir / "id_to_label.json"
-        try:
-            sorted_id_lookup = dict(sorted(id_label_lookup.items()))
-            with open(id_lookup_file, "w") as f:
-                json.dump(sorted_id_lookup, f, indent=2)
-            logger.info(f"Successfully wrote id→label lookup to {id_lookup_file}")
-        except Exception as e:
-            logger.error(
-                f"Error writing id→label lookup to {id_lookup_file}",
-                exc_info=e,
-            )
-
-    total_count = len(results)
-    success_count = sum(
-        1 for _, (result, _, _) in results if result == ResultType.SUCCESS
-    )
-    filtered_count = sum(
-        1 for _, (result, _, _) in results if result == ResultType.FILTERED
-    )
-    error_count = sum(1 for _, (result, _, _) in results if result == ResultType.ERROR)
-
-    tree = Tree(f"[bold]Processed {total_count} models[/bold]")
-    if success_count > 0:
-        tree.add(
-            f"Successfully output stats for  [b]{success_count}[/b] models",
-            style="green",
+        result = _write_output_file(
+            id_lookup_file,
+            lambda file: json.dump(
+                dict(sorted(id_label_lookup.items())), file, indent=2
+            ),
         )
+        output_results.append((id_lookup_file, result))
 
-    if filtered_count > 0:
-        tree.add(
-            f"Skipped  [b]{filtered_count}[/b] non-production models",
-            style="yellow",
-        )
+    result_summary = ResultSummary()
+    for json_file, result in results:
+        result_summary.add_result(json_file.stem, result)
+    result_summary.print()
+    _print_output_summary(output_results)
 
-    if error_count > 0:
-        tree.add(f"Did not output stats for  [b]{error_count}[/b] models", style="red")
-    print(tree)
+    return output_results
 
 
 @app.command()
@@ -2507,21 +2281,10 @@ def main(
             "--all-models-tsv-dir must be specified when --all-models is set."
         )
 
-    # Get list of JSON files in the input directory, excluding hidden files, and sort them
-    # for consistent processing order. Apply limit if specified.
-    json_files = sorted(
-        f for f in input_dir.glob("*.json") if not f.name.startswith(".")
-    )
-    if limit > 0:
-        json_files = json_files[:limit]
-
-    # If no JSON files found, log a warning and exit
-    if not json_files:
-        logger.warning(f"No JSON files found in the specified directory: {input_dir}")
-        raise typer.Exit(code=1)
+    json_files = get_json_files(input_dir, limit=limit)
 
     # Process each JSON file
-    results: list[tuple[Path, ProcessingResult]] = []
+    results: list[tuple[Path, PipelineResult]] = []
     model_aggregate = AggregateInfo()
     contributor_lookup: Dict[str, GocamStats] = {}
     provider_lookup: Dict[str, GocamStats] = {}
@@ -2529,8 +2292,8 @@ def main(
     constitutively_upstream_activities: list[ConstitutivelyUpstreamActivityInfo] = []
     id_label_lookup: Dict[str, str] = {}
 
-    # All-models TSV record accumulators. Populated only when --all-models
-    # is enabled; they cover every model regardless of production status.
+    # All-models TSV record accumulators. Populated only when --all-models is
+    # enabled; they cover every model regardless of production status.
     all_models_protein_complex_activities: list[ProteinComplexActivityInfo] = []
     all_models_constitutively_upstream_activities: list[
         ConstitutivelyUpstreamActivityInfo
@@ -2566,8 +2329,7 @@ def main(
         )
         results.append((json_file, result))
 
-    # Print result
-    output_summary(
+    output_results = output_summary(
         results,
         output_dir=output_dir,
         model_aggregate=model_aggregate,
@@ -2591,6 +2353,12 @@ def main(
             all_models_constitutively_upstream_activities,
         )
         logger.info(f"Wrote all-models TSV aggregate files to {all_models_tsv_dir}")
+
+    has_errors = any(
+        isinstance(result, ErrorResult) for _, result in results + output_results
+    )
+    if has_errors:
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":

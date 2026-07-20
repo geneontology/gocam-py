@@ -3,6 +3,7 @@ lives under ``pipeline/`` (excluded from the package), so it is loaded by file
 path via importlib. Add tests for any update to that module here."""
 
 import importlib.util
+import sys
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -22,6 +23,13 @@ PIPELINE_SCRIPT = (
 
 
 def _load_stats_module():
+    # The script imports sibling ``pipeline`` modules (e.g. ``_common``) that are
+    # only importable when the pipeline directory is on ``sys.path`` -- which
+    # happens automatically when the script is run directly, but not when it is
+    # loaded by file path here. Add it explicitly so the import resolves.
+    pipeline_dir = str(PIPELINE_SCRIPT.parent)
+    if pipeline_dir not in sys.path:
+        sys.path.insert(0, pipeline_dir)
     spec = importlib.util.spec_from_file_location(
         "output_stats_for_gocam_models", PIPELINE_SCRIPT
     )
