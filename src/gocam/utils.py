@@ -1,5 +1,6 @@
 # Derived from:
 # https://github.com/geneontology/web-components/blob/5d87e593121eafe6ac4690fa4591f88aa5a03fd8/packages/web-components/src/globals/%40noctua.form/data/taxon-dataset.json
+import logging
 from collections import defaultdict
 from typing import Any, Iterator, overload
 
@@ -25,6 +26,8 @@ from gocam.datamodel import (
 )
 from gocam.vocabulary import Relation
 
+logger = logging.getLogger(__name__)
+
 SPECIES_CODES = [
     "Atal",
     "Btau",
@@ -45,6 +48,35 @@ SPECIES_CODES = [
     "Sscr",
     "Xenopus",
 ]
+
+# If one activity has a molecular association with predicate P1 and molecule M,
+# and another activity has a molecular association with predicate P2 and the same
+# molecule M, then we can infer a causal relationship between the two activities. The
+# following set of predicate pairs defines which combinations of predicates can be
+# used to infer such causal relationships.
+IMPLICIT_CAUSAL_ASSOCIATION_CHAINS: frozenset[tuple[Relation, Relation]] = frozenset(
+    {
+        (Relation.HAS_OUTPUT, Relation.HAS_INPUT),
+        (Relation.HAS_OUTPUT, Relation.HAS_PRIMARY_INPUT),
+        (Relation.HAS_OUTPUT, Relation.HAS_SMALL_MOLECULE_REGULATOR),
+        (Relation.HAS_OUTPUT, Relation.HAS_SMALL_MOLECULE_ACTIVATOR),
+        (Relation.HAS_OUTPUT, Relation.HAS_SMALL_MOLECULE_INHIBITOR),
+        (Relation.HAS_PRIMARY_OUTPUT, Relation.HAS_INPUT),
+        (Relation.HAS_PRIMARY_OUTPUT, Relation.HAS_PRIMARY_INPUT),
+        (
+            Relation.HAS_PRIMARY_OUTPUT,
+            Relation.HAS_SMALL_MOLECULE_REGULATOR,
+        ),
+        (
+            Relation.HAS_PRIMARY_OUTPUT,
+            Relation.HAS_SMALL_MOLECULE_ACTIVATOR,
+        ),
+        (
+            Relation.HAS_PRIMARY_OUTPUT,
+            Relation.HAS_SMALL_MOLECULE_INHIBITOR,
+        ),
+    }
+)
 
 
 def remove_species_code_suffix(label: str) -> str:
@@ -243,23 +275,33 @@ def all_evidence(model: Model) -> Iterator[EvidenceItem]:
 def model_to_digraph(model: Model) -> nx.DiGraph:
     """Convert a Model to a NetworkX directed graph.
 
-    Nodes are added for activities with an 'enabled_by' property. Edges are added based on:
-    - Causal associations between activities.
-    - Outputs of one activity serving as inputs to another activity.
+    Nodes represent enabled activities. Edges represent explicit causal
+    associations or molecule-mediated predicate chains declared in
+    IMPLICIT_CAUSAL_ASSOCIATION_CHAINS.
 
     Args:
         model: The model to convert.
 
     Returns:
-        A directed graph representation of the model.
+        A directed graph representing causal connectivity in the model.
     """
     graph = nx.DiGraph()
 
-    activities_by_input: dict[str, list[str]] = defaultdict(list)
+    activities_by_molecule_and_predicate: defaultdict[
+        tuple[str, Relation], set[str]
+    ] = defaultdict(set)
     for activity in model.activities or []:
-        for input_ in all_activity_inputs(activity):
-            if input_.molecule:
-                activities_by_input[input_.molecule].append(activity.id)
+        for association in activity.molecular_associations or []:
+            if association.molecule is None:
+                continue
+            try:
+                predicate = Relation(association.predicate)
+            except ValueError:
+                logger.warning("Unknown predicate: %s", association.predicate)
+                continue
+            activities_by_molecule_and_predicate[(association.molecule, predicate)].add(
+                activity.id
+            )
 
     for activity in model.activities or []:
         if activity.enabled_by is None:
@@ -272,11 +314,19 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
             if downstream_activity_id:
                 graph.add_edge(activity.id, downstream_activity_id)
 
-        for output in all_activity_outputs(activity):
-            if output.molecule:
-                for downstream_activity_id in activities_by_input.get(
-                    output.molecule, []
-                ):
+        for association in activity.molecular_associations or []:
+            if association.molecule is None:
+                continue
+            for (
+                upstream_predicate,
+                downstream_predicate,
+            ) in IMPLICIT_CAUSAL_ASSOCIATION_CHAINS:
+                if association.predicate != upstream_predicate:
+                    continue
+                downstream_activity_ids = activities_by_molecule_and_predicate.get(
+                    (association.molecule, downstream_predicate), set()
+                )
+                for downstream_activity_id in downstream_activity_ids:
                     if downstream_activity_id != activity.id:
                         graph.add_edge(activity.id, downstream_activity_id)
 
