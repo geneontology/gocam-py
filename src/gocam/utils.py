@@ -303,15 +303,19 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
                 activity.id
             )
 
+    enabled_activity_ids = {
+        a.id for a in model.activities or [] if a.enabled_by is not None
+    }
+
     for activity in model.activities or []:
-        if activity.enabled_by is None:
+        if activity.id not in enabled_activity_ids:
             continue
 
         graph.add_node(activity.id)
 
         for causal_assoc in activity.causal_associations or []:
             downstream_activity_id = causal_assoc.downstream_activity
-            if downstream_activity_id:
+            if downstream_activity_id in enabled_activity_ids:
                 graph.add_edge(activity.id, downstream_activity_id)
 
         for association in activity.molecular_associations or []:
@@ -327,7 +331,10 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
                     (association.molecule, downstream_predicate), set()
                 )
                 for downstream_activity_id in downstream_activity_ids:
-                    if downstream_activity_id != activity.id:
+                    if (
+                        downstream_activity_id != activity.id
+                        and downstream_activity_id in enabled_activity_ids
+                    ):
                         graph.add_edge(activity.id, downstream_activity_id)
 
     return graph
