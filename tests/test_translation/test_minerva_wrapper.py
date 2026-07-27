@@ -626,6 +626,112 @@ def test_has_small_molecule_activator_association():
     assert len(has_small_molecule_activator_associations) == 2
 
 
+@pytest.mark.parametrize(
+    ("predicate", "molecule_is_subject"),
+    [
+        (Relation.HAS_SMALL_MOLECULE_REGULATOR, False),
+        (Relation.IS_SMALL_MOLECULE_REGULATOR_OF, True),
+    ],
+)
+def test_small_molecule_regulator_association_is_activity_oriented(
+    predicate: Relation, molecule_is_subject: bool
+):
+    """Generic regulator facts in either orientation normalize into activity-oriented
+    associations."""
+    model_id = "gomodel:test_small_molecule_regulator"
+    activity_id = f"{model_id}/activity"
+    protein_id = f"{model_id}/protein"
+    molecule_id = f"{model_id}/molecule"
+    subject, object_ = (
+        (molecule_id, activity_id)
+        if molecule_is_subject
+        else (activity_id, molecule_id)
+    )
+    minerva_object = {
+        "id": model_id,
+        "annotations": [{"key": "title", "value": "Small molecule regulator test"}],
+        "individuals": [
+            {
+                "id": activity_id,
+                "type": [
+                    {
+                        "type": "class",
+                        "id": "GO:0003674",
+                        "label": "molecular_function",
+                    }
+                ],
+                "root-type": [
+                    {
+                        "type": "class",
+                        "id": "GO:0003674",
+                        "label": "molecular_function",
+                    }
+                ],
+                "annotations": [],
+            },
+            {
+                "id": protein_id,
+                "type": [
+                    {
+                        "type": "class",
+                        "id": "UniProtKB:P12345",
+                        "label": "test protein",
+                    }
+                ],
+                "root-type": [
+                    {
+                        "type": "class",
+                        "id": "CHEBI:33695",
+                        "label": "information biomacromolecule",
+                    }
+                ],
+                "annotations": [],
+            },
+            {
+                "id": molecule_id,
+                "type": [
+                    {
+                        "type": "class",
+                        "id": "CHEBI:15377",
+                        "label": "water",
+                    }
+                ],
+                "root-type": [
+                    {
+                        "type": "class",
+                        "id": "CHEBI:24431",
+                        "label": "chemical entity",
+                    }
+                ],
+                "annotations": [],
+            },
+        ],
+        "facts": [
+            {
+                "subject": activity_id,
+                "property": Relation.ENABLED_BY,
+                "object": protein_id,
+                "annotations": [],
+            },
+            {
+                "subject": subject,
+                "property": predicate,
+                "object": object_,
+                "annotations": [],
+            },
+        ],
+    }
+
+    model = MinervaWrapper().minerva_object_to_model(minerva_object)
+
+    assert model.activities is not None
+    assert len(model.activities) == 1
+    assert [
+        (association.predicate, association.molecule)
+        for association in model.activities[0].molecular_associations or []
+    ] == [(Relation.HAS_SMALL_MOLECULE_REGULATOR, molecule_id)]
+
+
 def test_deeply_nested_part_of_associations():
     """Test that deeply nested part_of associations are correctly translated."""
     minerva_object = load_minerva_object("64d5781900000615")
