@@ -374,7 +374,7 @@ class Indexer:
                 )
                 for provided_by in all_provided_bys
             ],
-            key=lambda x: x.label,
+            key=lambda x: x.label or x.id,
         )
         qi.flattened_contributors = sorted(all_contributors)
 
