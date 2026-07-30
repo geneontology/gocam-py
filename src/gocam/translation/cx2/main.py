@@ -276,7 +276,10 @@ def model_to_cx2(
                 continue
 
             for association in activity.causal_associations:
-                if association.downstream_activity in activity_nodes_by_activity_id:
+                if (
+                    association.downstream_activity is not None
+                    and association.downstream_activity in activity_nodes_by_activity_id
+                ):
                     try:
                         relation_type = Relation(association.predicate)
                         relation_style = RELATIONS.get(relation_type, None)
