@@ -33,6 +33,7 @@ oaklib = [
     "setuptools<82.0.0; python_version < '3.12'"
 ]
 owl = ["py-horned-owl"]
+validator = ["linkml-term-validator"]
 
 [project.scripts]
 gocam = "gocam.cli:app"
