@@ -10,7 +10,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated, Any, Iterable
 
+import pystow
 import typer
+import yaml
 from _common import normalize_model_id, setup_logger
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -22,6 +24,10 @@ from gocam import __version__
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
+
+_PYSTOW_MODULE = pystow.module("gocam")
+_CURRENT_GROUPS_YAML_URL = "https://current.geneontology.org/metadata/groups.yaml"
+_CURRENT_USERS_YAML_URL = "https://current.geneontology.org/metadata/users.yaml"
 
 
 @dataclass
@@ -147,6 +153,41 @@ def summarize_model_entries(
     return summary
 
 
+def load_metadata_by_id(
+    path: Path | None, *, default_url: str, id_field: str
+) -> dict[str, dict[str, Any]]:
+    """Load GO metadata from an explicit file or a cached default URL."""
+    if path is None:
+        path = _PYSTOW_MODULE.ensure(
+            url=default_url,
+            download_kwargs={"backend": "requests"},
+        )
+
+    with path.open() as metadata_file:
+        records = yaml.safe_load(metadata_file)
+    if not isinstance(records, list):
+        raise ValueError(f"Expected a list of metadata records in {path}")
+
+    return {
+        str(record[id_field]): record
+        for record in records
+        if isinstance(record, dict) and record.get(id_field)
+    }
+
+
+def resolve_display_values(
+    identifiers: set[str],
+    metadata_by_id: dict[str, dict[str, Any]],
+    *,
+    display_field: str,
+) -> list[str]:
+    """Resolve identifiers to display values, retaining unknown identifiers."""
+    return sorted(
+        str(metadata_by_id.get(identifier, {}).get(display_field) or identifier)
+        for identifier in identifiers
+    )
+
+
 @app.command()
 def main(
     logs_dir: Annotated[
@@ -195,6 +236,26 @@ def main(
             help="Additional info to include in the metadata sheet, in 'Key=Value' format. Can be used multiple times.",
         ),
     ] = None,
+    goc_users_yaml: Annotated[
+        Path | None,
+        typer.Option(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="YAML file defining GOC users. Defaults to current.geneontology.org metadata.",
+        ),
+    ] = None,
+    goc_groups_yaml: Annotated[
+        Path | None,
+        typer.Option(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="YAML file defining GOC groups. Defaults to current.geneontology.org metadata.",
+        ),
+    ] = None,
 ) -> None:
     setup_logger(verbose)
 
@@ -211,6 +272,13 @@ def main(
     for step_file in step_files:
         for model_id, entry in iter_log_results(step_file):
             step_results_by_model_id[model_id].append(entry)
+
+    users_by_id = load_metadata_by_id(
+        goc_users_yaml, default_url=_CURRENT_USERS_YAML_URL, id_field="uri"
+    )
+    groups_by_id = load_metadata_by_id(
+        goc_groups_yaml, default_url=_CURRENT_GROUPS_YAML_URL, id_field="id"
+    )
 
     Column = namedtuple("Column", ["name", "width", "definition"])
     columns = [
@@ -248,7 +316,8 @@ def main(
         Column(
             "Contributors",
             35,
-            "All contributor identifiers found in the model's available provenance.",
+            "All contributors found in the model's available provenance. Names are shown when "
+            "available; otherwise contributor identifiers are shown.",
         ),
         Column(
             "Groups",
@@ -309,12 +378,23 @@ def main(
     ):
         row += 1
         summary = summarize_model_entries(model_id, entries)
-        group_display_values = summary.groups or summary.provided_by
+        contributor_display_values = resolve_display_values(
+            summary.contributors, users_by_id, display_field="nickname"
+        )
+        group_display_values = (
+            sorted(summary.groups)
+            if summary.groups
+            else resolve_display_values(
+                summary.provided_by, groups_by_id, display_field="label"
+            )
+        )
         formatted_contributors = (
-            ", ".join(sorted(summary.contributors)) if summary.contributors else None
+            ", ".join(contributor_display_values)
+            if contributor_display_values
+            else None
         )
         formatted_groups = (
-            ", ".join(sorted(group_display_values)) if group_display_values else None
+            ", ".join(group_display_values) if group_display_values else None
         )
         formatted_warnings = (
             "\n".join(format_warning(w) for w in summary.warnings)

@@ -262,6 +262,10 @@ from top-level Minerva annotations.
 
 - `--metadata`: Additional info to include in the metadata sheet, in 'Key=Value' format. Can be used
   multiple times.
+- `--goc-users-yaml`: YAML file defining GOC users. If omitted, the file at
+  `https://current.geneontology.org/metadata/users.yaml` is downloaded and cached.
+- `--goc-groups-yaml`: YAML file defining GOC groups. If omitted, the file at
+  `https://current.geneontology.org/metadata/groups.yaml` is downloaded and cached.
 - `--log-file-extension`: File extension used to find log files (default: `.jsonl`)
 - `--verbose` / `-v`: Increase verbosity level (`-v` for INFO, `-vv` for DEBUG)
 - `--limit N`: Limit the number of models included in the summary (0 = no limit)
