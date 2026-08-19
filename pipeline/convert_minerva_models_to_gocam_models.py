@@ -35,13 +35,14 @@ from _common import (
 )
 from rich.progress import track
 
+from gocam.datamodel import Model
 from gocam.translation import (
     MinervaObject,
     MinervaView,
     MinervaWrapper,
     WarningType,
 )
-from gocam.utils import model_to_digraph
+from gocam.utils import all_provenance, model_to_digraph
 
 app = typer.Typer()
 
@@ -61,6 +62,24 @@ def extract_minerva_model_metadata(minerva_view: MinervaView) -> dict:
         "contributors": annotations_multivalued.get("contributor"),
         "provided_by": annotations_multivalued.get("providedBy"),
         "provenance_scope": "model",
+    }
+
+
+def extract_gocam_model_metadata(model: Model) -> dict:
+    """Extract complete report metadata from a translated GO-CAM model."""
+    contributors = set()
+    provided_by = set()
+    for provenance in all_provenance(model):
+        contributors.update(provenance.contributor or [])
+        provided_by.update(provenance.provided_by or [])
+
+    return {
+        "title": model.title,
+        "status": model.status,
+        "date_modified": model.date_modified,
+        "contributors": sorted(contributors),
+        "provided_by": sorted(provided_by),
+        "provenance_scope": "all",
     }
 
 
@@ -101,6 +120,7 @@ def process_minerva_model_file(
         # Convert Minerva model to GO-CAM model
         translation_result = MinervaWrapper.translate(minerva_view)
         gocam_model = translation_result.result
+        meta = extract_gocam_model_metadata(gocam_model)
         translation_warnings = [
             dataclasses.asdict(w) for w in translation_result.warnings
         ]
