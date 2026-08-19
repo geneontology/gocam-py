@@ -35,12 +35,33 @@ from _common import (
 )
 from rich.progress import track
 
-from gocam.translation import MinervaWrapper, WarningType
+from gocam.translation import (
+    MinervaObject,
+    MinervaView,
+    MinervaWrapper,
+    WarningType,
+)
 from gocam.utils import model_to_digraph
 
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
+
+
+def extract_minerva_model_metadata(minerva_view: MinervaView) -> dict:
+    """Extract report metadata from a Minerva model's top-level annotations."""
+    model = minerva_view.raw_json
+    annotations = minerva_view.get_annotations(model)
+    annotations_multivalued = minerva_view.get_annotations_multivalued(model)
+
+    return {
+        "title": annotations.get("title"),
+        "status": annotations.get("state"),
+        "date_modified": annotations.get("date"),
+        "contributors": annotations_multivalued.get("contributor"),
+        "provided_by": annotations_multivalued.get("providedBy"),
+        "provenance_scope": "model",
+    }
 
 
 def process_minerva_model_file(
@@ -69,18 +90,20 @@ def process_minerva_model_file(
         logger.error(f"Error reading file {json_file}", exc_info=e)
         return ErrorResult(reason=ErrorReason.READ_ERROR, details=str(e))
 
-    # Convert Minerva model to GO-CAM model
     meta = None
     try:
-        translation_result = MinervaWrapper.translate(minerva_model)
+        # Extract model-level metadata directly from the Minerva model so it remains
+        # available if translation fails.
+        minerva_object = MinervaObject.model_validate(minerva_model)
+        minerva_view = MinervaView(minerva_object)
+        meta = extract_minerva_model_metadata(minerva_view)
+
+        # Convert Minerva model to GO-CAM model
+        translation_result = MinervaWrapper.translate(minerva_view)
         gocam_model = translation_result.result
         translation_warnings = [
             dataclasses.asdict(w) for w in translation_result.warnings
         ]
-        meta = {
-            "title": gocam_model.title,
-            "status": gocam_model.status,
-        }
         logger.debug(
             f"Successfully converted Minerva model to GO-CAM model for {json_file}"
         )
@@ -89,7 +112,9 @@ def process_minerva_model_file(
             f"Error converting Minerva model to GO-CAM model for {json_file}",
             exc_info=e,
         )
-        return ErrorResult(reason=ErrorReason.CONVERSION_ERROR, details=str(e))
+        return ErrorResult(
+            reason=ErrorReason.CONVERSION_ERROR, details=str(e), meta=meta
+        )
 
     # Detect if there is at least one activity edge in the model. If not, skip writing the model.
     graph = model_to_digraph(gocam_model)
