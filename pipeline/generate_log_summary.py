@@ -31,6 +31,15 @@ _CURRENT_USERS_YAML_URL = "https://current.geneontology.org/metadata/users.yaml"
 
 
 @dataclass
+class ProvidingGroup:
+    """Resolved identity and display metadata for a model-providing group."""
+
+    id: str
+    label: str
+    shorthand: str | None = None
+
+
+@dataclass
 class ModelSummary:
     """Merged reporting data for one model across all pipeline steps."""
 
@@ -39,7 +48,9 @@ class ModelSummary:
     model_status: str | None = None
     date_modified: str | None = None
     contributors: set[str] = field(default_factory=set)
+    contributor_names: list[str] = field(default_factory=list)
     provided_by: set[str] = field(default_factory=set)
+    providing_groups: list[ProvidingGroup] = field(default_factory=list)
     groups: set[str] = field(default_factory=set)
     provenance_scope: str | None = None
     longest_path: int | None = None
@@ -183,9 +194,40 @@ def resolve_display_values(
 ) -> list[str]:
     """Resolve identifiers to display values, retaining unknown identifiers."""
     return sorted(
-        str(metadata_by_id.get(identifier, {}).get(display_field) or identifier)
-        for identifier in identifiers
+        {
+            str(metadata_by_id.get(identifier, {}).get(display_field) or identifier)
+            for identifier in identifiers
+        }
     )
+
+
+def resolve_model_summary_metadata(
+    summary: ModelSummary,
+    *,
+    users_by_id: dict[str, dict[str, Any]],
+    groups_by_id: dict[str, dict[str, Any]],
+) -> ModelSummary:
+    """Add renderer-independent contributor and group display metadata."""
+    summary.contributor_names = resolve_display_values(
+        summary.contributors, users_by_id, display_field="nickname"
+    )
+
+    if summary.provided_by:
+        summary.providing_groups = [
+            ProvidingGroup(
+                id=group_id,
+                label=str(groups_by_id.get(group_id, {}).get("label") or group_id),
+                shorthand=groups_by_id.get(group_id, {}).get("shorthand"),
+            )
+            for group_id in sorted(summary.provided_by)
+        ]
+    else:
+        summary.providing_groups = [
+            ProvidingGroup(id=group_label, label=group_label)
+            for group_label in sorted(summary.groups)
+        ]
+
+    return summary
 
 
 @app.command()
@@ -377,21 +419,16 @@ def main(
         model_entries, description="Building log summary..."
     ):
         row += 1
-        summary = summarize_model_entries(model_id, entries)
-        contributor_display_values = resolve_display_values(
-            summary.contributors, users_by_id, display_field="nickname"
+        summary = resolve_model_summary_metadata(
+            summarize_model_entries(model_id, entries),
+            users_by_id=users_by_id,
+            groups_by_id=groups_by_id,
         )
-        group_display_values = (
-            sorted(summary.groups)
-            if summary.groups
-            else resolve_display_values(
-                summary.provided_by, groups_by_id, display_field="label"
-            )
+        group_display_values = sorted(
+            {group.label for group in summary.providing_groups}
         )
         formatted_contributors = (
-            ", ".join(contributor_display_values)
-            if contributor_display_values
-            else None
+            ", ".join(summary.contributor_names) if summary.contributor_names else None
         )
         formatted_groups = (
             ", ".join(group_display_values) if group_display_values else None
