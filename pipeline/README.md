@@ -248,7 +248,9 @@ python pipeline/generate_go_cam_browser_search_docs.py \
 ## generate_log_summary.py
 
 Generates an Excel summary of pipeline run results based on JSONL log files produced by other
-pipeline steps.
+pipeline steps. Per-model metadata includes the model's modification date, contributors, groups or
+provider identifiers, and whether provenance was collected from the full translated model or only
+from top-level Minerva annotations.
 
 **Inputs:**
 

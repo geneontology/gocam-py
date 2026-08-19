@@ -5,6 +5,7 @@ import itertools
 import json
 import logging
 from collections import defaultdict, namedtuple
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated, Any, Iterable
@@ -21,6 +22,24 @@ from gocam import __version__
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ModelSummary:
+    """Merged reporting data for one model across all pipeline steps."""
+
+    model_id: str
+    title: str | None = None
+    model_status: str | None = None
+    date_modified: str | None = None
+    contributors: set[str] = field(default_factory=set)
+    provided_by: set[str] = field(default_factory=set)
+    groups: set[str] = field(default_factory=set)
+    provenance_scope: str | None = None
+    longest_path: int | None = None
+    pipeline_status: str = "success"
+    pipeline_status_details: str | None = None
+    warnings: list[Any] = field(default_factory=list)
 
 
 def discover_step_files(logs_dir: Path, extension: str = ".jsonl") -> list[Path]:
@@ -96,6 +115,36 @@ def format_warning(warning: Any) -> str:
         return f"{warning_type}{': ' if warning_type else ''}{message}"
     else:
         return str(warning)
+
+
+def summarize_model_entries(
+    model_id: str, entries: list[dict[str, Any]]
+) -> ModelSummary:
+    """Merge report entries for one model into a renderer-independent summary."""
+    summary = ModelSummary(model_id=model_id)
+    for entry in entries:
+        summary.warnings.extend(entry.get("warnings") or [])
+
+        meta = entry.get("meta") or {}
+        if summary.title is None:
+            summary.title = meta.get("title")
+        if summary.model_status is None:
+            summary.model_status = meta.get("status")
+        if summary.date_modified is None:
+            summary.date_modified = meta.get("date_modified")
+        if summary.provenance_scope is None:
+            summary.provenance_scope = meta.get("provenance_scope")
+        if summary.longest_path is None:
+            summary.longest_path = meta.get("longest_path")
+        summary.contributors.update(meta.get("contributors") or [])
+        summary.provided_by.update(meta.get("provided_by") or [])
+        summary.groups.update(meta.get("groups") or [])
+
+        if summary.pipeline_status == "success" and entry.get("status") != "success":
+            summary.pipeline_status = entry.get("status", "unknown")
+            summary.pipeline_status_details = entry.get("reason")
+
+    return summary
 
 
 @app.command()
@@ -179,6 +228,7 @@ def main(
         Column("Minerva JSON", 15, "Link to download the model's Minerva JSON file."),
         Column("Title", 55, "The title of the model"),
         Column("Model State", 13, "The state of the model"),
+        Column("Date Modified", 15, "The date the model was last modified."),
         Column(
             "Pipeline Status",
             14,
@@ -196,10 +246,21 @@ def main(
             "the pipeline did not complete successfully.",
         ),
         Column(
+            "Contributors",
+            35,
+            "All contributor identifiers found in the model's available provenance.",
+        ),
+        Column(
             "Groups",
-            13,
-            "All groups that contributed to the model. Note that this information is computed late "
-            "in the pipeline, so if a model was filtered out by an earlier step, this information may not be available.",
+            35,
+            "All groups that contributed to the model. Group labels are shown when available; "
+            "otherwise the provider identifiers recorded in model provenance are shown.",
+        ),
+        Column(
+            "Provenance Scope",
+            18,
+            "Whether contributor and group metadata covers all translated GO-CAM provenance or "
+            "only top-level Minerva model provenance.",
         ),
         Column(
             "Longest Path",
@@ -247,36 +308,18 @@ def main(
         model_entries, description="Building log summary..."
     ):
         row += 1
-        title = None
-        model_status = None
-        groups = None
-        longest_path = None
-        pipeline_status = "success"
-        pipeline_status_details = None
-        warning_count = 0
-        warnings = []
-        for entry in entries:
-            warnings.extend(entry.get("warnings") or [])
-            warning_count += len(entry.get("warnings") or [])
-            meta = entry.get("meta", {})
-            if meta:
-                if title is None:
-                    title = meta.get("title")
-                if model_status is None:
-                    model_status = meta.get("status")
-                if groups is None:
-                    groups = meta.get("groups")
-                if longest_path is None:
-                    longest_path = meta.get("longest_path")
-            if entry.get("status") != "success":
-                pipeline_status = entry.get("status", "unknown")
-                reason = entry.get("reason")
-                if reason:
-                    pipeline_status_details = reason
-                break
-        formatted_groups = ", ".join(groups) if groups else None
+        summary = summarize_model_entries(model_id, entries)
+        group_display_values = summary.groups or summary.provided_by
+        formatted_contributors = (
+            ", ".join(sorted(summary.contributors)) if summary.contributors else None
+        )
+        formatted_groups = (
+            ", ".join(sorted(group_display_values)) if group_display_values else None
+        )
         formatted_warnings = (
-            "\n".join(format_warning(w) for w in warnings) if warnings else None
+            "\n".join(format_warning(w) for w in summary.warnings)
+            if summary.warnings
+            else None
         )
         summary_sheet.append(
             [
@@ -293,17 +336,20 @@ def main(
                     f"https://go-public.s3.amazonaws.com/files/go-cam/{model_id}.json",
                     "Minerva JSON",
                 ),
-                title,
-                model_status,
-                pipeline_status,
-                pipeline_status_details,
+                summary.title,
+                summary.model_status,
+                summary.date_modified,
+                summary.pipeline_status,
+                summary.pipeline_status_details,
+                formatted_contributors,
                 formatted_groups,
-                longest_path,
-                warning_count,
+                summary.provenance_scope,
+                summary.longest_path,
+                len(summary.warnings),
                 formatted_warnings,
             ]
         )
-        if pipeline_status == "success":
+        if summary.pipeline_status == "success":
             for cell in summary_sheet[row]:
                 cell.fill = fill_green
 
