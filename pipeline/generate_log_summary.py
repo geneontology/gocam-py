@@ -614,6 +614,12 @@ def main(
     ] = None,
 ) -> None:
     setup_logger(verbose)
+
+    if excel_output is None and html_output_dir is None:
+        raise typer.BadParameter(
+            "At least one of --excel-output or --html-output-dir must be provided."
+        )
+
     generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     if excel_output and not excel_output.name.endswith(".xlsx"):
