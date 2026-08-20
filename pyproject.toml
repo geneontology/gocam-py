@@ -46,8 +46,8 @@ dev = [
     "openpyxl>=3.1.5",
     "pytest>=8.2.2,<10",
     "requests-mock>=1.12.1,<2",
-    "ruff==0.16.1",
-    "ty==0.0.68",
+    "ruff==0.16.3",
+    "ty==0.0.71",
 ]
 
 [tool.uv]
