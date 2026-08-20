@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Generate an Excel summary of pipeline run results based on JSONL log files."""
+"""Generate Excel and HTML summaries of pipeline run results from JSONL logs."""
 
 import itertools
 import json
 import logging
+import re
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -14,6 +15,7 @@ import pystow
 import typer
 import yaml
 from _common import normalize_model_id, setup_logger
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -57,6 +59,27 @@ class ModelSummary:
     pipeline_status: str = "success"
     pipeline_status_details: str | None = None
     warnings: list[Any] = field(default_factory=list)
+
+
+@dataclass
+class GroupReport:
+    """Production models and pipeline results for one providing group."""
+
+    group: ProvidingGroup
+    models: list[ModelSummary]
+    filename: str = ""
+
+    @property
+    def success_models(self) -> list[ModelSummary]:
+        return [model for model in self.models if model.pipeline_status == "success"]
+
+    @property
+    def filtered_models(self) -> list[ModelSummary]:
+        return [model for model in self.models if model.pipeline_status == "filtered"]
+
+    @property
+    def error_models(self) -> list[ModelSummary]:
+        return [model for model in self.models if model.pipeline_status == "error"]
 
 
 def discover_step_files(logs_dir: Path, extension: str = ".jsonl") -> list[Path]:
@@ -230,98 +253,90 @@ def resolve_model_summary_metadata(
     return summary
 
 
-@app.command()
-def main(
-    logs_dir: Annotated[
-        Path,
-        typer.Option(
-            exists=True,
-            file_okay=False,
-            dir_okay=True,
-            readable=True,
-            help="Directory containing step JSONL report files.",
-        ),
-    ],
-    output: Annotated[
-        Path,
-        typer.Option(
-            file_okay=True,
-            dir_okay=False,
-            writable=True,
-            help="File to write the generated Excel summary to.",
-        ),
-    ],
-    log_file_extension: Annotated[
-        str,
-        typer.Option(
-            help="File extension used to find log files in logs directory (default: .jsonl).",
-        ),
-    ] = ".jsonl",
-    verbose: Annotated[
-        int,
-        typer.Option(
-            "--verbose",
-            "-v",
-            count=True,
-            help="Increase verbosity level. Can be used multiple times.",
-        ),
-    ] = 0,
-    limit: Annotated[
-        int,
-        typer.Option(
-            help="Limit the number of models included in the generated summary."
-        ),
-    ] = 0,
-    metadata: Annotated[
-        list[str] | None,
-        typer.Option(
-            help="Additional info to include in the metadata sheet, in 'Key=Value' format. Can be used multiple times.",
-        ),
-    ] = None,
-    goc_users_yaml: Annotated[
-        Path | None,
-        typer.Option(
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
-            help="YAML file defining GOC users. Defaults to current.geneontology.org metadata.",
-        ),
-    ] = None,
-    goc_groups_yaml: Annotated[
-        Path | None,
-        typer.Option(
-            exists=True,
-            file_okay=True,
-            dir_okay=False,
-            readable=True,
-            help="YAML file defining GOC groups. Defaults to current.geneontology.org metadata.",
-        ),
-    ] = None,
-) -> None:
-    setup_logger(verbose)
+def slugify(value: str) -> str:
+    """Convert a display value into a safe, readable filename component."""
+    slug = re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
+    return slug or "group"
 
-    if not output.name.endswith(".xlsx"):
-        raise typer.BadParameter("Output file must have .xlsx extension.")
 
-    step_files = discover_step_files(logs_dir, log_file_extension)
-    if not step_files:
-        raise typer.BadParameter(
-            f"No log files with extension {log_file_extension} found in directory: {logs_dir}"
+def sort_models_for_report(models: Iterable[ModelSummary]) -> list[ModelSummary]:
+    """Sort models newest-first, using title and ID to order equal dates."""
+    models_by_title = sorted(
+        models, key=lambda model: ((model.title or "").casefold(), model.model_id)
+    )
+    return sorted(
+        models_by_title,
+        key=lambda model: model.date_modified or "",
+        reverse=True,
+    )
+
+
+def build_group_reports(
+    model_summaries: Iterable[ModelSummary],
+) -> list[GroupReport]:
+    """Group production-model summaries by provider for HTML reporting."""
+    models_by_group: defaultdict[str, list[ModelSummary]] = defaultdict(list)
+    groups_by_id: dict[str, ProvidingGroup] = {}
+    unassigned = ProvidingGroup(
+        id="urn:gocam-report:unassigned",
+        label="Unassigned",
+        shorthand="unassigned",
+    )
+
+    for summary in model_summaries:
+        if summary.model_status != "production":
+            continue
+
+        providing_groups = summary.providing_groups or [unassigned]
+        for group in providing_groups:
+            groups_by_id[group.id] = group
+            models_by_group[group.id].append(summary)
+
+    reports = [
+        GroupReport(
+            group=groups_by_id[group_id],
+            models=sort_models_for_report(models),
         )
+        for group_id, models in models_by_group.items()
+    ]
+    reports.sort(key=lambda report: (report.group.label.casefold(), report.group.id))
 
-    step_results_by_model_id: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
-    for step_file in step_files:
-        for model_id, entry in iter_log_results(step_file):
-            step_results_by_model_id[model_id].append(entry)
+    for report in reports:
+        filename_group = slugify(
+            report.group.shorthand or report.group.label or report.group.id
+        )
+        report.filename = f"{filename_group}_go-cam_pipeline_report.html"
 
-    users_by_id = load_metadata_by_id(
-        goc_users_yaml, default_url=_CURRENT_USERS_YAML_URL, id_field="uri"
-    )
-    groups_by_id = load_metadata_by_id(
-        goc_groups_yaml, default_url=_CURRENT_GROUPS_YAML_URL, id_field="id"
-    )
+    return reports
 
+
+def format_plural(count: int, singular: str, plural: str | None = None) -> str:
+    """Return a string with the count and the appropriate singular/plural form."""
+    if plural is None:
+        plural = singular + "s"
+    return f"{count} {singular if count == 1 else plural}"
+
+
+_HTML_ENVIRONMENT = Environment(
+    autoescape=True,
+    loader=FileSystemLoader(
+        Path(__file__).parent / "templates" / "generate_log_summary"
+    ),
+    undefined=StrictUndefined,
+)
+
+
+_HTML_ENVIRONMENT.filters["warning_text"] = format_warning
+_HTML_ENVIRONMENT.filters["pluralize"] = format_plural
+
+
+def render_excel_summary(
+    model_summaries: list[ModelSummary],
+    *,
+    extra_metadata: list[str] | None,
+    generated_at: str,
+) -> Workbook:
+    """Render all pipeline results into an Excel workbook."""
     Column = namedtuple("Column", ["name", "width", "definition"])
     columns = [
         Column(
@@ -410,20 +425,9 @@ def main(
     alignment_wrapped = Alignment(wrap_text=True, vertical="top")
     font_bold = Font(bold=True)
 
-    model_entries = step_results_by_model_id.items()
-    if limit > 0:
-        model_entries = itertools.islice(model_entries, limit)
-
     row = 1
-    for model_id, entries in track(
-        model_entries, description="Building log summary..."
-    ):
+    for summary in model_summaries:
         row += 1
-        summary = resolve_model_summary_metadata(
-            summarize_model_entries(model_id, entries),
-            users_by_id=users_by_id,
-            groups_by_id=groups_by_id,
-        )
         group_display_values = sorted(
             {group.label for group in summary.providing_groups}
         )
@@ -440,17 +444,17 @@ def main(
         )
         summary_sheet.append(
             [
-                model_id,
+                summary.model_id,
                 hyperlink_formula(
-                    f"http://noctua.geneontology.org/workbench/noctua-visual-pathway-editor/?model_id=gomodel:{model_id}",
+                    f"http://noctua.geneontology.org/workbench/noctua-visual-pathway-editor/?model_id=gomodel:{summary.model_id}",
                     "VPE",
                 ),
                 hyperlink_formula(
-                    f"http://noctua.geneontology.org/editor/graph/gomodel:{model_id}",
+                    f"http://noctua.geneontology.org/editor/graph/gomodel:{summary.model_id}",
                     "Graph Editor",
                 ),
                 hyperlink_formula(
-                    f"https://go-public.s3.amazonaws.com/files/go-cam/{model_id}.json",
+                    f"https://go-public.s3.amazonaws.com/files/go-cam/{summary.model_id}.json",
                     "Minerva JSON",
                 ),
                 summary.title,
@@ -480,12 +484,10 @@ def main(
     metadata_sheet.append(["Provenance"])
     for cell in metadata_sheet[metadata_sheet.max_row]:
         cell.font = font_bold
-    metadata_sheet.append(
-        ["Generated on", datetime.now(timezone.utc).isoformat(timespec="seconds")]
-    )
+    metadata_sheet.append(["Generated on", generated_at])
     metadata_sheet.append(["gocam-py version", __version__])
-    if metadata:
-        for item in metadata:
+    if extra_metadata:
+        for item in extra_metadata:
             if "=" not in item:
                 raise typer.BadParameter(
                     f"Invalid metadata entry {item!r}. Expected format: Key=Value."
@@ -504,23 +506,177 @@ def main(
     for cell in metadata_sheet["B"]:
         cell.alignment = alignment_wrapped
 
-    with Progress() as progress:
-        progress.add_task(description="Writing summary file...", total=None)
-        # Add filters to the header row
-        last_column_letter = get_column_letter(len(columns))
-        summary_sheet.auto_filter.ref = f"A1:{last_column_letter}{row}"
+    # Add filters to the header row
+    last_column_letter = get_column_letter(len(columns))
+    summary_sheet.auto_filter.ref = f"A1:{last_column_letter}{row}"
 
-        # Apply text wrapping and alignment to all cells
-        for row_cells in summary_sheet.iter_rows():
-            for cell in row_cells:
-                cell.alignment = alignment_wrapped
+    # Apply text wrapping and alignment to all cells
+    for row_cells in summary_sheet.iter_rows():
+        for cell in row_cells:
+            cell.alignment = alignment_wrapped
 
-        # Make the header row bold
-        for cell in summary_sheet[1]:
-            cell.font = font_bold
+    # Make the header row bold
+    for cell in summary_sheet[1]:
+        cell.font = font_bold
 
-        # Save the workbook to the specified output file
-        wb.save(output)
+    return wb
+
+
+def render_group_report(report: GroupReport, *, generated_at: str) -> str:
+    """Render production-model pipeline results for one providing group."""
+    return _HTML_ENVIRONMENT.get_template("group.html.jinja2").render(
+        report=report, generated_at=generated_at
+    )
+
+
+def render_group_index(reports: list[GroupReport], *, generated_at: str) -> str:
+    """Render the index linking to every providing-group report."""
+    return _HTML_ENVIRONMENT.get_template("index.html.jinja2").render(
+        reports=reports, generated_at=generated_at
+    )
+
+
+@app.command()
+def main(
+    logs_dir: Annotated[
+        Path,
+        typer.Option(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            readable=True,
+            help="Directory containing step JSONL report files.",
+        ),
+    ],
+    log_file_extension: Annotated[
+        str,
+        typer.Option(
+            help="File extension used to find log files in logs directory (default: .jsonl).",
+        ),
+    ] = ".jsonl",
+    verbose: Annotated[
+        int,
+        typer.Option(
+            "--verbose",
+            "-v",
+            count=True,
+            help="Increase verbosity level. Can be used multiple times.",
+        ),
+    ] = 0,
+    limit: Annotated[
+        int,
+        typer.Option(
+            help="Limit the number of models included in the generated summary."
+        ),
+    ] = 0,
+    metadata: Annotated[
+        list[str] | None,
+        typer.Option(
+            help="Additional info to include in the metadata sheet, in 'Key=Value' format. Can be used multiple times.",
+        ),
+    ] = None,
+    excel_output: Annotated[
+        Path | None,
+        typer.Option(
+            file_okay=True,
+            dir_okay=False,
+            writable=True,
+            help="File to write the generated Excel summary to.",
+        ),
+    ] = None,
+    html_output_dir: Annotated[
+        Path | None,
+        typer.Option(
+            file_okay=False,
+            dir_okay=True,
+            help="Directory to write static HTML reports to.",
+        ),
+    ] = None,
+    goc_users_yaml: Annotated[
+        Path | None,
+        typer.Option(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="YAML file defining GOC users. Defaults to current.geneontology.org metadata.",
+        ),
+    ] = None,
+    goc_groups_yaml: Annotated[
+        Path | None,
+        typer.Option(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help="YAML file defining GOC groups. Defaults to current.geneontology.org metadata.",
+        ),
+    ] = None,
+) -> None:
+    setup_logger(verbose)
+    generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+    if excel_output and not excel_output.name.endswith(".xlsx"):
+        raise typer.BadParameter("Output file must have .xlsx extension.")
+
+    step_files = discover_step_files(logs_dir, log_file_extension)
+    if not step_files:
+        raise typer.BadParameter(
+            f"No log files with extension {log_file_extension} found in directory: {logs_dir}"
+        )
+
+    step_results_by_model_id: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+    for step_file in step_files:
+        for model_id, entry in iter_log_results(step_file):
+            step_results_by_model_id[model_id].append(entry)
+
+    users_by_id = load_metadata_by_id(
+        goc_users_yaml, default_url=_CURRENT_USERS_YAML_URL, id_field="uri"
+    )
+    groups_by_id = load_metadata_by_id(
+        goc_groups_yaml, default_url=_CURRENT_GROUPS_YAML_URL, id_field="id"
+    )
+
+    model_entries = step_results_by_model_id.items()
+    if limit > 0:
+        model_entries = itertools.islice(model_entries, limit)
+    model_summaries = [
+        resolve_model_summary_metadata(
+            summarize_model_entries(model_id, entries),
+            users_by_id=users_by_id,
+            groups_by_id=groups_by_id,
+        )
+        for model_id, entries in track(
+            model_entries, description="Building log summaries..."
+        )
+    ]
+
+    if excel_output is not None:
+        with Progress() as progress:
+            task = progress.add_task(description="Rendering Excel summary...", total=1)
+            wb = render_excel_summary(
+                model_summaries, extra_metadata=metadata, generated_at=generated_at
+            )
+            wb.save(excel_output)
+            progress.advance(task, 1)
+
+    if html_output_dir is not None:
+        reports = build_group_reports(model_summaries)
+        html_output_dir.mkdir(parents=True, exist_ok=True)
+        with Progress() as progress:
+            task = progress.add_task(
+                description="Writing HTML reports...", total=len(reports) + 1
+            )
+            (html_output_dir / "index.html").write_text(
+                render_group_index(reports, generated_at=generated_at), encoding="utf-8"
+            )
+            progress.advance(task, 1)
+            for report in reports:
+                (html_output_dir / report.filename).write_text(
+                    render_group_report(report, generated_at=generated_at),
+                    encoding="utf-8",
+                )
+                progress.advance(task, 1)
 
 
 if __name__ == "__main__":

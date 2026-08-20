@@ -8,8 +8,9 @@ One-off or exploratory analyses should be added to the `gocam-analysis` [reposit
 
 ## Setup
 
-These scripts are not included in the published `gocam-py` package, so you will need to set up a
-local development environment to run them. Use `uv` to install the necessary dependencies:
+These scripts are not included in the published `gocam-py` package, so you will need to
+set up a local development environment to run them. Use `uv` to install the necessary
+dependencies:
 
 ```bash
 uv sync --all-extras
@@ -71,13 +72,15 @@ Run `./pipeline/run_pipeline.sh --help` for the complete command synopsis.
 
 ## convert_minerva_models_to_gocam_models.py
 
-Converts Minerva model JSON files to GO-CAM model format, doing basic filtering to eliminate obvious
-non-GO-CAM models. The output files are intended for internal QC analysis and further filtering.
+Converts Minerva model JSON files to GO-CAM model format, doing basic filtering to
+eliminate obvious non-GO-CAM models. The output files are intended for internal QC
+analysis and further filtering.
 
 **Inputs:**
 
 - `--input-dir`: Directory containing Minerva model JSON files
-- `--output-dir`: Directory to save converted GO-CAM models (required unless using `--dry-run`)
+- `--output-dir`: Directory to save converted GO-CAM models (required unless using
+  `--dry-run`)
 
 **Filtering:**
 
@@ -94,7 +97,8 @@ Models are filtered out and not written if they:
 **Options:**
 
 - `--dry-run`: Perform conversion without writing output files
-- `--verbose` / `-v`: Increase verbosity (use multiple times for more detail: `-v` for INFO, `-vv`
+- `--verbose` / `-v`: Increase verbosity (use multiple times for more detail: `-v` for
+  INFO, `-vv`
   for DEBUG)
 - `--limit N`: Limit processing to first N models (0 = no limit)
 
@@ -108,31 +112,32 @@ python pipeline/convert_minerva_models_to_gocam_models.py \
 
 ## filter_true_gocam_models.py
 
-Filters a collection of models based on whether they meet the True GO-CAM criteria. A True GO-CAM
-model is defined as a model where all of the following criteria are met:
+Filters a collection of models based on whether they meet the True GO-CAM criteria. A
+True GO-CAM model is defined as a model where all of the following criteria are met:
 
 - The model is in production status.
-- The model has at least two activities that are connected by a causal association, either
-  directly or indirectly via shared chemical entities.
-- The model has no activities that are disconnected from all other activities in the model.
+- The model has at least two activities that are connected by a causal association,
+  either directly or indirectly via shared chemical entities.
+- The model has no activities that are disconnected from all other activities in the
+  model.
 
 **Inputs:**
 
 - `--input-dir`: Directory containing GO-CAM model JSON files
 - `--output-dir`: Directory to save production True GO-CAM models (required unless using
   `--dry-run`)
-- `--pseudo-gocam-output-dir`: Directory to save models that have production status but do not
-  otherwise meet True GO-CAM criteria (required unless using `--dry-run`)
+- `--pseudo-gocam-output-dir`: Directory to save models that have production status but
+  do not otherwise meet True GO-CAM criteria (required unless using `--dry-run`)
 
 **Filtering:**
 
 Models are classified and moved based on these criteria:
 
 - **Status**: Only models with a "production" status are considered.
-- **Connectivity**: Models must have at least two activities that are connected by a causal
-  association, either
-  directly or indirectly via shared chemical entities. Models may not have any activities that are
-  completely disconnected from all other activities in the model.
+- **Connectivity**: Models must have at least two activities that are connected by a
+  causal association, either directly or indirectly via shared chemical entities. Models
+  may not have any activities that are completely disconnected from all other activities
+  in the model.
 
 **Outputs:**
 
@@ -158,13 +163,14 @@ python pipeline/filter_true_gocam_models.py \
 
 ## add_query_index_to_models.py
 
-Populates the `query_index` field of all models in a directory with pre-computed data for faster
-querying and indexing.
+Populates the `query_index` field of all models in a directory with pre-computed data
+for faster querying and indexing.
 
 **Inputs:**
 
 - `--input-dir`: Directory containing GO-CAM model JSON files
-- `--output-dir`: Directory to save indexed GO-CAM model files (required unless using `--dry-run`)
+- `--output-dir`: Directory to save indexed GO-CAM model files (required unless using
+  `--dry-run`)
 
 **Options:**
 
@@ -187,13 +193,15 @@ python pipeline/add_query_index_to_models.py \
 
 ## generate_index_files.py
 
-Generates various specialized index files (JSON) mapping attributes like contributors and entities
-to model IDs for a directory of GO-CAM models. These files are intended to be used by the GO API.
+Generates various specialized index files (JSON) mapping attributes like contributors
+and entities to model IDs for a directory of GO-CAM models. These files are intended to
+be used by the GO API.
 
 **Inputs:**
 
 - `--input-dir`: Directory containing indexed GO-CAM model JSON files
-- `--output-dir`: Directory to save generated index files (required unless using `--dry-run`)
+- `--output-dir`: Directory to save generated index files (required unless using
+  `--dry-run`)
 
 **Outputs:**
 
@@ -223,12 +231,14 @@ python pipeline/generate_index_files.py \
 
 ## generate_go_cam_browser_search_docs.py
 
-Generates a single JSON file containing search documents optimized for the GO-CAM Browser.
+Generates a single JSON file containing search documents optimized for the GO-CAM
+Browser.
 
 **Inputs:**
 
 - `--input-dir`: Directory containing indexed GO-CAM model JSON files
-- `--output`: File to write the generated search documents to (required unless using `--dry-run`)
+- `--output`: File to write the generated search documents to (required unless using
+  `--dry-run`)
 
 **Options:**
 
@@ -247,21 +257,26 @@ python pipeline/generate_go_cam_browser_search_docs.py \
 
 ## generate_log_summary.py
 
-Generates an Excel summary of pipeline run results based on JSONL log files produced by other
-pipeline steps. Per-model metadata includes the model's modification date, contributors, groups or
-provider identifiers, and whether provenance was collected from the full translated model or only
-from top-level Minerva annotations.
+Generates summary reports of pipeline run results based on JSONL log files produced by
+other pipeline steps. It can generate a full, detailed Excel report and/or static HTML
+reports organized by providing group. Per-model metadata includes the model's
+modification date, contributors, groups or provider identifiers, and whether provenance
+was collected from the full translated model or only from top-level Minerva annotations.
 
 **Inputs:**
 
-- `--logs-dir`: Directory containing step JSONL report files (e.g., reports generated via
+- `--logs-dir`: Directory containing step JSONL report files (e.g., reports generated
+  via
   `--report-file` in other scripts)
-- `--output`: File to write the generated Excel summary to (must have `.xlsx` extension)
 
 **Options:**
 
-- `--metadata`: Additional info to include in the metadata sheet, in 'Key=Value' format. Can be used
-  multiple times.
+- `--metadata`: Additional info to include in the metadata sheet, in 'Key=Value' format.
+  Can be used multiple times.
+- `--excel-output`: File to write the generated Excel summary to (must have `.xlsx`
+  extension)
+- `--html-output-dir`: Directory in which to write an HTML report index and one
+  production-model pipeline-result report per providing group.
 - `--goc-users-yaml`: YAML file defining GOC users. If omitted, the file at
   `https://current.geneontology.org/metadata/users.yaml` is downloaded and cached.
 - `--goc-groups-yaml`: YAML file defining GOC groups. If omitted, the file at
@@ -275,44 +290,61 @@ from top-level Minerva annotations.
 ```bash
 python pipeline/generate_log_summary.py \
   --logs-dir /path/to/logs \
-  --output summary.xlsx \
+  --excel-output summary.xlsx \
+  --html-output-dir html-reports \
   --metadata "Release date=1970-01-01"
 ```
 
+The HTML output contains an `index.html` linking to each providing-group report. Group
+pages show production model counts by pipeline result (`success`, `filtered`, or
+`error`) and list every production model, including any warnings. A model associated
+with multiple groups appears in each applicable report; production models without group
+metadata appear in an Unassigned report.
+
 ## output_stats_for_gocam_models.py
 
-Computes per-model, per-contributor (curator), per-provider (group), and aggregate statistics
-across a directory of GO-CAM model JSON files. Counts include activity units, gene-product and
-protein-complex enablers, causal relations, input/output molecules (chemical vs. other), GO terms,
-references/PMIDs, and inferred relations (activity pairs connected via shared chemical molecules).
+Computes per-model, per-contributor (curator), per-provider (group), and aggregate
+statistics across a directory of GO-CAM model JSON files. Counts include activity units,
+gene-product and protein-complex enablers, causal relations, input/output molecules
+(chemical vs. other), GO terms, references/PMIDs, and inferred relations (activity pairs
+connected via shared chemical molecules).
 
 **Inputs:**
 
 - `--input-dir`: Directory containing GO-CAM model JSON files
-- `--output-dir`: Directory to save statistics JSON files (required unless using `--dry-run`)
+- `--output-dir`: Directory to save statistics JSON files (required unless using
+  `--dry-run`)
 
 **Outputs:**
 
 - `aggregate_model_stats.json` — cross-model aggregate statistics
 - `aggregate_curator_stats.json` — cross-curator aggregate statistics
 - `aggregate_group_stats.json` — cross-group aggregate statistics
-- `aggregate_protein_complex.json` — one record per activity enabled by a protein complex
-- `member_variable_definitions.json` — descriptions for every field used in the outputs above
-- `id_to_label.json` — flat `{ id: label }` lookup for every identifier in the models' `objects`
-  indexes (gene products, protein complexes, molecule inputs/outputs, CHEBI molecules, GO terms,
-  etc.; e.g. `UniProtKB:P12345 → "TP53"`, `CHEBI:58199 → "(R)-malate(2-)"`). Useful for rendering
-  the bare CURIEs in the stats outputs without re-querying an ontology service.
-- `calculated_aggregate_values_by_model/` — per-model query-index dump (one file per input)
+- `aggregate_protein_complex.json` — one record per activity enabled by a protein
+  complex
+- `member_variable_definitions.json` — descriptions for every field used in the outputs
+  above
+- `id_to_label.json` — flat `{ id: label }` lookup for every identifier in the models'
+  `objects`
+  indexes (gene products, protein complexes, molecule inputs/outputs, CHEBI molecules,
+  GO terms, etc.; e.g. `UniProtKB:P12345 → "TP53"`, `CHEBI:58199 → "(R)-malate(2-)"`).
+  Useful for rendering the bare CURIEs in the stats outputs without re-querying an
+  ontology service.
+- `calculated_aggregate_values_by_model/` — per-model query-index dump (one file per
+  input)
 - `stats_by_model/` — per-model detailed statistics (one file per input)
 - `stats_by_curator/`, `stats_by_group/` — per-entity detailed statistics
 
-The id→label lookup is sorted by key and indented for stable diffs. Labels are sourced from the
-model's `objects` and reflect the labels current at the moment the stats were computed.
+The id→label lookup is sorted by key and indented for stable diffs. Labels are sourced
+from the model's `objects` and reflect the labels current at the moment the stats were
+computed.
 
 **Options:**
 
-- `--production-only` / `--no-production-only`: Only process models with `status == "production"`
-  (default: enabled). Non-production models are filtered out before indexing or accumulation.
+- `--production-only` / `--no-production-only`: Only process models with
+  `status == "production"`
+  (default: enabled). Non-production models are filtered out before indexing or
+  accumulation.
 - `--dry-run`: Compute statistics without writing any output files
 - `--verbose` / `-v`: Increase verbosity (`-v` for INFO, `-vv` for DEBUG)
 - `--limit N`: Limit processing to first N models (0 = no limit)
