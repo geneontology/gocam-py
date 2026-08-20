@@ -85,7 +85,24 @@
     code {
       overflow-wrap: anywhere;
     }
+
+    button {
+      background-color: transparent;
+      color: #075ea8;
+      border: #075ea8 1px solid;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+    }
   </style>
+  <link rel="stylesheet"
+        href="https://cdn.datatables.net/3.0.2/css/dataTables.dataTables.css"/>
+  <script src="https://cdn.datatables.net/3.0.2/js/dataTables.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"
+          integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script
+      src="https://cdn.datatables.net/plug-ins/3.0.2/features/markjs/dist/dataTables.markjs.min.js"></script>
 </head>
 <body>
 {% block body %}{% endblock %}

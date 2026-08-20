@@ -16,7 +16,7 @@
     <li><strong>{{ report.filtered_models | length }}</strong> filtered</li>
     <li><strong>{{ report.error_models | length }}</strong> error</li>
   </ul>
-  <table>
+  <table id="models-table">
     <thead>
     <tr>
       <th>Model ID</th>
@@ -39,7 +39,7 @@
         <td>{{ model.pipeline_status_details or "" }}</td>
         <td>
           {% if model.warnings %}
-            <details>
+            <details class="warning-details">
               <summary>
                 {{ model.warnings | length | pluralize("warning") }}
               </summary>
@@ -57,4 +57,30 @@
     {% endfor %}
     </tbody>
   </table>
+  <script>
+    const showText = 'Show all warnings';
+    const hideText = 'Hide all warnings';
+    let toggleWarningsButton = document.createElement('button');
+    toggleWarningsButton.textContent = showText;
+    toggleWarningsButton.addEventListener('click', function () {
+      const detailsElements = document.querySelectorAll('.warning-details');
+      const isAnyOpen = Array.from(detailsElements).some(el => el.open);
+      detailsElements.forEach(el => el.open = !isAnyOpen);
+      this.textContent = isAnyOpen ? showText : hideText;
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      new DataTable("#models-table", {
+        columnDefs: [
+          {targets: 2, type: 'string'}
+        ],
+        layout: {
+          topEnd: ['search', toggleWarningsButton],
+        },
+        mark: true,
+        order: [],
+        paging: false,
+      });
+    });
+  </script>
 {% endblock %}
