@@ -263,6 +263,19 @@ reports organized by providing group. Per-model metadata includes the model's
 modification date, contributors, groups or provider identifiers, and whether provenance
 was collected from the full translated model or only from top-level Minerva annotations.
 
+Each JSONL pipeline report is self-describing. Its first line is a required header:
+
+```json
+{"record_type":"pipeline_step_report","format_version":1,"step":"convert"}
+```
+
+The remaining lines contain per-model results. The supported step identifiers, in
+canonical pipeline order, are `convert`, `filter`, `query-index`, `index-files`, and
+`browser-search`. Report filenames do not determine processing order and may be chosen by
+the caller. A directory may contain any subset of steps, but it may not contain multiple
+reports for the same step. Missing or invalid headers, unsupported format versions,
+unknown steps, and duplicate steps are rejected.
+
 **Inputs:**
 
 - `--logs-dir`: Directory containing step JSONL report files (e.g., reports generated
@@ -276,7 +289,7 @@ was collected from the full translated model or only from top-level Minerva anno
 - `--excel-output`: File to write the generated Excel summary to (must have `.xlsx`
   extension)
 - `--html-output-dir`: Directory in which to write an HTML report index and one
-  production-model pipeline-result report per providing group.
+  pipeline-result report of production GO-CAM-like models per providing group.
 - `--goc-users-yaml`: YAML file defining GOC users. If omitted, the file at
   `https://current.geneontology.org/metadata/users.yaml` is downloaded and cached.
 - `--goc-groups-yaml`: YAML file defining GOC groups. If omitted, the file at
@@ -296,10 +309,12 @@ python pipeline/generate_log_summary.py \
 ```
 
 The HTML output contains an `index.html` linking to each providing-group report. Group
-pages show production model counts by pipeline result (`success`, `filtered`, or
-`error`) and list every production model, including any warnings. A model associated
-with multiple groups appears in each applicable report; production models without group
-metadata appear in an Unassigned report.
+pages show production GO-CAM-like model counts by pipeline result (`success`, `filtered`,
+or `error`) and list every production GO-CAM-like model—that is, every production model
+that was processed by the `filter` pipeline step—including any warnings. A model
+associated with multiple groups appears in each applicable report; production GO-CAM-like
+models without group metadata appear in an Unassigned report. The Excel output continues
+to include results for all models.
 
 ## output_stats_for_gocam_models.py
 

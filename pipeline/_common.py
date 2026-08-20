@@ -1,6 +1,5 @@
 """Utilities for pipeline scripts."""
 
-import io
 import json
 import logging
 from abc import ABC, abstractmethod
@@ -8,7 +7,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, TextIO
 
 from rich import print
 from rich.logging import RichHandler
@@ -82,6 +81,21 @@ class ErrorReason(str, Enum):
     WRITE_ERROR = "Write error"
 
 
+class PipelineStep(str, Enum):
+    """Identifiers for steps that produce pipeline reports."""
+
+    CONVERT = "convert"
+    FILTER = "filter"
+    QUERY_INDEX = "query-index"
+    INDEX_FILES = "index-files"
+    BROWSER_SEARCH = "browser-search"
+
+
+PIPELINE_STEP_ORDER = tuple(PipelineStep)
+PIPELINE_REPORT_RECORD_TYPE = "pipeline_step_report"
+PIPELINE_REPORT_FORMAT_VERSION = 1
+
+
 @dataclass(frozen=True, kw_only=True)
 class PipelineResult(ABC):
     """Base class for pipeline results."""
@@ -110,16 +124,6 @@ class PipelineResult(ABC):
         if self.meta:
             entry["meta"] = self.meta
         return entry
-
-    def write_to_file(self, file: io.TextIOWrapper, model_id: str) -> None:
-        """Write the result as a line of JSON to the given file.
-
-        Args:
-            file: The file to write to.
-            model_id: The ID of the model associated with this result.
-        """
-        entry = self.get_report_entry(model_id)
-        file.write(json.dumps(entry) + "\n")
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -173,6 +177,27 @@ class ErrorResult(PipelineResult):
         if self.details:
             entry["details"] = self.details
         return entry
+
+
+class PipelineReportWriter:
+    """Writer for pipeline step reports in JSON Lines format with identifying header."""
+
+    def __init__(self, file: TextIO, step: PipelineStep) -> None:
+        self.file = file
+        self.file.write(
+            json.dumps(
+                {
+                    "record_type": PIPELINE_REPORT_RECORD_TYPE,
+                    "format_version": PIPELINE_REPORT_FORMAT_VERSION,
+                    "step": step.value,
+                }
+            )
+            + "\n"
+        )
+
+    def write_result(self, result: PipelineResult, model_id: str) -> None:
+        """Append one model result to the report."""
+        self.file.write(json.dumps(result.get_report_entry(model_id)) + "\n")
 
 
 class ResultSummary:

@@ -14,7 +14,14 @@ from typing import Annotated, Any, Iterable
 import pystow
 import typer
 import yaml
-from _common import normalize_model_id, setup_logger
+from _common import (
+    PIPELINE_REPORT_FORMAT_VERSION,
+    PIPELINE_REPORT_RECORD_TYPE,
+    PIPELINE_STEP_ORDER,
+    PipelineStep,
+    normalize_model_id,
+    setup_logger,
+)
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -58,12 +65,13 @@ class ModelSummary:
     longest_path: int | None = None
     pipeline_status: str = "success"
     pipeline_status_details: str | None = None
+    processed_steps: set[PipelineStep] = field(default_factory=set)
     warnings: list[Any] = field(default_factory=list)
 
 
 @dataclass
 class GroupReport:
-    """Production models and pipeline results for one providing group."""
+    """Production GO-CAM-like models and pipeline results for one providing group."""
 
     group: ProvidingGroup
     models: list[ModelSummary]
@@ -82,45 +90,117 @@ class GroupReport:
         return [model for model in self.models if model.pipeline_status == "error"]
 
 
-def discover_step_files(logs_dir: Path, extension: str = ".jsonl") -> list[Path]:
-    """Find all JSONL files in the logs directory that represent pipeline step reports.
+@dataclass(frozen=True)
+class PipelineStepReport:
+    """A pipeline step report file."""
+
+    path: Path
+    step: PipelineStep
+
+
+def read_step_report_header(step_file: Path) -> PipelineStep:
+    """Read and validate a pipeline step report header."""
+    with step_file.open() as report_file:
+        line = report_file.readline()
+
+    if not line:
+        raise ValueError(f"Pipeline report {step_file} is empty")
+    try:
+        header = json.loads(line)
+    except json.JSONDecodeError as error:
+        raise ValueError(f"Invalid JSON in {step_file} at line 1: {error}") from error
+
+    if not isinstance(header, dict):
+        raise ValueError(f"{step_file} pipeline report header must be a JSON object")
+    if header.get("record_type") != PIPELINE_REPORT_RECORD_TYPE:
+        raise ValueError(f"{step_file} does not start with a pipeline report header")
+    format_version = header.get("format_version")
+    if (
+        type(format_version) is not int
+        or format_version != PIPELINE_REPORT_FORMAT_VERSION
+    ):
+        raise ValueError(
+            f"{step_file} uses unsupported pipeline report format version "
+            f"{format_version!r}"
+        )
+    step_value = header.get("step")
+    try:
+        return PipelineStep(step_value)
+    except ValueError as error:
+        raise ValueError(
+            f"{step_file} declares unknown pipeline step {step_value!r}"
+        ) from error
+
+
+def discover_step_reports(
+    logs_dir: Path, extension: str = ".jsonl"
+) -> list[PipelineStepReport]:
+    """Find, validate, and canonically order pipeline step report files.
 
     Args:
         logs_dir: Path to the directory containing log files.
         extension: The file extension to filter log files (default: .jsonl).
 
     Returns:
-        A sorted list of Paths to JSONL files in the logs directory.
+        Reports ordered by their step's position in the canonical pipeline.
     """
-    return sorted(
+    log_files = sorted(
         file
         for file in logs_dir.iterdir()
         if file.is_file() and file.suffix == extension and not file.name.startswith(".")
     )
+    reports_by_step: dict[PipelineStep, PipelineStepReport] = {}
+    for log_file in log_files:
+        step = read_step_report_header(log_file)
+        if step in reports_by_step:
+            first_report = reports_by_step[step]
+            raise ValueError(
+                f"Found multiple reports for pipeline step {step.value!r}: "
+                f"{first_report.path} and {log_file}"
+            )
+        reports_by_step[step] = PipelineStepReport(path=log_file, step=step)
+
+    return [
+        reports_by_step[step] for step in PIPELINE_STEP_ORDER if step in reports_by_step
+    ]
 
 
-def iter_log_results(step_file: Path) -> Iterable[tuple[str, dict[str, Any]]]:
+def iter_log_results(
+    step_report: PipelineStepReport,
+) -> Iterable[tuple[str, dict[str, Any]]]:
     """Iterate over the entries in a JSONL log file, yielding model_id and entry data.
 
     Args:
-        step_file: Path to the JSONL log file.
+        step_report: Validated pipeline step report to read.
 
     Yields:
         Tuples of (normalized_model_id, entry_dict) for each entry in the log file
     """
-    with step_file.open() as f:
-        for line_number, line in enumerate(f, start=1):
+    with step_report.path.open() as f:
+        # Skip the header line
+        next(f)
+        for line_number, line in enumerate(f, start=2):
             try:
                 entry = json.loads(line)
             except json.JSONDecodeError as error:
                 raise ValueError(
-                    f"Invalid JSON in {step_file} at line {line_number}: {error}"
+                    f"Invalid JSON in {step_report.path} at line {line_number}: {error}"
                 ) from error
 
+            if not isinstance(entry, dict):
+                raise ValueError(
+                    f"Pipeline report result at line {line_number} must be a JSON "
+                    f"object in {step_report.path}"
+                )
             model_id = entry.get("model_id")
             if model_id is None:
                 raise ValueError(
-                    f"Missing model_id in {step_file} at line {line_number}"
+                    f"Missing model_id in {step_report.path} at line {line_number}"
+                )
+            if not isinstance(model_id, str):
+                raise ValueError(
+                    f"model_id in {step_report.path} at line {line_number} must be a "
+                    "string"
                 )
             yield normalize_model_id(model_id), entry
 
@@ -158,10 +238,13 @@ def format_warning(warning: Any) -> str:
 
 
 def summarize_model_entries(
-    model_id: str, entries: list[dict[str, Any]]
+    model_id: str,
+    entries: list[dict[str, Any]],
+    *,
+    processed_steps: set[PipelineStep],
 ) -> ModelSummary:
     """Merge report entries for one model into a renderer-independent summary."""
-    summary = ModelSummary(model_id=model_id)
+    summary = ModelSummary(model_id=model_id, processed_steps=set(processed_steps))
     for entry in entries:
         summary.warnings.extend(entry.get("warnings") or [])
 
@@ -274,7 +357,11 @@ def sort_models_for_report(models: Iterable[ModelSummary]) -> list[ModelSummary]
 def build_group_reports(
     model_summaries: Iterable[ModelSummary],
 ) -> list[GroupReport]:
-    """Group production-model summaries by provider for HTML reporting."""
+    """Group production GO-CAM-like model summaries by provider for HTML reporting.
+
+    GO-CAM-like models are the ones that have been processed by the FILTER step (they
+    were not filtered out by the "obvious not a GO-CAM" checks in the CONVERT step).
+    """
     models_by_group: defaultdict[str, list[ModelSummary]] = defaultdict(list)
     groups_by_id: dict[str, ProvidingGroup] = {}
     unassigned = ProvidingGroup(
@@ -284,7 +371,10 @@ def build_group_reports(
     )
 
     for summary in model_summaries:
-        if summary.model_status != "production":
+        if (
+            summary.model_status != "production"
+            or PipelineStep.FILTER not in summary.processed_steps
+        ):
             continue
 
         providing_groups = summary.providing_groups or [unassigned]
@@ -523,7 +613,7 @@ def render_excel_summary(
 
 
 def render_group_report(report: GroupReport, *, generated_at: str) -> str:
-    """Render production-model pipeline results for one providing group."""
+    """Render production GO-CAM-like model results for one providing group."""
     return _HTML_ENVIRONMENT.get_template("group.html.jinja2").render(
         report=report, generated_at=generated_at
     )
@@ -625,16 +715,18 @@ def main(
     if excel_output and not excel_output.name.endswith(".xlsx"):
         raise typer.BadParameter("Output file must have .xlsx extension.")
 
-    step_files = discover_step_files(logs_dir, log_file_extension)
-    if not step_files:
+    step_reports = discover_step_reports(logs_dir, log_file_extension)
+    if not step_reports:
         raise typer.BadParameter(
             f"No log files with extension {log_file_extension} found in directory: {logs_dir}"
         )
 
     step_results_by_model_id: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
-    for step_file in step_files:
-        for model_id, entry in iter_log_results(step_file):
+    processed_steps_by_model_id: defaultdict[str, set[PipelineStep]] = defaultdict(set)
+    for step_report in step_reports:
+        for model_id, entry in iter_log_results(step_report):
             step_results_by_model_id[model_id].append(entry)
+            processed_steps_by_model_id[model_id].add(step_report.step)
 
     users_by_id = load_metadata_by_id(
         goc_users_yaml, default_url=_CURRENT_USERS_YAML_URL, id_field="uri"
@@ -646,9 +738,14 @@ def main(
     model_entries = step_results_by_model_id.items()
     if limit > 0:
         model_entries = itertools.islice(model_entries, limit)
+
     model_summaries = [
         resolve_model_summary_metadata(
-            summarize_model_entries(model_id, entries),
+            summarize_model_entries(
+                model_id,
+                entries,
+                processed_steps=processed_steps_by_model_id[model_id],
+            ),
             users_by_id=users_by_id,
             groups_by_id=groups_by_id,
         )

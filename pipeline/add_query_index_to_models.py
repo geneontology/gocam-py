@@ -15,7 +15,9 @@ import typer
 from _common import (
     ErrorReason,
     ErrorResult,
+    PipelineReportWriter,
     PipelineResult,
+    PipelineStep,
     ResultSummary,
     SuccessResult,
     get_json_files,
@@ -160,6 +162,11 @@ def main(
         raise typer.BadParameter(
             "Output directory must be specified unless --dry-run is used."
         )
+    report_writer = (
+        PipelineReportWriter(report_file, PipelineStep.QUERY_INDEX)
+        if report_file
+        else None
+    )
 
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
@@ -176,8 +183,8 @@ def main(
     for json_file in track(json_files, description="Indexing models..."):
         result = process_gocam_model_file(json_file, output_dir, indexer)
         result_summary.add_result(json_file.stem, result)
-        if report_file:
-            result.write_to_file(report_file, json_file.stem)
+        if report_writer:
+            report_writer.write_result(result, json_file.stem)
 
     # Print result summary
     result_summary.print()

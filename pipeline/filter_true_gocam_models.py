@@ -21,7 +21,9 @@ from _common import (
     ErrorResult,
     FilteredResult,
     FilterReason,
+    PipelineReportWriter,
     PipelineResult,
+    PipelineStep,
     ResultSummary,
     SuccessResult,
     get_json_files,
@@ -198,6 +200,9 @@ def main(
         logger.warning(
             "Report file should have a .jsonl extension for JSON Lines format."
         )
+    report_writer = (
+        PipelineReportWriter(report_file, PipelineStep.FILTER) if report_file else None
+    )
 
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
@@ -209,8 +214,8 @@ def main(
             json_file, output_dir, pseudo_gocam_output_dir
         )
         result_summary.add_result(json_file.stem, result)
-        if report_file:
-            result.write_to_file(report_file, json_file.stem)
+        if report_writer:
+            report_writer.write_result(result, json_file.stem)
 
     # Print result
     result_summary.print()

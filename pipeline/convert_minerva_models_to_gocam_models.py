@@ -27,7 +27,9 @@ from _common import (
     ErrorResult,
     FilteredResult,
     FilterReason,
+    PipelineReportWriter,
     PipelineResult,
+    PipelineStep,
     ResultSummary,
     SuccessResult,
     get_json_files,
@@ -242,6 +244,9 @@ def main(
         logger.warning(
             "Report file should have a .jsonl extension for JSON Lines format."
         )
+    report_writer = (
+        PipelineReportWriter(report_file, PipelineStep.CONVERT) if report_file else None
+    )
 
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
@@ -255,8 +260,8 @@ def main(
         result = process_minerva_model_file(json_file, output_dir=output_dir)
         model_id = json_file.stem
         result_summary.add_result(model_id, result)
-        if report_file:
-            result.write_to_file(report_file, model_id)
+        if report_writer:
+            report_writer.write_result(result, model_id)
 
     # Print result
     result_summary.print()
