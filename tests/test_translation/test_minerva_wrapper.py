@@ -880,3 +880,170 @@ def test_minerva_view_get_facts():
     assert len(view.get_facts(subject="S1", property="P2")) == 1
     assert len(view.get_facts(subject="S1", object="O3")) == 0
     assert len(view.get_facts(subject="S2", property="P1", object="O3")) == 1
+
+
+def test_translation_warning_for_individuals_with_complement_types():
+    """Test that a warning is generated for individuals with complement types."""
+    minerva_object = {
+        "id": "gomodel:test_individuals_with_complement_types",
+        "annotations": [
+            {
+                "key": "title",
+                "value": "Test model with individuals having complement types",
+            }
+        ],
+        "individuals": [
+            {
+                "id": "gomodel:test_individuals_with_complement_types/1",
+                "type": [
+                    {
+                        "type": "class",
+                        "id": "GO:0051082",
+                        "label": "obsolete unfolded protein binding",
+                    },
+                    {
+                        "type": "complement",
+                        "filler": {
+                            "type": "class",
+                            "id": "GO:0051087",
+                            "label": "protein-folding chaperone binding",
+                        },
+                    },
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "annotations": [],
+            },
+            {
+                "id": "gomodel:test_individuals_with_complement_types/2",
+                "type": [
+                    {
+                        "type": "class",
+                        "id": "GO:0051082",
+                        "label": "obsolete unfolded protein binding",
+                    },
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "annotations": [],
+            },
+            {
+                "id": "gomodel:test_individuals_with_complement_types/3",
+                "type": [
+                    {
+                        "type": "complement",
+                        "filler": {
+                            "type": "class",
+                            "id": "GO:0051087",
+                            "label": "protein-folding chaperone binding",
+                        },
+                    },
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "annotations": [],
+            },
+        ],
+        "facts": [],
+    }
+
+    translation_result = MinervaWrapper.translate(minerva_object)
+    complement_warnings = [
+        w
+        for w in translation_result.warnings
+        if w.type == WarningType.INDIVIDUAL_HAS_COMPLEMENT_TYPE
+    ]
+
+    assert len(complement_warnings) == 2
+    assert {w.entity_id for w in complement_warnings} == {
+        "gomodel:test_individuals_with_complement_types/1",
+        "gomodel:test_individuals_with_complement_types/3",
+    }
+
+
+def test_translation_warning_for_individuals_with_multiple_types():
+    """
+    Test that a warning is generated for individuals with multiple types and that the
+    first type is used for translation.
+    """
+    minerva_object = {
+        "id": "gomodel:test_individuals_with_multiple_types",
+        "annotations": [
+            {
+                "key": "title",
+                "value": "Test model with individuals having multiple types",
+            }
+        ],
+        "individuals": [
+            {
+                "id": "gomodel:test_individuals_with_multiple_types/1",
+                "type": [
+                    {
+                        "type": "class",
+                        "id": "GO:0046923",
+                        "label": "ER lumen protein retrieval receptor activity",
+                    },
+                    {
+                        "type": "class",
+                        "id": "GO:0038024",
+                        "label": "cargo receptor activity",
+                    },
+                ],
+                "root-type": [
+                    {"type": "class", "id": "GO:0003674", "label": "molecular_function"}
+                ],
+                "annotations": [],
+            },
+            {
+                "id": "gomodel:test_individuals_with_multiple_types/2",
+                "type": [
+                    {
+                        "type": "class",
+                        "id": "PomBase:SPAC22E12.05c",
+                        "label": "rer1 Spom",
+                    }
+                ],
+                "root-type": [
+                    {
+                        "type": "class",
+                        "id": "CHEBI:33695",
+                        "label": "information biomacromolecule",
+                    },
+                    {"type": "class", "id": "CHEBI:24431", "label": "chemical entity"},
+                ],
+                "annotations": [],
+            },
+        ],
+        "facts": [
+            {
+                "subject": "gomodel:test_individuals_with_multiple_types/1",
+                "property": "RO:0002333",
+                "property-label": "RO:0002333",
+                "object": "gomodel:test_individuals_with_multiple_types/2",
+                "annotations": [],
+            },
+        ],
+    }
+
+    translation_result = MinervaWrapper.translate(minerva_object)
+    multiple_type_warnings = [
+        w
+        for w in translation_result.warnings
+        if w.type == WarningType.INDIVIDUAL_HAS_MULTIPLE_TYPES
+    ]
+
+    assert len(multiple_type_warnings) == 1
+    assert (
+        multiple_type_warnings[0].entity_id
+        == "gomodel:test_individuals_with_multiple_types/1"
+    )
+
+    assert translation_result.result.activities is not None
+    assert len(translation_result.result.activities) == 1
+    assert translation_result.result.activities[0].molecular_function is not None
+    assert (
+        translation_result.result.activities[0].molecular_function.term == "GO:0046923"
+    )
