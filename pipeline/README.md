@@ -15,6 +15,60 @@ local development environment to run them. Use `uv` to install the necessary dep
 uv sync --all-extras
 ```
 
+## Running the pipeline locally
+
+The local pipeline runner reproduces the sequence of pipeline scripts used during a GO release. It
+supports full runs as well as selected stages.
+
+Copy the example configuration and set the raw Minerva model directory. The output root directory
+defaults to `/tmp/gocam-work`, but it can also be changed in `.env`:
+
+```bash
+cp .env.example .env
+```
+
+```dotenv
+GOCAM_PIPELINE_MODELS_DIR=/path/to/raw/minerva-models
+GOCAM_PIPELINE_OUTPUT_ROOT_DIR=/tmp/gocam-work
+```
+
+Run all stages in pipeline order:
+
+```bash
+./pipeline/run_pipeline.sh
+```
+
+Run an arbitrary subset of stages. Selected stages always run in pipeline order, regardless of the
+order in which they are listed:
+
+```bash
+./pipeline/run_pipeline.sh --steps index,stats
+```
+
+Available stages are `convert`, `filter`, `index`, `index-files`, `browser-search`, `stats`, and
+`summary`. A selected stage uses existing upstream outputs when the upstream stage is not selected.
+The runner fails before processing if a required input is unavailable.
+
+By default, the runner preserves the overall output root directory and replaces only the outputs
+owned by selected stages. Use `--clean` to remove the entire output root directory before running,
+or `--dry-run` to inspect the planned cleanup and commands without changing files:
+
+```bash
+./pipeline/run_pipeline.sh --clean
+./pipeline/run_pipeline.sh --dry-run --steps filter,index
+```
+
+Configuration precedence is command-line option, exported environment variable, `.env`, then the
+default value (where one exists):
+
+```bash
+./pipeline/run_pipeline.sh \
+  --models-dir /path/to/other/models \
+  --output-root-dir /tmp/alternate-gocam-work
+```
+
+Run `./pipeline/run_pipeline.sh --help` for the complete command synopsis.
+
 ## convert_minerva_models_to_gocam_models.py
 
 Converts Minerva model JSON files to GO-CAM model format, doing basic filtering to eliminate obvious
