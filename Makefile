@@ -14,12 +14,9 @@ PYDANTIC := $(PYMODEL)/gocam.py
 DOCDIR := docs
 CONFIG_YAML := --config-file config.yaml
 
-.PHONY: help install audit all site deploy gen-examples gen-test-inputs gen-project \
-	test test-schema test-python lint lint-python lint-fix-python type-check \
-	test-examples serve gendoc testdoc clean
-
 # note: "help" MUST be the first target in the file,
 # when the user types "make" they should get help info
+.PHONY: help
 help:
 	@echo ""
 	@echo "make install -- install dependencies"
@@ -43,20 +40,29 @@ help:
 	@echo ""
 
 # install any dependencies required for building
+.PHONY: install
 install:
 	UV_MALWARE_CHECK=1 uv sync --frozen --all-extras
 
+.PHONY: audit
 audit: install
 	uv audit --frozen
 
+.PHONY: all
 all: site
+
+.PHONY: site
 site: gen-project gendoc $(PYDANTIC)
+
+.PHONY: deploy
 deploy: all mkd-gh-deploy
 
+.PHONY: gen-examples
 gen-examples:
 	$(RUN) gocam fetch --format yaml 663d668500002178 > src/data/examples/Model-663d668500002178.yaml
 	$(RUN) gocam fetch --format json 663d668500002178 > src/data/examples/Model-663d668500002178.json
 
+.PHONY: gen-test-inputs
 gen-test-inputs:
 	$(RUN) gocam fetch --format yaml 63f809ec00000701 > tests/input/Model-63f809ec00000701.yaml
 	$(RUN) gocam fetch --format yaml 568b0f9600000284 > tests/input/Model-568b0f9600000284.yaml
@@ -65,31 +71,40 @@ gen-test-inputs:
 
 # generates all project files
 
+.PHONY: gen-project
 gen-project:
 	$(RUN) gen-project ${CONFIG_YAML} --exclude excel --exclude graphql -d $(DEST) $(SOURCE_SCHEMA_PATH)
 
+.PHONY: test
 test: test-schema test-python test-examples
 
+.PHONY: test-schema
 test-schema:
 	$(RUN) gen-project ${CONFIG_YAML} --exclude excel --exclude graphql -d tmp $(SOURCE_SCHEMA_PATH)
 
+.PHONY: test-python
 test-python:
 	$(RUN) pytest tests
 
+.PHONY: lint
 lint:
 	$(RUN) linkml-lint $(SOURCE_SCHEMA_PATH)
 
+.PHONY: lint-python
 lint-python:
 	$(RUN) ruff format --check
 	$(RUN) ruff check
 
+.PHONY: lint-fix-python
 lint-fix-python:
 	$(RUN) ruff check --fix
 	$(RUN) ruff format
 
+.PHONY: type-check
 type-check:
 	$(RUN) ty check
 
+.PHONY: test-examples
 test-examples: examples/output
 
 examples/output: src/gocam/schema/gocam.yaml
@@ -103,6 +118,7 @@ examples/output: src/gocam/schema/gocam.yaml
 		--schema $< > $@/README.md
 
 # Test documentation locally
+.PHONY: serve
 serve: mkd-serve
 
 # Python datamodel
@@ -115,16 +131,19 @@ $(PYDANTIC): $(SOURCE_SCHEMA_PATH)
 $(DOCDIR):
 	mkdir -p $@
 
+.PHONY: gendoc
 gendoc: $(DOCDIR)
 	cp -rf src/docs/* $(DOCDIR) ; \
 	$(RUN) gen-doc -d $(DOCDIR) $(SOURCE_SCHEMA_PATH)
 
+.PHONY: testdoc
 testdoc: gendoc serve
 
 MKDOCS = $(RUN) mkdocs
 mkd-%:
 	$(MKDOCS) $*
 
+.PHONY: clean
 clean:
 	rm -rf $(DEST)
 	rm -rf tmp
