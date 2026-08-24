@@ -14,6 +14,16 @@ It also contains scripts for processing GO-CAM models in the GO Release pipeline
 
 One-off and exploratory analyses should be shared through the `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). 
 
+## Generated schema artifacts
+
+The LinkML schema in `src/gocam/schema/gocam.yaml` is the source of truth for the GO-CAM data
+model. Run `make gen-project` to create non-documentation schema artifacts alongside the tracked
+`project/README.md`. Every other entry in that directory is disposable local build output and is
+not kept in sync in the Git repository.
+
+Run `make gendoc` to generate schema documentation separately. Versioned schema artifacts are
+available as downloadable archives attached to GitHub Releases.
+
 ## About
 
 Example yaml/json

@@ -13,6 +13,7 @@ PYMODEL := src/gocam/datamodel
 PYDANTIC := $(PYMODEL)/gocam.py
 DOCDIR := docs
 CONFIG_YAML := --config-file config.yaml
+GEN_PROJECT_ARGS := $(CONFIG_YAML) --exclude excel --exclude graphql --exclude markdown
 
 # note: "help" MUST be the first target in the file,
 # when the user types "make" they should get help info
@@ -73,14 +74,14 @@ gen-test-inputs:
 
 .PHONY: gen-project
 gen-project:
-	$(RUN) gen-project ${CONFIG_YAML} --exclude excel --exclude graphql -d $(DEST) $(SOURCE_SCHEMA_PATH)
+	$(RUN) gen-project $(GEN_PROJECT_ARGS) -d $(DEST) $(SOURCE_SCHEMA_PATH)
 
 .PHONY: test
 test: test-schema test-python test-examples
 
 .PHONY: test-schema
 test-schema:
-	$(RUN) gen-project ${CONFIG_YAML} --exclude excel --exclude graphql -d tmp $(SOURCE_SCHEMA_PATH)
+	$(RUN) gen-project $(GEN_PROJECT_ARGS) -d tmp $(SOURCE_SCHEMA_PATH)
 
 .PHONY: test-python
 test-python:
@@ -145,7 +146,7 @@ mkd-%:
 
 .PHONY: clean
 clean:
-	rm -rf $(DEST)
+	find "$(DEST)" -not -name "README.md" -delete
 	rm -rf tmp
 	rm -fr docs/*
 	rm -fr $(PYDANTIC)
