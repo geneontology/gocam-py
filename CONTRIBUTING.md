@@ -56,7 +56,7 @@ Please submit a [Pull Request][pulls] to submit a new term for consideration.
 
 ### Data analysis contributions
 
-One-off and exploratory analyses should be shared through the `gocam-analysis` repository rather
+One-off and exploratory analyses should be shared through the `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis) rather
 than `gocam-py`. Material in `gocam-analysis` may be untested, not reproducible, or unmaintained. To
 give future readers enough context to understand the work, include:
 

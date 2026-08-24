@@ -12,7 +12,7 @@ This repository defines the GO-CAM schema, artifacts derived from it, and reusab
 
 It also contains scripts for processing GO-CAM models in the GO Release pipeline. These scripts are not intended for general use and are not included in the published Python package.
 
-One-off and exploratory analyses should be shared through the `gocam-analysis` repository. 
+One-off and exploratory analyses should be shared through the `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). 
 
 ## About
 
