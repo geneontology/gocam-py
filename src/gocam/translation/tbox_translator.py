@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from typing import Dict, Iterable, Iterator, List, Literal, Optional, Union
 
 from oaklib.datamodels.vocabulary import (
-    HAS_OUTPUT,
     HAS_PART,
     IN_TAXON,
     IS_A,
@@ -339,7 +338,7 @@ class TBoxTranslator:
             id = id.replace("/", "__")
         try:
             return self.ontology.curie(id)
-        except ValueError as e:
+        except ValueError:
             if ":" not in id:
                 id = f"TEMP:{id}"
                 logger.warning(
@@ -350,7 +349,7 @@ class TBoxTranslator:
             self.ontology.add_prefix_mapping(pfx, f"http://identifiers.org/{pfx}:")
             try:
                 return self.ontology.curie(id)
-            except ValueError as e:
+            except ValueError:
                 raise ValueError(f"{id} not a CURIE")
 
     def get_class(self, id: str) -> Class:

@@ -33,6 +33,7 @@ def input_model(get_model):
 
     return _get_input_model
 
+
 def test_model_to_tbox(example_model):
     """Test the model_to_cx2 function."""
     tbox_translator = TBoxTranslator()

@@ -1,7 +1,7 @@
-from dataclasses import dataclass
-from typing import Union, List, Dict, Optional, Any
-
 import logging
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Union
+
 from gocam.datamodel import Model
 
 logger = logging.getLogger(__name__)
@@ -20,6 +20,7 @@ class Flattener:
     - an atomic value (str, int, float, bool, None)
     - a list of strings (for fields that are lists in the model, e.g. terms)
     """
+
     fields: Optional[List[str]] = None
 
     def flatten(self, model: Model) -> ROW:
@@ -75,12 +76,11 @@ class Flattener:
             # TODO: make more schema-driven
             if key.split("_")[-1] in ("terms", "closure", "rollup", "genes"):
                 return {
-                    f"{key}_id": [v.get('id', str(v)) for v in val],
-                    f"{key}_label": [v.get('label', v.get('id', str(v))) for v in val],
+                    f"{key}_id": [v.get("id", str(v)) for v in val],
+                    f"{key}_label": [v.get("label", v.get("id", str(v))) for v in val],
                 }
             else:
                 return {key: [str(v) for v in val]}
         else:
             logger.warning(f"Unexpected type in list: {type(sample)}")
             return {key: [str(v) for v in val]}
-

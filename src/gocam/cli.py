@@ -11,7 +11,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Iterable
+from typing import Iterable, List, Optional
 from urllib.request import urlretrieve
 
 import typer
@@ -25,7 +25,6 @@ from gocam.indexing.indexer import Indexer
 from gocam.translation import MinervaWrapper
 from gocam.translation.cx2 import model_to_cx2
 from gocam.translation.networkx.model_network_translator import ModelNetworkTranslator
-
 
 logger = logging.getLogger(__name__)
 
