@@ -12,8 +12,7 @@ DEST := project
 PYMODEL := src/gocam/datamodel
 PYDANTIC := $(PYMODEL)/gocam.py
 DOCDIR := docs
-CONFIG_YAML := --config-file config.yaml
-GEN_PROJECT_ARGS := $(CONFIG_YAML) --exclude excel --exclude graphql --exclude markdown
+GEN_PROJECT_ARGS := --config-file config.yaml
 
 # note: "help" MUST be the first target in the file,
 # when the user types "make" they should get help info
