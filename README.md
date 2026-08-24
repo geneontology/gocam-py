@@ -6,6 +6,14 @@ GO CAM Data Model (Python)
 
 [https://geneontology.github.io/gocam-py](https://geneontology.github.io/gocam-py)
 
+## Project scope
+
+This repository defines the GO-CAM schema, artifacts derived from it, and reusable Python code for working with GO-CAM models. 
+
+It also contains scripts for processing GO-CAM models in the GO Release pipeline. These scripts are not intended for general use and are not included in the published Python package.
+
+One-off and exploratory analyses should be shared through the `gocam-analysis` repository. 
+
 ## About
 
 Example yaml/json

@@ -14,6 +14,7 @@ in a pull request.
   * [Reporting issues and making requests](#reporting-issues)
   * [Questions and Discussion](#questions-and-discussion)
   * [Adding new elements yourself](#adding-elements)
+  * [Data analysis contributions](#data-analyses)
 * [Best Practices](#best-practices)
   * [How to write a great issue](#great-issues)
   * [How to create a great pull/merge request](#great-pulls)
@@ -50,6 +51,23 @@ Please use our [Discussions forum][discussions] to ask general questions or cont
 ### Adding new elements yourself
 
 Please submit a [Pull Request][pulls] to submit a new term for consideration.
+
+<a id="data-analyses"></a>
+
+### Data analysis contributions
+
+One-off and exploratory analyses should be shared through the `gocam-analysis` repository rather
+than `gocam-py`. Material in `gocam-analysis` may be untested, not reproducible, or unmaintained. To
+give future readers enough context to understand the work, include:
+
+- The author and date
+- The question being explored
+- The input source and its access date
+- The analysis code or notebook
+- Any resulting artifacts or links to them
+
+Work that needs to run regularly or be integrated into production systems does not belong in
+`gocam-analysis`. Talk to other GO developers if you are unsure where such work should live.
 
 <a id="best-practices"></a>
 
