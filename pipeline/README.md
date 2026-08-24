@@ -1,6 +1,10 @@
 # Pipeline Scripts
 
-This directory contains scripts for processing steps in the GOC pipeline.
+This directory contains maintained operational scripts for processing steps in the GO Release
+pipeline. Some scripts produce reports as part of their processing. These reports are run logs,
+summaries, quality-control outputs, or maintained data products
+
+One-off or exploratory analyses should be added to the `gocam-analysis` repository. Analyses that ready to be integrated into the production GO Release pipeline can be re-implemented here.
 
 ## Setup
 
@@ -260,4 +264,3 @@ python pipeline/output_stats_for_gocam_models.py \
   --input-dir /path/to/indexed_models \
   --output-dir /path/to/stats
 ```
-
