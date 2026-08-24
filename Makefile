@@ -14,48 +14,49 @@ PYDANTIC := $(PYMODEL)/gocam.py
 DOCDIR := docs
 CONFIG_YAML := --config-file config.yaml
 
-.PHONY: all clean gen-project gen-examples gendoc lint lint-python lint-fix-python audit install
+.PHONY: help install audit all site deploy gen-examples gen-test-inputs gen-project \
+	test test-schema test-python lint lint-python lint-fix-python type-check \
+	test-examples serve gendoc testdoc clean
 
 # note: "help" MUST be the first target in the file,
 # when the user types "make" they should get help info
 help:
 	@echo ""
-	@echo "make site -- makes site locally"
 	@echo "make install -- install dependencies"
 	@echo "make audit -- scan dependencies for malware and known vulnerabilities"
-	@echo "make test -- runs tests"
-	@echo "make lint -- perform linting"
-	@echo "make testdoc -- builds docs and runs local test server"
-	@echo "make deploy -- deploys site"
-	@echo "make translate-collection -- translate GO-CAM collection to networkx and cx2"
+	@echo "make gen-project -- generate LinkML project artifacts"
+	@echo "make gendoc -- generate schema documentation"
+	@echo "make gen-examples -- refresh committed model examples"
+	@echo "make gen-test-inputs -- refresh committed test inputs"
+	@echo "make test -- run all tests"
+	@echo "make test-python -- run Python tests"
+	@echo "make lint -- lint the LinkML schema"
+	@echo "make lint-python -- check Python formatting and linting"
+	@echo "make lint-fix-python -- fix Python formatting and linting"
+	@echo "make type-check -- type-check Python code"
+	@echo "make site -- generate the local documentation site"
+	@echo "make serve -- serve documentation locally"
+	@echo "make testdoc -- generate and serve documentation locally"
+	@echo "make deploy -- deploy the documentation site"
+	@echo "make clean -- remove generated artifacts"
 	@echo "make help -- show this help"
 	@echo ""
 
 # install any dependencies required for building
 install:
 	UV_MALWARE_CHECK=1 uv sync --frozen --all-extras
-.PHONY: install
 
 audit: install
 	uv audit --frozen
 
-# EXPERIMENTAL
-create-data-harmonizer:
-	npm init data-harmonizer $(SOURCE_SCHEMA_PATH)
-
 all: site
 site: gen-project gendoc $(PYDANTIC)
-%.yaml: gen-project
 deploy: all mkd-gh-deploy
-
-compile-sheets:
-	$(RUN) sheets2linkml --gsheet-id $(SHEET_ID) $(SHEET_TABS) > $(SHEET_MODULE_PATH).tmp && mv $(SHEET_MODULE_PATH).tmp $(SHEET_MODULE_PATH)
 
 gen-examples:
 	$(RUN) gocam fetch --format yaml 663d668500002178 > src/data/examples/Model-663d668500002178.yaml
 	$(RUN) gocam fetch --format json 663d668500002178 > src/data/examples/Model-663d668500002178.json
 
-.PHONY: gen-test-inputs
 gen-test-inputs:
 	$(RUN) gocam fetch --format yaml 63f809ec00000701 > tests/input/Model-63f809ec00000701.yaml
 	$(RUN) gocam fetch --format yaml 568b0f9600000284 > tests/input/Model-568b0f9600000284.yaml
@@ -88,16 +89,6 @@ lint-fix-python:
 
 type-check:
 	$(RUN) ty check
-
-convert-examples-to-%:
-	$(patsubst %, $(RUN) linkml-convert  % -s $(SOURCE_SCHEMA_PATH) -C Person, $(shell ${SHELL} find src/data/examples -name "*.yaml"))
-
-examples/%.yaml: src/data/examples/%.yaml
-	$(RUN) linkml-convert -s $(SOURCE_SCHEMA_PATH) -C Person $< -o $@
-examples/%.json: src/data/examples/%.yaml
-	$(RUN) linkml-convert -s $(SOURCE_SCHEMA_PATH) -C Person $< -o $@
-examples/%.ttl: src/data/examples/%.yaml
-	$(RUN) linkml-convert -P EXAMPLE=http://example.org/ -s $(SOURCE_SCHEMA_PATH) -C Person $< -o $@
 
 test-examples: examples/output
 
@@ -133,14 +124,6 @@ testdoc: gendoc serve
 MKDOCS = $(RUN) mkdocs
 mkd-%:
 	$(MKDOCS) $*
-
-# Translate GO-CAM collection to networkx and cx2 formats
-translate-collection:
-	$(RUN) gocam translate-collection
-
-# Translate GO-CAM collection with custom parameters (example)
-translate-collection-test:
-	$(RUN) gocam -v translate-collection --limit 5
 
 clean:
 	rm -rf $(DEST)
