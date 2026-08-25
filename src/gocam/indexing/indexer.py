@@ -6,9 +6,19 @@ from typing import Collection, List, Optional, Tuple
 import networkx as nx
 import pystow
 import yaml
-from oaklib import get_adapter
-from oaklib.datamodels.vocabulary import IS_A, PART_OF
-from oaklib.interfaces import OboGraphInterface
+
+try:
+    from oaklib import get_adapter
+    from oaklib.datamodels.vocabulary import IS_A, PART_OF
+    from oaklib.interfaces import OboGraphInterface
+except ModuleNotFoundError as ex:
+    if ex.name != "oaklib":
+        raise
+    raise ModuleNotFoundError(
+        "The oaklib package extra is required for this module. "
+        "Please install with 'pip install gocam[oaklib]'.",
+        name=ex.name,
+    ) from None
 
 from gocam.datamodel import (
     EnabledByGeneProductAssociation,

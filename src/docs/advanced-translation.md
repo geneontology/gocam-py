@@ -38,8 +38,6 @@ variables.
 
 ## Gene-to-gene translation
 
-Gene-to-gene translation uses NetworkX and requires the `gocam[cx2]` extra installed above.
-
 `ModelNetworkTranslator` creates a gene-centered causal network from one or more validated GO-CAM
 models. Nodes represent gene products. Edges represent causal relationships and retain relevant GO
 terms, evidence references, evidence codes, and contributors.

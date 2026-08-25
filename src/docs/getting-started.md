@@ -12,8 +12,7 @@ Install the package from PyPI:
 pip install gocam
 ```
 
-This installs both the Python package and the `gocam` command. Optional dependencies for CX2 and
-gene-network workflows are covered in [Advanced translation](advanced-translation.md).
+This installs both the Python package and the `gocam` command. 
 
 ## Fetch a published model from the command line
 

@@ -675,6 +675,8 @@ name = "gocam"
 source = { editable = "." }
 dependencies = [
     { name = "linkml-runtime" },
+    { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "prefixmaps" },
     { name = "pydantic" },
     { name = "pystow" },
@@ -715,6 +717,7 @@ dev = [
 requires-dist = [
     { name = "linkml-runtime", specifier = ">=1.1.24,<2" },
     { name = "ndex2", marker = "extra == 'cx2'", specifier = ">=3.9.0,<4" },
+    { name = "networkx", specifier = ">=3,<4" },
     { name = "networkx", extras = ["extra"], marker = "extra == 'cx2'", specifier = ">=3,<4" },
     { name = "oaklib", marker = "extra == 'oaklib'" },
     { name = "prefixmaps", specifier = ">=0.2.6,<0.3" },
