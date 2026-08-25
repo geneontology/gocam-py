@@ -11,7 +11,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Iterable
+from typing import Iterable, List, Optional
 from urllib.request import urlretrieve
 
 import typer
@@ -21,11 +21,8 @@ from typing_extensions import Annotated, Literal
 from gocam import __version__
 from gocam.datamodel import Model
 from gocam.indexing.flattener import Flattener
-from gocam.indexing.indexer import Indexer
 from gocam.translation import MinervaWrapper
-from gocam.translation.cx2 import model_to_cx2
 from gocam.translation.networkx.model_network_translator import ModelNetworkTranslator
-
 
 logger = logging.getLogger(__name__)
 
@@ -136,6 +133,8 @@ def fetch(
     wrapper = MinervaWrapper()
     indexer = None
     if add_indexes:
+        from gocam.indexing.indexer import Indexer
+
         indexer = Indexer()
 
     model_id_iter: Iterable[str]
@@ -228,6 +227,8 @@ def convert(
         raise typer.BadParameter(f"Could not load model: {e}")
 
     if output_format == "cx2":
+        from gocam.translation.cx2 import model_to_cx2
+
         if len(models) != 1:
             raise typer.BadParameter("CX2 format only supports a single model")
         model_obj = models[0]
@@ -236,10 +237,14 @@ def convert(
         if ndex_upload:
             try:
                 import ndex2
-            except ImportError:
-                raise typer.BadParameter(
-                    "ndex2 package is required for NDEx upload. Install with: pip install ndex2"
-                )
+            except ModuleNotFoundError as ex:
+                if ex.name != "ndex2":
+                    raise
+                raise ModuleNotFoundError(
+                    "The cx2 package extra is required for NDEx upload. "
+                    "Please install with 'pip install gocam[cx2]'.",
+                    name=ex.name,
+                ) from None
 
             # This is very basic proof-of-concept usage of the NDEx client. Once we have a better
             # idea of how we want to use it, we can refactor this to allow more CLI options for
@@ -309,6 +314,8 @@ def index_models(
 
     For YAML input, the file can contain multiple documents separated by '---'.
     """
+    from gocam.indexing.indexer import Indexer
+
     input_path = Path(input_file)
 
     # Determine input format if not specified
@@ -668,7 +675,7 @@ def translate_collection(
                         break
 
             # Only create file if there are causal edges (matching NetworkX behavior)
-            if has_causal_edges:
+            if has_causal_edges and model_to_cx2 is not None:
                 # Translate the model
                 cx2_data = model_to_cx2(
                     model, validate_iquery_gene_symbol_pattern=False
@@ -698,6 +705,10 @@ def translate_collection(
             f"Created output directory for {fmt.value}: {output_paths[fmt.value]}",
             err=True,
         )
+
+    model_to_cx2 = None
+    if TranslationFormat.CX2 in format:
+        from gocam.translation.cx2 import model_to_cx2
 
     # Create temporary directory for extraction
     with tempfile.TemporaryDirectory() as temp_dir:

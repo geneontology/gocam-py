@@ -16,9 +16,9 @@ markdown_extensions:
   - attr_list
   - md_in_html
 nav:
-  # - Home: home.md
-  - Index: index.md
-  - About: about.md
+  - Schema reference: index.md
+  - Getting started: getting-started.md
+  - Advanced translation: advanced-translation.md
 site_url: https://geneontology.github.io/gocam-py
 repo_url: https://github.com/geneontology/gocam-py
 

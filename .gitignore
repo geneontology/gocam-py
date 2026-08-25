@@ -3,7 +3,8 @@ tmp
 tests/output
 examples/output
 /docs/
-/project/docs/
+/project/*
+!/project/README.md
 /tmp/
 
 # Byte-compiled / optimized / DLL files

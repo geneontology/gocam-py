@@ -1,49 +1,21 @@
+"""Tests for the command-line interface (CLI) of the gocam package.
+
+Note: important basic tests of the CLI are in tests/test_base_install.py so that they
+can be run separately in a minimal environment in CI.
+"""
+
 import json
 
 import pytest
-import yaml
 from typer.testing import CliRunner
 
-from gocam import __version__
 from gocam.cli import app
-from tests import EXAMPLES_DIR, INPUT_DIR
+from tests import EXAMPLES_DIR
 
 
 @pytest.fixture
 def runner():
     return CliRunner()
-
-
-@pytest.fixture
-def api_mock(requests_mock):
-    gocam_id = "5b91dbd100002057"
-    with open(INPUT_DIR / f"minerva-{gocam_id}.json", "r") as f:
-        minerva_object = json.load(f)
-    requests_mock.get(
-        f"https://api.geneontology.org/api/go-cam/{gocam_id}", json=minerva_object
-    )
-
-
-def test_fetch_yaml(runner, api_mock):
-    result = runner.invoke(app, ["fetch", "--format", "yaml", "5b91dbd100002057"])
-    assert result.exit_code == 0
-
-    parsed_output = yaml.safe_load(result.stdout)
-    assert parsed_output["id"] == "gomodel:5b91dbd100002057"
-
-
-def test_fetch_json(runner, api_mock):
-    result = runner.invoke(app, ["fetch", "--format", "json", "5b91dbd100002057"])
-    assert result.exit_code == 0
-
-    parsed_output = json.loads(result.stdout)
-    assert parsed_output["id"] == "gomodel:5b91dbd100002057"
-
-
-def test_version(runner):
-    result = runner.invoke(app, ["--version"])
-    assert result.exit_code == 0
-    assert __version__ in result.stdout
 
 
 @pytest.mark.parametrize("format", ["json", "yaml"])

@@ -2,26 +2,26 @@ import logging
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, Iterator, List, Literal, Optional, Union
 
-from oaklib.datamodels.vocabulary import (
-    HAS_OUTPUT,
-    HAS_PART,
-    IN_TAXON,
-    IS_A,
-    MOLECULAR_FUNCTION,
-    PART_OF,
-    RDFS_LABEL,
-)
-from pyhornedowl import PyIndexedOntology
-from pyhornedowl.model import (
-    IRI,
-    Annotation,
-    AnnotationAssertion,
-    Class,
-    ObjectProperty,
-    ObjectSomeValuesFrom,
-    SimpleLiteral,
-    SubClassOf,
-)
+try:
+    from pyhornedowl import PyIndexedOntology
+    from pyhornedowl.model import (
+        IRI,
+        Annotation,
+        AnnotationAssertion,
+        Class,
+        ObjectProperty,
+        ObjectSomeValuesFrom,
+        SimpleLiteral,
+        SubClassOf,
+    )
+except ModuleNotFoundError as ex:
+    if ex.name != "pyhornedowl":
+        raise
+    raise ModuleNotFoundError(
+        "The owl package extra is required for this module. "
+        "Please install with 'pip install gocam[owl]'.",
+        name=ex.name,
+    ) from None
 
 from gocam.datamodel import (
     Activity,
@@ -43,6 +43,15 @@ logger = logging.getLogger(__name__)
 SIMPLE_AXIOM = Union[SubClassOf, AnnotationAssertion]
 
 SERIALIZATION = Literal["owl", "rdf", "ofn", "owx"]
+
+# Define these constants locally instead of importing from oaklib.datamodels.vocabulary
+# so that this module can be used without requiring the oaklib package extra.
+HAS_PART = Relation.HAS_PART.value
+IN_TAXON = "RO:0002162"
+IS_A = "rdfs:subClassOf"
+MOLECULAR_FUNCTION = "GO:0003674"
+PART_OF = Relation.PART_OF.value
+RDFS_LABEL = "rdfs:label"
 
 
 @dataclass
@@ -339,7 +348,7 @@ class TBoxTranslator:
             id = id.replace("/", "__")
         try:
             return self.ontology.curie(id)
-        except ValueError as e:
+        except ValueError:
             if ":" not in id:
                 id = f"TEMP:{id}"
                 logger.warning(
@@ -350,7 +359,7 @@ class TBoxTranslator:
             self.ontology.add_prefix_mapping(pfx, f"http://identifiers.org/{pfx}:")
             try:
                 return self.ontology.curie(id)
-            except ValueError as e:
+            except ValueError:
                 raise ValueError(f"{id} not a CURIE")
 
     def get_class(self, id: str) -> Class:

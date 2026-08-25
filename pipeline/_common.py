@@ -10,12 +10,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-import networkx as nx
 from rich import print
 from rich.logging import RichHandler
 from rich.tree import Tree
-
-from gocam.datamodel import Activity, Model, MoleculeAssociation
 
 
 def setup_logger(verbose: int) -> None:

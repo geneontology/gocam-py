@@ -13,6 +13,7 @@ jobs:
       name: pypi
       url: https://pypi.org/p/gocam
     permissions:
+      contents: write
       # this permission is mandatory for trusted publishing
       id-token: write
 
@@ -39,6 +40,22 @@ jobs:
 
       - name: Test project
         run: make test
+
+      - name: Package schema artifacts
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir -p release-artifacts
+          archive_tag=${RELEASE_TAG//\//-}
+          schema_archive="release-artifacts/gocam-schema-artifacts-${archive_tag}.zip"
+          (cd project && zip -r "../$schema_archive" . -x README.md)
+          echo "SCHEMA_ARCHIVE=$schema_archive" >> "$GITHUB_ENV"
+
+      - name: Upload schema artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" "$SCHEMA_ARCHIVE" --clobber
 
       - name: Build source and wheel archives
         run: uv build

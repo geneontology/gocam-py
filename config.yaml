@@ -1,5 +1,14 @@
-# Configuration of generators (defaults illustrated)
 ---
+excludes:
+  # Excluded for historical reason
+  - excel
+  - graphql
+  # Documentation generation is handled separately
+  - markdown
+  # Pydantic is the preferred Python output format and is generated separately to
+  # src/gocam/datamodel. Disable the old dataclass generator to avoid confusion and
+  # duplication.
+  - python
 generator_args:
   owl:
     mergeimports: true
@@ -17,8 +26,6 @@ generator_args:
   jsonschema:
     mergeimports: true
   jsonldcontext:
-    mergeimports: true
-  python:
     mergeimports: true
   prefixmap:
     mergeimports: true

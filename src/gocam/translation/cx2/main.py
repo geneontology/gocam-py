@@ -6,7 +6,17 @@ from typing import Dict, List, Optional
 
 import networkx as nx
 import prefixmaps
-from ndex2.cx2 import CX2Network, CX2NetworkXFactory
+
+try:
+    from ndex2.cx2 import CX2Network, CX2NetworkXFactory
+except ModuleNotFoundError as ex:
+    if ex.name != "ndex2":
+        raise
+    raise ModuleNotFoundError(
+        "The cx2 package extra is required for this module. "
+        "Please install it with 'pip install gocam[cx2]'.",
+        name=ex.name,
+    ) from None
 
 from gocam.datamodel import (
     EnabledByProteinComplexAssociation,
