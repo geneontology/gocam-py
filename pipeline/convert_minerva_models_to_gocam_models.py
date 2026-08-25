@@ -35,28 +35,12 @@ from _common import (
 )
 from rich.progress import track
 
-from gocam.translation import MinervaWrapper
+from gocam.translation import MinervaWrapper, WarningType
 from gocam.utils import model_to_digraph
 
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
-
-
-def minerva_model_uses_complement(minerva_model: dict) -> bool:
-    """Check if the Minerva model uses complement constructs.
-
-    Args:
-        minerva_model (dict): The Minerva model as a dictionary.
-
-    Returns:
-        bool: True if the model uses complement constructs, False otherwise.
-    """
-    for individual in minerva_model.get("individuals", []):
-        for type_ in individual.get("type", []):
-            if type_.get("type") == "complement":
-                return True
-    return False
 
 
 def process_minerva_model_file(
@@ -115,7 +99,11 @@ def process_minerva_model_file(
         return FilteredResult(reason=FilterReason.NO_ACTIVITY_EDGE, meta=meta)
 
     # Detect if the Minerva model uses complement constructs. If so, skip writing the model.
-    if minerva_model_uses_complement(minerva_model):
+    if any(
+        w
+        for w in translation_result.warnings
+        if w.type == WarningType.INDIVIDUAL_HAS_COMPLEMENT_TYPE
+    ):
         logger.info(
             f"Minerva model for GO-CAM model {gocam_model.id} uses complement constructs; skipping."
         )

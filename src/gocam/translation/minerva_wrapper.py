@@ -101,13 +101,16 @@ class MinervaObject(Annotated):
     facts: list[Fact] = Field(default_factory=list)
 
 
-@dataclass
+@dataclass(frozen=True)
 class MinervaView:
     """
     Indexed, read-only view of raw Minerva JSON data.
     """
 
     raw_json: MinervaObject
+    individuals_with_multiple_types: set[str] = field(init=False, default_factory=set)
+    individuals_with_complement_types: set[str] = field(init=False, default_factory=set)
+
     _facts_by_property: defaultdict[str, list[Fact]] = field(
         init=False, default_factory=lambda: defaultdict(list)
     )
@@ -130,10 +133,6 @@ class MinervaView:
     _objects_by_id: dict[str, IndividualType] = field(init=False, default_factory=dict)
 
     def __post_init__(self):
-        self._facts_by_property = defaultdict(list)
-        self._facts_by_subject_property = defaultdict(list)
-        self._facts_by_object_property = defaultdict(list)
-
         for individual in self.raw_json.individuals:
             ind_id = individual.id
             self._individual_id_to_root_types[ind_id] = [
@@ -146,13 +145,20 @@ class MinervaView:
                 self._extract_annotations_multivalued(individual)
             )
 
-            for type_ in individual.type:
-                if type_.type == "complement":
-                    continue
-                type_id = type_.id
-                if type_id:
-                    self._objects_by_id[type_id] = type_
-                    self._individual_id_to_term[ind_id] = type_id
+            if not individual.type:
+                continue
+
+            if any(t.type == "complement" for t in individual.type):
+                self.individuals_with_complement_types.add(ind_id)
+
+            if len(individual.type) > 1:
+                self.individuals_with_multiple_types.add(ind_id)
+
+            type_ = individual.type[0]
+            type_id = type_.id
+            if type_id:
+                self._objects_by_id[type_id] = type_
+                self._individual_id_to_term[ind_id] = type_id
 
         for fact in self.raw_json.facts:
             self._facts_by_property[fact.property].append(fact)
@@ -279,6 +285,22 @@ class MinervaTranslator:
 
     def __post_init__(self):
         self.view = MinervaView(self.minerva_obj)
+        for individual_id in self.view.individuals_with_multiple_types:
+            self.translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.INDIVIDUAL_HAS_MULTIPLE_TYPES,
+                    message="Individual has multiple types; using the first type for translation",
+                    entity_id=individual_id,
+                )
+            )
+        for individual_id in self.view.individuals_with_complement_types:
+            self.translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.INDIVIDUAL_HAS_COMPLEMENT_TYPE,
+                    message="Individual has a complement type; this is not supported in translation",
+                    entity_id=individual_id,
+                )
+            )
 
     def translate(self) -> TranslationResult[Model]:
         """
