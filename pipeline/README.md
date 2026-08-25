@@ -4,7 +4,7 @@ This directory contains maintained operational scripts for processing steps in t
 pipeline. Some scripts produce reports as part of their processing. These reports are run logs,
 summaries, quality-control outputs, or maintained data products
 
-One-off or exploratory analyses should be added to the `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). Analyses that ready to be integrated into the production GO Release pipeline can be re-implemented here.
+One-off or exploratory analyses should be added to the `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). Analyses that are ready to be integrated into the production GO Release pipeline can be re-implemented here.
 
 ## Setup
 
