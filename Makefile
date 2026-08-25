@@ -145,7 +145,7 @@ mkd-%:
 
 .PHONY: clean
 clean:
-	find "$(DEST)" -not -name "README.md" -delete
+	find "$(DEST)" -mindepth 1 -not -path "$(DEST)/README.md" -delete
 	rm -rf tmp
 	rm -fr docs/*
 	rm -fr $(PYDANTIC)
