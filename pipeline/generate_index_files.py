@@ -64,6 +64,14 @@ class IndexReport(ABC):
         model_id = normalize_model_id(model.id)
         self.index[key].add(model_id)
 
+    def get_index(self) -> dict[str, list[str]] | list[str]:
+        """Get the index data to be written to the output file.
+
+        Returns:
+            A dictionary where keys are index keys and values are sorted lists of model IDs.
+        """
+        return {k: sorted(v) for k, v in self.index.items()}
+
     def write(self, output_directory: Path) -> None:
         """Write the index to a JSON file.
 
@@ -79,7 +87,12 @@ class IndexReport(ABC):
             )
 
         with open(output_directory / self.file_name, "w") as f:
-            json.dump({k: sorted(v) for k, v in self.index.items()}, f, indent=2)
+            json.dump(self.get_index(), f, indent=2)
+
+    @property
+    def summary(self) -> str:
+        """Return a summary of the index report."""
+        return f"{self.file_name}: {len(self.index)} keys"
 
 
 class ContributorIndexReport(IndexReport):
@@ -152,6 +165,28 @@ class TaxonIndexReport(IndexReport):
             self.add(model.taxon, model)
         for taxon in model.additional_taxa or []:
             self.add(taxon, model)
+
+
+class AllModelsIndexReport(IndexReport):
+    """Index report for all models, regardless of their content."""
+
+    _key = "ALL"
+
+    def process_model(self, model: Model) -> None:
+        self.add(self._key, model)
+
+    def get_index(self) -> dict[str, list[str]] | list[str]:
+        """Get the index data to be written to the output file.
+
+        Returns:
+            A list of all model IDs.
+        """
+        return sorted(self.index.get(self._key, set()))
+
+    @property
+    def summary(self) -> str:
+        """Return a summary of the index report."""
+        return f"{self.file_name}: {len(self.index.get(self._key, set()))} models"
 
 
 def process_gocam_model_file(
@@ -258,6 +293,7 @@ def main(
         ProvidedByIndexReport("provided_by_index.json"),
         SourceIndexReport("source_index.json"),
         TaxonIndexReport("taxon_index.json"),
+        AllModelsIndexReport("all_index.json"),
     ]
 
     result_summary = ResultSummary()
@@ -281,9 +317,7 @@ def main(
                 report.write(output_dir)
                 if success_branch is None:
                     success_branch = tree.add("Successful indexes", style="green")
-                success_branch.add(
-                    f"{report.file_name}: [b]{len(report.index)}[/b] keys"
-                )
+                success_branch.add(report.summary)
             except EmptyIndexError:
                 if empty_branch is None:
                     empty_branch = tree.add(
