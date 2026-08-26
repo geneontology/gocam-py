@@ -286,9 +286,12 @@ if step_selected stats; then
 fi
 
 if step_selected summary; then
-  output_file="$logs_dir/summary.xlsx"
-  prepare_output_file "$output_file"
+  excel_output_file="$logs_dir/summary.xlsx"
+  html_output_dir="$logs_dir/summary-html"
+  prepare_output_file "$excel_output_file"
+  prepare_output_dir "$html_output_dir"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/generate_log_summary.py" \
     --logs-dir "$logs_dir" \
-    --output "$output_file"
+    --excel-output "$excel_output_file" \
+    --html-output-dir "$html_output_dir"
 fi
