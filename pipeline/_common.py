@@ -13,6 +13,8 @@ from rich import print
 from rich.logging import RichHandler
 from rich.tree import Tree
 
+logger = logging.getLogger(__name__)
+
 
 def setup_logger(verbose: int) -> None:
     """Set up the logger with the specified verbosity level.
@@ -183,6 +185,10 @@ class PipelineLogWriter:
     """Writer for pipeline step logs in JSON Lines format with identifying header."""
 
     def __init__(self, file: TextIO, step: PipelineStep) -> None:
+        if not file.name.endswith(".jsonl"):
+            logger.warning(
+                "Log file should have a .jsonl extension for JSON Lines format."
+            )
         self.file = file
         self.file.write(
             json.dumps(

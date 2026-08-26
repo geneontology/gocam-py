@@ -195,9 +195,6 @@ def main(
             "Pseudo-GO-CAM output directory must be specified unless --dry-run is used."
         )
 
-    # Validate log_file name
-    if log_file and not log_file.name.endswith(".jsonl"):
-        logger.warning("Log file should have a .jsonl extension for JSON Lines format.")
     log_writer = PipelineLogWriter(log_file, PipelineStep.FILTER) if log_file else None
 
     # Get list of JSON files in the input directory
