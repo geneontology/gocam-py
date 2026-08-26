@@ -21,7 +21,7 @@ from _common import (
     ErrorResult,
     FilteredResult,
     FilterReason,
-    PipelineReportWriter,
+    PipelineLogWriter,
     PipelineResult,
     PipelineStep,
     ResultSummary,
@@ -149,10 +149,10 @@ def main(
             help="Directory to save production pseudo-GO-CAM model JSON files. Required unless --dry-run is used.",
         ),
     ] = None,
-    report_file: Annotated[
+    log_file: Annotated[
         typer.FileTextWrite | None,
         typer.Option(
-            help="JSON Lines file to write a detailed report of the identification results.",
+            help="JSON Lines log file to write identification results.",
         ),
     ] = None,
     dry_run: Annotated[
@@ -195,14 +195,10 @@ def main(
             "Pseudo-GO-CAM output directory must be specified unless --dry-run is used."
         )
 
-    # Validate report_file name
-    if report_file and not report_file.name.endswith(".jsonl"):
-        logger.warning(
-            "Report file should have a .jsonl extension for JSON Lines format."
-        )
-    report_writer = (
-        PipelineReportWriter(report_file, PipelineStep.FILTER) if report_file else None
-    )
+    # Validate log_file name
+    if log_file and not log_file.name.endswith(".jsonl"):
+        logger.warning("Log file should have a .jsonl extension for JSON Lines format.")
+    log_writer = PipelineLogWriter(log_file, PipelineStep.FILTER) if log_file else None
 
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
@@ -214,8 +210,8 @@ def main(
             json_file, output_dir, pseudo_gocam_output_dir
         )
         result_summary.add_result(json_file.stem, result)
-        if report_writer:
-            report_writer.write_result(result, json_file.stem)
+        if log_writer:
+            log_writer.write_result(result, json_file.stem)
 
     # Print result
     result_summary.print()

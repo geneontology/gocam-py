@@ -82,7 +82,7 @@ class ErrorReason(str, Enum):
 
 
 class PipelineStep(str, Enum):
-    """Identifiers for steps that produce pipeline reports."""
+    """Identifiers for steps that produce pipeline logs."""
 
     CONVERT = "convert"
     FILTER = "filter"
@@ -92,8 +92,8 @@ class PipelineStep(str, Enum):
 
 
 PIPELINE_STEP_ORDER = tuple(PipelineStep)
-PIPELINE_REPORT_RECORD_TYPE = "pipeline_step_report"
-PIPELINE_REPORT_FORMAT_VERSION = 1
+PIPELINE_LOG_RECORD_TYPE = "pipeline_step_log"
+PIPELINE_LOG_FORMAT_VERSION = 1
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -108,14 +108,14 @@ class PipelineResult(ABC):
         """Return the status string for this result."""
         pass
 
-    def get_report_entry(self, model_id: str) -> dict[str, Any]:
-        """Get a report entry for this result.
+    def get_log_entry(self, model_id: str) -> dict[str, Any]:
+        """Get a log entry for this result.
 
         Args:
             model_id: The ID of the model associated with this result
 
         Returns:
-            A dictionary representing the report entry.
+            A dictionary representing the log entry.
         """
         entry: dict[str, Any] = {
             "model_id": model_id,
@@ -137,8 +137,8 @@ class SuccessResult(PipelineResult):
     def status(self) -> str:
         return "success"
 
-    def get_report_entry(self, model_id: str) -> dict[str, str | list[str]]:
-        entry = super().get_report_entry(model_id)
+    def get_log_entry(self, model_id: str) -> dict[str, str | list[str]]:
+        entry = super().get_log_entry(model_id)
         if self.warnings:
             entry["warnings"] = self.warnings
         return entry
@@ -154,8 +154,8 @@ class FilteredResult(PipelineResult):
     def status(self) -> str:
         return "filtered"
 
-    def get_report_entry(self, model_id: str) -> dict[str, str | list[str]]:
-        entry = super().get_report_entry(model_id)
+    def get_log_entry(self, model_id: str) -> dict[str, str | list[str]]:
+        entry = super().get_log_entry(model_id)
         entry["reason"] = self.reason.value
         return entry
 
@@ -171,24 +171,24 @@ class ErrorResult(PipelineResult):
     def status(self) -> str:
         return "error"
 
-    def get_report_entry(self, model_id: str) -> dict[str, str | list[str]]:
-        entry = super().get_report_entry(model_id)
+    def get_log_entry(self, model_id: str) -> dict[str, str | list[str]]:
+        entry = super().get_log_entry(model_id)
         entry["reason"] = self.reason.value
         if self.details:
             entry["details"] = self.details
         return entry
 
 
-class PipelineReportWriter:
-    """Writer for pipeline step reports in JSON Lines format with identifying header."""
+class PipelineLogWriter:
+    """Writer for pipeline step logs in JSON Lines format with identifying header."""
 
     def __init__(self, file: TextIO, step: PipelineStep) -> None:
         self.file = file
         self.file.write(
             json.dumps(
                 {
-                    "record_type": PIPELINE_REPORT_RECORD_TYPE,
-                    "format_version": PIPELINE_REPORT_FORMAT_VERSION,
+                    "record_type": PIPELINE_LOG_RECORD_TYPE,
+                    "format_version": PIPELINE_LOG_FORMAT_VERSION,
                     "step": step.value,
                 }
             )
@@ -196,8 +196,8 @@ class PipelineReportWriter:
         )
 
     def write_result(self, result: PipelineResult, model_id: str) -> None:
-        """Append one model result to the report."""
-        self.file.write(json.dumps(result.get_report_entry(model_id)) + "\n")
+        """Append one model result to the log."""
+        self.file.write(json.dumps(result.get_log_entry(model_id)) + "\n")
 
 
 class ResultSummary:

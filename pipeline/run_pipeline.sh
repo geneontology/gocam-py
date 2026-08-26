@@ -172,7 +172,7 @@ if step_selected summary \
     exit 2
   fi
   if ! compgen -G "$logs_dir/*.jsonl" >/dev/null; then
-    echo "No JSONL reports are available for step 'summary': $logs_dir" >&2
+    echo "No JSONL log files are available for step 'summary': $logs_dir" >&2
     exit 2
   fi
 fi
@@ -221,60 +221,60 @@ fi
 
 if step_selected convert; then
   output_dir="$output_root_dir/01-gocam-models"
-  report_file="$logs_dir/01-convert.jsonl"
+  log_file="$logs_dir/01-convert.jsonl"
   prepare_output_dir "$output_dir"
-  prepare_output_file "$report_file"
+  prepare_output_file "$log_file"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/convert_minerva_models_to_gocam_models.py" \
     --input-dir "$models_dir" \
     --output-dir "$output_dir" \
-    --report-file "$report_file"
+    --log-file "$log_file"
 fi
 
 if step_selected filter; then
   output_dir="$output_root_dir/02-true-gocams"
   pseudo_output_dir="$output_root_dir/02-pseudo-gocams"
-  report_file="$logs_dir/02-filter.jsonl"
+  log_file="$logs_dir/02-filter.jsonl"
   prepare_output_dir "$output_dir"
   prepare_output_dir "$pseudo_output_dir"
-  prepare_output_file "$report_file"
+  prepare_output_file "$log_file"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/filter_true_gocam_models.py" \
     --input-dir "$output_root_dir/01-gocam-models" \
     --output-dir "$output_dir" \
     --pseudo-gocam-output-dir "$pseudo_output_dir" \
-    --report-file "$report_file"
+    --log-file "$log_file"
 fi
 
 if step_selected index; then
   output_dir="$output_root_dir/03-indexed-true-gocams"
-  report_file="$logs_dir/03-index.jsonl"
+  log_file="$logs_dir/03-index.jsonl"
   prepare_output_dir "$output_dir"
-  prepare_output_file "$report_file"
+  prepare_output_file "$log_file"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/add_query_index_to_models.py" \
     --input-dir "$output_root_dir/02-true-gocams" \
     --output-dir "$output_dir" \
-    --report-file "$report_file"
+    --log-file "$log_file"
 fi
 
 if step_selected index-files; then
   output_dir="$output_root_dir/04-index-files"
-  report_file="$logs_dir/04-index-files.jsonl"
+  log_file="$logs_dir/04-index-files.jsonl"
   prepare_output_dir "$output_dir"
-  prepare_output_file "$report_file"
+  prepare_output_file "$log_file"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/generate_index_files.py" \
     --input-dir "$output_root_dir/03-indexed-true-gocams" \
     --output-dir "$output_dir" \
-    --report-file "$report_file"
+    --log-file "$log_file"
 fi
 
 if step_selected browser-search; then
   output_dir="$output_root_dir/05-browser-search-docs"
-  report_file="$logs_dir/05-browser-search.jsonl"
+  log_file="$logs_dir/05-browser-search.jsonl"
   prepare_output_dir "$output_dir"
-  prepare_output_file "$report_file"
+  prepare_output_file "$log_file"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/generate_go_cam_browser_search_docs.py" \
     --input-dir "$output_root_dir/03-indexed-true-gocams" \
     --output "$output_dir/go-cam-browser-search-docs.json" \
-    --report-file "$report_file"
+    --log-file "$log_file"
 fi
 
 if step_selected stats; then

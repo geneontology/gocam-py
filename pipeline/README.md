@@ -1,8 +1,9 @@
 # Pipeline Scripts
 
 This directory contains maintained operational scripts for processing steps in the GO Release
-pipeline. Some scripts produce reports as part of their processing. These reports are run logs,
-summaries, quality-control outputs, or maintained data products
+pipeline. Some scripts produce JSONL log files as part of their processing. Other scripts derive
+reports, summaries, quality-control outputs, or maintained data products from those log files or
+from model files.
 
 One-off or exploratory analyses should be added to the `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). Analyses that are ready to be integrated into the production GO Release pipeline can be re-implemented here.
 
@@ -96,6 +97,7 @@ Models are filtered out and not written if they:
 
 **Options:**
 
+- `--log-file`: JSON Lines log file to write the conversion results
 - `--dry-run`: Perform conversion without writing output files
 - `--verbose` / `-v`: Increase verbosity (use multiple times for more detail: `-v` for
   INFO, `-vv`
@@ -147,7 +149,7 @@ Models are classified and moved based on these criteria:
 
 **Options:**
 
-- `--report-file`: JSON Lines file to write a detailed report of the results
+- `--log-file`: JSON Lines log file to write the results
 - `--dry-run`: Perform the analysis without copying any files
 - `--verbose` / `-v`: Increase verbosity (`-v` for INFO, `-vv` for DEBUG)
 - `--limit N`: Limit processing to first N models (0 = no limit)
@@ -174,7 +176,7 @@ for faster querying and indexing.
 
 **Options:**
 
-- `--report-file`: JSON Lines file to write a detailed report of the indexing results
+- `--log-file`: JSON Lines log file to write the indexing results
 - `--dry-run`: Perform indexing without writing output files
 - `--go-adapter-descriptor`: OAK adapter descriptor for GO (default: `sqlite:obo:go`)
 - `--ncbi-taxon-adapter-descriptor`: OAK adapter descriptor for NCBITaxon (default:
@@ -216,7 +218,7 @@ Generates the following JSON index files in the output directory:
 
 **Options:**
 
-- `--report-file`: JSON Lines file to write a detailed report of the results
+- `--log-file`: JSON Lines log file to write the results
 - `--dry-run`: Perform processing without writing output files
 - `--verbose` / `-v`: Increase verbosity level (`-v` for INFO, `-vv` for DEBUG)
 - `--limit N`: Limit processing to first N models (0 = no limit)
@@ -242,7 +244,7 @@ Browser.
 
 **Options:**
 
-- `--report-file`: JSON Lines file to write a detailed report of the results
+- `--log-file`: JSON Lines log file to write the results
 - `--dry-run`: Perform processing without writing output files
 - `--verbose` / `-v`: Increase verbosity level (`-v` for INFO, `-vv` for DEBUG)
 - `--limit N`: Limit processing to first N models (0 = no limit)
@@ -263,24 +265,23 @@ reports organized by providing group. Per-model metadata includes the model's
 modification date, contributors, groups or provider identifiers, and whether provenance
 was collected from the full translated model or only from top-level Minerva annotations.
 
-Each JSONL pipeline report is self-describing. Its first line is a required header:
+Each JSONL pipeline log is self-describing. Its first line is a required header:
 
 ```json
-{"record_type":"pipeline_step_report","format_version":1,"step":"convert"}
+{"record_type":"pipeline_step_log","format_version":1,"step":"convert"}
 ```
 
 The remaining lines contain per-model results. The supported step identifiers, in
 canonical pipeline order, are `convert`, `filter`, `query-index`, `index-files`, and
-`browser-search`. Report filenames do not determine processing order and may be chosen by
+`browser-search`. Log filenames do not determine processing order and may be chosen by
 the caller. A directory may contain any subset of steps, but it may not contain multiple
-reports for the same step. Missing or invalid headers, unsupported format versions,
+logs for the same step. Missing or invalid headers, unsupported format versions,
 unknown steps, and duplicate steps are rejected.
 
 **Inputs:**
 
-- `--logs-dir`: Directory containing step JSONL report files (e.g., reports generated
-  via
-  `--report-file` in other scripts)
+- `--logs-dir`: Directory containing step JSONL log files (e.g., logs generated via
+  `--log-file` in other scripts)
 
 **Options:**
 

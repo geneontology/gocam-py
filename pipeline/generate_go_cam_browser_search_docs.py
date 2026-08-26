@@ -12,7 +12,7 @@ import typer
 from _common import (
     ErrorReason,
     ErrorResult,
-    PipelineReportWriter,
+    PipelineLogWriter,
     PipelineResult,
     PipelineStep,
     ResultSummary,
@@ -107,10 +107,10 @@ def main(
             help="File to write the generated search documents to. Required unless --dry-run is used.",
         ),
     ] = None,
-    report_file: Annotated[
+    log_file: Annotated[
         typer.FileTextWrite | None,
         typer.Option(
-            help="JSON Lines file to write a detailed report of the processing results.",
+            help="JSON Lines log file to write processing results.",
         ),
     ] = None,
     dry_run: Annotated[
@@ -143,10 +143,8 @@ def main(
         raise typer.BadParameter(
             "Output file must be specified unless --dry-run is used."
         )
-    report_writer = (
-        PipelineReportWriter(report_file, PipelineStep.BROWSER_SEARCH)
-        if report_file
-        else None
+    log_writer = (
+        PipelineLogWriter(log_file, PipelineStep.BROWSER_SEARCH) if log_file else None
     )
 
     # Get list of JSON files in the input directory
@@ -157,8 +155,8 @@ def main(
     for json_file in track(json_files, description="Generating search docs..."):
         result = process_gocam_model_file(json_file)
         result_summary.add_result(json_file.stem, result)
-        if report_writer:
-            report_writer.write_result(result, json_file.stem)
+        if log_writer:
+            log_writer.write_result(result, json_file.stem)
         if isinstance(result, SuccessResult):
             search_docs.append(result.data)
 

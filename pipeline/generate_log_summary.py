@@ -15,8 +15,8 @@ import pystow
 import typer
 import yaml
 from _common import (
-    PIPELINE_REPORT_FORMAT_VERSION,
-    PIPELINE_REPORT_RECORD_TYPE,
+    PIPELINE_LOG_FORMAT_VERSION,
+    PIPELINE_LOG_RECORD_TYPE,
     PIPELINE_STEP_ORDER,
     PipelineStep,
     normalize_model_id,
@@ -91,36 +91,33 @@ class GroupReport:
 
 
 @dataclass(frozen=True)
-class PipelineStepReport:
-    """A pipeline step report file."""
+class PipelineStepLog:
+    """A pipeline step log file."""
 
     path: Path
     step: PipelineStep
 
 
-def read_step_report_header(step_file: Path) -> PipelineStep:
-    """Read and validate a pipeline step report header."""
-    with step_file.open() as report_file:
-        line = report_file.readline()
+def read_step_log_header(step_file: Path) -> PipelineStep:
+    """Read and validate a pipeline step log header."""
+    with step_file.open() as log_file:
+        line = log_file.readline()
 
     if not line:
-        raise ValueError(f"Pipeline report {step_file} is empty")
+        raise ValueError(f"Pipeline log {step_file} is empty")
     try:
         header = json.loads(line)
     except json.JSONDecodeError as error:
         raise ValueError(f"Invalid JSON in {step_file} at line 1: {error}") from error
 
     if not isinstance(header, dict):
-        raise ValueError(f"{step_file} pipeline report header must be a JSON object")
-    if header.get("record_type") != PIPELINE_REPORT_RECORD_TYPE:
-        raise ValueError(f"{step_file} does not start with a pipeline report header")
+        raise ValueError(f"{step_file} pipeline log header must be a JSON object")
+    if header.get("record_type") != PIPELINE_LOG_RECORD_TYPE:
+        raise ValueError(f"{step_file} does not start with a pipeline log header")
     format_version = header.get("format_version")
-    if (
-        type(format_version) is not int
-        or format_version != PIPELINE_REPORT_FORMAT_VERSION
-    ):
+    if type(format_version) is not int or format_version != PIPELINE_LOG_FORMAT_VERSION:
         raise ValueError(
-            f"{step_file} uses unsupported pipeline report format version "
+            f"{step_file} uses unsupported pipeline log format version "
             f"{format_version!r}"
         )
     step_value = header.get("step")
@@ -132,51 +129,49 @@ def read_step_report_header(step_file: Path) -> PipelineStep:
         ) from error
 
 
-def discover_step_reports(
+def discover_step_logs(
     logs_dir: Path, extension: str = ".jsonl"
-) -> list[PipelineStepReport]:
-    """Find, validate, and canonically order pipeline step report files.
+) -> list[PipelineStepLog]:
+    """Find, validate, and canonically order pipeline step log files.
 
     Args:
         logs_dir: Path to the directory containing log files.
         extension: The file extension to filter log files (default: .jsonl).
 
     Returns:
-        Reports ordered by their step's position in the canonical pipeline.
+        Logs ordered by their step's position in the canonical pipeline.
     """
     log_files = sorted(
         file
         for file in logs_dir.iterdir()
         if file.is_file() and file.suffix == extension and not file.name.startswith(".")
     )
-    reports_by_step: dict[PipelineStep, PipelineStepReport] = {}
+    logs_by_step: dict[PipelineStep, PipelineStepLog] = {}
     for log_file in log_files:
-        step = read_step_report_header(log_file)
-        if step in reports_by_step:
-            first_report = reports_by_step[step]
+        step = read_step_log_header(log_file)
+        if step in logs_by_step:
+            first_log = logs_by_step[step]
             raise ValueError(
-                f"Found multiple reports for pipeline step {step.value!r}: "
-                f"{first_report.path} and {log_file}"
+                f"Found multiple logs for pipeline step {step.value!r}: "
+                f"{first_log.path} and {log_file}"
             )
-        reports_by_step[step] = PipelineStepReport(path=log_file, step=step)
+        logs_by_step[step] = PipelineStepLog(path=log_file, step=step)
 
-    return [
-        reports_by_step[step] for step in PIPELINE_STEP_ORDER if step in reports_by_step
-    ]
+    return [logs_by_step[step] for step in PIPELINE_STEP_ORDER if step in logs_by_step]
 
 
 def iter_log_results(
-    step_report: PipelineStepReport,
+    step_log: PipelineStepLog,
 ) -> Iterable[tuple[str, dict[str, Any]]]:
     """Iterate over the entries in a JSONL log file, yielding model_id and entry data.
 
     Args:
-        step_report: Validated pipeline step report to read.
+        step_log: Validated pipeline step log to read.
 
     Yields:
         Tuples of (normalized_model_id, entry_dict) for each entry in the log file
     """
-    with step_report.path.open() as f:
+    with step_log.path.open() as f:
         # Skip the header line
         next(f)
         for line_number, line in enumerate(f, start=2):
@@ -184,22 +179,22 @@ def iter_log_results(
                 entry = json.loads(line)
             except json.JSONDecodeError as error:
                 raise ValueError(
-                    f"Invalid JSON in {step_report.path} at line {line_number}: {error}"
+                    f"Invalid JSON in {step_log.path} at line {line_number}: {error}"
                 ) from error
 
             if not isinstance(entry, dict):
                 raise ValueError(
-                    f"Pipeline report result at line {line_number} must be a JSON "
-                    f"object in {step_report.path}"
+                    f"Pipeline log result at line {line_number} must be a JSON "
+                    f"object in {step_log.path}"
                 )
             model_id = entry.get("model_id")
             if model_id is None:
                 raise ValueError(
-                    f"Missing model_id in {step_report.path} at line {line_number}"
+                    f"Missing model_id in {step_log.path} at line {line_number}"
                 )
             if not isinstance(model_id, str):
                 raise ValueError(
-                    f"model_id in {step_report.path} at line {line_number} must be a "
+                    f"model_id in {step_log.path} at line {line_number} must be a "
                     "string"
                 )
             yield normalize_model_id(model_id), entry
@@ -635,7 +630,7 @@ def main(
             file_okay=False,
             dir_okay=True,
             readable=True,
-            help="Directory containing step JSONL report files.",
+            help="Directory containing step JSONL log files.",
         ),
     ],
     log_file_extension: Annotated[
@@ -715,18 +710,18 @@ def main(
     if excel_output and not excel_output.name.endswith(".xlsx"):
         raise typer.BadParameter("Output file must have .xlsx extension.")
 
-    step_reports = discover_step_reports(logs_dir, log_file_extension)
-    if not step_reports:
+    step_logs = discover_step_logs(logs_dir, log_file_extension)
+    if not step_logs:
         raise typer.BadParameter(
             f"No log files with extension {log_file_extension} found in directory: {logs_dir}"
         )
 
     step_results_by_model_id: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
     processed_steps_by_model_id: defaultdict[str, set[PipelineStep]] = defaultdict(set)
-    for step_report in step_reports:
-        for model_id, entry in iter_log_results(step_report):
+    for step_log in step_logs:
+        for model_id, entry in iter_log_results(step_log):
             step_results_by_model_id[model_id].append(entry)
-            processed_steps_by_model_id[model_id].add(step_report.step)
+            processed_steps_by_model_id[model_id].add(step_log.step)
 
     users_by_id = load_metadata_by_id(
         goc_users_yaml, default_url=_CURRENT_USERS_YAML_URL, id_field="uri"

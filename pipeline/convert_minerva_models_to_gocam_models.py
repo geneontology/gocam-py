@@ -27,7 +27,7 @@ from _common import (
     ErrorResult,
     FilteredResult,
     FilterReason,
-    PipelineReportWriter,
+    PipelineLogWriter,
     PipelineResult,
     PipelineStep,
     ResultSummary,
@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 
 
 def extract_minerva_model_metadata(minerva_view: MinervaView) -> dict:
-    """Extract report metadata from a Minerva model's top-level annotations."""
+    """Extract model summary metadata from top-level Minerva annotations."""
     model = minerva_view.raw_json
     annotations = minerva_view.get_annotations(model)
     annotations_multivalued = minerva_view.get_annotations_multivalued(model)
@@ -68,7 +68,7 @@ def extract_minerva_model_metadata(minerva_view: MinervaView) -> dict:
 
 
 def extract_gocam_model_metadata(model: Model) -> dict:
-    """Extract complete report metadata from a translated GO-CAM model."""
+    """Extract complete model summary metadata from a translated GO-CAM model."""
     contributors = set()
     provided_by = set()
     for provenance in all_provenance(model):
@@ -200,10 +200,10 @@ def main(
             help="Directory to save converted GO-CAM model files. Required unless --dry-run is used.",
         ),
     ] = None,
-    report_file: Annotated[
+    log_file: Annotated[
         typer.FileTextWrite | None,
         typer.Option(
-            help="JSON Lines file to write a detailed report of the conversion results.",
+            help="JSON Lines log file to write conversion results.",
         ),
     ] = None,
     dry_run: Annotated[
@@ -239,14 +239,10 @@ def main(
             "Output directory must be specified unless --dry-run is used."
         )
 
-    # Validate report_file name
-    if report_file and not report_file.name.endswith(".jsonl"):
-        logger.warning(
-            "Report file should have a .jsonl extension for JSON Lines format."
-        )
-    report_writer = (
-        PipelineReportWriter(report_file, PipelineStep.CONVERT) if report_file else None
-    )
+    # Validate log_file name
+    if log_file and not log_file.name.endswith(".jsonl"):
+        logger.warning("Log file should have a .jsonl extension for JSON Lines format.")
+    log_writer = PipelineLogWriter(log_file, PipelineStep.CONVERT) if log_file else None
 
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
@@ -260,8 +256,8 @@ def main(
         result = process_minerva_model_file(json_file, output_dir=output_dir)
         model_id = json_file.stem
         result_summary.add_result(model_id, result)
-        if report_writer:
-            report_writer.write_result(result, model_id)
+        if log_writer:
+            log_writer.write_result(result, model_id)
 
     # Print result
     result_summary.print()
