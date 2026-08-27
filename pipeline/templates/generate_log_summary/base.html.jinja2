@@ -24,11 +24,6 @@
       color: #075ea8;
     }
 
-    .metadata {
-      color: #555;
-      font-size: 0.875rem;
-    }
-
     .summary {
       display: flex;
       flex-wrap: wrap;
@@ -73,6 +68,30 @@
       background-color: rgba(255, 0, 0, 0.1);
     }
 
+    hr {
+      margin: 1rem 0;
+      border: none;
+      border-top: 1px solid #ccd2d8;
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: max-content auto;
+      font-size: 0.75rem;
+      row-gap: 0.25rem;
+      column-gap: 1rem;
+    }
+
+    dt {
+      grid-column-start: 1;
+      font-weight: 500;
+    }
+
+    dd {
+      grid-column-start: 2;
+      margin: 0;
+    }
+
     details ul {
       margin-bottom: 0;
       padding-left: 1.25rem;
@@ -102,5 +121,12 @@
 </head>
 <body>
 {% block body %}{% endblock %}
+<hr>
+<dl>
+  {% for key, value in metadata.items() %}
+    <dt>{{ key }}</dt>
+    <dd>{{ value }}</dd>
+  {% endfor %}
+</dl>
 </body>
 </html>
