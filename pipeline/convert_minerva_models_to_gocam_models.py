@@ -172,7 +172,7 @@ def process_minerva_model_file(
         logger.info(f"Successfully wrote GO-CAM model to {output_file}")
     except Exception as e:
         logger.error(f"Error writing GO-CAM model to file {output_file}", exc_info=e)
-        return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
+        return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e), meta=meta)
 
     # If we reach here, the conversion and writing were successful
     return SuccessResult(warnings=translation_warnings, meta=meta)
