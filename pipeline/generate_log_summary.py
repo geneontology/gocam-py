@@ -768,6 +768,8 @@ def main(
             progress.advance(task, 1)
 
     if html_output_dir is not None:
+        if not any(log.step == PipelineStep.CONVERT for log in step_logs):
+            logger.warning("No CONVERT step log found; HTML reports may be incomplete.")
         reports = build_group_reports(model_summaries)
         html_output_dir.mkdir(parents=True, exist_ok=True)
         with Progress() as progress:
