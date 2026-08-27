@@ -285,7 +285,7 @@ unknown steps, and duplicate steps are rejected.
 
 **Options:**
 
-- `--metadata`: Additional info to include in the metadata sheet, in 'Key=Value' format.
+- `--metadata`: Additional info to include in reports, in 'Key=Value' format.
   Can be used multiple times.
 - `--excel-output`: File to write the generated Excel summary to (must have `.xlsx`
   extension)

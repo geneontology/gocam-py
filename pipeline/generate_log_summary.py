@@ -427,8 +427,7 @@ _HTML_ENVIRONMENT.filters["pluralize"] = format_plural
 def render_excel_summary(
     model_summaries: list[ModelSummary],
     *,
-    extra_metadata: list[str] | None,
-    generated_at: str,
+    metadata: dict[str, str] | None,
 ) -> Workbook:
     """Render all pipeline results into an Excel workbook."""
     Column = namedtuple("Column", ["name", "width", "definition"])
@@ -578,16 +577,9 @@ def render_excel_summary(
     metadata_sheet.append(["Provenance"])
     for cell in metadata_sheet[metadata_sheet.max_row]:
         cell.font = font_bold
-    metadata_sheet.append(["Generated on", generated_at])
-    metadata_sheet.append(["gocam-py version", __version__])
-    if extra_metadata:
-        for item in extra_metadata:
-            if "=" not in item:
-                raise typer.BadParameter(
-                    f"Invalid metadata entry {item!r}. Expected format: Key=Value."
-                )
-            key, value = item.split("=", 1)
-            metadata_sheet.append([key.strip(), value.strip()])
+    if metadata:
+        for key, value in metadata.items():
+            metadata_sheet.append([key, value])
 
     # Add column definitions section
     metadata_sheet.append([])
@@ -616,17 +608,17 @@ def render_excel_summary(
     return wb
 
 
-def render_group_report(report: GroupReport, *, generated_at: str) -> str:
+def render_group_report(report: GroupReport, *, metadata: dict[str, str]) -> str:
     """Render production GO-CAM-like model results for one providing group."""
     return _HTML_ENVIRONMENT.get_template("group.html.jinja2").render(
-        report=report, generated_at=generated_at
+        report=report, metadata=metadata
     )
 
 
-def render_group_index(reports: list[GroupReport], *, generated_at: str) -> str:
+def render_group_index(reports: list[GroupReport], *, metadata: dict[str, str]) -> str:
     """Render the index linking to every providing-group report."""
     return _HTML_ENVIRONMENT.get_template("index.html.jinja2").render(
-        reports=reports, generated_at=generated_at
+        reports=reports, metadata=metadata
     )
 
 
@@ -714,8 +706,6 @@ def main(
             "At least one of --excel-output or --html-output-dir must be provided."
         )
 
-    generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
-
     if excel_output and not excel_output.name.endswith(".xlsx"):
         raise typer.BadParameter("Output file must have .xlsx extension.")
 
@@ -724,6 +714,22 @@ def main(
         raise typer.BadParameter(
             f"No log files with extension {log_file_extension} found in directory: {logs_dir}"
         )
+
+    metadata_dict = {}
+    if metadata:
+        for item in metadata:
+            if "=" not in item:
+                raise typer.BadParameter(
+                    f"Invalid metadata entry {item!r}. Expected format: Key=Value."
+                )
+            key, value = item.split("=", 1)
+            metadata_dict[key.strip()] = value.strip()
+    metadata_dict.update(
+        {
+            "Generated on": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "gocam-py version": __version__,
+        }
+    )
 
     step_results_by_model_id: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
     processed_steps_by_model_id: defaultdict[str, set[PipelineStep]] = defaultdict(set)
@@ -761,9 +767,7 @@ def main(
     if excel_output is not None:
         with Progress() as progress:
             task = progress.add_task(description="Rendering Excel summary...", total=1)
-            wb = render_excel_summary(
-                model_summaries, extra_metadata=metadata, generated_at=generated_at
-            )
+            wb = render_excel_summary(model_summaries, metadata=metadata_dict)
             wb.save(excel_output)
             progress.advance(task, 1)
 
@@ -777,12 +781,12 @@ def main(
                 description="Writing HTML reports...", total=len(reports) + 1
             )
             (html_output_dir / "index.html").write_text(
-                render_group_index(reports, generated_at=generated_at), encoding="utf-8"
+                render_group_index(reports, metadata=metadata_dict), encoding="utf-8"
             )
             progress.advance(task, 1)
             for report in reports:
                 (html_output_dir / report.filename).write_text(
-                    render_group_report(report, generated_at=generated_at),
+                    render_group_report(report, metadata=metadata_dict),
                     encoding="utf-8",
                 )
                 progress.advance(task, 1)
