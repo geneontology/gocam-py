@@ -259,8 +259,17 @@ def summarize_model_entries(
         summary.groups.update(meta.get("groups") or [])
 
         if summary.pipeline_status == "success" and entry.get("status") != "success":
+            # This is the first non-success status we've seen, so record that status
+            # for the report along with any associated reason and details.
             summary.pipeline_status = entry.get("status", "unknown")
-            summary.pipeline_status_details = entry.get("reason")
+            reason = entry.get("reason", "")
+            details = entry.get("details", "")
+            summary.pipeline_status_details = reason
+            if details:
+                if summary.pipeline_status_details:
+                    summary.pipeline_status_details += f": {details}"
+                else:
+                    summary.pipeline_status_details = details
 
     return summary
 
