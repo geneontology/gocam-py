@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %}</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, sans-serif;
+    }
+
+    body {
+      color: #222;
+      margin: 2rem auto;
+      padding: 0 1.25rem;
+    }
+
+    h1 {
+      margin-bottom: .25rem;
+    }
+
+    a {
+      color: #075ea8;
+    }
+
+    .metadata {
+      color: #555;
+      font-size: 0.875rem;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+    }
+
+    .summary li {
+      background: #f2f5f7;
+      border-radius: .25rem;
+      padding: .65rem 1rem;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th, td {
+      border: 1px solid #ccd2d8;
+      padding: .6rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #e8edf1;
+    }
+
+    .status {
+      font-weight: 600;
+    }
+
+    .status.success {
+      color: #0f5132;
+      background-color: rgba(25, 135, 84, 0.1);
+    }
+
+    .status.error {
+      color: #842029;
+      background-color: rgba(255, 0, 0, 0.1);
+    }
+
+    details ul {
+      margin-bottom: 0;
+      padding-left: 1.25rem;
+    }
+
+    code {
+      overflow-wrap: anywhere;
+    }
+
+    button {
+      background-color: transparent;
+      color: #075ea8;
+      border: #075ea8 1px solid;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+    }
+  </style>
+  <link rel="stylesheet"
+        href="https://cdn.datatables.net/3.0.2/css/dataTables.dataTables.css"/>
+  <script src="https://cdn.datatables.net/3.0.2/js/dataTables.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"
+          integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script
+      src="https://cdn.datatables.net/plug-ins/3.0.2/features/markjs/dist/dataTables.markjs.min.js"></script>
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>

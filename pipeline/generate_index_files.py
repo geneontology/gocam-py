@@ -14,7 +14,9 @@ import typer
 from _common import (
     ErrorReason,
     ErrorResult,
+    PipelineLogWriter,
     PipelineResult,
+    PipelineStep,
     ResultSummary,
     SuccessResult,
     get_json_files,
@@ -243,10 +245,10 @@ def main(
             help="Directory to save generated index files. Required unless --dry-run is used.",
         ),
     ] = None,
-    report_file: Annotated[
+    log_file: Annotated[
         typer.FileTextWrite | None,
         typer.Option(
-            help="JSON Lines file to write a detailed report of the report generation results.",
+            help="JSON Lines log file to write index generation results.",
         ),
     ] = None,
     dry_run: Annotated[
@@ -282,6 +284,9 @@ def main(
         raise typer.BadParameter(
             "Output directory must be specified unless --dry-run is used."
         )
+    log_writer = (
+        PipelineLogWriter(log_file, PipelineStep.INDEX_FILES) if log_file else None
+    )
 
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
@@ -300,8 +305,8 @@ def main(
     for json_file in track(json_files, description="Generating index files..."):
         result = process_gocam_model_file(json_file, reports)
         result_summary.add_result(json_file.stem, result)
-        if report_file:
-            result.write_to_file(report_file, json_file.stem)
+        if log_writer:
+            log_writer.write_result(result, json_file.stem)
 
     # Print processing results summary
     result_summary.print()

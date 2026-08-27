@@ -26,6 +26,22 @@ def load_minerva_object(id: str):
         return json.load(f)
 
 
+def test_translate_accepts_prevalidated_minerva_view(monkeypatch):
+    """Translate a prebuilt view without validating its Minerva object again."""
+    raw_minerva_object = load_minerva_object("633b013300000306")
+    minerva_object = MinervaObject.model_validate(raw_minerva_object)
+    view = MinervaView(minerva_object)
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("MinervaObject.model_validate was called")
+
+    monkeypatch.setattr(MinervaObject, "model_validate", fail_if_called)
+
+    result = MinervaWrapper.translate(view)
+
+    assert result.result.id == "gomodel:633b013300000306"
+
+
 # This is an integration test because it makes real network requests
 @pytest.mark.integration
 @pytest.mark.parametrize("model_local_id", ["663d668500002178"])

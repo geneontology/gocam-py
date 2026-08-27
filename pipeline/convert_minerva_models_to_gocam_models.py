@@ -27,7 +27,9 @@ from _common import (
     ErrorResult,
     FilteredResult,
     FilterReason,
+    PipelineLogWriter,
     PipelineResult,
+    PipelineStep,
     ResultSummary,
     SuccessResult,
     get_json_files,
@@ -35,12 +37,52 @@ from _common import (
 )
 from rich.progress import track
 
-from gocam.translation import MinervaWrapper, WarningType
-from gocam.utils import model_to_digraph
+from gocam.datamodel import Model
+from gocam.translation import (
+    MinervaObject,
+    MinervaView,
+    MinervaWrapper,
+    WarningType,
+)
+from gocam.utils import all_provenance, model_to_digraph
 
 app = typer.Typer()
 
 logger = logging.getLogger(__name__)
+
+
+def extract_minerva_model_metadata(minerva_view: MinervaView) -> dict:
+    """Extract model summary metadata from top-level Minerva annotations."""
+    model = minerva_view.raw_json
+    annotations = minerva_view.get_annotations(model)
+    annotations_multivalued = minerva_view.get_annotations_multivalued(model)
+
+    return {
+        "title": annotations.get("title"),
+        "status": annotations.get("state"),
+        "date_modified": annotations.get("date"),
+        "contributors": annotations_multivalued.get("contributor"),
+        "provided_by": annotations_multivalued.get("providedBy"),
+        "provenance_scope": "model",
+    }
+
+
+def extract_gocam_model_metadata(model: Model) -> dict:
+    """Extract complete model summary metadata from a translated GO-CAM model."""
+    contributors = set()
+    provided_by = set()
+    for provenance in all_provenance(model):
+        contributors.update(provenance.contributor or [])
+        provided_by.update(provenance.provided_by or [])
+
+    return {
+        "title": model.title,
+        "status": model.status,
+        "date_modified": model.date_modified,
+        "contributors": sorted(contributors),
+        "provided_by": sorted(provided_by),
+        "provenance_scope": "all",
+    }
 
 
 def process_minerva_model_file(
@@ -69,18 +111,21 @@ def process_minerva_model_file(
         logger.error(f"Error reading file {json_file}", exc_info=e)
         return ErrorResult(reason=ErrorReason.READ_ERROR, details=str(e))
 
-    # Convert Minerva model to GO-CAM model
     meta = None
     try:
-        translation_result = MinervaWrapper.translate(minerva_model)
+        # Extract model-level metadata directly from the Minerva model so it remains
+        # available if translation fails.
+        minerva_object = MinervaObject.model_validate(minerva_model)
+        minerva_view = MinervaView(minerva_object)
+        meta = extract_minerva_model_metadata(minerva_view)
+
+        # Convert Minerva model to GO-CAM model
+        translation_result = MinervaWrapper.translate(minerva_view)
         gocam_model = translation_result.result
+        meta = extract_gocam_model_metadata(gocam_model)
         translation_warnings = [
             dataclasses.asdict(w) for w in translation_result.warnings
         ]
-        meta = {
-            "title": gocam_model.title,
-            "status": gocam_model.status,
-        }
         logger.debug(
             f"Successfully converted Minerva model to GO-CAM model for {json_file}"
         )
@@ -89,7 +134,9 @@ def process_minerva_model_file(
             f"Error converting Minerva model to GO-CAM model for {json_file}",
             exc_info=e,
         )
-        return ErrorResult(reason=ErrorReason.CONVERSION_ERROR, details=str(e))
+        return ErrorResult(
+            reason=ErrorReason.CONVERSION_ERROR, details=str(e), meta=meta
+        )
 
     # Detect if there is at least one activity edge in the model. If not, skip writing the model.
     graph = model_to_digraph(gocam_model)
@@ -125,7 +172,7 @@ def process_minerva_model_file(
         logger.info(f"Successfully wrote GO-CAM model to {output_file}")
     except Exception as e:
         logger.error(f"Error writing GO-CAM model to file {output_file}", exc_info=e)
-        return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e))
+        return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e), meta=meta)
 
     # If we reach here, the conversion and writing were successful
     return SuccessResult(warnings=translation_warnings, meta=meta)
@@ -153,10 +200,10 @@ def main(
             help="Directory to save converted GO-CAM model files. Required unless --dry-run is used.",
         ),
     ] = None,
-    report_file: Annotated[
+    log_file: Annotated[
         typer.FileTextWrite | None,
         typer.Option(
-            help="JSON Lines file to write a detailed report of the conversion results.",
+            help="JSON Lines log file to write conversion results.",
         ),
     ] = None,
     dry_run: Annotated[
@@ -192,11 +239,7 @@ def main(
             "Output directory must be specified unless --dry-run is used."
         )
 
-    # Validate report_file name
-    if report_file and not report_file.name.endswith(".jsonl"):
-        logger.warning(
-            "Report file should have a .jsonl extension for JSON Lines format."
-        )
+    log_writer = PipelineLogWriter(log_file, PipelineStep.CONVERT) if log_file else None
 
     # Get list of JSON files in the input directory
     json_files = get_json_files(input_dir, limit=limit)
@@ -210,8 +253,8 @@ def main(
         result = process_minerva_model_file(json_file, output_dir=output_dir)
         model_id = json_file.stem
         result_summary.add_result(model_id, result)
-        if report_file:
-            result.write_to_file(report_file, model_id)
+        if log_writer:
+            log_writer.write_result(result, model_id)
 
     # Print result
     result_summary.print()

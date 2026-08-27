@@ -1,6 +1,5 @@
 """Utilities for pipeline scripts."""
 
-import io
 import json
 import logging
 from abc import ABC, abstractmethod
@@ -8,11 +7,13 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, TextIO
 
 from rich import print
 from rich.logging import RichHandler
 from rich.tree import Tree
+
+logger = logging.getLogger(__name__)
 
 
 def setup_logger(verbose: int) -> None:
@@ -82,6 +83,21 @@ class ErrorReason(str, Enum):
     WRITE_ERROR = "Write error"
 
 
+class PipelineStep(str, Enum):
+    """Identifiers for steps that produce pipeline logs."""
+
+    CONVERT = "convert"
+    FILTER = "filter"
+    QUERY_INDEX = "query-index"
+    INDEX_FILES = "index-files"
+    BROWSER_SEARCH = "browser-search"
+
+
+PIPELINE_STEP_ORDER = tuple(PipelineStep)
+PIPELINE_LOG_RECORD_TYPE = "pipeline_step_log"
+PIPELINE_LOG_FORMAT_VERSION = 1
+
+
 @dataclass(frozen=True, kw_only=True)
 class PipelineResult(ABC):
     """Base class for pipeline results."""
@@ -94,14 +110,14 @@ class PipelineResult(ABC):
         """Return the status string for this result."""
         pass
 
-    def get_report_entry(self, model_id: str) -> dict[str, Any]:
-        """Get a report entry for this result.
+    def get_log_entry(self, model_id: str) -> dict[str, Any]:
+        """Get a log entry for this result.
 
         Args:
             model_id: The ID of the model associated with this result
 
         Returns:
-            A dictionary representing the report entry.
+            A dictionary representing the log entry.
         """
         entry: dict[str, Any] = {
             "model_id": model_id,
@@ -110,16 +126,6 @@ class PipelineResult(ABC):
         if self.meta:
             entry["meta"] = self.meta
         return entry
-
-    def write_to_file(self, file: io.TextIOWrapper, model_id: str) -> None:
-        """Write the result as a line of JSON to the given file.
-
-        Args:
-            file: The file to write to.
-            model_id: The ID of the model associated with this result.
-        """
-        entry = self.get_report_entry(model_id)
-        file.write(json.dumps(entry) + "\n")
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -133,8 +139,8 @@ class SuccessResult(PipelineResult):
     def status(self) -> str:
         return "success"
 
-    def get_report_entry(self, model_id: str) -> dict[str, str | list[str]]:
-        entry = super().get_report_entry(model_id)
+    def get_log_entry(self, model_id: str) -> dict[str, str | list[str]]:
+        entry = super().get_log_entry(model_id)
         if self.warnings:
             entry["warnings"] = self.warnings
         return entry
@@ -150,8 +156,8 @@ class FilteredResult(PipelineResult):
     def status(self) -> str:
         return "filtered"
 
-    def get_report_entry(self, model_id: str) -> dict[str, str | list[str]]:
-        entry = super().get_report_entry(model_id)
+    def get_log_entry(self, model_id: str) -> dict[str, str | list[str]]:
+        entry = super().get_log_entry(model_id)
         entry["reason"] = self.reason.value
         return entry
 
@@ -167,12 +173,37 @@ class ErrorResult(PipelineResult):
     def status(self) -> str:
         return "error"
 
-    def get_report_entry(self, model_id: str) -> dict[str, str | list[str]]:
-        entry = super().get_report_entry(model_id)
+    def get_log_entry(self, model_id: str) -> dict[str, str | list[str]]:
+        entry = super().get_log_entry(model_id)
         entry["reason"] = self.reason.value
         if self.details:
             entry["details"] = self.details
         return entry
+
+
+class PipelineLogWriter:
+    """Writer for pipeline step logs in JSON Lines format with identifying header."""
+
+    def __init__(self, file: TextIO, step: PipelineStep) -> None:
+        if not file.name.endswith(".jsonl"):
+            logger.warning(
+                "Log file should have a .jsonl extension for JSON Lines format."
+            )
+        self.file = file
+        self.file.write(
+            json.dumps(
+                {
+                    "record_type": PIPELINE_LOG_RECORD_TYPE,
+                    "format_version": PIPELINE_LOG_FORMAT_VERSION,
+                    "step": step.value,
+                }
+            )
+            + "\n"
+        )
+
+    def write_result(self, result: PipelineResult, model_id: str) -> None:
+        """Append one model result to the log."""
+        self.file.write(json.dumps(result.get_log_entry(model_id)) + "\n")
 
 
 class ResultSummary:

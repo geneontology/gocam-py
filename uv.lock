@@ -703,6 +703,7 @@ owl = [
 [package.dev-dependencies]
 dev = [
     { name = "glom" },
+    { name = "jinja2" },
     { name = "linkml" },
     { name = "mkdocs-material" },
     { name = "mkdocs-mermaid2-plugin" },
@@ -735,6 +736,7 @@ provides-extras = ["cx2", "oaklib", "owl"]
 [package.metadata.requires-dev]
 dev = [
     { name = "glom", specifier = ">=25.12.0" },
+    { name = "jinja2", specifier = ">=3.1.6" },
     { name = "linkml", specifier = ">=1.10.0,<2" },
     { name = "mkdocs-material", specifier = ">=8.2.8,<10" },
     { name = "mkdocs-mermaid2-plugin", specifier = ">=1.1.1" },

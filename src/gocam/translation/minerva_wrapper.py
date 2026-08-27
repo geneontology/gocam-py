@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from collections.abc import Iterator
-from dataclasses import dataclass, field
+from dataclasses import InitVar, dataclass, field
 
 import requests
 from pydantic import BaseModel, Field
@@ -274,6 +274,7 @@ class MinervaTranslator:
     """
 
     minerva_obj: MinervaObject
+    minerva_view: InitVar[MinervaView | None] = None
     view: MinervaView = field(init=False)
     activities: list[Activity] = field(default_factory=list)
     activities_by_mf_id: defaultdict[str, list[Activity]] = field(
@@ -283,8 +284,8 @@ class MinervaTranslator:
     processed_facts: set[tuple[str, str, str]] = field(default_factory=set)
     translation_warnings: set[TranslationWarning] = field(default_factory=set)
 
-    def __post_init__(self):
-        self.view = MinervaView(self.minerva_obj)
+    def __post_init__(self, minerva_view: MinervaView | None):
+        self.view = minerva_view or MinervaView(self.minerva_obj)
         for individual_id in self.view.individuals_with_multiple_types:
             self.translation_warnings.add(
                 TranslationWarning(
@@ -1140,17 +1141,24 @@ class MinervaWrapper:
         return self.minerva_object_to_model(minerva_object)
 
     @staticmethod
-    def translate(minerva_obj: dict) -> TranslationResult[Model]:
+    def translate(
+        minerva_obj: dict | MinervaView,
+    ) -> TranslationResult[Model]:
         """Convert a Minerva JSON object to a GO-CAM Model.
 
         Args:
-            minerva_obj: Minerva JSON object
+            minerva_obj: Minerva JSON object or MinervaView instance
 
         Returns:
             Object containing GO-CAM Model and any translation warnings
         """
-        minerva_model = MinervaObject.model_validate(minerva_obj)
-        translator = MinervaTranslator(minerva_model)
+        if isinstance(minerva_obj, MinervaView):
+            minerva_model = minerva_obj.raw_json
+            minerva_view = minerva_obj
+        else:
+            minerva_model = MinervaObject.model_validate(minerva_obj)
+            minerva_view = None
+        translator = MinervaTranslator(minerva_model, minerva_view=minerva_view)
         return translator.translate()
 
     @staticmethod

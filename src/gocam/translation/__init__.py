@@ -1,3 +1,5 @@
+from gocam.translation.minerva_wrapper import MinervaObject as MinervaObject
+from gocam.translation.minerva_wrapper import MinervaView as MinervaView
 from gocam.translation.minerva_wrapper import MinervaWrapper as MinervaWrapper
 from gocam.translation.result import TranslationResult as TranslationResult
 from gocam.translation.result import TranslationWarning as TranslationWarning
