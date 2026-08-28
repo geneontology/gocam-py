@@ -1,11 +1,14 @@
 # Pipeline Scripts
 
-This directory contains maintained operational scripts for processing steps in the GO Release
-pipeline. Some scripts produce JSONL log files as part of their processing. Other scripts derive
-reports, summaries, quality-control outputs, or maintained data products from those log files or
-from model files.
+This directory contains maintained operational scripts for processing steps in the GO
+Release pipeline. Some scripts produce JSONL log files as part of their processing.
+Other scripts derive reports, summaries, quality-control outputs, or maintained data
+products from those log files or from model files.
 
-One-off or exploratory analyses should be added to the `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). Analyses that are ready to be integrated into the production GO Release pipeline can be re-implemented here.
+One-off or exploratory analyses should be added to the
+`gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). Analyses
+that are ready to be integrated into the production GO Release pipeline can be
+re-implemented here.
 
 ## Setup
 
@@ -19,11 +22,11 @@ uv sync --all-extras
 
 ## Running the pipeline locally
 
-The local pipeline runner reproduces the sequence of pipeline scripts used during a GO release. It
-supports full runs as well as selected stages.
+The local pipeline runner reproduces the sequence of pipeline scripts used during a GO
+release. It supports full runs as well as selected stages.
 
-Copy the example configuration and set the raw Minerva model directory. The output root directory
-defaults to `/tmp/gocam-work`, but it can also be changed in `.env`:
+Copy the example configuration and set the raw Minerva model directory. The output root
+directory defaults to `/tmp/gocam-work`, but it can also be changed in `.env`:
 
 ```bash
 cp .env.example .env
@@ -40,28 +43,30 @@ Run all stages in pipeline order:
 ./pipeline/run_pipeline.sh
 ```
 
-Run an arbitrary subset of stages. Selected stages always run in pipeline order, regardless of the
-order in which they are listed:
+Run an arbitrary subset of stages. Selected stages always run in pipeline order,
+regardless of the order in which they are listed:
 
 ```bash
 ./pipeline/run_pipeline.sh --steps index,stats
 ```
 
-Available stages are `convert`, `filter`, `index`, `index-files`, `browser-search`, `stats`, and
-`summary`. A selected stage uses existing upstream outputs when the upstream stage is not selected.
-The runner fails before processing if a required input is unavailable.
+Available stages are `convert`, `filter`, `index`, `index-files`, `browser-search`,
+`stats`, and
+`summary`. A selected stage uses existing upstream outputs when the upstream stage is
+not selected. The runner fails before processing if a required input is unavailable.
 
-By default, the runner preserves the overall output root directory and replaces only the outputs
-owned by selected stages. Use `--clean` to remove the entire output root directory before running,
-or `--dry-run` to inspect the planned cleanup and commands without changing files:
+By default, the runner preserves the overall output root directory and replaces only the
+outputs owned by selected stages. Use `--clean` to remove the entire output root
+directory before running, or `--dry-run` to inspect the planned cleanup and commands
+without changing files:
 
 ```bash
 ./pipeline/run_pipeline.sh --clean
 ./pipeline/run_pipeline.sh --dry-run --steps filter,index
 ```
 
-Configuration precedence is command-line option, exported environment variable, `.env`, then the
-default value (where one exists):
+Configuration precedence is command-line option, exported environment variable, `.env`,
+then the default value (where one exists):
 
 ```bash
 ./pipeline/run_pipeline.sh \
@@ -215,6 +220,7 @@ Generates the following JSON index files in the output directory:
 - `provided_by_index.json`
 - `source_index.json`
 - `taxon_index.json`
+- `all_index.json`
 
 **Options:**
 
@@ -268,15 +274,19 @@ was collected from the full translated model or only from top-level Minerva anno
 Each JSONL pipeline log is self-describing. Its first line is a required header:
 
 ```json
-{"record_type":"pipeline_step_log","format_version":1,"step":"convert"}
+{
+  "record_type": "pipeline_step_log",
+  "format_version": 1,
+  "step": "convert"
+}
 ```
 
 The remaining lines contain per-model results. The supported step identifiers, in
 canonical pipeline order, are `convert`, `filter`, `query-index`, `index-files`, and
 `browser-search`. Log filenames do not determine processing order and may be chosen by
 the caller. A directory may contain any subset of steps, but it may not contain multiple
-logs for the same step. Missing or invalid headers, unsupported format versions,
-unknown steps, and duplicate steps are rejected.
+logs for the same step. Missing or invalid headers, unsupported format versions, unknown
+steps, and duplicate steps are rejected.
 
 **Inputs:**
 
@@ -285,12 +295,14 @@ unknown steps, and duplicate steps are rejected.
 
 **Options:**
 
-- `--metadata`: Additional info to include in reports, in 'Key=Value' format.
-  Can be used multiple times.
+- `--metadata`: Additional info to include in reports, in 'Key=Value' format. Can be
+  used multiple times.
 - `--excel-output`: File to write the generated Excel summary to (must have `.xlsx`
   extension)
 - `--html-output-dir`: Directory in which to write an HTML report index and one
   pipeline-result report of production GO-CAM-like models per providing group.
+- `--html-index-filename`: Filename for the generated HTML index file (default:
+  `index.html`)
 - `--goc-users-yaml`: YAML file defining GOC users. If omitted, the file at
   `https://current.geneontology.org/metadata/users.yaml` is downloaded and cached.
 - `--goc-groups-yaml`: YAML file defining GOC groups. If omitted, the file at
@@ -309,13 +321,13 @@ python pipeline/generate_log_summary.py \
   --metadata "Release date=1970-01-01"
 ```
 
-The HTML output contains an `index.html` linking to each providing-group report. Group
-pages show production GO-CAM-like model counts by pipeline result (`success`, `filtered`,
-or `error`) and list every production GO-CAM-like model—that is, every production model
-that was processed by the `filter` pipeline step—including any warnings. A model
-associated with multiple groups appears in each applicable report; production GO-CAM-like
-models without group metadata appear in an Unassigned report. The Excel output continues
-to include results for all models.
+The HTML output contains an index page (`index.html` by default) linking to each
+providing-group report. Group pages show production GO-CAM-like model counts by pipeline
+result (`success`,`filtered`, or `error`) and list every production GO-CAM-like
+model—that is, every production model that was processed by the `filter` pipeline
+step—including any warnings. A model associated with multiple groups appears in each
+applicable report; production GO-CAM-like models without group metadata appear in an
+Unassigned report. The Excel output continues to include results for all models.
 
 ## output_stats_for_gocam_models.py
 
