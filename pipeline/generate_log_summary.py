@@ -721,9 +721,10 @@ def main(
         raise typer.BadParameter("HTML index filename must have .html extension.")
 
     if (
-        html_index_filename.startswith("/")
-        or html_index_filename.startswith("..")
+        html_index_filename.startswith("..")
         or "/" in html_index_filename
+        or "\\" in html_index_filename
+        or ":" in html_index_filename
     ):
         raise typer.BadParameter(
             "HTML index filename must be a simple filename, not a path."
@@ -795,7 +796,10 @@ def main(
         if not any(log.step == PipelineStep.CONVERT for log in step_logs):
             logger.warning("No CONVERT step log found; HTML reports may be incomplete.")
         reports = build_group_reports(model_summaries)
-        if any(report.filename == html_index_filename for report in reports):
+        if any(
+            report.filename.casefold() == html_index_filename.casefold()
+            for report in reports
+        ):
             raise typer.BadParameter(
                 f"HTML index filename '{html_index_filename}' conflicts with a group report filename."
             )
