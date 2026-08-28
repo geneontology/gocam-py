@@ -3,7 +3,7 @@
 {% block title %}GO-CAM-like Models Report — {{ report.group.label }}{% endblock %}
 
 {% block body %}
-  <p><a href="index.html">&larr; All groups</a></p>
+  <p><a href="{{ index_filename | urlencode }}">&larr; All groups</a></p>
   <h1>GO-CAM-like Models Report — {{ report.group.label }}</h1>
   <ul class="summary">
     <li>

@@ -608,10 +608,12 @@ def render_excel_summary(
     return wb
 
 
-def render_group_report(report: GroupReport, *, metadata: dict[str, str]) -> str:
+def render_group_report(
+    report: GroupReport, *, metadata: dict[str, str], index_filename: str
+) -> str:
     """Render production GO-CAM-like model results for one providing group."""
     return _HTML_ENVIRONMENT.get_template("group.html.jinja2").render(
-        report=report, metadata=metadata
+        report=report, metadata=metadata, index_filename=index_filename
     )
 
 
@@ -678,6 +680,12 @@ def main(
             help="Directory to write static HTML reports to.",
         ),
     ] = None,
+    html_index_filename: Annotated[
+        str,
+        typer.Option(
+            help="Filename for the generated HTML index file (default: index.html).",
+        ),
+    ] = "index.html",
     goc_users_yaml: Annotated[
         Path | None,
         typer.Option(
@@ -708,6 +716,19 @@ def main(
 
     if excel_output and not excel_output.name.endswith(".xlsx"):
         raise typer.BadParameter("Output file must have .xlsx extension.")
+
+    if not html_index_filename.endswith(".html"):
+        raise typer.BadParameter("HTML index filename must have .html extension.")
+
+    if (
+        html_index_filename.startswith("..")
+        or "/" in html_index_filename
+        or "\\" in html_index_filename
+        or ":" in html_index_filename
+    ):
+        raise typer.BadParameter(
+            "HTML index filename must be a simple filename, not a path."
+        )
 
     step_logs = discover_step_logs(logs_dir, log_file_extension)
     if not step_logs:
@@ -775,18 +796,29 @@ def main(
         if not any(log.step == PipelineStep.CONVERT for log in step_logs):
             logger.warning("No CONVERT step log found; HTML reports may be incomplete.")
         reports = build_group_reports(model_summaries)
+        if any(
+            report.filename.casefold() == html_index_filename.casefold()
+            for report in reports
+        ):
+            raise typer.BadParameter(
+                f"HTML index filename '{html_index_filename}' conflicts with a group report filename."
+            )
         html_output_dir.mkdir(parents=True, exist_ok=True)
         with Progress() as progress:
             task = progress.add_task(
                 description="Writing HTML reports...", total=len(reports) + 1
             )
-            (html_output_dir / "index.html").write_text(
+            (html_output_dir / html_index_filename).write_text(
                 render_group_index(reports, metadata=metadata_dict), encoding="utf-8"
             )
             progress.advance(task, 1)
             for report in reports:
                 (html_output_dir / report.filename).write_text(
-                    render_group_report(report, metadata=metadata_dict),
+                    render_group_report(
+                        report,
+                        metadata=metadata_dict,
+                        index_filename=html_index_filename,
+                    ),
                     encoding="utf-8",
                 )
                 progress.advance(task, 1)
