@@ -1,5 +1,6 @@
 import json
 import re
+import warnings
 
 import pytest
 
@@ -49,6 +50,89 @@ def test_api(model_local_id):
     mw = MinervaWrapper()
     model = mw.fetch_model(model_local_id)
     assert model is not None
+
+
+def test_fetch_model_is_deprecated(monkeypatch):
+    wrapper = MinervaWrapper()
+    minerva_object = load_minerva_object("663d668500002178")
+    monkeypatch.setattr(
+        wrapper, "fetch_minerva_object", lambda model_id: minerva_object
+    )
+
+    with pytest.warns(DeprecationWarning, match="GoCamClient.fetch_model"):
+        model = wrapper.fetch_model("663d668500002178")
+
+    assert model.id == "gomodel:663d668500002178"
+
+
+def test_models_ids_is_deprecated_once(requests_mock):
+    wrapper = MinervaWrapper()
+    requests_mock.get(
+        wrapper.gocam_index_url,
+        json=[{"gocam": "http://model.geneontology.org/663d668500002178"}],
+    )
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        model_ids = wrapper.models_ids()
+
+    deprecations = [w for w in caught if issubclass(w.category, DeprecationWarning)]
+    assert len(deprecations) == 1
+    assert "GoCamClient.fetch_model_ids" in str(deprecations[0].message)
+
+    with warnings.catch_warnings(record=True) as consumed:
+        warnings.simplefilter("always")
+        assert list(model_ids) == ["663d668500002178"]
+
+    assert not [w for w in consumed if issubclass(w.category, DeprecationWarning)]
+
+
+def test_models_is_deprecated_once(requests_mock):
+    wrapper = MinervaWrapper()
+    model_id = "663d668500002178"
+    requests_mock.get(
+        wrapper.gocam_index_url,
+        json=[{"gocam": f"http://model.geneontology.org/{model_id}"}],
+    )
+    requests_mock.get(
+        f"{wrapper.gocam_endpoint_base}{model_id}",
+        json=load_minerva_object(model_id),
+    )
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        models_iterator = wrapper.models()
+
+    deprecations = [w for w in caught if issubclass(w.category, DeprecationWarning)]
+    assert len(deprecations) == 1
+    assert "GoCamClient.iter_models" in str(deprecations[0].message)
+
+    with warnings.catch_warnings(record=True) as consumed:
+        warnings.simplefilter("always")
+        models = list(models_iterator)
+
+    assert not [w for w in consumed if issubclass(w.category, DeprecationWarning)]
+    assert models[0].id == f"gomodel:{model_id}"
+
+
+def test_explicit_minerva_operations_are_not_deprecated(requests_mock):
+    wrapper = MinervaWrapper()
+    model_id = "663d668500002178"
+    minerva_object = load_minerva_object(model_id)
+    requests_mock.get(
+        f"{wrapper.gocam_endpoint_base}{model_id}",
+        json=minerva_object,
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        fetched = wrapper.fetch_minerva_object(model_id)
+        translation = wrapper.translate(minerva_object)
+        converted = wrapper.minerva_object_to_model(minerva_object)
+
+    assert fetched["id"] == f"gomodel:{model_id}"
+    assert translation.result.id == f"gomodel:{model_id}"
+    assert converted.id == f"gomodel:{model_id}"
 
 
 @pytest.mark.parametrize("id", ["663d668500002178", "5b91dbd100002057"])

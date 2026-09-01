@@ -1,12 +1,13 @@
 # gocam
 
-`gocam` is a Python data model and command-line interface for working with Gene Ontology Causal
-Activity Models (GO-CAMs). It provides Pydantic models for validated GO-CAM data, tools for fetching
-published models, and optional translations to formats such as CX2 and gene-centered networks.
+`gocam` is a Python data model and command-line interface for working with Gene Ontology
+Causal Activity Models (GO-CAMs). It provides Pydantic models for validated GO-CAM data,
+tools for fetching published models, and optional translations to formats such as CX2
+and gene-centered networks.
 
 Learn more about
-[GO-CAMs](https://geneontology.org/docs/go-annotations/#go-causal-activity-models) or explore
-published models in the [GO-CAM browser](https://geneontology.org/go-cam).
+[GO-CAMs](https://geneontology.org/docs/go-annotations/#go-causal-activity-models) or
+explore published models in the [GO-CAM browser](https://geneontology.org/go-cam).
 
 ## Installation
 
@@ -26,12 +27,14 @@ Fetch a published model as YAML from the command line:
 gocam fetch 5b91dbd100002057 > model.yaml
 ```
 
-Fetch and translate a published model from Python:
+Published models are fetched from GO Release data.
+
+Fetch a published model from Python:
 
 ```python
-from gocam.translation import MinervaWrapper
+from gocam import GoCamClient
 
-model = MinervaWrapper().fetch_model("5b91dbd100002057")
+model = GoCamClient().fetch_model("5b91dbd100002057")
 print(model.title)
 ```
 
@@ -46,8 +49,9 @@ model = Model.model_validate_json(Path("model.json").read_text())
 print(model.id)
 ```
 
-See the [getting-started guide](https://geneontology.github.io/gocam-py/getting-started/) for JSON
-output, local YAML loading, serialization, and more complete examples.
+See
+the [getting-started guide](https://geneontology.github.io/gocam-py/getting-started/)
+for JSON output, local YAML loading, serialization, and more complete examples.
 
 ## Documentation
 
@@ -58,12 +62,13 @@ output, local YAML loading, serialization, and more complete examples.
 
 ## Development
 
-The source schema is `src/gocam/schema/gocam.yaml`. This repository also contains reusable Python
-code and internal scripts used by the GO Release pipeline. One-off and exploratory analyses belong
-in the [`gocam-analysis` repository](https://github.com/geneontology/gocam-analysis).
+The source schema is `src/gocam/schema/gocam.yaml`. This repository also contains
+reusable Python code and internal scripts used by the GO Release pipeline. One-off and
+exploratory analyses belong in the [
+`gocam-analysis` repository](https://github.com/geneontology/gocam-analysis).
 
-Install [uv](https://docs.astral.sh/uv/), clone the repository, and create the complete development
-environment:
+Install [uv](https://docs.astral.sh/uv/), clone the repository, and create the complete
+development environment:
 
 ```bash
 git clone https://github.com/geneontology/gocam-py.git
@@ -72,8 +77,8 @@ uv sync --all-extras
 ```
 
 CX2-related development requires
-[Graphviz](https://pygraphviz.github.io/documentation/stable/install.html#recommended) to be
-installed on the system before syncing the optional dependencies.
+[Graphviz](https://pygraphviz.github.io/documentation/stable/install.html#recommended)
+to be installed on the system before syncing the optional dependencies.
 
 Run the standard project checks:
 
@@ -91,5 +96,6 @@ make gen-project
 make gendoc
 ```
 
-The generated `project/` directory is disposable local output. Versioned generated schema artifacts
-are distributed through [GitHub Releases](https://github.com/geneontology/gocam-py/releases).
+The generated `project/` directory is disposable local output. Versioned generated
+schema artifacts are distributed
+through [GitHub Releases](https://github.com/geneontology/gocam-py/releases).
