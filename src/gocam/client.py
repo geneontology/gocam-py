@@ -18,8 +18,13 @@ class GoCamClient:
     """Client for JSON-serialized standard format models in GO Release data."""
 
     base_url: str = DEFAULT_GO_CAM_BASE_URL
+    """Base URL for GO-CAM model data. Defaults to the current release."""
+
     session: requests.Session = field(default_factory=requests.Session)
+    """Requests session for HTTP requests. Defaults to a new session."""
+
     timeout: float = 30.0
+    """Timeout in seconds for HTTP requests. Defaults to 30 seconds."""
 
     def fetch_model(self, model_id: str) -> Model:
         """Fetch one GO-CAM model."""

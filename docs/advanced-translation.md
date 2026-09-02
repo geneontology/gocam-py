@@ -1,8 +1,9 @@
-# Advanced translation
+# Advanced Translation
 
 The base `gocam` package supports fetching and loading GO-CAM models. This page covers
-optional translations for CX2 and gene-centered causal networks. Start with
-[Getting started](getting-started.md) if you have not yet loaded a model.
+optional translations for CX2 and gene-centered causal networks. Start with the
+[Introduction](index.md#fetch-a-published-model-with-python) if you have not yet loaded
+a model.
 
 ## CX2 conversion
 
@@ -19,7 +20,7 @@ to be installed on the system. Graphviz 2.46 or later is recommended.
 Convert a local JSON or YAML model with the CLI:
 
 ```bash
-gocam convert --output-format cx2 model.yaml > model.cx2.json
+gocam convert --output-format cx2 model.yaml > model.cx2
 ```
 
 The input format is inferred from the filename. Run `gocam convert --help` for explicit

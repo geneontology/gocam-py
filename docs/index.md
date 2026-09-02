@@ -1,8 +1,10 @@
-# Getting started
+# Introduction
 
-The `gocam` package provides Pydantic models and a command-line interface for working
-with Gene Ontology Causal Activity Models (GO-CAMs). See
-the [GO-CAM overview](https://geneontology.org/docs/go-annotations/#go-causal-activity-models)
+The `gocam` package defines a [LinkML schema](schema/index.md) for representing Gene
+Ontology Causal Activity Models (GO-CAMs) and provides Pydantic models and a
+command-line interface for working with GO-CAM data.
+
+See the [GO-CAM overview](https://geneontology.org/docs/gocam-overview/)
 for background on the model and use
 the [GO-CAM Browser](https://geneontology.org/go-cam) to explore published models.
 
@@ -14,9 +16,9 @@ Install the package from PyPI:
 pip install gocam
 ```
 
-This installs both the Python package and the `gocam` command.
+This installs both the Python package and the `gocam` CLI.
 
-## Fetch a published model from the command line
+## Fetch a published model with the CLI
 
 The `fetch` command retrieves GO-CAM data from GO Releases. The current release's data
 is used by default. YAML is the default output format:
@@ -41,7 +43,7 @@ gocam fetch \
 
 Run `gocam fetch --help` for all fetch options.
 
-## Fetch a published model from Python
+## Fetch a published model with Python
 
 The `GoCamClient` class retrieves GO-CAM data from GO Releases. The current release's
 data is used by default.
@@ -110,6 +112,6 @@ Convert it back to JSON-compatible Python values with Pydantic:
 model_data = model.model_dump(mode="json", exclude_none=True)
 ```
 
-See the [schema reference](index.md) for all model classes and fields. For CX2,
+See the [schema reference](schema/index.md) for all model classes and fields. For CX2,
 gene-to-gene, and NetworkX workflows, continue
 to [Advanced translation](advanced-translation.md).

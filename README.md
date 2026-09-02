@@ -49,14 +49,13 @@ model = Model.model_validate_json(Path("model.json").read_text())
 print(model.id)
 ```
 
-See
-the [getting-started guide](https://geneontology.github.io/gocam-py/getting-started/)
+See the [full documentation](https://geneontology.github.io/gocam-py/)
 for JSON output, local YAML loading, serialization, and more complete examples.
 
 ## Documentation
 
-- [Getting started](https://geneontology.github.io/gocam-py/getting-started/)
-- [Generated schema reference](https://geneontology.github.io/gocam-py/)
+- [Introduction](https://geneontology.github.io/gocam-py/)
+- [Generated schema reference](https://geneontology.github.io/gocam-py/schema/)
 - [Advanced translation](https://geneontology.github.io/gocam-py/advanced-translation/)
 - [Versioned schema artifacts](https://github.com/geneontology/gocam-py/releases)
 

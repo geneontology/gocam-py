@@ -1084,8 +1084,8 @@ class MinervaWrapper:
     def models(self) -> Iterator[Model]:
         """Iterate over translated models from the legacy Minerva source.
 
-        .. deprecated::
-           Use :meth:`GoCamClient.iter_models` instead.
+        Warning: Deprecated since 0.13.0
+           Use `GoCamClient.iter_models` instead.
 
         This method fetches the list of all GO-CAM models from the index URL. For each model, the
         Minerva JSON object is fetched and converted to a Model object.
@@ -1109,8 +1109,8 @@ class MinervaWrapper:
     def models_ids(self) -> Iterator[str]:
         """Iterate over GO-CAM IDs from the legacy Minerva index.
 
-        .. deprecated::
-           Use :meth:`GoCamClient.fetch_model_ids` instead.
+        Warning: Deprecated since 0.13.0
+           Use `GoCamClient.fetch_model_ids` instead.
 
         This method fetches the list of all GO-CAM models from the index URL and returns an
         iterator over the IDs of each model.
@@ -1155,8 +1155,8 @@ class MinervaWrapper:
     def fetch_model(self, gocam_id: str) -> Model:
         """Fetch and translate a model from the legacy Minerva source.
 
-        .. deprecated::
-           Use :meth:`GoCamClient.fetch_model` instead.
+        Warning: Deprecated since 0.13.0
+           Use `GoCamClient.fetch_model` instead.
 
         Args:
             gocam_id: GO-CAM ID
