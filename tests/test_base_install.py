@@ -11,6 +11,7 @@ import json
 import networkx as nx
 import pytest
 import yaml
+from click import unstyle
 from typer.testing import CliRunner
 
 from gocam import __version__
@@ -133,8 +134,10 @@ def test_fetch_rejects_base_url_with_as_minerva(runner, app):
     )
 
     assert result.exit_code == 2
-    assert "--base-url" in result.stderr
-    assert "--as-minerva" in result.stderr
+
+    stderr = unstyle(result.stderr)
+    assert "--base-url" in stderr
+    assert "--as-minerva" in stderr
 
 
 def test_fetch_all_as_minerva_uses_legacy_index(runner, app, requests_mock):
