@@ -332,7 +332,7 @@ python pipeline/generate_log_summary.py \
 
 The HTML output contains an index page (`index.html` by default) linking to each
 providing-group report. Group pages show production GO-CAM-like model counts by pipeline
-result (`success`,`filtered`, or `error`) and list every production GO-CAM-like
+result (`success`, `filtered`, or `error`) and list every production GO-CAM-like
 model—that is, every production model that was processed by the `filter` pipeline
 step—including any warnings. A model associated with multiple groups appears in each
 applicable report; production
