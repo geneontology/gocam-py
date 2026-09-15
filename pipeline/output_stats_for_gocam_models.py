@@ -30,6 +30,7 @@ import json
 import logging
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import (
     Annotated,
@@ -55,6 +56,7 @@ from _common import (
     get_json_files,
     setup_logger,
 )
+from oaklib.datamodels.vocabulary import IS_A
 from pydantic import BaseModel, ConfigDict
 from rich import print
 from rich.progress import track
@@ -659,6 +661,11 @@ def _collect_terms(
         term = association.term
         if not term or not term.upper().startswith("GO:"):
             continue
+        # Protein complexes are cellular component terms, but they describe what
+        # carries out an activity rather than where it happens, so counting them
+        # inflates the CC totals. See go-site issue #2678.
+        if is_protein_complex_term(term):
+            continue
         if stats_by_model.list_go_terms is not None:
             stats_by_model.list_go_terms.append(term)
         if model_aggregate.list_go_terms is not None:
@@ -829,6 +836,33 @@ def _collect_labels(
         label = getattr(obj, "label", None)
         if label:
             id_label_lookup[obj_id] = label
+
+
+# "protein-containing complex" in the GO cellular component aspect. Its is_a
+# descendants are the protein complex terms; GO-CAM uses them both as activity
+# enablers and, occasionally, as occurs_in/part_of locations.
+PROTEIN_COMPLEX_ROOT = "GO:0032991"
+
+
+@lru_cache(maxsize=1)
+def get_protein_complex_terms() -> frozenset[str]:
+    """Return every GO cellular component term that is a protein complex.
+
+    Resolved once from the GO hierarchy as ``GO:0032991`` plus its ``is_a``
+    descendants. Non-GO descendants (the GO SQLite build reaches a few PRO
+    terms) are dropped, which also drops the only descendants that are not in
+    the cellular component aspect.
+
+    Returns:
+        A frozenset of GO CURIEs considered protein complexes.
+    """
+    terms = Indexer().go_adapter.descendants([PROTEIN_COMPLEX_ROOT], predicates=[IS_A])
+    return frozenset(t for t in terms if t and t.upper().startswith("GO:"))
+
+
+def is_protein_complex_term(term: str | None) -> bool:
+    """Return True if ``term`` is a protein complex cellular component term."""
+    return bool(term) and term in get_protein_complex_terms()
 
 
 def process_gocam_model_file(
