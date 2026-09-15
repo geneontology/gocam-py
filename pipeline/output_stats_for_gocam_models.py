@@ -74,7 +74,12 @@ from gocam.datamodel import (
     TermAssociation,
 )
 from gocam.indexing.indexer import Indexer
-from gocam.utils import all_activity_inputs, all_activity_outputs, all_associations
+from gocam.utils import (
+    IMPLICIT_CAUSAL_ASSOCIATION_CHAINS,
+    all_activity_inputs,
+    all_activity_outputs,
+    all_associations,
+)
 
 app = typer.Typer()
 
@@ -750,8 +755,16 @@ def _compute_inferred_relations(
 ) -> list[dict[str, Any]]:
     """Compute inferred relations between activities based on shared chemicals.
 
-    An inferred relation exists when activity A produces chemical outputs that
-    are consumed as inputs by activity B.
+    An inferred relation exists when activity A attaches a chemical to a
+    molecular association whose predicate is the upstream half of one of the
+    chains in ``IMPLICIT_CAUSAL_ASSOCIATION_CHAINS``, and activity B attaches
+    the same chemical using the matching downstream predicate. That covers the
+    plain output-to-input case as well as output to small molecule
+    regulator/activator/inhibitor (see go-site issue #2741).
+
+    Chemicals are compared by their resolved CHEBI term rather than by the
+    molecule node, so two activities referring to the same chemical through
+    different molecule individuals still connect.
 
     Args:
         activities: List of Activity objects from a GO-CAM model.
@@ -762,42 +775,44 @@ def _compute_inferred_relations(
         A deduplicated list of dicts, each with keys activity_a, activity_a_genes,
         activity_b, and activity_b_genes.
     """
-    # Build per-activity chemical input and output sets
-    activity_chem_outputs: dict[str, set[str]] = {}
-    activity_chem_inputs: dict[str, set[str]] = {}
+    # Chemicals each activity attaches under each predicate that takes part in a chain
+    chain_predicates = {
+        p for chain in IMPLICIT_CAUSAL_ASSOCIATION_CHAINS for p in chain
+    }
+    chemicals_by_activity_and_predicate: dict[str, dict[str, set[str]]] = {}
     activity_genes: dict[str, list[str]] = {}
 
     for activity in activities:
         activity_genes[activity.id] = _get_activity_genes(activity, obsolete_ids)
+        by_predicate: dict[str, set[str]] = {}
+        for predicate in chain_predicates:
+            terms = _get_chemical_terms(
+                [
+                    ma
+                    for ma in activity.molecular_associations or []
+                    if ma.predicate == predicate
+                ],
+                obsolete_ids,
+                molecule_lookup,
+            )
+            if terms:
+                by_predicate[predicate] = terms
+        if by_predicate:
+            chemicals_by_activity_and_predicate[activity.id] = by_predicate
 
-        outputs = _get_chemical_terms(
-            all_activity_outputs(activity),
-            obsolete_ids,
-            molecule_lookup,
-        )
-        if outputs:
-            activity_chem_outputs[activity.id] = outputs
-
-        inputs = _get_chemical_terms(
-            all_activity_inputs(activity),
-            obsolete_ids,
-            molecule_lookup,
-        )
-        if inputs:
-            activity_chem_inputs[activity.id] = inputs
-
-    # Find pairs where A's outputs overlap with B's inputs
+    # Find pairs whose chemicals overlap across a declared predicate chain
     relations: list[dict[str, Any]] = []
     seen: set[tuple[str, str]] = set()
 
-    for a_id, a_outputs in activity_chem_outputs.items():
-        for b_id, b_inputs in activity_chem_inputs.items():
-            if a_id == b_id:
+    for a_id, a_by_predicate in chemicals_by_activity_and_predicate.items():
+        for b_id, b_by_predicate in chemicals_by_activity_and_predicate.items():
+            if a_id == b_id or (a_id, b_id) in seen:
                 continue
-            if a_outputs & b_inputs:
-                pair = (a_id, b_id)
-                if pair not in seen:
-                    seen.add(pair)
+            for upstream, downstream in IMPLICIT_CAUSAL_ASSOCIATION_CHAINS:
+                if a_by_predicate.get(upstream, set()) & b_by_predicate.get(
+                    downstream, set()
+                ):
+                    seen.add((a_id, b_id))
                     relations.append(
                         {
                             "activity_a": a_id,
@@ -806,6 +821,7 @@ def _compute_inferred_relations(
                             "activity_b_genes": activity_genes.get(b_id, []),
                         }
                     )
+                    break
 
     return relations
 
