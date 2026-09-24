@@ -14,9 +14,13 @@ of status. Statistics include:
 - GO term counts (total and unique)
 - Reference and PMID counts
 - Inferred relation counts: An inferred relation is identified when an
-  activity A produces chemical outputs (CHEBI terms) that are consumed as
-  inputs by another activity B. Each inferred relation records the pair of
-  activity IDs along with the genes that enable each activity.
+  activity A attaches a molecule node that another activity B also attaches
+  under a matching predicate -- output to input, or output to small molecule
+  regulator/activator/inhibitor. Matching is on the molecule node the curator
+  drew, so activities that merely reference the same term through separate
+  nodes are not related, and the counts match the model graph rendered by
+  AmiGO and Noctua. Each inferred relation records the pair of activity IDs
+  along with the genes that enable each activity.
 
 Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
@@ -748,23 +752,63 @@ def _get_activity_genes(
     return genes
 
 
+def _get_molecule_ids(
+    molecular_associations: Collection[MoleculeAssociation],
+    obsolete_ids: set[str],
+    molecule_lookup: Dict[str, str] | None = None,
+) -> set[str]:
+    """Extract the molecule node IDs a set of associations points at.
+
+    Unlike ``_get_chemical_terms`` this returns the molecule *individual* each
+    association points at rather than the term it resolves to, and keeps
+    non-CHEBI molecules (gene products and complexes act as mediators too).
+    Two activities share an ID here only when the curator attached them to the
+    same molecule node, which is what makes the relation counts agree with the
+    model graph.
+
+    Args:
+        molecular_associations: List of MoleculeAssociation objects from an activity.
+        obsolete_ids: Set of object IDs marked as obsolete.
+        molecule_lookup: Optional mapping of molecule IDs to canonical IDs.
+
+    Returns:
+        A set of molecule node IDs.
+    """
+    ids: set[str] = set()
+    for ma in molecular_associations:
+        molecule_id = ma.molecule
+        if not molecule_id or molecule_id in obsolete_ids:
+            continue
+        resolved = (
+            molecule_lookup.get(molecule_id, molecule_id)
+            if molecule_lookup
+            else molecule_id
+        )
+        if resolved and resolved not in obsolete_ids:
+            ids.add(molecule_id)
+    return ids
+
+
 def _compute_inferred_relations(
     activities: list[Activity],
     obsolete_ids: set[str],
     molecule_lookup: Dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Compute inferred relations between activities based on shared chemicals.
+    """Compute inferred relations between activities that share a molecule node.
 
-    An inferred relation exists when activity A attaches a chemical to a
-    molecular association whose predicate is the upstream half of one of the
+    An inferred relation exists when activity A attaches a chemical molecule to
+    a molecular association whose predicate is the upstream half of one of the
     chains in ``IMPLICIT_CAUSAL_ASSOCIATION_CHAINS``, and activity B attaches
-    the same chemical using the matching downstream predicate. That covers the
+    the same molecule using the matching downstream predicate. That covers the
     plain output-to-input case as well as output to small molecule
     regulator/activator/inhibitor (see go-site issue #2741).
 
-    Chemicals are compared by their resolved CHEBI term rather than by the
-    molecule node, so two activities referring to the same chemical through
-    different molecule individuals still connect.
+    Molecules are matched on the molecule *individual*, not on the term it
+    resolves to, so only connections the curator actually drew are counted:
+    two activities referencing the same chemical through separate molecule
+    nodes are not related here. Every molecule mediates, chemical or not. The
+    result is the set of molecule-mediated edges in the model graph, so the
+    counts agree with what AmiGO and Noctua render for the model.
 
     Args:
         activities: List of Activity objects from a GO-CAM model.
@@ -775,7 +819,7 @@ def _compute_inferred_relations(
         A deduplicated list of dicts, each with keys activity_a, activity_a_genes,
         activity_b, and activity_b_genes.
     """
-    # Chemicals each activity attaches under each predicate that takes part in a chain
+    # Molecule nodes each activity attaches under each predicate in a chain
     chain_predicates = {
         p for chain in IMPLICIT_CAUSAL_ASSOCIATION_CHAINS for p in chain
     }
@@ -786,7 +830,7 @@ def _compute_inferred_relations(
         activity_genes[activity.id] = _get_activity_genes(activity, obsolete_ids)
         by_predicate: dict[str, set[str]] = {}
         for predicate in chain_predicates:
-            terms = _get_chemical_terms(
+            molecule_ids = _get_molecule_ids(
                 [
                     ma
                     for ma in activity.molecular_associations or []
@@ -795,8 +839,8 @@ def _compute_inferred_relations(
                 obsolete_ids,
                 molecule_lookup,
             )
-            if terms:
-                by_predicate[predicate] = terms
+            if molecule_ids:
+                by_predicate[predicate] = molecule_ids
         if by_predicate:
             chemicals_by_activity_and_predicate[activity.id] = by_predicate
 
