@@ -1,0 +1,195 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Generate GO-CAM information",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/pipeline/convert_minerva_models_to_gocam_models.py",
+            "console": "integratedTerminal",
+            "args" : [
+            "--verbose",
+            "--input-dir",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_test_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/noctua_in_json_format",
+            //"/home/muruganu/projects/geneontology/downloads/20260224_test_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_go_cam_stats/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9_after_label_change/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260129_published_go_cam/noctua_files",
+            //"/home/muruganu/projects/geneontology/downloads/20260319_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260324_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260326_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/snapshot_2026_03_12/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260325/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260501_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260505_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260512_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250512/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260513_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260514_set_of_9/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250514/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612_test_set_9_20260601/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/release_20260519_test_set_9_20260612/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260619/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260714/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_9_20260714/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_10_20260720/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260720/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_11_20260728/noctua_in_json",
+            //"/home/muruganu/projects/geneontology/downloads/20260805_release_stats_20260914/noctua_in_json",
+            "/home/muruganu/projects/geneontology/downloads/20260805_release_test_set_11_20260915/noctua_in_json",
+            "--output-dir",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_test_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/go_cam_test_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260224_test_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_go_cam_stats/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9_after_label_change/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/2026_0129_go_cam_stats/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260319_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260324_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260326_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/snapshot_2026_03_12/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260325/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260501_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260505_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260512_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250512/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260513_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260514_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250514/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612_test_set_9_20260601/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/release_20260519_test_set_9_20260612/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260619/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260714/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_9_20260714/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_10_20260720/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260720/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_11_20260728/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260805_release_stats_20260914/go_cam_input",
+            "/home/muruganu/projects/geneontology/downloads/20260805_release_test_set_11_20260915/go_cam_input",
+            "--log-file",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_test_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260226_go_cam_stats/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/go_cam_test_input/noctua_conversion_info.txt",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_go_cam_stats/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9_after_label_change/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260319_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260324_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260326_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/snapshot_2026_03_12/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260325/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260501_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260505_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260512_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250512/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260513_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260514_set_of_9/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250514/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612_test_set_9_20260601/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/release_20260519_test_set_9_20260612/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260619/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260714/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_9_20260714/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_10_20260720/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260720/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_11_20260728/noctua_conversion_info.txt"
+            //"/home/muruganu/projects/geneontology/downloads/20260805_release_stats_20260914/noctua_conversion_info.jsonl"
+            "/home/muruganu/projects/geneontology/downloads/20260805_release_test_set_11_20260915/noctua_conversion_info.jsonl"
+            ]
+        },
+        {
+         "name": "Generate statistics information",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/pipeline/output_stats_for_gocam_models.py",
+            "console": "integratedTerminal",
+            "args" : [
+            "--input-dir",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_test_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/go_cam_test_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260224_test_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_go_cam_stats/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9_after_label_change/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260129_test_set_of_7/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260319_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260324_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260326_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/snapshot_2026_03_12/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260325/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260501_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260505_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260512_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250512/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260513_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260514_set_of_9/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250514/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612_test_set_9_20260601/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/release_20260519_test_set_9_20260612/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260619/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260714/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_9_20260714/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_10_20260720/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260720/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_11_20260728/go_cam_input",
+            //"/home/muruganu/projects/geneontology/downloads/20260805_release_stats_20260914/go_cam_input",
+            "/home/muruganu/projects/geneontology/downloads/20260805_release_test_set_11_20260915/go_cam_input",
+            "--output-dir",
+            //"/home/muruganu/projects/geneontology/downloads/20260304_test_set_of_9/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/go_cam_test_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260224_test_set_of_9/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260304_go_cam_stats/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260217_test_set_of_9_after_label_change/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260129_test_set_of_7/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260319_set_of_9/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260324_set_of_9/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260326_set_of_9/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/snapshot_2026_03_12/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260325/go_cam_stats_output"]
+            //"/home/muruganu/projects/geneontology/downloads/20260501_set_of_9/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260505_set_of_9/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260512_set_of_9/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250512/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260513_set_of_9/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260514_set_of_9/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260325_release_stats_20250514/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612_test_set_9_20260601/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260612/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/release_20260519_test_set_9_20260612/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260519_release_stats_20260619/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260714/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_9_20260714/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_10_20260720/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_stats_20260720/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260619_release_test_set_11_20260728/go_cam_stats_output",
+            //"/home/muruganu/projects/geneontology/downloads/20260805_release_stats_20260914/go_cam_stats_output",
+            "/home/muruganu/projects/geneontology/downloads/20260805_release_test_set_11_20260915/go_cam_stats_output",
+            "--production-only"]
+        },
+        {
+            "name": "Small test set - Generate statistics information",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/pipeline/output_stats_for_gocam_models.py",
+            "console": "integratedTerminal",
+            "args" : [
+            "--input-dir",
+            "/home/muruganu/projects/geneontology/downloads/go_cam_test_input",
+            "--output-dir",
+            "/home/muruganu/projects/geneontology/downloads/go_cam_test_stats_output"]
+        }
+
+    ]
+}
