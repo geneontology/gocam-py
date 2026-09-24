@@ -3,7 +3,7 @@
 tmp
 tests/output
 examples/output
-/docs/
+/docs/schema
 /project/*
 !/project/README.md
 /tmp/

@@ -5,6 +5,15 @@ Release pipeline. Some scripts produce JSONL log files as part of their processi
 Other scripts derive reports, summaries, quality-control outputs, or maintained data
 products from those log files or from model files.
 
+> [!IMPORTANT]
+> Scripts should be written to read local files (typically directories of models
+serialized as JSON) and write local files. They should never fetch files from
+`current.geneontology.org` or other remote locations unless they provide a mechanism to
+override that behavior. They should never use features (like `GoCamClient`) that are
+intended for end-user consumption of GO-CAM data. The pipeline process which runs these
+scripts is responsible for providing any inputs as local files and for publishing any
+outputs to the correct remote locations.
+
 One-off or exploratory analyses should be added to the
 `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). Analyses
 that are ready to be integrated into the production GO Release pipeline can be
@@ -326,8 +335,10 @@ providing-group report. Group pages show production GO-CAM-like model counts by 
 result (`success`, `filtered`, or `error`) and list every production GO-CAM-like
 model—that is, every production model that was processed by the `filter` pipeline
 step—including any warnings. A model associated with multiple groups appears in each
-applicable report; production GO-CAM-like models without group metadata appear in an
-Unassigned report. The Excel output continues to include results for all models.
+applicable report; production
+GO-CAM-like models without group metadata appear in an
+Unassigned report. The Excel
+output continues to include results for all models.
 
 ## output_stats_for_gocam_models.py
 
