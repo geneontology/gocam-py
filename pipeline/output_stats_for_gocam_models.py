@@ -79,10 +79,10 @@ from gocam.datamodel import (
 )
 from gocam.indexing.indexer import Indexer
 from gocam.utils import (
-    IMPLICIT_CAUSAL_ASSOCIATION_CHAINS,
     all_activity_inputs,
     all_activity_outputs,
     all_associations,
+    model_to_digraph,
 )
 
 app = typer.Typer()
@@ -752,122 +752,52 @@ def _get_activity_genes(
     return genes
 
 
-def _get_molecule_ids(
-    molecular_associations: Collection[MoleculeAssociation],
-    obsolete_ids: set[str],
-    molecule_lookup: Dict[str, str] | None = None,
-) -> set[str]:
-    """Extract the molecule node IDs a set of associations points at.
-
-    Unlike ``_get_chemical_terms`` this returns the molecule *individual* each
-    association points at rather than the term it resolves to, and keeps
-    non-CHEBI molecules (gene products and complexes act as mediators too).
-    Two activities share an ID here only when the curator attached them to the
-    same molecule node, which is what makes the relation counts agree with the
-    model graph.
-
-    Args:
-        molecular_associations: List of MoleculeAssociation objects from an activity.
-        obsolete_ids: Set of object IDs marked as obsolete.
-        molecule_lookup: Optional mapping of molecule IDs to canonical IDs.
-
-    Returns:
-        A set of molecule node IDs.
-    """
-    ids: set[str] = set()
-    for ma in molecular_associations:
-        molecule_id = ma.molecule
-        if not molecule_id or molecule_id in obsolete_ids:
-            continue
-        resolved = (
-            molecule_lookup.get(molecule_id, molecule_id)
-            if molecule_lookup
-            else molecule_id
-        )
-        if resolved and resolved not in obsolete_ids:
-            ids.add(molecule_id)
-    return ids
-
-
 def _compute_inferred_relations(
-    activities: list[Activity],
+    model: Model,
     obsolete_ids: set[str],
-    molecule_lookup: Dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Compute inferred relations between activities that share a molecule node.
+    """Collect the molecule-mediated relations between activities in a model.
 
-    An inferred relation exists when activity A attaches a chemical molecule to
-    a molecular association whose predicate is the upstream half of one of the
-    chains in ``IMPLICIT_CAUSAL_ASSOCIATION_CHAINS``, and activity B attaches
-    the same molecule using the matching downstream predicate. That covers the
-    plain output-to-input case as well as output to small molecule
+    Delegates the connectivity question to ``model_to_digraph``, which already
+    builds the model's activity graph, and keeps the edges it marked
+    ``inferred``: activity A attaches a molecule that activity B also attaches
+    under the matching half of an ``IMPLICIT_CAUSAL_ASSOCIATION_CHAINS`` pair,
+    covering output-to-input as well as output to small molecule
     regulator/activator/inhibitor (see go-site issue #2741).
 
-    Molecules are matched on the molecule *individual*, not on the term it
-    resolves to, so only connections the curator actually drew are counted:
-    two activities referencing the same chemical through separate molecule
-    nodes are not related here. Every molecule mediates, chemical or not. The
-    result is the set of molecule-mediated edges in the model graph, so the
-    counts agree with what AmiGO and Noctua render for the model.
+    Because the graph matches on the molecule node rather than the term it
+    resolves to, only connections the curator actually drew are reported, and
+    the counts agree with the model graph rendered by AmiGO and Noctua. Edges
+    that are additionally asserted as causal associations are still included:
+    they are genuine molecule-mediated relations, and are counted separately as
+    explicit causal relations.
 
     Args:
-        activities: List of Activity objects from a GO-CAM model.
+        model: The GO-CAM model to inspect.
         obsolete_ids: Set of object IDs marked as obsolete.
-        molecule_lookup: Optional mapping of molecule IDs to canonical IDs.
 
     Returns:
-        A deduplicated list of dicts, each with keys activity_a, activity_a_genes,
-        activity_b, and activity_b_genes.
+        A list of dicts, ordered by activity pair, each with keys activity_a,
+        activity_a_genes, activity_b, and activity_b_genes.
     """
-    # Molecule nodes each activity attaches under each predicate in a chain
-    chain_predicates = {
-        p for chain in IMPLICIT_CAUSAL_ASSOCIATION_CHAINS for p in chain
+    activity_genes = {
+        activity.id: _get_activity_genes(activity, obsolete_ids)
+        for activity in model.activities or []
     }
-    chemicals_by_activity_and_predicate: dict[str, dict[str, set[str]]] = {}
-    activity_genes: dict[str, list[str]] = {}
 
-    for activity in activities:
-        activity_genes[activity.id] = _get_activity_genes(activity, obsolete_ids)
-        by_predicate: dict[str, set[str]] = {}
-        for predicate in chain_predicates:
-            molecule_ids = _get_molecule_ids(
-                [
-                    ma
-                    for ma in activity.molecular_associations or []
-                    if ma.predicate == predicate
-                ],
-                obsolete_ids,
-                molecule_lookup,
-            )
-            if molecule_ids:
-                by_predicate[predicate] = molecule_ids
-        if by_predicate:
-            chemicals_by_activity_and_predicate[activity.id] = by_predicate
-
-    # Find pairs whose chemicals overlap across a declared predicate chain
-    relations: list[dict[str, Any]] = []
-    seen: set[tuple[str, str]] = set()
-
-    for a_id, a_by_predicate in chemicals_by_activity_and_predicate.items():
-        for b_id, b_by_predicate in chemicals_by_activity_and_predicate.items():
-            if a_id == b_id or (a_id, b_id) in seen:
-                continue
-            for upstream, downstream in IMPLICIT_CAUSAL_ASSOCIATION_CHAINS:
-                if a_by_predicate.get(upstream, set()) & b_by_predicate.get(
-                    downstream, set()
-                ):
-                    seen.add((a_id, b_id))
-                    relations.append(
-                        {
-                            "activity_a": a_id,
-                            "activity_a_genes": activity_genes.get(a_id, []),
-                            "activity_b": b_id,
-                            "activity_b_genes": activity_genes.get(b_id, []),
-                        }
-                    )
-                    break
-
-    return relations
+    return [
+        {
+            "activity_a": activity_a,
+            "activity_a_genes": activity_genes.get(activity_a, []),
+            "activity_b": activity_b,
+            "activity_b_genes": activity_genes.get(activity_b, []),
+        }
+        for activity_a, activity_b in sorted(
+            (a, b)
+            for a, b, edge in model_to_digraph(model).edges(data=True)
+            if edge.get("inferred")
+        )
+    ]
 
 
 def _collect_labels(
@@ -1219,9 +1149,7 @@ def process_gocam_model_file(
 
     # Compute inferred relations for the model
     if gocam_model.activities:
-        inferred = _compute_inferred_relations(
-            gocam_model.activities, obsolete_ids, molecule_lookup
-        )
+        inferred = _compute_inferred_relations(gocam_model, obsolete_ids)
         stats_by_model.list_inferred_relations = inferred
         stats_by_model.total_inferred_relations = len(inferred)
         if model_aggregate.list_inferred_relations is not None:
