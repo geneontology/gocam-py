@@ -63,7 +63,7 @@ def test_declared_implicit_causal_chain_adds_edge(
 
     assert set(graph.nodes) == {"upstream", "downstream"}
     assert set(graph.edges) == {("upstream", "downstream")}
-    assert graph.edges["upstream", "downstream"] == {}
+    assert graph.edges["upstream", "downstream"] == {"inferred": True}
 
 
 @pytest.mark.parametrize(
@@ -196,3 +196,4 @@ def test_explicit_causal_association_still_adds_edge():
     graph = model_to_digraph(model)
 
     assert set(graph.edges) == {("upstream", "downstream")}
+    assert graph.edges["upstream", "downstream"] == {"explicit": True}

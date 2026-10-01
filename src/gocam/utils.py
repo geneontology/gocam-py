@@ -279,6 +279,16 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
     associations or molecule-mediated predicate chains declared in
     IMPLICIT_CAUSAL_ASSOCIATION_CHAINS.
 
+    Each edge records how it arose, as two independent boolean attributes:
+
+        ``explicit``  — asserted by a causal association on the activity.
+        ``inferred``  — implied by two activities sharing a molecule across a
+                        predicate chain.
+
+    They are independent because a pair of activities can be connected both
+    ways at once, so callers wanting only the implied connections must filter
+    on ``inferred`` rather than subtracting the explicit ones.
+
     Args:
         model: The model to convert.
 
@@ -316,7 +326,7 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
         for causal_assoc in activity.causal_associations or []:
             downstream_activity_id = causal_assoc.downstream_activity
             if downstream_activity_id in enabled_activity_ids:
-                graph.add_edge(activity.id, downstream_activity_id)
+                graph.add_edge(activity.id, downstream_activity_id, explicit=True)
 
         for association in activity.molecular_associations or []:
             if association.molecule is None:
@@ -335,6 +345,8 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
                         downstream_activity_id != activity.id
                         and downstream_activity_id in enabled_activity_ids
                     ):
-                        graph.add_edge(activity.id, downstream_activity_id)
+                        graph.add_edge(
+                            activity.id, downstream_activity_id, inferred=True
+                        )
 
     return graph

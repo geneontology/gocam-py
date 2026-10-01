@@ -14,9 +14,13 @@ of status. Statistics include:
 - GO term counts (total and unique)
 - Reference and PMID counts
 - Inferred relation counts: An inferred relation is identified when an
-  activity A produces chemical outputs (CHEBI terms) that are consumed as
-  inputs by another activity B. Each inferred relation records the pair of
-  activity IDs along with the genes that enable each activity.
+  activity A attaches a molecule node that another activity B also attaches
+  under a matching predicate -- output to input, or output to small molecule
+  regulator/activator/inhibitor. Matching is on the molecule node the curator
+  drew, so activities that merely reference the same term through separate
+  nodes are not related, and the counts match the model graph rendered by
+  AmiGO and Noctua. Each inferred relation records the pair of activity IDs
+  along with the genes that enable each activity.
 
 Results are written as JSON files organized into subdirectories by model,
 contributor (curator), and provider (group), along with aggregate summaries.
@@ -30,6 +34,7 @@ import json
 import logging
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import (
     Annotated,
@@ -55,6 +60,7 @@ from _common import (
     get_json_files,
     setup_logger,
 )
+from oaklib.datamodels.vocabulary import IS_A
 from pydantic import BaseModel, ConfigDict
 from rich import print
 from rich.progress import track
@@ -72,7 +78,12 @@ from gocam.datamodel import (
     TermAssociation,
 )
 from gocam.indexing.indexer import Indexer
-from gocam.utils import all_activity_inputs, all_activity_outputs, all_associations
+from gocam.utils import (
+    all_activity_inputs,
+    all_activity_outputs,
+    all_associations,
+    model_to_digraph,
+)
 
 app = typer.Typer()
 
@@ -659,6 +670,11 @@ def _collect_terms(
         term = association.term
         if not term or not term.upper().startswith("GO:"):
             continue
+        # Protein complexes are cellular component terms, but they describe what
+        # carries out an activity rather than where it happens, so counting them
+        # inflates the CC totals. See go-site issue #2678.
+        if is_protein_complex_term(term):
+            continue
         if stats_by_model.list_go_terms is not None:
             stats_by_model.list_go_terms.append(term)
         if model_aggregate.list_go_terms is not None:
@@ -737,70 +753,51 @@ def _get_activity_genes(
 
 
 def _compute_inferred_relations(
-    activities: list[Activity],
+    model: Model,
     obsolete_ids: set[str],
-    molecule_lookup: Dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Compute inferred relations between activities based on shared chemicals.
+    """Collect the molecule-mediated relations between activities in a model.
 
-    An inferred relation exists when activity A produces chemical outputs that
-    are consumed as inputs by activity B.
+    Delegates the connectivity question to ``model_to_digraph``, which already
+    builds the model's activity graph, and keeps the edges it marked
+    ``inferred``: activity A attaches a molecule that activity B also attaches
+    under the matching half of an ``IMPLICIT_CAUSAL_ASSOCIATION_CHAINS`` pair,
+    covering output-to-input as well as output to small molecule
+    regulator/activator/inhibitor (see go-site issue #2741).
+
+    Because the graph matches on the molecule node rather than the term it
+    resolves to, only connections the curator actually drew are reported, and
+    the counts agree with the model graph rendered by AmiGO and Noctua. Edges
+    that are additionally asserted as causal associations are still included:
+    they are genuine molecule-mediated relations, and are counted separately as
+    explicit causal relations.
 
     Args:
-        activities: List of Activity objects from a GO-CAM model.
+        model: The GO-CAM model to inspect.
         obsolete_ids: Set of object IDs marked as obsolete.
-        molecule_lookup: Optional mapping of molecule IDs to canonical IDs.
 
     Returns:
-        A deduplicated list of dicts, each with keys activity_a, activity_a_genes,
-        activity_b, and activity_b_genes.
+        A list of dicts, ordered by activity pair, each with keys activity_a,
+        activity_a_genes, activity_b, and activity_b_genes.
     """
-    # Build per-activity chemical input and output sets
-    activity_chem_outputs: dict[str, set[str]] = {}
-    activity_chem_inputs: dict[str, set[str]] = {}
-    activity_genes: dict[str, list[str]] = {}
+    activity_genes = {
+        activity.id: _get_activity_genes(activity, obsolete_ids)
+        for activity in model.activities or []
+    }
 
-    for activity in activities:
-        activity_genes[activity.id] = _get_activity_genes(activity, obsolete_ids)
-
-        outputs = _get_chemical_terms(
-            all_activity_outputs(activity),
-            obsolete_ids,
-            molecule_lookup,
+    return [
+        {
+            "activity_a": activity_a,
+            "activity_a_genes": activity_genes.get(activity_a, []),
+            "activity_b": activity_b,
+            "activity_b_genes": activity_genes.get(activity_b, []),
+        }
+        for activity_a, activity_b in sorted(
+            (a, b)
+            for a, b, edge in model_to_digraph(model).edges(data=True)
+            if edge.get("inferred")
         )
-        if outputs:
-            activity_chem_outputs[activity.id] = outputs
-
-        inputs = _get_chemical_terms(
-            all_activity_inputs(activity),
-            obsolete_ids,
-            molecule_lookup,
-        )
-        if inputs:
-            activity_chem_inputs[activity.id] = inputs
-
-    # Find pairs where A's outputs overlap with B's inputs
-    relations: list[dict[str, Any]] = []
-    seen: set[tuple[str, str]] = set()
-
-    for a_id, a_outputs in activity_chem_outputs.items():
-        for b_id, b_inputs in activity_chem_inputs.items():
-            if a_id == b_id:
-                continue
-            if a_outputs & b_inputs:
-                pair = (a_id, b_id)
-                if pair not in seen:
-                    seen.add(pair)
-                    relations.append(
-                        {
-                            "activity_a": a_id,
-                            "activity_a_genes": activity_genes.get(a_id, []),
-                            "activity_b": b_id,
-                            "activity_b_genes": activity_genes.get(b_id, []),
-                        }
-                    )
-
-    return relations
+    ]
 
 
 def _collect_labels(
@@ -829,6 +826,33 @@ def _collect_labels(
         label = getattr(obj, "label", None)
         if label:
             id_label_lookup[obj_id] = label
+
+
+# "protein-containing complex" in the GO cellular component aspect. Its is_a
+# descendants are the protein complex terms; GO-CAM uses them both as activity
+# enablers and, occasionally, as occurs_in/part_of locations.
+PROTEIN_COMPLEX_ROOT = "GO:0032991"
+
+
+@lru_cache(maxsize=1)
+def get_protein_complex_terms() -> frozenset[str]:
+    """Return every GO cellular component term that is a protein complex.
+
+    Resolved once from the GO hierarchy as ``GO:0032991`` plus its ``is_a``
+    descendants. Non-GO descendants (the GO SQLite build reaches a few PRO
+    terms) are dropped, which also drops the only descendants that are not in
+    the cellular component aspect.
+
+    Returns:
+        A frozenset of GO CURIEs considered protein complexes.
+    """
+    terms = Indexer().go_adapter.descendants([PROTEIN_COMPLEX_ROOT], predicates=[IS_A])
+    return frozenset(t for t in terms if t and t.upper().startswith("GO:"))
+
+
+def is_protein_complex_term(term: str | None) -> bool:
+    """Return True if ``term`` is a protein complex cellular component term."""
+    return bool(term) and term in get_protein_complex_terms()
 
 
 def process_gocam_model_file(
@@ -1125,9 +1149,7 @@ def process_gocam_model_file(
 
     # Compute inferred relations for the model
     if gocam_model.activities:
-        inferred = _compute_inferred_relations(
-            gocam_model.activities, obsolete_ids, molecule_lookup
-        )
+        inferred = _compute_inferred_relations(gocam_model, obsolete_ids)
         stats_by_model.list_inferred_relations = inferred
         stats_by_model.total_inferred_relations = len(inferred)
         if model_aggregate.list_inferred_relations is not None:

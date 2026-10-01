@@ -1,5 +1,6 @@
 .DS_Store
 .idea
+.vscode/
 tmp
 tests/output
 examples/output
