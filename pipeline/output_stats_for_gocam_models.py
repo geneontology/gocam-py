@@ -309,6 +309,8 @@ class ProteinComplexActivityInfo(BaseModel):
     """The activity unit ID that is enabled by a protein complex."""
     protein_complex_term: str | None = None
     """The protein complex term that carries out the activity."""
+    protein_complex_members: List[str] = []
+    """List of gene product terms that are 'has part' members of the protein complex (may be empty)."""
     molecular_function: str | None = None
     """The molecular function GO term associated with the activity that is carried out by the gene product or complex"""
     model_status: str | None = None
@@ -1037,6 +1039,11 @@ def process_gocam_model_file(
                         model_name=gocam_model.title,
                         activity_id=activity.id,
                         protein_complex_term=activity.enabled_by.term,
+                        protein_complex_members=[
+                            member.term
+                            for member in activity.enabled_by.has_part or []
+                            if member.term and member.term not in obsolete_ids
+                        ],
                         molecular_function=(
                             activity.molecular_function.term
                             if activity.molecular_function
