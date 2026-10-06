@@ -28,6 +28,14 @@ A flat lookup table, ``id_to_label.json``, is also emitted alongside the
 aggregate files: it maps every identifier in the models' ``objects`` indexes
 (gene products, protein complexes, molecule inputs/outputs, CHEBI molecules,
 GO terms, etc.) to its human-readable label.
+
+These JSON files are the input to go-site's ``scripts/reports-go-cam-stats.py``,
+which renders the HTML reports published under ``reports/go-cam-stats/`` in a
+release. Only ``go-cam-aggregate-stats.html`` sits at the top of that folder;
+the other reports live under ``full-go-cam-stats/``, and the JSON files from
+this module are placed in ``full-go-cam-stats/data/`` when the report script is
+run with ``--data-subdir full-go-cam-stats/data`` (go-site issue #2744). This
+module's own output layout is unchanged.
 """
 
 import json
