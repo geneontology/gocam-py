@@ -11,7 +11,7 @@ SOURCE_SCHEMA_PATH := src/gocam/schema/gocam.yaml
 DEST := project
 PYMODEL := src/gocam/datamodel
 PYDANTIC := $(PYMODEL)/gocam.py
-DOCDIR := docs
+DOCDIR := docs/schema
 GEN_PROJECT_ARGS := --config-file config.yaml
 
 # note: "help" MUST be the first target in the file,
@@ -133,7 +133,6 @@ $(DOCDIR):
 
 .PHONY: gendoc
 gendoc: $(DOCDIR)
-	cp -rf src/docs/* $(DOCDIR) ; \
 	$(RUN) gen-doc -d $(DOCDIR) $(SOURCE_SCHEMA_PATH)
 
 .PHONY: testdoc
@@ -147,5 +146,5 @@ mkd-%:
 clean:
 	find "$(DEST)" -mindepth 1 -not -path "$(DEST)/README.md" -delete
 	rm -rf tmp
-	rm -fr docs/*
+	rm -fr $(DOCDIR)
 	rm -fr $(PYDANTIC)
