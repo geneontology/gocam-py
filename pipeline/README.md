@@ -384,3 +384,11 @@ python pipeline/output_stats_for_gocam_models.py \
   --input-dir /path/to/indexed_models \
   --output-dir /path/to/stats
 ```
+
+**Release reports:** go-site's `scripts/reports-go-cam-stats.py` renders these JSON files
+as the HTML reports published under `reports/go-cam-stats/` in a release. Only
+`go-cam-aggregate-stats.html` sits at the top of that folder; every other report is under
+`full-go-cam-stats/`. Run the report script with `--data-subdir full-go-cam-stats/data` to
+place the JSON files from this step in `full-go-cam-stats/data/` instead of next to the
+aggregate report
+([go-site#2744](https://github.com/geneontology/go-site/issues/2744)).

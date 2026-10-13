@@ -28,6 +28,14 @@ A flat lookup table, ``id_to_label.json``, is also emitted alongside the
 aggregate files: it maps every identifier in the models' ``objects`` indexes
 (gene products, protein complexes, molecule inputs/outputs, CHEBI molecules,
 GO terms, etc.) to its human-readable label.
+
+These JSON files are the input to go-site's ``scripts/reports-go-cam-stats.py``,
+which renders the HTML reports published under ``reports/go-cam-stats/`` in a
+release. Only ``go-cam-aggregate-stats.html`` sits at the top of that folder;
+the other reports live under ``full-go-cam-stats/``, and the JSON files from
+this module are placed in ``full-go-cam-stats/data/`` when the report script is
+run with ``--data-subdir full-go-cam-stats/data`` (go-site issue #2744). This
+module's own output layout is unchanged.
 """
 
 import json
@@ -309,6 +317,8 @@ class ProteinComplexActivityInfo(BaseModel):
     """The activity unit ID that is enabled by a protein complex."""
     protein_complex_term: str | None = None
     """The protein complex term that carries out the activity."""
+    protein_complex_members: List[str] = []
+    """List of gene product terms that are 'has part' members of the protein complex (may be empty)."""
     molecular_function: str | None = None
     """The molecular function GO term associated with the activity that is carried out by the gene product or complex"""
     model_status: str | None = None
@@ -1037,6 +1047,11 @@ def process_gocam_model_file(
                         model_name=gocam_model.title,
                         activity_id=activity.id,
                         protein_complex_term=activity.enabled_by.term,
+                        protein_complex_members=[
+                            member.term
+                            for member in activity.enabled_by.has_part or []
+                            if member.term and member.term not in obsolete_ids
+                        ],
                         molecular_function=(
                             activity.molecular_function.term
                             if activity.molecular_function
