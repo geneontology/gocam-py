@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "gocam"
 description = "GO CAM Data Model (Python)"
 authors = [{ name = "The Gene Ontology Consortium", email = "help@geneontology.org" }]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "README.md"
 license-files = ["LICENSE"]
 dynamic = ["version"]
