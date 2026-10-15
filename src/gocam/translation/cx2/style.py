@@ -94,6 +94,13 @@ RELATIONS = {
         color=Color.LIGHT_GREEN,
         width=Width.DEFAULT,
     ),
+    Relation.IMMEDIATELY_CONSTITUTIVELY_UPSTREAM_OF: RelationStyle(
+        line_style=LineStyle.DASHED,
+        arrow_shape=ArrowShape.CIRCLE,
+        label="immediately constitutively upstream of",
+        color=Color.LIGHT_GREEN,
+        width=Width.DEFAULT,
+    ),
     Relation.DIRECTLY_NEGATIVELY_REGULATES: RelationStyle(
         line_style=LineStyle.SOLID,
         arrow_shape=ArrowShape.TEE,
