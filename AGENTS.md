@@ -1,12 +1,14 @@
 # AGENTS.md
 
-This file provides context and instructions for AI agents working on the `gocam-py` project.
+This file provides context and instructions for AI agents working on the `gocam-py`
+project.
 
 ## Project Context
 
 - **Name**: `gocam` (GO-CAM Data Model Python)
-- **Purpose**: A Python implementation of the Gene Ontology Causal Activity Model (GO-CAM) schema.
-- **Tech Stack**: Python (>=3.10), Pydantic v2, LinkML, NetworkX.
+- **Purpose**: A Python implementation of the Gene Ontology Causal Activity Model
+  (GO-CAM) schema.
+- **Tech Stack**: Python (>=3.11), Pydantic v2, LinkML, NetworkX.
 - **Key Features**:
     - Pydantic datamodels for GO-CAM.
     - Translation between GO-CAM and other formats (Minerva models, CX2, NetworkX).
@@ -26,13 +28,16 @@ This file provides context and instructions for AI agents working on the `gocam-
 
 ## Code Style & Conventions
 
-- **Linting**: Use `make lint-python` to check code style and formatting. Autofix issues with
+- **Linting**: Use `make lint-python` to check code style and formatting. Autofix issues
+  with
   `make lint-fix-python`.
 - **Type Checking**: Use `make type-check`
 - **Exclusions**:
-    - `src/gocam/datamodel/gocam.py` is a **generated file**. Do NOT include it in code reviews or
+    - `src/gocam/datamodel/gocam.py` is a **generated file**. Do NOT include it in code
+      reviews or
       attempt to manually edit it.
-    - The `project/` directory contains LinkML artifacts and should generally be treated as
+    - The `project/` directory contains LinkML artifacts and should generally be treated
+      as
       read-only/generated.
 
 ## Pydantic Generation
@@ -47,4 +52,5 @@ This file provides context and instructions for AI agents working on the `gocam-
 - Ensure all tests pass (`make test-python`) before submitting.
 - Ensure linting passes (`make lint-python`).
 - Ensure type checking passes (`make type-check`).
-- Do not commit changes to generated files unless you are intentionally re-running the generator.
+- Do not commit changes to generated files unless you are intentionally re-running the
+  generator.
