@@ -196,10 +196,10 @@
 <nav aria-label="Rules" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#members-must-be-specified-when-the-generic-go-complex-is-specified">
+<a class="md-nav__link" href="#has_part-must-be-specified-when-the-generic-go-complex-is-specified">
 <span class="md-ellipsis">
       
-        members must be specified when the generic GO complex is specified
+        has_part must be specified when the generic GO complex is specified
       
     </span>
 </a>
@@ -397,7 +397,7 @@
 </tbody>
 </table>
 <h2 id="rules">Rules</h2>
-<h3 id="members-must-be-specified-when-the-generic-go-complex-is-specified">members must be specified when the generic GO complex is specified</h3>
+<h3 id="has_part-must-be-specified-when-the-generic-go-complex-is-specified">has_part must be specified when the generic GO complex is specified</h3>
 <table>
 <thead>
 <tr>
@@ -411,14 +411,14 @@
 <tr>
 <td>slot_conditions</td>
 <td><code>{'term': {'equals_string': 'GO:0032991'}}</code></td>
-<td><code>{'members': {'required': True}}</code></td>
+<td><code>{'has_part': {'required': True}}</code></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <h2 id="comments">Comments</h2>
 <ul>
-<li>Protein complexes can be specified either by <em>pre-composition</em> or <em>post-composition</em>. For pre-composition, a species-specific named protein complex (such as an entry in ComplexPortal) can be specified, in which case the value of <code>members</code> is <em>implicit</em>. For post-composition, the placeholder term "GO:0032991" can be used, in which case <code>members</code> must be <em>explicitly</em> specified. An intermediate case is when a named class in GO that is a subclass of "GO:0032991" is used. In this case, <code>members</code> should still be specified, as this may only be partially specified by the GO class.</li>
+<li>Protein complexes can be specified either by <em>pre-composition</em> or <em>post-composition</em>. For pre-composition, a species-specific named protein complex (such as an entry in ComplexPortal) can be specified, in which case the value of <code>has_part</code> is <em>implicit</em>. For post-composition, the placeholder term "GO:0032991" can be used, in which case <code>has_part</code> must be <em>explicitly</em> specified. An intermediate case is when a named class in GO that is a subclass of "GO:0032991" is used. In this case, <code>has_part</code> should still be specified, as this may only be partially specified by the GO class.</li>
 </ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
 <h3 id="schema-source">Schema Source</h3>
@@ -456,11 +456,11 @@ description: An association between an activity and a protein complex, where the
 comments:
 - Protein complexes can be specified either by *pre-composition* or *post-composition*.
   For pre-composition, a species-specific named protein complex (such as an entry
-  in ComplexPortal) can be specified, in which case the value of `members` is *implicit*.
+  in ComplexPortal) can be specified, in which case the value of `has_part` is *implicit*.
   For post-composition, the placeholder term "GO:0032991" can be used, in which case
-  `members` must be *explicitly* specified. An intermediate case is when a named class
-  in GO that is a subclass of "GO:0032991" is used. In this case, `members` should
-  still be specified, as this may only be partially specified by the GO class.
+  `has_part` must be *explicitly* specified. An intermediate case is when a named
+  class in GO that is a subclass of "GO:0032991" is used. In this case, `has_part`
+  should still be specified, as this may only be partially specified by the GO class.
 from_schema: https://w3id.org/gocam
 is_a: EnabledByAssociation
 slot_usage:
@@ -469,7 +469,7 @@ slot_usage:
     examples:
     - value: GO:0032991
       description: The generic GO entry for a protein complex. If this is the value
-        of `term`, then members *must* be specified.
+        of `term`, then `has_part` *must* be specified.
     - value: ComplexPortal:CPX-969
       description: The human Caspase-2 complex
     range: ProteinComplexTermObject
@@ -493,10 +493,10 @@ rules:
         equals_string: GO:0032991
   postconditions:
     slot_conditions:
-      members:
-        name: members
+      has_part:
+        name: has_part
         required: true
-  title: members must be specified when the generic GO complex is specified
+  title: has_part must be specified when the generic GO complex is specified
 
 </code></pre>
 </details>
@@ -510,11 +510,11 @@ description: An association between an activity and a protein complex, where the
 comments:
 - Protein complexes can be specified either by *pre-composition* or *post-composition*.
   For pre-composition, a species-specific named protein complex (such as an entry
-  in ComplexPortal) can be specified, in which case the value of `members` is *implicit*.
+  in ComplexPortal) can be specified, in which case the value of `has_part` is *implicit*.
   For post-composition, the placeholder term "GO:0032991" can be used, in which case
-  `members` must be *explicitly* specified. An intermediate case is when a named class
-  in GO that is a subclass of "GO:0032991" is used. In this case, `members` should
-  still be specified, as this may only be partially specified by the GO class.
+  `has_part` must be *explicitly* specified. An intermediate case is when a named
+  class in GO that is a subclass of "GO:0032991" is used. In this case, `has_part`
+  should still be specified, as this may only be partially specified by the GO class.
 from_schema: https://w3id.org/gocam
 is_a: EnabledByAssociation
 slot_usage:
@@ -523,7 +523,7 @@ slot_usage:
     examples:
     - value: GO:0032991
       description: The generic GO entry for a protein complex. If this is the value
-        of `term`, then members *must* be specified.
+        of `term`, then `has_part` *must* be specified.
     - value: ComplexPortal:CPX-969
       description: The human Caspase-2 complex
     range: ProteinComplexTermObject
@@ -546,7 +546,7 @@ attributes:
     examples:
     - value: GO:0032991
       description: The generic GO entry for a protein complex. If this is the value
-        of `term`, then members *must* be specified.
+        of `term`, then `has_part` *must* be specified.
     - value: ComplexPortal:CPX-969
       description: The human Caspase-2 complex
     from_schema: https://w3id.org/gocam
@@ -605,10 +605,10 @@ rules:
         equals_string: GO:0032991
   postconditions:
     slot_conditions:
-      members:
-        name: members
+      has_part:
+        name: has_part
         required: true
-  title: members must be specified when the generic GO complex is specified
+  title: has_part must be specified when the generic GO complex is specified
 
 </code></pre>
 </details>
