@@ -29,7 +29,7 @@ from pydantic import (
 )
 
 
-metamodel_version = "1.7.0"
+metamodel_version = "1.11.0"
 version = "None"
 
 
@@ -455,24 +455,24 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'comments': ['Protein complexes can be specified either by *pre-composition* '
                       'or *post-composition*. For pre-composition, a species-specific '
                       'named protein complex (such as an entry in ComplexPortal) can '
-                      'be specified, in which case the value of `members` is '
+                      'be specified, in which case the value of `has_part` is '
                       '*implicit*. For post-composition, the placeholder term '
-                      '"GO:0032991" can be used, in which case `members` must be '
+                      '"GO:0032991" can be used, in which case `has_part` must be '
                       '*explicitly* specified. An intermediate case is when a named '
                       'class in GO that is a subclass of "GO:0032991" is used. In this '
-                      'case, `members` should still be specified, as this may only be '
+                      'case, `has_part` should still be specified, as this may only be '
                       'partially specified by the GO class.'],
          'from_schema': 'https://w3id.org/gocam',
-         'rules': [{'postconditions': {'slot_conditions': {'members': {'name': 'members',
-                                                                       'required': True}}},
+         'rules': [{'postconditions': {'slot_conditions': {'has_part': {'name': 'has_part',
+                                                                        'required': True}}},
                     'preconditions': {'slot_conditions': {'term': {'equals_string': 'GO:0032991',
                                                                    'name': 'term'}}},
-                    'title': 'members must be specified when the generic GO complex is '
-                             'specified'}],
+                    'title': 'has_part must be specified when the generic GO complex '
+                             'is specified'}],
          'slot_usage': {'term': {'examples': [{'description': 'The generic GO entry '
                                                               'for a protein complex. '
                                                               'If this is the value of '
-                                                              '`term`, then members '
+                                                              '`term`, then `has_part` '
                                                               '*must* be specified.',
                                                'value': 'GO:0032991'},
                                               {'description': 'The human Caspase-2 '
@@ -488,7 +488,7 @@ class EnabledByProteinComplexAssociation(EnabledByAssociation):
                        'EnabledByAssociation',
                        'TermAssociation'],
          'examples': [{'description': 'The generic GO entry for a protein complex. If '
-                                      'this is the value of `term`, then members '
+                                      'this is the value of `term`, then `has_part` '
                                       '*must* be specified.',
                        'value': 'GO:0032991'},
                       {'description': 'The human Caspase-2 complex',

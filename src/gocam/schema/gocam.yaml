@@ -343,19 +343,19 @@ classes:
     comments:
       - Protein complexes can be specified either by *pre-composition* or *post-composition*. For pre-composition,
         a species-specific named protein complex (such as an entry in ComplexPortal) can be specified, in
-        which case the value of `members` is *implicit*. For post-composition, the placeholder term "GO:0032991"
-        can be used, in which case `members` must be *explicitly* specified. An intermediate case is when
-        a named class in GO that is a subclass of "GO:0032991" is used. In this case, `members` should still
+        which case the value of `has_part` is *implicit*. For post-composition, the placeholder term "GO:0032991"
+        can be used, in which case `has_part` must be *explicitly* specified. An intermediate case is when
+        a named class in GO that is a subclass of "GO:0032991" is used. In this case, `has_part` should still
         be specified, as this may only be partially specified by the GO class.
     rules:
-      - title: members must be specified when the generic GO complex is specified
+      - title: has_part must be specified when the generic GO complex is specified
         preconditions:
           slot_conditions:
             term:
               equals_string: GO:0032991
         postconditions:
           slot_conditions:
-            members:
+            has_part:
               required: true
     is_a: EnabledByAssociation
     attributes:
@@ -369,7 +369,7 @@ classes:
         examples:
           - value: GO:0032991
             description: The generic GO entry for a protein complex.
-              If this is the value of `term`, then members *must* be specified.
+              If this is the value of `term`, then `has_part` *must* be specified.
           - value: ComplexPortal:CPX-969
             description: The human Caspase-2 complex
 
