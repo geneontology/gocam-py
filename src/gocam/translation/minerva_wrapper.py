@@ -424,10 +424,15 @@ class MinervaTranslator:
                 enabled_by_object, object_term, evs, prov
             )
 
+            # The molecular function is the type of the subject individual rather than a fact, so
+            # its provenance comes from the individual's annotations.
+            _, mf_prov = self._extract_evidence_and_provenance(enabled_by_subject)
             activity = Activity(
                 id=enabled_by_subject,
                 enabled_by=enabled_by_association,
-                molecular_function=MolecularFunctionAssociation(term=subject_term),
+                molecular_function=MolecularFunctionAssociation(
+                    term=subject_term, provenances=[mf_prov]
+                ),
             )
             self.activities.append(activity)
             self.activities_by_mf_id[enabled_by_subject].append(activity)
