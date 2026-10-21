@@ -308,6 +308,36 @@ def test_provenance_on_associations():
             assert len(activity.enabled_by.provenances) > 0
 
 
+def test_provenance_on_molecular_function_association():
+    """Test that the molecular function individual's annotations are included on the
+    ProvenanceInfo instance attached to the MolecularFunctionAssociation. The
+    molecular function is the type of an individual rather than a fact,
+    so its provenance comes from the individual."""
+    minerva_object = load_minerva_object("663d668500002178")
+    individuals_by_id = {ind["id"]: ind for ind in minerva_object["individuals"]}
+    mw = MinervaWrapper()
+    model = mw.minerva_object_to_model(minerva_object)
+
+    assert model.activities
+    for activity in model.activities:
+        annotations = individuals_by_id[activity.id]["annotations"]
+        expected_contributors = [
+            a["value"] for a in annotations if a["key"] == "contributor"
+        ]
+        expected_provided_by = [
+            a["value"] for a in annotations if a["key"] == "providedBy"
+        ]
+        expected_date = next(a["value"] for a in annotations if a["key"] == "date")
+
+        assert activity.molecular_function is not None
+        assert activity.molecular_function.provenances is not None
+        assert len(activity.molecular_function.provenances) == 1
+        provenance = activity.molecular_function.provenances[0]
+        assert provenance.contributor == expected_contributors
+        assert provenance.provided_by == expected_provided_by
+        assert provenance.date == expected_date
+
+
 def test_evidence_with_objects():
     """Test that evidence with_objects are correctly translated."""
     minerva_object = load_minerva_object("5f46c3b700001031")
