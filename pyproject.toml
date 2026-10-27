@@ -61,9 +61,10 @@ preview-features = ["audit-command", "malware-check"]
 
 [tool.uv.audit]
 ignore = [
-    # setuptools<82.0.0 is required for oaklib on Python<3.12, but it has a known security
-    # vulnerability. See: https://github.com/INCATools/ontology-access-kit/issues/852
+    # setuptools<82.0.0 is required for oaklib on Python<3.12, but it has known security
+    # vulnerabilities. See: https://github.com/INCATools/ontology-access-kit/issues/852
     "PYSEC-2026-3447",
+    "GHSA-xmj3-9gf7-h52w"
 ]
 
 [tool.hatch.build.targets.sdist]
