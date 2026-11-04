@@ -31,6 +31,7 @@ from gocam.datamodel import (
 from gocam.translation.result import TranslationResult, TranslationWarning, WarningType
 from gocam.vocabulary import (
     INFORMATION_BIOMACROMOLECULE,
+    MOLECULAR_EVENT,
     MOLECULAR_FUNCTION,
     PROTEIN_CONTAINING_COMPLEX,
     Relation,
@@ -110,6 +111,9 @@ class MinervaView:
     raw_json: MinervaObject
     individuals_with_multiple_types: set[str] = field(init=False, default_factory=set)
     individuals_with_complement_types: set[str] = field(init=False, default_factory=set)
+    individuals_with_only_molecular_event_root_type: set[str] = field(
+        init=False, default_factory=set
+    )
 
     _facts_by_property: defaultdict[str, list[Fact]] = field(
         init=False, default_factory=lambda: defaultdict(list)
@@ -138,6 +142,12 @@ class MinervaView:
             self._individual_id_to_root_types[ind_id] = [
                 x for x in individual.root_type if x
             ]
+            # Molecular functions also have molecular event as a root type, so only flag
+            # individuals where it is the sole root type.
+            if [rt.id for rt in self._individual_id_to_root_types[ind_id]] == [
+                MOLECULAR_EVENT
+            ]:
+                self.individuals_with_only_molecular_event_root_type.add(ind_id)
             self._individual_id_to_annotations[ind_id] = self._extract_annotations(
                 individual
             )
@@ -299,6 +309,14 @@ class MinervaTranslator:
                 TranslationWarning(
                     type=WarningType.INDIVIDUAL_HAS_COMPLEMENT_TYPE,
                     message="Individual has a complement type; this is not supported in translation",
+                    entity_id=individual_id,
+                )
+            )
+        for individual_id in self.view.individuals_with_only_molecular_event_root_type:
+            self.translation_warnings.add(
+                TranslationWarning(
+                    type=WarningType.MOLECULAR_EVENT_INDIVIDUAL,
+                    message="Individual is a molecular event; this is not supported in translation",
                     entity_id=individual_id,
                 )
             )

@@ -74,6 +74,7 @@ class FilterReason(str, Enum):
     NO_ACTIVITY_EDGE = "Model has 0 connected activities"
     NO_EVIDENCE = "Model has no evidence for any assertions"
     USES_COMPLEMENT = "Model uses complement"
+    USES_MOLECULAR_EVENT = "Model uses molecular event"
 
 
 class ErrorReason(str, Enum):
