@@ -3,7 +3,9 @@
 This directory contains maintained operational scripts for processing steps in the GO
 Release pipeline. Some scripts produce JSONL log files as part of their processing.
 Other scripts derive reports, summaries, quality-control outputs, or maintained data
-products from those log files or from model files.
+products from those log files or from model files. The exception is
+`translate_minerva_model.py`, a development aid that is intentionally not a pipeline
+step (see [below](#translate_minerva_modelpy)).
 
 One-off or exploratory analyses should be added to the
 `gocam-analysis` [repository](https://github.com/geneontology/gocam-analysis). Analyses
@@ -17,7 +19,7 @@ set up a local development environment to run them. Use `uv` to install the nece
 dependencies:
 
 ```bash
-uv sync --all-extras
+uv sync
 ```
 
 ## Running the pipeline locally
@@ -392,3 +394,36 @@ as the HTML reports published under `reports/go-cam-stats/` in a release. Only
 place the JSON files from this step in `full-go-cam-stats/data/` instead of next to the
 aggregate report
 ([go-site#2744](https://github.com/geneontology/go-site/issues/2744)).
+
+## translate_minerva_model.py
+
+Translates a single Minerva model JSON file to a GO-CAM model and reports translation
+warnings. This is a development aid for debugging translation issues.
+
+This script is intentionally **not** a pipeline step. It does no filtering, writes no
+pipeline log, and is not run by `run_pipeline.sh` or the GO Release pipeline. Pipeline
+steps should not call or depend on it.
+
+**Inputs:**
+
+- `INPUT_FILE`: Minerva model JSON file
+
+**Outputs:**
+
+- The translated GO-CAM model as JSON on stdout
+- Translation warnings on stderr, one per line, as tab-separated values: warning type,
+  entity ID, and message
+
+**Options:**
+
+- `--warnings-only`: Only write translation warnings; do not write the GO-CAM model
+
+**Usage:**
+
+```bash
+# Save the model and view the warnings
+python pipeline/translate_minerva_model.py model.json > gocam.json
+
+# Find warnings of a specific type
+python pipeline/translate_minerva_model.py --warnings-only model.json 2>&1 | grep SKIPPED_FACT
+```

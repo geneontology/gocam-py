@@ -68,12 +68,13 @@ environment:
 ```bash
 git clone https://github.com/geneontology/gocam-py.git
 cd gocam-py
-uv sync --all-extras
+uv sync
 ```
 
-CX2-related development requires
+The development environment includes all optional dependencies. CX2-related development requires
 [Graphviz](https://pygraphviz.github.io/documentation/stable/install.html#recommended) to be
-installed on the system before syncing the optional dependencies.
+installed on the system before syncing. To sync the development tools without the optional
+dependencies, use `uv sync --no-group all-extras`.
 
 Run the standard project checks:
 

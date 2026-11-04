@@ -29,6 +29,10 @@ jobs:
 
   test-base:
     runs-on: ubuntu-latest
+    env:
+      # Exclude the optional dependencies from both `uv sync` and `uv run` so that tests run
+      # against the base package only.
+      UV_NO_GROUP: all-extras
     strategy:
       matrix:
         python-version: [ "3.11", "3.14" ]
