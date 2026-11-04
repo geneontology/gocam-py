@@ -6,19 +6,57 @@ theme:
   #  scheme: slate
   #  primary: cyan
   features:
+    - content.code.copy
     - content.tabs.link
 plugins:
   - search
-  - mermaid2
   - mermaid2:
       version: 10.9.0
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - src
+          inventories:
+            - https://docs.python.org/3/objects.inv
+          options:
+            docstring_options:
+              ignore_init_summary: true
+            docstring_section_style: list
+            docstring_style: google
+            group_by_category: true
+            inherited_members: true
+            merge_init_into_class: true
+            signature_crossrefs: true
+            separate_signature: true
+            show_bases: false
+            show_category_heading: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            show_signature_type_parameters: true
+            show_source: false
 markdown_extensions:
   - attr_list
   - md_in_html
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        # make exceptions to allow mermaid diagrams to be rendered in the documentation
+        # https://mkdocs-mermaid2.readthedocs.io/en/latest/superfences/
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
 nav:
-  - Schema reference: index.md
-  - Getting started: getting-started.md
-  - Advanced translation: advanced-translation.md
+  - Introduction: index.md
+  - Schema Reference: schema/index.md
+  - Advanced Translation: advanced-translation.md
+  - API Reference: api-reference.md
 site_url: https://geneontology.github.io/gocam-py
 repo_url: https://github.com/geneontology/gocam-py
 

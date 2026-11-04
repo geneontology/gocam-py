@@ -18,7 +18,7 @@ import typer
 import yaml
 from typing_extensions import Annotated, Literal
 
-from gocam import __version__
+from gocam import GoCamClient, __version__
 from gocam.datamodel import Model
 from gocam.indexing.flattener import Flattener
 from gocam.translation import MinervaWrapper
@@ -92,13 +92,24 @@ def main(
         logger.setLevel(logging.ERROR)
 
 
+def _write_fetched_model(
+    model_dict: dict,
+    format: Literal["json", "yaml"],
+) -> None:
+    if format == "json":
+        typer.echo(json.dumps(model_dict, indent=2))
+    elif format == "yaml":
+        typer.echo("---")
+        typer.echo(yaml.dump(model_dict, sort_keys=False))
+
+
 @app.command()
 def fetch(
     model_ids: Annotated[
         Optional[List[str]], typer.Argument(help="Model IDs to fetch")
     ] = None,
     format: Annotated[
-        Literal["json", "yaml"], typer.Option("--format", "-f", help="Input format")
+        Literal["json", "yaml"], typer.Option("--format", "-f", help="Output format")
     ] = "yaml",
     add_indexes: Annotated[
         bool,
@@ -108,14 +119,21 @@ def fetch(
     ] = False,
     as_minerva: Annotated[
         bool,
-        typer.Option(help="Export as minerva json/yaml"),
+        typer.Option(
+            "--as-minerva",
+            help="Output model in Minerva format (deprecated)",
+        ),
     ] = False,
+    base_url: Annotated[
+        Optional[str],
+        typer.Option(
+            help="GO Release go-cams directory; defaults to the current release"
+        ),
+    ] = None,
 ):
     """Fetch GO-CAM models.
 
-    TODO: this currently fetches from a pre-filtered set of models.
-
-    Fetch and convert to GO-CAM yaml:
+    Fetch GO-CAM model and output as YAML:
 
         gocam fetch 61e0e55600000624
 
@@ -123,14 +141,16 @@ def fetch(
 
         gocam fetch --add-indexes 61e0e55600000624
 
-    Fetch, preserving minerva low-level format:
+    Fetch model as Minerva format:
 
         gocam fetch --as-minerva gomodel:YeastPathways_LYSDEGII-PWY
 
-    Note: this should be used mostly for debugging purposes.
+    Note: this option is deprecated and will be removed in a future release.
 
     """
-    wrapper = MinervaWrapper()
+    if as_minerva and base_url is not None:
+        raise typer.BadParameter("--base-url cannot be used with --as-minerva")
+
     indexer = None
     if add_indexes:
         from gocam.indexing.indexer import Indexer
@@ -138,27 +158,26 @@ def fetch(
         indexer = Indexer()
 
     model_id_iter: Iterable[str]
-    if model_ids:
-        model_id_iter = model_ids
-    else:
-        model_id_iter = wrapper.models_ids()
-
-    for model_id in model_id_iter:
-        if as_minerva:
+    if as_minerva:
+        typer.secho(
+            "Warning: --as-minerva is deprecated and will be removed in a future release.",
+            fg=typer.colors.YELLOW,
+            err=True,
+        )
+        wrapper = MinervaWrapper()
+        model_id_iter = model_ids if model_ids else wrapper.models_ids()
+        for model_id in model_id_iter:
             model_dict = wrapper.fetch_minerva_object(model_id)
-        else:
-            model = wrapper.fetch_model(model_id)
-            if indexer:
-                indexer.index_model(model)
-            model_dict = model.model_dump(exclude_none=True)
+            _write_fetched_model(model_dict, format)
+        return
 
-        if format == "json":
-            typer.echo(json.dumps(model_dict, indent=2))
-        elif format == "yaml":
-            typer.echo("---")
-            typer.echo(yaml.dump(model_dict, sort_keys=False))
-        else:
-            typer.echo(model_dict)
+    client = GoCamClient(base_url=base_url) if base_url is not None else GoCamClient()
+    model_id_iter = model_ids if model_ids else client.fetch_model_ids()
+    for model_id in model_id_iter:
+        model = client.fetch_model(model_id)
+        if indexer:
+            indexer.index_model(model)
+        _write_fetched_model(model.model_dump(exclude_none=True), format)
 
 
 @app.command()
