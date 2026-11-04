@@ -16,9 +16,13 @@ project.
 
 ## Setup Commands
 
-- **Install only base dependencies**: `uv sync --no-dev`
-- **Install with extras**: `uv sync --no-dev --all-extras`
-- **Full development environment**: `uv sync --all-extras`
+- **Full development environment**: `uv sync` (the default groups include all optional
+  dependencies)
+- **Install only base dependencies**: `uv sync --no-default-groups`
+- **Install with extras**: `uv sync --no-dev`
+- **Development tools without extras**: `uv sync --no-group all-extras`. Note that `uv run`
+  also syncs the default groups, so pass the same flag to `uv run` (or set
+  `UV_NO_GROUP=all-extras`) to keep the extras out.
 
 ## Testing Instructions
 

@@ -19,7 +19,7 @@ set up a local development environment to run them. Use `uv` to install the nece
 dependencies:
 
 ```bash
-uv sync --all-extras
+uv sync
 ```
 
 ## Running the pipeline locally

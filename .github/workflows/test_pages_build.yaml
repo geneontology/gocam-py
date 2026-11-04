@@ -12,6 +12,9 @@ concurrency: preview-${{ github.ref }}
 jobs:
   run:
     runs-on: ubuntu-latest
+    env:
+      # The documentation build doesn't need the optional dependencies.
+      UV_NO_GROUP: all-extras
     permissions:
       contents: write
       pages: write
