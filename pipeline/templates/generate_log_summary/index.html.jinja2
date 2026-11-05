@@ -5,18 +5,15 @@
 {% block body %}
   <h1>GO-CAM-like Models Report</h1>
   <p>
-    These reports summarize the results of the GO-CAM processing pipeline. They report
-    models which are considered at least "GO-CAM-like." This means that they:
+    These reports summarize the results of the GO-CAM processing pipeline. They list
+    models with status "production" that have at least two causally connected activity
+    units. Models with no causally connected activities are not listed.
   </p>
-  <ul>
-    <li>have status "production"</li>
-    <li>have at least two causally connected activity units</li>
-    <li>do not use complement types</li>
-  </ul>
   <p>
-    These models may still not meet the current "True GO-CAM" definition, in which case
-    they will have a pipeline result of "filtered" and a result detail explaining what
-    criteria was not met.
+    Models that do not meet the current "True GO-CAM" definition are Pseudo GO-CAMs.
+    They have a pipeline result of "filtered" and a result detail explaining which
+    criterion was not met: for example, an activity with no causal relations, no
+    evidence, use of complement types, or use of molecular events.
   </p>
   <p>
     Regardless of whether a model meets the "True GO-CAM" definition, it may contain

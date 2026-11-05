@@ -18,6 +18,8 @@ from _common import (
     PIPELINE_LOG_FORMAT_VERSION,
     PIPELINE_LOG_RECORD_TYPE,
     PIPELINE_STEP_ORDER,
+    ErrorReason,
+    FilterCategory,
     PipelineStep,
     normalize_model_id,
     setup_logger,
@@ -65,7 +67,9 @@ class ModelSummary:
     longest_path: int | None = None
     pipeline_status: str = "success"
     pipeline_status_details: str | None = None
-    processed_steps: set[PipelineStep] = field(default_factory=set)
+    convert_status: str | None = None
+    convert_category: str | None = None
+    convert_reason: str | None = None
     warnings: list[Any] = field(default_factory=list)
 
 
@@ -234,13 +238,29 @@ def format_warning(warning: Any) -> str:
 
 def summarize_model_entries(
     model_id: str,
-    entries: list[dict[str, Any]],
-    *,
-    processed_steps: set[PipelineStep],
+    entries: list[tuple[PipelineStep, dict[str, Any]]],
 ) -> ModelSummary:
-    """Merge report entries for one model into a renderer-independent summary."""
-    summary = ModelSummary(model_id=model_id, processed_steps=set(processed_steps))
-    for entry in entries:
+    """Combine one model's log entries from all pipeline steps into a single summary.
+
+    The summary is used by both the Excel and HTML outputs. The convert step's status,
+    category, and reason are also stored separately, because is_group_report_model uses
+    them to decide whether the model appears on the HTML group reports.
+
+    Args:
+        model_id: The normalized model ID.
+        entries: The model's log entries, each paired with the step that produced it, in
+            pipeline step order.
+
+    Returns:
+        The combined summary for the model.
+    """
+    summary = ModelSummary(model_id=model_id)
+    for step, entry in entries:
+        if step == PipelineStep.CONVERT:
+            summary.convert_status = entry.get("status")
+            summary.convert_category = entry.get("category")
+            summary.convert_reason = entry.get("reason")
+
         summary.warnings.extend(entry.get("warnings") or [])
 
         meta = entry.get("meta") or {}
@@ -358,13 +378,39 @@ def sort_models_for_report(models: Iterable[ModelSummary]) -> list[ModelSummary]
     )
 
 
+def is_group_report_model(summary: ModelSummary) -> bool:
+    """Return whether a model belongs on the HTML group reports.
+
+    A model belongs on the reports if the convert step found it to be a True GO-CAM or a
+    Pseudo GO-CAM, even if writing the model's file then failed. Excluded models (including
+    all non-production models), models that could not be read or translated, and models
+    with no convert step log entry are left off.
+    """
+    match summary.convert_status:
+        case "success":
+            return True
+        case "filtered":
+            return summary.convert_category == FilterCategory.PSEUDO_GOCAM.value
+        case "error":
+            return summary.convert_reason == ErrorReason.WRITE_ERROR.value
+        case _:
+            return False
+
+
 def build_group_reports(
     model_summaries: Iterable[ModelSummary],
 ) -> list[GroupReport]:
-    """Group production GO-CAM-like model summaries by provider for HTML reporting.
+    """Build one HTML report per providing group from the model summaries.
 
-    GO-CAM-like models are the ones that have been processed by the FILTER step (they
-    were not filtered out by the "obvious not a GO-CAM" checks in the CONVERT step).
+    Only models for which is_group_report_model returns True are included. A model with
+    several providing groups appears in each of their reports, and a model with none
+    appears in an "Unassigned" report.
+
+    Args:
+        model_summaries: Summaries of all models in the pipeline logs.
+
+    Returns:
+        The group reports, sorted by group label, each with its output filename set.
     """
     models_by_group: defaultdict[str, list[ModelSummary]] = defaultdict(list)
     groups_by_id: dict[str, ProvidingGroup] = {}
@@ -375,10 +421,7 @@ def build_group_reports(
     )
 
     for summary in model_summaries:
-        if (
-            summary.model_status != "production"
-            or PipelineStep.FILTER not in summary.processed_steps
-        ):
+        if not is_group_report_model(summary):
             continue
 
         providing_groups = summary.providing_groups or [unassigned]
@@ -752,12 +795,12 @@ def main(
         }
     )
 
-    step_results_by_model_id: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
-    processed_steps_by_model_id: defaultdict[str, set[PipelineStep]] = defaultdict(set)
+    step_results_by_model_id: defaultdict[
+        str, list[tuple[PipelineStep, dict[str, Any]]]
+    ] = defaultdict(list)
     for step_log in step_logs:
         for model_id, entry in iter_log_results(step_log):
-            step_results_by_model_id[model_id].append(entry)
-            processed_steps_by_model_id[model_id].add(step_log.step)
+            step_results_by_model_id[model_id].append((step_log.step, entry))
 
     users_by_id = load_metadata_by_id(
         goc_users_yaml, default_url=_CURRENT_USERS_YAML_URL, id_field="uri"
@@ -772,11 +815,7 @@ def main(
 
     model_summaries = [
         resolve_model_summary_metadata(
-            summarize_model_entries(
-                model_id,
-                entries,
-                processed_steps=processed_steps_by_model_id[model_id],
-            ),
+            summarize_model_entries(model_id, entries),
             users_by_id=users_by_id,
             groups_by_id=groups_by_id,
         )

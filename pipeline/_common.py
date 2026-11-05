@@ -68,6 +68,22 @@ def normalize_model_id(model_id: str) -> str:
     return model_id.removeprefix("gomodel:")
 
 
+class FilterCategory(str, Enum):
+    """Category of a FilterReason, which decides what happens to models filtered for it.
+
+    EXCLUDED: The model is not in production status or lacks the basic structure of a
+    GO-CAM. It is not written to any output directory and does not appear on the HTML group
+    reports. It is only recorded in the log file.
+
+    PSEUDO_GOCAM: The model is intended to be a GO-CAM but does not meet the True GO-CAM
+    criteria. It is written to the Pseudo GO-CAM output directory and appears on the HTML
+    group reports with the filter reason, so that curators can fix it.
+    """
+
+    EXCLUDED = "excluded"
+    PSEUDO_GOCAM = "pseudo-gocam"
+
+
 class FilterReason(str, Enum):
     DISCONNECTED_ACTIVITY = "Model has at least one activity with no causal relations"
     NOT_PRODUCTION_MODEL = "Model status is not 'production'"
@@ -75,6 +91,21 @@ class FilterReason(str, Enum):
     NO_EVIDENCE = "Model has no evidence for any assertions"
     USES_COMPLEMENT = "Model uses complement"
     USES_MOLECULAR_EVENT = "Model uses molecular event"
+
+    @property
+    def category(self) -> FilterCategory:
+        """Return the category of this reason. See FilterCategory."""
+        return _FILTER_REASON_CATEGORIES[self]
+
+
+_FILTER_REASON_CATEGORIES: dict[FilterReason, FilterCategory] = {
+    FilterReason.NOT_PRODUCTION_MODEL: FilterCategory.EXCLUDED,
+    FilterReason.NO_ACTIVITY_EDGE: FilterCategory.EXCLUDED,
+    FilterReason.DISCONNECTED_ACTIVITY: FilterCategory.PSEUDO_GOCAM,
+    FilterReason.NO_EVIDENCE: FilterCategory.PSEUDO_GOCAM,
+    FilterReason.USES_COMPLEMENT: FilterCategory.PSEUDO_GOCAM,
+    FilterReason.USES_MOLECULAR_EVENT: FilterCategory.PSEUDO_GOCAM,
+}
 
 
 class ErrorReason(str, Enum):
@@ -88,7 +119,6 @@ class PipelineStep(str, Enum):
     """Identifiers for steps that produce pipeline logs."""
 
     CONVERT = "convert"
-    FILTER = "filter"
     QUERY_INDEX = "query-index"
     INDEX_FILES = "index-files"
     BROWSER_SEARCH = "browser-search"
@@ -96,7 +126,7 @@ class PipelineStep(str, Enum):
 
 PIPELINE_STEP_ORDER = tuple(PipelineStep)
 PIPELINE_LOG_RECORD_TYPE = "pipeline_step_log"
-PIPELINE_LOG_FORMAT_VERSION = 1
+PIPELINE_LOG_FORMAT_VERSION = 2
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -152,6 +182,7 @@ class FilteredResult(PipelineResult):
     """Result for models filtered out during processing."""
 
     reason: FilterReason
+    warnings: list[Any] = field(default_factory=list)
 
     @property
     def status(self) -> str:
@@ -160,6 +191,9 @@ class FilteredResult(PipelineResult):
     def get_log_entry(self, model_id: str) -> dict[str, str | list[str]]:
         entry = super().get_log_entry(model_id)
         entry["reason"] = self.reason.value
+        entry["category"] = self.reason.category.value
+        if self.warnings:
+            entry["warnings"] = self.warnings
         return entry
 
 
