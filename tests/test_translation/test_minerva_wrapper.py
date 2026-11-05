@@ -17,7 +17,7 @@ from gocam.translation.minerva_wrapper import (
     MinervaWrapper,
 )
 from gocam.translation.result import WarningType
-from gocam.vocabulary import Relation
+from gocam.vocabulary import MOLECULAR_EVENT, Relation
 from tests import INPUT_DIR
 
 
@@ -1008,6 +1008,76 @@ def test_translation_warning_for_individuals_with_complement_types():
         "gomodel:test_individuals_with_complement_types/1",
         "gomodel:test_individuals_with_complement_types/3",
     }
+
+
+def test_translation_warning_for_molecular_event_individuals():
+    """Test that a warning is generated for individuals whose only root type is molecular event.
+
+    Molecular functions also have molecular event as a root type, so individuals that have both
+    should not generate a warning.
+    """
+    minerva_object = {
+        "id": "gomodel:test_molecular_event_individuals",
+        "annotations": [
+            {
+                "key": "title",
+                "value": "Test model with molecular event individuals",
+            }
+        ],
+        "individuals": [
+            {
+                "id": "gomodel:test_molecular_event_individuals/1",
+                "type": [
+                    {
+                        "type": "class",
+                        "id": MOLECULAR_EVENT,
+                        "label": "Molecular Event",
+                    },
+                ],
+                "root-type": [
+                    {"type": "class", "id": MOLECULAR_EVENT, "label": "Molecular Event"}
+                ],
+                "annotations": [],
+            },
+            {
+                "id": "gomodel:test_molecular_event_individuals/2",
+                "type": [
+                    {
+                        "type": "class",
+                        "id": "GO:0003919",
+                        "label": "FMN adenylyltransferase activity",
+                    },
+                ],
+                "root-type": [
+                    {
+                        "type": "class",
+                        "id": "GO:0003674",
+                        "label": "molecular_function",
+                    },
+                    {
+                        "type": "class",
+                        "id": MOLECULAR_EVENT,
+                        "label": "Molecular Event",
+                    },
+                ],
+                "annotations": [],
+            },
+        ],
+        "facts": [],
+    }
+
+    translation_result = MinervaWrapper.translate(minerva_object)
+    molecular_event_warnings = [
+        w
+        for w in translation_result.warnings
+        if w.type == WarningType.MOLECULAR_EVENT_INDIVIDUAL
+    ]
+
+    assert len(molecular_event_warnings) == 1
+    assert (
+        molecular_event_warnings[0].entity_id
+        == "gomodel:test_molecular_event_individuals/1"
+    )
 
 
 def test_translation_warning_for_individuals_with_multiple_types():

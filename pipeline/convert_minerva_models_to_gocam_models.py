@@ -10,6 +10,9 @@ basic connectivity criteria are filtered out. At least one of the following cond
 - The model has at least one activity with an indirect association to another activity via
   input and output associations to the same chemical entity.
 
+Models that use complement types or molecular event individuals are also filtered out, since these
+cannot be represented in the GO-CAM data model.
+
 The models which pass the connectivity criteria are written to the output directory. They may or may
 not be True GO-CAM models. This output set is designed for QC analysis and further downstream
 filtering.
@@ -155,6 +158,17 @@ def process_minerva_model_file(
             f"Minerva model for GO-CAM model {gocam_model.id} uses complement constructs; skipping."
         )
         return FilteredResult(reason=FilterReason.USES_COMPLEMENT, meta=meta)
+
+    # Detect if the Minerva model uses molecular events. If so, skip writing the model.
+    if any(
+        w
+        for w in translation_result.warnings
+        if w.type == WarningType.MOLECULAR_EVENT_INDIVIDUAL
+    ):
+        logger.info(
+            f"Minerva model for GO-CAM model {gocam_model.id} uses molecular events; skipping."
+        )
+        return FilteredResult(reason=FilterReason.USES_MOLECULAR_EVENT, meta=meta)
 
     # If dry run is enabled, skip writing the output file
     if output_dir is None:

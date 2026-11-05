@@ -97,6 +97,8 @@ Models are filtered out and not written if they:
 - Have no activity edges (no activities linked by causal associations or shared chemical
   inputs/outputs)
 - Use complement types
+- Use molecular event individuals (individuals whose only root type is
+  `obo:go/extensions/reacto.owl#molecular_event`)
 
 **Outputs:**
 
