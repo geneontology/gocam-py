@@ -5,23 +5,23 @@ excluded models.
 
 This script reads Minerva model JSON files from an input directory and translates each one to
 a GO-CAM model. It then checks the translated model, and the warnings produced while
-translating it, against the criteria below. Checks run in the order listed, and the first
-check a model fails decides what happens to it.
+translating it, for the conditions below. Conditions are checked in the order listed, and the
+first one that applies to a model decides what happens to it.
 
-Exclusion checks. A model that fails one of these is not written to any output directory. It
-is only recorded in the log file:
-  - The model has production status.
-  - The model has at least one activity with a causal association to another activity, either
-    directly or through input and output associations with the same chemical entity.
+A model is excluded if any of these apply. Excluded models are not written to any output
+directory; they are only recorded in the log file:
+  - The model does not have production status.
+  - No activity in the model has a causal association with another activity, either directly
+    or through input and output associations with the same chemical entity.
 
-Pseudo GO-CAM checks. A model that fails one of these is written to the Pseudo GO-CAM output
-directory:
-  - The model does not use complement types.
-  - The model does not use molecular event individuals.
-  - Every activity in the model has a causal association with at least one other activity.
-  - The model has evidence for at least one assertion.
+A model is a Pseudo GO-CAM if any of these apply. Pseudo GO-CAMs are written to the Pseudo
+GO-CAM output directory:
+  - The model uses complement types.
+  - The model uses molecular event individuals.
+  - At least one activity has no causal association with any other activity.
+  - The model has no evidence for any assertion.
 
-A model that passes every check is a True GO-CAM and is written to the output directory.
+A model to which none of these apply is a True GO-CAM and is written to the output directory.
 """
 
 import dataclasses
@@ -102,17 +102,17 @@ def classify_model(
 ) -> SuccessResult | FilteredResult:
     """Check a translated model against the True GO-CAM criteria.
 
-    The checks and their order are described in the module docstring. Checking stops at the
-    first check the model fails.
+    The conditions and their order are described in the module docstring. Checking stops at
+    the first condition that applies to the model.
 
     Args:
         model: The translated GO-CAM model.
         warnings: The warnings produced while translating the model.
 
     Returns:
-        A SuccessResult if the model passes every check, otherwise a FilteredResult with the
-        reason for the first failed check. The result has no metadata or warnings; the caller
-        adds them.
+        A SuccessResult if no condition applies, otherwise a FilteredResult with the reason
+        for the first condition that applies. The result has no metadata or warnings; the
+        caller adds them.
     """
     if model.status != ModelStateEnum.production:
         return FilteredResult(reason=FilterReason.NOT_PRODUCTION_MODEL)
