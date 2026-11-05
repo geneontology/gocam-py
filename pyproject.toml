@@ -88,6 +88,9 @@ addopts = [
     # Using `importlib` more closely mimics how the code will be run when installed as a package.
     "--import-mode=importlib"
 ]
+# Pipeline scripts import their siblings (e.g. `_common`) as top-level modules, so tests of
+# those scripts need the pipeline directory itself on sys.path.
+pythonpath = ["pipeline"]
 markers = [
     "integration"
 ]
@@ -106,3 +109,7 @@ exclude = [
     "project/",
     "src/gocam/datamodel/gocam.py"
 ]
+
+[tool.ty.environment]
+# Pipeline scripts import their siblings as top-level modules; tests do the same.
+extra-paths = ["pipeline"]

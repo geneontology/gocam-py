@@ -16,8 +16,8 @@ Options:
   --output-root-dir PATH
                      Root directory for pipeline outputs.
   --steps NAMES      Comma-separated step names (default: all steps).
-                     Steps: convert, filter, index, index-files,
-                     browser-search, stats, summary.
+                     Steps: convert, index, index-files, browser-search,
+                     stats, summary.
   --clean            Remove the entire output root directory before running.
   --dry-run          Print planned cleanup and commands without changing files.
   -h, --help         Show this help.
@@ -106,7 +106,7 @@ if [[ "$clean" == true ]] \
 fi
 
 logs_dir="$output_root_dir/logs"
-known_steps=(convert filter index index-files browser-search stats summary)
+known_steps=(convert index index-files browser-search stats summary)
 
 if [[ "$steps" == "all" ]]; then
   selected_steps="$(IFS=,; echo "${known_steps[*]}")"
@@ -146,24 +146,20 @@ require_input_dir() {
   fi
 }
 
-if step_selected filter; then
-  require_input_dir "$output_root_dir/01-gocam-models" filter convert
-fi
 if step_selected index; then
-  require_input_dir "$output_root_dir/02-true-gocams" index filter
+  require_input_dir "$output_root_dir/01-true-gocams" index convert
 fi
 if step_selected index-files; then
-  require_input_dir "$output_root_dir/03-indexed-true-gocams" index-files index
+  require_input_dir "$output_root_dir/02-indexed-true-gocams" index-files index
 fi
 if step_selected browser-search; then
-  require_input_dir "$output_root_dir/03-indexed-true-gocams" browser-search index
+  require_input_dir "$output_root_dir/02-indexed-true-gocams" browser-search index
 fi
 if step_selected stats; then
-  require_input_dir "$output_root_dir/03-indexed-true-gocams" stats index
+  require_input_dir "$output_root_dir/02-indexed-true-gocams" stats index
 fi
 if step_selected summary \
   && ! step_selected convert \
-  && ! step_selected filter \
   && ! step_selected index \
   && ! step_selected index-files \
   && ! step_selected browser-search; then
@@ -220,68 +216,57 @@ if [[ "$dry_run" == false ]]; then
 fi
 
 if step_selected convert; then
-  output_dir="$output_root_dir/01-gocam-models"
+  output_dir="$output_root_dir/01-true-gocams"
+  pseudo_output_dir="$output_root_dir/01-pseudo-gocams"
   log_file="$logs_dir/01-convert.jsonl"
-  prepare_output_dir "$output_dir"
-  prepare_output_file "$log_file"
-  run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/convert_minerva_models_to_gocam_models.py" \
-    --input-dir "$models_dir" \
-    --output-dir "$output_dir" \
-    --log-file "$log_file"
-fi
-
-if step_selected filter; then
-  output_dir="$output_root_dir/02-true-gocams"
-  pseudo_output_dir="$output_root_dir/02-pseudo-gocams"
-  log_file="$logs_dir/02-filter.jsonl"
   prepare_output_dir "$output_dir"
   prepare_output_dir "$pseudo_output_dir"
   prepare_output_file "$log_file"
-  run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/filter_true_gocam_models.py" \
-    --input-dir "$output_root_dir/01-gocam-models" \
+  run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/convert_minerva_models_to_gocam_models.py" \
+    --input-dir "$models_dir" \
     --output-dir "$output_dir" \
     --pseudo-gocam-output-dir "$pseudo_output_dir" \
     --log-file "$log_file"
 fi
 
 if step_selected index; then
-  output_dir="$output_root_dir/03-indexed-true-gocams"
-  log_file="$logs_dir/03-index.jsonl"
+  output_dir="$output_root_dir/02-indexed-true-gocams"
+  log_file="$logs_dir/02-index.jsonl"
   prepare_output_dir "$output_dir"
   prepare_output_file "$log_file"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/add_query_index_to_models.py" \
-    --input-dir "$output_root_dir/02-true-gocams" \
+    --input-dir "$output_root_dir/01-true-gocams" \
     --output-dir "$output_dir" \
     --log-file "$log_file"
 fi
 
 if step_selected index-files; then
-  output_dir="$output_root_dir/04-index-files"
-  log_file="$logs_dir/04-index-files.jsonl"
+  output_dir="$output_root_dir/03-index-files"
+  log_file="$logs_dir/03-index-files.jsonl"
   prepare_output_dir "$output_dir"
   prepare_output_file "$log_file"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/generate_index_files.py" \
-    --input-dir "$output_root_dir/03-indexed-true-gocams" \
+    --input-dir "$output_root_dir/02-indexed-true-gocams" \
     --output-dir "$output_dir" \
     --log-file "$log_file"
 fi
 
 if step_selected browser-search; then
-  output_dir="$output_root_dir/05-browser-search-docs"
-  log_file="$logs_dir/05-browser-search.jsonl"
+  output_dir="$output_root_dir/04-browser-search-docs"
+  log_file="$logs_dir/04-browser-search.jsonl"
   prepare_output_dir "$output_dir"
   prepare_output_file "$log_file"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/generate_go_cam_browser_search_docs.py" \
-    --input-dir "$output_root_dir/03-indexed-true-gocams" \
+    --input-dir "$output_root_dir/02-indexed-true-gocams" \
     --output "$output_dir/go-cam-browser-search-docs.json" \
     --log-file "$log_file"
 fi
 
 if step_selected stats; then
-  output_dir="$output_root_dir/06-stats"
+  output_dir="$output_root_dir/05-stats"
   prepare_output_dir "$output_dir"
   run_command uv run --project "$REPO_ROOT" python "$SCRIPT_DIR/output_stats_for_gocam_models.py" \
-    --input-dir "$output_root_dir/03-indexed-true-gocams" \
+    --input-dir "$output_root_dir/02-indexed-true-gocams" \
     --output-dir "$output_dir"
 fi
 

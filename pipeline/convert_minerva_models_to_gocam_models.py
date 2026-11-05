@@ -1,26 +1,33 @@
 #!/usr/bin/env python3
 """
-Convert Minerva models to GO-CAM models, filtering out models that are definitely not GO-CAM shaped.
+Convert Minerva models to GO-CAM models and sort them into True GO-CAMs, Pseudo GO-CAMs, and
+excluded models.
 
-This script reads Minerva model JSON files from a specified input directory, converts them to
-GO-CAM models, and saves the converted models to an output directory. Models that do not meet very
-basic connectivity criteria are filtered out. At least one of the following conditions must be met:
+This script reads Minerva model JSON files from an input directory and translates each one to
+a GO-CAM model. It then checks the translated model, and the warnings produced while
+translating it, for the conditions below. Conditions are checked in the order listed, and the
+first one that applies to a model decides what happens to it.
 
-- The model has at least one activity with a direct causal association to another activity.
-- The model has at least one activity with an indirect association to another activity via
-  input and output associations to the same chemical entity.
+A model is excluded if any of these apply. Excluded models are not written to any output
+directory; they are only recorded in the log file:
+  - The model does not have production status.
+  - No activity in the model has a causal association with another activity, either directly
+    or through input and output associations with the same chemical entity.
 
-Models that use complement types or molecular event individuals are also filtered out, since these
-cannot be represented in the GO-CAM data model.
+A model is a Pseudo GO-CAM if any of these apply. Pseudo GO-CAMs are written to the Pseudo
+GO-CAM output directory:
+  - The model uses complement types.
+  - The model uses molecular event individuals.
+  - At least one activity has no causal association with any other activity.
+  - The model has no evidence for any assertion.
 
-The models which pass the connectivity criteria are written to the output directory. They may or may
-not be True GO-CAM models. This output set is designed for QC analysis and further downstream
-filtering.
+A model to which none of these apply is a True GO-CAM and is written to the output directory.
 """
 
 import dataclasses
 import json
 import logging
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Annotated
 
@@ -28,6 +35,7 @@ import typer
 from _common import (
     ErrorReason,
     ErrorResult,
+    FilterCategory,
     FilteredResult,
     FilterReason,
     PipelineLogWriter,
@@ -40,14 +48,15 @@ from _common import (
 )
 from rich.progress import track
 
-from gocam.datamodel import Model
+from gocam.datamodel import Model, ModelStateEnum
 from gocam.translation import (
     MinervaObject,
     MinervaView,
     MinervaWrapper,
+    TranslationWarning,
     WarningType,
 )
-from gocam.utils import all_provenance, model_to_digraph
+from gocam.utils import all_evidence, all_provenance, model_to_digraph
 
 app = typer.Typer()
 
@@ -88,22 +97,71 @@ def extract_gocam_model_metadata(model: Model) -> dict:
     }
 
 
+def classify_model(
+    model: Model, warnings: Iterable[TranslationWarning]
+) -> SuccessResult | FilteredResult:
+    """Check a translated model against the True GO-CAM criteria.
+
+    The conditions and their order are described in the module docstring. Checking stops at
+    the first condition that applies to the model.
+
+    Args:
+        model: The translated GO-CAM model.
+        warnings: The warnings produced while translating the model.
+
+    Returns:
+        A SuccessResult if no condition applies, otherwise a FilteredResult with the reason
+        for the first condition that applies. The result has no metadata or warnings; the
+        caller adds them.
+    """
+    if model.status != ModelStateEnum.production:
+        return FilteredResult(reason=FilterReason.NOT_PRODUCTION_MODEL)
+
+    graph = model_to_digraph(model)
+    if graph.number_of_edges() == 0:
+        return FilteredResult(reason=FilterReason.NO_ACTIVITY_EDGE)
+
+    warning_types = {warning.type for warning in warnings}
+    if WarningType.INDIVIDUAL_HAS_COMPLEMENT_TYPE in warning_types:
+        return FilteredResult(reason=FilterReason.USES_COMPLEMENT)
+
+    if WarningType.MOLECULAR_EVENT_INDIVIDUAL in warning_types:
+        return FilteredResult(reason=FilterReason.USES_MOLECULAR_EVENT)
+
+    if any(degree == 0 for _, degree in graph.degree()):
+        return FilteredResult(reason=FilterReason.DISCONNECTED_ACTIVITY)
+
+    if next(all_evidence(model), None) is None:
+        return FilteredResult(reason=FilterReason.NO_EVIDENCE)
+
+    return SuccessResult()
+
+
 def process_minerva_model_file(
     json_file: Path,
     output_dir: Path | None,
+    pseudo_gocam_output_dir: Path | None,
 ) -> PipelineResult:
-    """Process a single Minerva model JSON file and convert it to a GO-CAM model.
+    """Convert one Minerva model JSON file to a GO-CAM model, check it, and write it out.
+
+    True GO-CAMs are written to output_dir and Pseudo GO-CAMs to pseudo_gocam_output_dir,
+    using the input file's name. Excluded models are not written.
 
     Args:
         json_file: Path to the Minerva model JSON file.
-        output_dir: Directory to save the converted GO-CAM model file. If None, no file will be
+        output_dir: Directory to save True GO-CAM models in. If None, True GO-CAMs are not
             written.
+        pseudo_gocam_output_dir: Directory to save Pseudo GO-CAM models in. If None, Pseudo
+            GO-CAMs are not written.
 
     Returns:
-        A ProcessingResult indicating the outcome:
-            - SuccessResult: If the conversion was successful, with any warnings.
-            - FilteredResult: If the model was filtered out, with the reason.
-            - ErrorResult: If there was an error, with the reason.
+        A PipelineResult describing the outcome. It includes the model's metadata whenever
+        the metadata could be read from the file.
+            - SuccessResult: The model is a True GO-CAM. Includes any translation warnings.
+            - FilteredResult: The model failed a check. Includes the reason and any
+              translation warnings.
+            - ErrorResult: The file could not be read, translated, or written. Includes the
+              reason and the error message.
     """
     # Read Minerva model from JSON file
     try:
@@ -141,44 +199,26 @@ def process_minerva_model_file(
             reason=ErrorReason.CONVERSION_ERROR, details=str(e), meta=meta
         )
 
-    # Detect if there is at least one activity edge in the model. If not, skip writing the model.
-    graph = model_to_digraph(gocam_model)
-    has_activity_edge = graph.number_of_edges() > 0
-    if not has_activity_edge:
-        logger.info(f"GO-CAM model {gocam_model.id} has no activity edges; skipping.")
-        return FilteredResult(reason=FilterReason.NO_ACTIVITY_EDGE, meta=meta)
+    result = dataclasses.replace(
+        classify_model(gocam_model, translation_result.warnings),
+        warnings=translation_warnings,
+        meta=meta,
+    )
+    if isinstance(result, SuccessResult):
+        destination = output_dir
+    else:
+        logger.info(f"GO-CAM model {gocam_model.id} filtered: {result.reason.value}")
+        if result.reason.category == FilterCategory.PSEUDO_GOCAM:
+            destination = pseudo_gocam_output_dir
+        else:
+            destination = None
 
-    # Detect if the Minerva model uses complement constructs. If so, skip writing the model.
-    if any(
-        w
-        for w in translation_result.warnings
-        if w.type == WarningType.INDIVIDUAL_HAS_COMPLEMENT_TYPE
-    ):
-        logger.info(
-            f"Minerva model for GO-CAM model {gocam_model.id} uses complement constructs; skipping."
-        )
-        return FilteredResult(reason=FilterReason.USES_COMPLEMENT, meta=meta)
+    # Excluded models are never written, and nothing is written during a dry run
+    if destination is None:
+        return result
 
-    # Detect if the Minerva model uses molecular events. If so, skip writing the model.
-    if any(
-        w
-        for w in translation_result.warnings
-        if w.type == WarningType.MOLECULAR_EVENT_INDIVIDUAL
-    ):
-        logger.info(
-            f"Minerva model for GO-CAM model {gocam_model.id} uses molecular events; skipping."
-        )
-        return FilteredResult(reason=FilterReason.USES_MOLECULAR_EVENT, meta=meta)
-
-    # If dry run is enabled, skip writing the output file
-    if output_dir is None:
-        logger.info(
-            f"Dry run enabled; skipping write for GO-CAM model {gocam_model.id}"
-        )
-        return SuccessResult(warnings=translation_warnings, meta=meta)
-
-    # Write GO-CAM model to output directory
-    output_file = output_dir / json_file.name
+    # Write GO-CAM model to the destination directory
+    output_file = destination / json_file.name
     try:
         gocam_model_json = gocam_model.model_dump_json(exclude_none=True)
         with open(output_file, "w") as f:
@@ -188,8 +228,7 @@ def process_minerva_model_file(
         logger.error(f"Error writing GO-CAM model to file {output_file}", exc_info=e)
         return ErrorResult(reason=ErrorReason.WRITE_ERROR, details=str(e), meta=meta)
 
-    # If we reach here, the conversion and writing were successful
-    return SuccessResult(warnings=translation_warnings, meta=meta)
+    return result
 
 
 @app.command()
@@ -211,7 +250,17 @@ def main(
             file_okay=False,
             dir_okay=True,
             writable=True,
-            help="Directory to save converted GO-CAM model files. Required unless --dry-run is used.",
+            help="Directory to save True GO-CAM model files. Required unless --dry-run is used.",
+        ),
+    ] = None,
+    pseudo_gocam_output_dir: Annotated[
+        Path | None,
+        typer.Option(
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            writable=True,
+            help="Directory to save Pseudo GO-CAM model files. Required unless --dry-run is used.",
         ),
     ] = None,
     log_file: Annotated[
@@ -243,15 +292,25 @@ def main(
     ] = 0,
 ):
     """
-    Convert Minerva models to GO-CAM models, with basic connectivity filtering.
+    Convert Minerva models to GO-CAM models. True GO-CAMs are written to the output directory and
+    Pseudo GO-CAMs are written to the Pseudo GO-CAM output directory. Excluded models are only
+    recorded in the log file.
     """
     setup_logger(verbose)
 
-    # Validate output directory if not a dry run
-    if not dry_run and output_dir is None:
-        raise typer.BadParameter(
-            "Output directory must be specified unless --dry-run is used."
-        )
+    # Validate output directories if not a dry run
+    if dry_run:
+        output_dir = None
+        pseudo_gocam_output_dir = None
+    else:
+        if output_dir is None:
+            raise typer.BadParameter(
+                "Output directory must be specified unless --dry-run is used."
+            )
+        if pseudo_gocam_output_dir is None:
+            raise typer.BadParameter(
+                "Pseudo GO-CAM output directory must be specified unless --dry-run is used."
+            )
 
     log_writer = PipelineLogWriter(log_file, PipelineStep.CONVERT) if log_file else None
 
@@ -261,10 +320,14 @@ def main(
     # Process each JSON file
     result_summary = ResultSummary()
     for json_file in track(
-        json_files, description="Converting Minerva models to GO-CAM models..."
+        json_files, description="Converting and filtering Minerva models..."
     ):
         logger.debug(f"Processing file: {json_file}")
-        result = process_minerva_model_file(json_file, output_dir=output_dir)
+        result = process_minerva_model_file(
+            json_file,
+            output_dir=output_dir,
+            pseudo_gocam_output_dir=pseudo_gocam_output_dir,
+        )
         model_id = json_file.stem
         result_summary.add_result(model_id, result)
         if log_writer:

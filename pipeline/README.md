@@ -52,8 +52,7 @@ regardless of the order in which they are listed:
 ./pipeline/run_pipeline.sh --steps index,stats
 ```
 
-Available stages are `convert`, `filter`, `index`, `index-files`, `browser-search`,
-`stats`, and
+Available stages are `convert`, `index`, `index-files`, `browser-search`, `stats`, and
 `summary`. A selected stage uses existing upstream outputs when the upstream stage is
 not selected. The runner fails before processing if a required input is unavailable.
 
@@ -64,7 +63,7 @@ without changing files:
 
 ```bash
 ./pipeline/run_pipeline.sh --clean
-./pipeline/run_pipeline.sh --dry-run --steps filter,index
+./pipeline/run_pipeline.sh --dry-run --steps convert,index
 ```
 
 Configuration precedence is command-line option, exported environment variable, `.env`,
@@ -80,37 +79,52 @@ Run `./pipeline/run_pipeline.sh --help` for the complete command synopsis.
 
 ## convert_minerva_models_to_gocam_models.py
 
-Converts Minerva model JSON files to GO-CAM model format, doing basic filtering to
-eliminate obvious non-GO-CAM models. The output files are intended for internal QC
-analysis and further filtering.
+Converts Minerva model JSON files to GO-CAM models and sorts them into True GO-CAMs,
+Pseudo GO-CAMs, and excluded models. Checks use both the translated GO-CAM model and the
+warnings produced during translation.
 
 **Inputs:**
 
 - `--input-dir`: Directory containing Minerva model JSON files
-- `--output-dir`: Directory to save converted GO-CAM models (required unless using
+- `--output-dir`: Directory to save True GO-CAM models (required unless using
   `--dry-run`)
+- `--pseudo-gocam-output-dir`: Directory to save Pseudo GO-CAM models (required unless
+  using `--dry-run`)
 
 **Filtering:**
 
-Models are filtered out and not written if they:
+Checks run in the following order. The first failing check determines the outcome, and
+no further checks run.
 
-- Have no activity edges (no activities linked by causal associations or shared chemical
-  inputs/outputs)
-- Use complement types
-- Use molecular event individuals (individuals whose only root type is
-  `obo:go/extensions/reacto.owl#molecular_event`)
+Exclusion checks. Excluded models are not written to any output directory and do not
+appear on the HTML group reports, but they are recorded in the log:
+
+- The model does not have "production" status (`NOT_PRODUCTION_MODEL`)
+- The model has no activity edges, that is, no activities linked by causal associations
+  or shared chemical inputs/outputs (`NO_ACTIVITY_EDGE`)
+
+Pseudo GO-CAM checks. Pseudo GO-CAMs are written to `--pseudo-gocam-output-dir` and
+appear on the HTML group reports with the reason they were filtered:
+
+- The model uses complement types (`USES_COMPLEMENT`)
+- The model uses molecular event individuals, that is, individuals whose only root type
+  is `obo:go/extensions/reacto.owl#molecular_event` (`USES_MOLECULAR_EVENT`)
+- The model has at least one activity with no causal relations (`DISCONNECTED_ACTIVITY`)
+- The model has no evidence for any assertion (`NO_EVIDENCE`)
+
+Models that pass every check are True GO-CAMs.
 
 **Outputs:**
 
-- GO-CAM model JSON files (one per input file) in the specified output directory
+- True GO-CAM model JSON files in `--output-dir`
+- Pseudo GO-CAM model JSON files in `--pseudo-gocam-output-dir`
 
 **Options:**
 
-- `--log-file`: JSON Lines log file to write the conversion results
-- `--dry-run`: Perform conversion without writing output files
-- `--verbose` / `-v`: Increase verbosity (use multiple times for more detail: `-v` for
-  INFO, `-vv`
-  for DEBUG)
+- `--log-file`: JSON Lines log file to write the results. Filtered entries include a
+  `category` of `excluded` or `pseudo-gocam`.
+- `--dry-run`: Perform conversion and filtering without writing output files
+- `--verbose` / `-v`: Increase verbosity (`-v` for INFO, `-vv` for DEBUG)
 - `--limit N`: Limit processing to first N models (0 = no limit)
 
 **Usage:**
@@ -118,58 +132,8 @@ Models are filtered out and not written if they:
 ```bash
 python pipeline/convert_minerva_models_to_gocam_models.py \
   --input-dir /path/to/minerva/models \
-  --output-dir /path/to/gocam/models
-```
-
-## filter_true_gocam_models.py
-
-Filters a collection of models based on whether they meet the True GO-CAM criteria. A
-True GO-CAM model is defined as a model where all of the following criteria are met:
-
-- The model is in production status.
-- The model has at least two activities that are connected by a causal association,
-  either directly or indirectly via shared chemical entities.
-- The model has no activities that are disconnected from all other activities in the
-  model.
-
-**Inputs:**
-
-- `--input-dir`: Directory containing GO-CAM model JSON files
-- `--output-dir`: Directory to save production True GO-CAM models (required unless using
-  `--dry-run`)
-- `--pseudo-gocam-output-dir`: Directory to save models that have production status but
-  do not otherwise meet True GO-CAM criteria (required unless using `--dry-run`)
-
-**Filtering:**
-
-Models are classified and moved based on these criteria:
-
-- **Status**: Only models with a "production" status are considered.
-- **Connectivity**: Models must have at least two activities that are connected by a
-  causal association, either directly or indirectly via shared chemical entities. Models
-  may not have any activities that are completely disconnected from all other activities
-  in the model.
-
-**Outputs:**
-
-- True GO-CAM models are copied to the specified `--output-dir`.
-- Models that are production-status but not pathway-like are copied to the
-  `--pseudo-gocam-output-dir`.
-
-**Options:**
-
-- `--log-file`: JSON Lines log file to write the results
-- `--dry-run`: Perform the analysis without copying any files
-- `--verbose` / `-v`: Increase verbosity (`-v` for INFO, `-vv` for DEBUG)
-- `--limit N`: Limit processing to first N models (0 = no limit)
-
-**Usage:**
-
-```bash
-python pipeline/filter_true_gocam_models.py \
-  --input-dir /path/to/input \
-  --output-dir /path/to/true_models \
-  --pseudo-gocam-output-dir /path/to/pseudo_models
+  --output-dir /path/to/true-gocams \
+  --pseudo-gocam-output-dir /path/to/pseudo-gocams
 ```
 
 ## add_query_index_to_models.py
@@ -280,17 +244,18 @@ Each JSONL pipeline log is self-describing. Its first line is a required header:
 ```json
 {
   "record_type": "pipeline_step_log",
-  "format_version": 1,
+  "format_version": 2,
   "step": "convert"
 }
 ```
 
 The remaining lines contain per-model results. The supported step identifiers, in
-canonical pipeline order, are `convert`, `filter`, `query-index`, `index-files`, and
+canonical pipeline order, are `convert`, `query-index`, `index-files`, and
 `browser-search`. Log filenames do not determine processing order and may be chosen by
 the caller. A directory may contain any subset of steps, but it may not contain multiple
 logs for the same step. Missing or invalid headers, unsupported format versions, unknown
-steps, and duplicate steps are rejected.
+steps, and duplicate steps are rejected. Logs written before format version 2 (which
+included a separate `filter` step) are not supported.
 
 **Inputs:**
 
@@ -326,12 +291,14 @@ python pipeline/generate_log_summary.py \
 ```
 
 The HTML output contains an index page (`index.html` by default) linking to each
-providing-group report. Group pages show production GO-CAM-like model counts by pipeline
-result (`success`, `filtered`, or `error`) and list every production GO-CAM-like
-model—that is, every production model that was processed by the `filter` pipeline
-step—including any warnings. A model associated with multiple groups appears in each
-applicable report; production GO-CAM-like models without group metadata appear in an
-Unassigned report. The Excel output continues to include results for all models.
+providing-group report. Group pages show model counts by pipeline result (`success`,
+`filtered`, or `error`) and list every production True GO-CAM and Pseudo GO-CAM,
+including any warnings. Which models are listed depends on the result of the `convert`
+step: models it wrote as True GO-CAMs, models it filtered with the `pseudo-gocam`
+category, and models it failed to write. Excluded models and models that could not be
+read or translated are not listed. A model associated with multiple groups appears in
+each applicable report; listed models without group metadata appear in an Unassigned
+report. The Excel output continues to include results for all models.
 
 ## output_stats_for_gocam_models.py
 
