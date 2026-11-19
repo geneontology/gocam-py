@@ -4,6 +4,7 @@ from gocam.datamodel import (
     Activity,
     CausalAssociation,
     EnabledByGeneProductAssociation,
+    EvidenceItem,
     Model,
     MoleculeAssociation,
 )
@@ -197,3 +198,72 @@ def test_explicit_causal_association_still_adds_edge():
 
     assert set(graph.edges) == {("upstream", "downstream")}
     assert graph.edges["upstream", "downstream"] == {"explicit": True}
+
+
+def test_optional_support_retains_predicates_intermediates_and_evidence():
+    upstream = activity_with_molecular_associations(
+        "upstream", (Relation.HAS_OUTPUT, "m1"), (Relation.HAS_PRIMARY_OUTPUT, "m2")
+    )
+    downstream = activity_with_molecular_associations(
+        "downstream",
+        (Relation.HAS_INPUT, "m1"),
+        (Relation.HAS_SMALL_MOLECULE_INHIBITOR, "m2"),
+    )
+    upstream.causal_associations = [
+        CausalAssociation(
+            predicate=Relation.CAUSALLY_UPSTREAM_OF,
+            downstream_activity="downstream",
+            evidence=[EvidenceItem(reference="PMID:1")],
+        ),
+        CausalAssociation(
+            predicate="RO:0002413",
+            downstream_activity="downstream",
+            evidence=[EvidenceItem(reference="PMID:2")],
+        ),
+    ]
+    assert upstream.molecular_associations is not None
+    assert downstream.molecular_associations is not None
+    upstream.molecular_associations[0].evidence = [EvidenceItem(reference="PMID:3")]
+    downstream.molecular_associations[0].evidence = [EvidenceItem(reference="PMID:4")]
+    model = Model(
+        id="gomodel:test",
+        title="Supporting associations",
+        activities=[upstream, downstream],
+    )
+    before = model.model_dump()
+    graph = model_to_digraph(model, include_support=True)
+    edge = graph.edges["upstream", "downstream"]
+    assert edge["explicit"] and edge["inferred"]
+    assert edge["causal_associations"] == upstream.causal_associations
+    chains = {chain["molecule"]: chain for chain in edge["molecule_chains"]}
+    assert set(chains) == {"m1", "m2"}
+    assert chains["m1"]["upstream"] is upstream.molecular_associations[0]
+    assert chains["m1"]["downstream"] is downstream.molecular_associations[0]
+    assert chains["m1"]["upstream"].evidence[0].reference == "PMID:3"
+    assert chains["m1"]["downstream"].evidence[0].reference == "PMID:4"
+    assert chains["m2"]["downstream"].predicate == Relation.HAS_SMALL_MOLECULE_INHIBITOR
+    assert model.model_dump() == before
+    assert model_to_digraph(model).edges["upstream", "downstream"] == {
+        "explicit": True,
+        "inferred": True,
+    }
+
+
+def test_support_groups_identical_chains_but_keeps_different_evidence():
+    upstream = activity_with_molecular_associations(
+        "upstream", (Relation.HAS_OUTPUT, "m")
+    )
+    assert upstream.molecular_associations is not None
+    output = upstream.molecular_associations[0]
+    upstream.molecular_associations.extend(
+        [output.model_copy(deep=True), output.model_copy(deep=True)]
+    )
+    upstream.molecular_associations[-1].evidence = [EvidenceItem(reference="PMID:5")]
+    downstream = activity_with_molecular_associations(
+        "downstream", (Relation.HAS_INPUT, "m")
+    )
+    model = Model(
+        id="gomodel:test", title="Duplicate support", activities=[upstream, downstream]
+    )
+    graph = model_to_digraph(model, include_support=True)
+    assert len(graph.edges["upstream", "downstream"]["molecule_chains"]) == 2
