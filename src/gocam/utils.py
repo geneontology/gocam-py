@@ -272,7 +272,7 @@ def all_evidence(model: Model) -> Iterator[EvidenceItem]:
             yield from association.evidence
 
 
-def model_to_digraph(model: Model) -> nx.DiGraph:
+def model_to_digraph(model: Model, *, include_support: bool = False) -> nx.DiGraph:
     """Convert a Model to a NetworkX directed graph.
 
     Nodes represent enabled activities. Edges represent explicit causal
@@ -289,8 +289,21 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
     ways at once, so callers wanting only the implied connections must filter
     on ``inferred`` rather than subtracting the explicit ones.
 
+    With ``include_support=True``, explicit edges also carry
+    ``causal_associations`` (the original CausalAssociation objects), and
+    inferred edges carry ``molecule_chains`` (dictionaries containing the
+    ``molecule`` instance ID and the original ``upstream`` and ``downstream``
+    MoleculeAssociation objects). This lets consumers explain a connection
+    without reconstructing the inference rules. Distinct supporting predicates,
+    molecules and evidence are retained. Identical molecular chains are grouped;
+    explicit assertion records are retained individually. The source model is
+    not modified. Support objects reference the model and should be treated as
+    read-only; use their ``model_dump`` method for serialization.
+
     Args:
         model: The model to convert.
+        include_support: Attach supporting associations to edges. Defaults to
+            False, preserving the compact connectivity-only graph.
 
     Returns:
         A directed graph representing causal connectivity in the model.
@@ -298,8 +311,8 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
     graph = nx.DiGraph()
 
     activities_by_molecule_and_predicate: defaultdict[
-        tuple[str, Relation], set[str]
-    ] = defaultdict(set)
+        tuple[str, Relation], list[tuple[str, MoleculeAssociation]]
+    ] = defaultdict(list)
     for activity in model.activities or []:
         for association in activity.molecular_associations or []:
             if association.molecule is None:
@@ -309,9 +322,9 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
             except ValueError:
                 logger.warning("Unknown predicate: %s", association.predicate)
                 continue
-            activities_by_molecule_and_predicate[(association.molecule, predicate)].add(
-                activity.id
-            )
+            activities_by_molecule_and_predicate[
+                (association.molecule, predicate)
+            ].append((activity.id, association))
 
     enabled_activity_ids = {
         a.id for a in model.activities or [] if a.enabled_by is not None
@@ -327,6 +340,10 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
             downstream_activity_id = causal_assoc.downstream_activity
             if downstream_activity_id in enabled_activity_ids:
                 graph.add_edge(activity.id, downstream_activity_id, explicit=True)
+                if include_support:
+                    graph.edges[activity.id, downstream_activity_id].setdefault(
+                        "causal_associations", []
+                    ).append(causal_assoc)
 
         for association in activity.molecular_associations or []:
             if association.molecule is None:
@@ -337,10 +354,13 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
             ) in IMPLICIT_CAUSAL_ASSOCIATION_CHAINS:
                 if association.predicate != upstream_predicate:
                     continue
-                downstream_activity_ids = activities_by_molecule_and_predicate.get(
-                    (association.molecule, downstream_predicate), set()
+                downstream_associations = activities_by_molecule_and_predicate.get(
+                    (association.molecule, downstream_predicate), []
                 )
-                for downstream_activity_id in downstream_activity_ids:
+                for (
+                    downstream_activity_id,
+                    downstream_association,
+                ) in downstream_associations:
                     if (
                         downstream_activity_id != activity.id
                         and downstream_activity_id in enabled_activity_ids
@@ -348,5 +368,16 @@ def model_to_digraph(model: Model) -> nx.DiGraph:
                         graph.add_edge(
                             activity.id, downstream_activity_id, inferred=True
                         )
+                        if include_support:
+                            chains = graph.edges[
+                                activity.id, downstream_activity_id
+                            ].setdefault("molecule_chains", [])
+                            chain = {
+                                "molecule": association.molecule,
+                                "upstream": association,
+                                "downstream": downstream_association,
+                            }
+                            if chain not in chains:
+                                chains.append(chain)
 
     return graph
