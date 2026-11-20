@@ -311,7 +311,7 @@ class ModelNetworkTranslator(GraphTranslator):
                 # Extend the list with new values, avoiding duplicates
                 for v in value:
                     if v not in merged[key]:
-                        merged[key].append(v)  # ty:ignore[unresolved-attribute]
+                        merged[key].append(v)  # ty:ignore[missing-union-attribute]
             else:
                 merged[key] = value
 
