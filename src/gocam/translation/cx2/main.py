@@ -19,6 +19,7 @@ except ModuleNotFoundError as ex:
     ) from None
 
 from gocam.datamodel import (
+    EnabledByGeneProductSetAssociation,
     EnabledByProteinComplexAssociation,
     EvidenceItem,
     Model,
@@ -220,10 +221,17 @@ def model_to_cx2(
 
         if isinstance(activity.enabled_by, EnabledByProteinComplexAssociation):
             node_type = NodeType.COMPLEX
+        elif isinstance(activity.enabled_by, EnabledByGeneProductSetAssociation):
+            node_type = NodeType.GENE_SET
         else:
             node_type = NodeType.GENE
 
-        node_name = _get_object_label(activity.enabled_by.term)
+        if isinstance(activity.enabled_by, EnabledByGeneProductSetAssociation):
+            node_name = activity.enabled_by.label or " | ".join(
+                _get_object_label(m.term) for m in activity.enabled_by.members
+            )
+        else:
+            node_name = _get_object_label(activity.enabled_by.term)
         if (
             validate_iquery_gene_symbol_pattern
             and node_type == NodeType.GENE
@@ -239,7 +247,11 @@ def model_to_cx2(
             "type": node_type.value,
         }
 
-        if (
+        if isinstance(activity.enabled_by, EnabledByGeneProductSetAssociation):
+            node_attributes["member"] = [
+                _get_object_label(m.term) for m in activity.enabled_by.members
+            ]
+        elif (
             isinstance(activity.enabled_by, EnabledByProteinComplexAssociation)
             and activity.enabled_by.has_part
         ):

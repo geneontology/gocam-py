@@ -21,8 +21,7 @@ except ModuleNotFoundError as ex:
     ) from None
 
 from gocam.datamodel import (
-    EnabledByGeneProductAssociation,
-    EnabledByProteinComplexAssociation,
+    EnabledByGeneProductSetAssociation,
     EvidenceTermObject,
     Model,
     MoleculeNode,
@@ -31,7 +30,12 @@ from gocam.datamodel import (
     QueryIndex,
     TermObject,
 )
-from gocam.utils import all_evidence, all_provenance, model_to_digraph
+from gocam.utils import (
+    all_evidence,
+    all_provenance,
+    enabled_by_gene_products,
+    model_to_digraph,
+)
 from gocam.vocabulary import (
     CHEMICAL_ENTITY,
     INFORMATION_BIOMACROMOLECULE,
@@ -318,17 +322,16 @@ class Indexer:
             annoton_term_id_parts = []
 
             if activity.enabled_by:
-                all_enabled_bys.add(activity.enabled_by.term)
-                if isinstance(activity.enabled_by, EnabledByGeneProductAssociation):
-                    all_enabled_by_genes.add(activity.enabled_by.term)
-                elif isinstance(
-                    activity.enabled_by, EnabledByProteinComplexAssociation
-                ):
-                    if activity.enabled_by.has_part:
-                        all_enabled_by_genes.update(
-                            member.term for member in activity.enabled_by.has_part
-                        )
-                annoton_term_id_parts.append(activity.enabled_by.term)
+                gene_products = enabled_by_gene_products(activity.enabled_by)
+                all_enabled_by_genes.update(gene_products)
+                if isinstance(activity.enabled_by, EnabledByGeneProductSetAssociation):
+                    # The set term (CHEBI:33695) is a placeholder; each member is a
+                    # potential enabler in its own right.
+                    all_enabled_bys.update(gene_products)
+                    annoton_term_id_parts.append("|".join(gene_products))
+                else:
+                    all_enabled_bys.add(activity.enabled_by.term)
+                    annoton_term_id_parts.append(activity.enabled_by.term)
 
             if activity.molecular_function:
                 all_mfs.add(activity.molecular_function.term)
@@ -354,8 +357,11 @@ class Indexer:
                         annoton_term_id_parts.append(input_molecule.term)
 
             if activity.enabled_by:
-                annoton_term_id_parts = filter(None, annoton_term_id_parts)
-                annoton_term_label_parts = [_label(x) for x in annoton_term_id_parts]
+                annoton_term_id_parts = [x for x in annoton_term_id_parts if x]
+                annoton_term_label_parts = [
+                    " | ".join(_label(y) for y in x.split("|"))
+                    for x in annoton_term_id_parts
+                ]
                 annoton_term = TermObject(
                     id="-".join(annoton_term_id_parts),
                     label="; ".join(annoton_term_label_parts),

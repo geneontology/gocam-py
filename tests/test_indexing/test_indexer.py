@@ -9,6 +9,7 @@ from gocam.indexing.indexer import Indexer
 from gocam.utils import model_to_digraph
 from gocam.vocabulary import CHEMICAL_ENTITY, INFORMATION_BIOMACROMOLECULE
 from tests import EXAMPLES_DIR
+from tests import INPUT_DIR as TESTS_INPUT_DIR
 from tests.test_indexing import INPUT_DIR
 
 
@@ -264,6 +265,32 @@ def test_indexer_adds_complex_members_to_model_activity_enabled_by_genes():
     assert len(model.query_index.model_activity_enabled_by_terms) == 1
     assert model.query_index.model_activity_enabled_by_terms[0].id == "GO:00001"
     assert model.query_index.model_activity_enabled_by_terms[0].label == "Test Complex"
+
+
+def test_indexer_counts_gene_product_set_members():
+    """Members of an enabler set are counted as enablers, rather than the set placeholder term."""
+    with open(TESTS_INPUT_DIR / "Model-erk-paralog-set.yaml") as f:
+        model = Model.model_validate(yaml.safe_load(f))
+    indexer = Indexer()
+    indexer.index_model(model)
+    qi = model.query_index
+    assert qi is not None
+    erk1, erk2, mek1 = "UniProtKB:P27361", "UniProtKB:P28482", "UniProtKB:Q02750"
+    assert {g.id for g in qi.model_activity_enabled_by_genes or []} == {
+        mek1,
+        erk1,
+        erk2,
+    }
+    assert {t.id for t in qi.model_activity_enabled_by_terms or []} == {
+        mek1,
+        erk1,
+        erk2,
+    }
+    assert qi.number_of_enabled_by_terms == 3
+    annoton_ids = {t.id for t in qi.annoton_terms or []}
+    assert f"{erk1}|{erk2}-GO:0004707" in annoton_ids
+    annoton_labels = {t.label for t in qi.annoton_terms or []}
+    assert "MAPK3 Hsap | MAPK1 Hsap; MAP kinase activity" in annoton_labels
 
 
 def test_indexer_populates_flattened_provided_by():

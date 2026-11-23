@@ -1,0 +1,53 @@
+# Illustrative model (not a real GO-CAM) showing an activity enabled by a set of
+# substitutable gene products (paralogs ERK1 and ERK2); see issue #68.
+# The reference and contributor are placeholders.
+id: gomodel:example_paralogy_model
+title: MEK1 activates ERK1/ERK2 (illustrative example)
+taxon: NCBITaxon:9606
+status: development
+activities:
+- id: gomodel:example_paralogy_model/mek1_activity
+  enabled_by:
+    type: EnabledByGeneProductAssociation
+    term: UniProtKB:Q02750  # MEK1 (MAP2K1)
+  molecular_function:
+    type: MolecularFunctionAssociation
+    term: GO:0004708  # MAP kinase kinase activity
+  causal_associations:
+  - type: CausalAssociation
+    predicate: RO:0002629  # directly positively regulates
+    downstream_activity: gomodel:example_paralogy_model/erk_activity
+- id: gomodel:example_paralogy_model/erk_activity
+  enabled_by:
+    type: EnabledByGeneProductSetAssociation
+    term: CHEBI:33695  # information biomacromolecule
+    label: ERK1/2
+    # evidence on the set applies to all members, e.g. a review article
+    evidence:
+    - term: ECO:0000304  # author statement supported by traceable reference
+      reference: PMID:12345678
+      provenances:
+      - contributor:
+        - https://orcid.org/0000-0000-0000-0000
+        date: '2025-03-27'
+    members:
+    - type: GeneProductSetMemberAssociation
+      term: UniProtKB:P27361  # ERK1 (MAPK3)
+    - type: GeneProductSetMemberAssociation
+      term: UniProtKB:P28482  # ERK2 (MAPK1)
+  molecular_function:
+    type: MolecularFunctionAssociation
+    term: GO:0004707  # MAP kinase activity
+objects:
+- id: UniProtKB:Q02750
+  label: MAP2K1 Hsap
+- id: UniProtKB:P27361
+  label: MAPK3 Hsap
+- id: UniProtKB:P28482
+  label: MAPK1 Hsap
+- id: CHEBI:33695
+  label: information biomacromolecule
+- id: GO:0004708
+  label: MAP kinase kinase activity
+- id: GO:0004707
+  label: MAP kinase activity

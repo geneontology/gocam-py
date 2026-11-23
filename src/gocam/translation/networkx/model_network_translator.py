@@ -4,7 +4,12 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 import networkx as nx
 
-from gocam.datamodel import Activity, CausalAssociation, Model
+from gocam.datamodel import (
+    Activity,
+    CausalAssociation,
+    EnabledByGeneProductSetAssociation,
+    Model,
+)
 from gocam.translation.networkx.graph_translator import GraphTranslator
 
 
@@ -26,7 +31,8 @@ class ModelNetworkTranslator(GraphTranslator):
         Translate multiple GO-CAM models into a single gene-to-gene NetworkX DiGraph.
 
         In the gene-to-gene format:
-        - Nodes represent gene products (from enabled_by associations)
+        - Nodes represent gene products (from enabled_by associations). An activity enabled by
+          a set of substitutable gene products contributes one node per member of the set.
         - Edges represent causal relationships between gene products
         - Edge attributes include GO terms (molecular function, biological process, etc.)
 
@@ -51,17 +57,21 @@ class ModelNetworkTranslator(GraphTranslator):
             model: GO-CAM Model to add
             graph: NetworkX DiGraph to add nodes and edges to
         """
-        # Build mapping from activity ID to gene product
-        activity_to_gene: Dict[str, str] = {}
+        # Build mapping from activity ID to gene products
+        activity_to_genes: Dict[str, List[str]] = {}
 
         for activity in model.activities or []:
-            if activity.enabled_by and activity.enabled_by.term:
-                gene_product = activity.enabled_by.term
-                activity_to_gene[activity.id] = gene_product
+            gene_products = self._activity_gene_products(activity)
+            if not gene_products:
+                continue
+            activity_to_genes[activity.id] = gene_products
 
-                # Add gene product as node if not already present
+            # Add gene products as nodes if not already present
+            for gene_product in gene_products:
                 if not graph.has_node(gene_product):
-                    node_attrs = self._get_gene_node_attributes(activity, model)
+                    node_attrs = self._get_gene_node_attributes(
+                        gene_product, activity, model
+                    )
                     graph.add_node(gene_product, **node_attrs)
 
         # Add edges based on causal associations
@@ -69,61 +79,79 @@ class ModelNetworkTranslator(GraphTranslator):
             if not activity.causal_associations:
                 continue
 
-            source_gene = activity_to_gene.get(activity.id)
-            if not source_gene:
-                continue
-
+            source_genes = activity_to_genes.get(activity.id, [])
             for causal_assoc in activity.causal_associations:
                 if not causal_assoc.downstream_activity:
                     continue
-                target_gene = activity_to_gene.get(causal_assoc.downstream_activity)
-                if not target_gene:
-                    continue
-
-                # Create edge with GO term attributes
-                edge_attrs = self._get_edge_attributes(
-                    activity, causal_assoc, model, source_gene, target_gene
+                target_genes = activity_to_genes.get(
+                    causal_assoc.downstream_activity, []
                 )
+                for source_gene in source_genes:
+                    for target_gene in target_genes:
+                        self._add_edge(
+                            graph,
+                            activity,
+                            causal_assoc,
+                            model,
+                            source_gene,
+                            target_gene,
+                        )
 
-                # Add or update edge
-                if graph.has_edge(source_gene, target_gene):
-                    # Merge attributes if edge already exists
-                    existing_attrs = graph[source_gene][target_gene]
-                    merged_attrs = self._merge_edge_attributes(
-                        existing_attrs, edge_attrs
-                    )
-                    graph[source_gene][target_gene].update(merged_attrs)
-                else:
-                    graph.add_edge(source_gene, target_gene, **edge_attrs)
+    @staticmethod
+    def _activity_gene_products(activity: Activity) -> List[str]:
+        """Get the node IDs for the gene product(s) that enable an activity.
+
+        For a set of substitutable gene products these are the members of the set; otherwise it
+        is the term of the enabled_by association (a gene product or a complex).
+        """
+        enabled_by = activity.enabled_by
+        if enabled_by is None:
+            return []
+        if isinstance(enabled_by, EnabledByGeneProductSetAssociation):
+            return [m.term for m in enabled_by.members if m.term]
+        return [enabled_by.term] if enabled_by.term else []
+
+    def _add_edge(
+        self,
+        graph: nx.DiGraph,
+        activity: Activity,
+        causal_assoc: CausalAssociation,
+        model: Model,
+        source_gene: str,
+        target_gene: str,
+    ) -> None:
+        """Add an edge with GO term attributes, merging with any existing edge."""
+        edge_attrs = self._get_edge_attributes(
+            activity, causal_assoc, model, source_gene, target_gene
+        )
+        if graph.has_edge(source_gene, target_gene):
+            existing_attrs = graph[source_gene][target_gene]
+            merged_attrs = self._merge_edge_attributes(existing_attrs, edge_attrs)
+            graph[source_gene][target_gene].update(merged_attrs)
+        else:
+            graph.add_edge(source_gene, target_gene, **edge_attrs)
 
     def _get_gene_node_attributes(
-        self, activity: Activity, model: Model
+        self, gene_product: str, activity: Activity, model: Model
     ) -> Dict[str, str]:
         """
         Get node attributes for a gene product.
 
         Args:
-            activity: Activity containing the gene product
+            gene_product: The gene product (node) ID
+            activity: Activity enabled by the gene product
             model: The GO-CAM model
 
         Returns:
             Dictionary of node attributes
         """
-        attrs: dict[str, str] = {"model_id": model.id}
-
-        if activity.enabled_by and activity.enabled_by.term:
-            attrs["gene_product"] = activity.enabled_by.term
+        attrs: dict[str, str] = {"model_id": model.id, "gene_product": gene_product}
 
         # Add gene product label if available
-        if model.objects:
-            for obj in model.objects:
-                if (
-                    activity.enabled_by
-                    and obj.id == activity.enabled_by.term
-                    and obj.label
-                ):
-                    attrs["label"] = obj.label
-                    break
+        for obj in model.objects or []:
+            if obj.id == gene_product and obj.label:
+                attrs["label"] = obj.label
+                break
 
         return attrs
 
