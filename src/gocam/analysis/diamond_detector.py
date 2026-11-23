@@ -8,11 +8,12 @@ A diamond pattern consists of:
 - A common downstream activity (the "sink")
 """
 
-from collections import defaultdict
-from typing import List, Dict, Set, Tuple, Optional
-from dataclasses import dataclass, field
 import logging
-from gocam.datamodel.gocam import Model, Activity, CausalAssociation
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Set, Tuple
+
+from gocam.datamodel.gocam import Activity, Model
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class DiamondPattern:
     """Represents a diamond pattern in a causal flow."""
+
     source_activity_id: str
     parallel_activity_ids: List[str]
     sink_activity_id: str
@@ -30,7 +32,9 @@ class DiamondPattern:
     # Store path lengths and classification
     upstream_hops: int = 0  # Number of hops from source to parallel activities
     downstream_hops: int = 0  # Number of hops from parallel activities to sink
-    intermediate_nodes: Optional[Dict[str, List[str]]] = None  # Intermediate nodes on each path
+    intermediate_nodes: Optional[Dict[str, List[str]]] = (
+        None  # Intermediate nodes on each path
+    )
     classification: str = ""  # Classification of diamond type
     is_pure: bool = True  # Whether this is a pure diamond (no extra edges)
     path_length_consistent: bool = True  # Whether all parallel paths have same length
@@ -58,11 +62,13 @@ class DiamondPattern:
         return self.upstream_hops + self.downstream_hops
 
     def __str__(self) -> str:
-        return (f"Diamond in {self.model_id}: "
-                f"{self.source_activity_id} -> "
-                f"[{', '.join(self.parallel_activity_ids)}] -> "
-                f"{self.sink_activity_id} "
-                f"(type: {self.diamond_type}, hops: {self.upstream_hops}+{self.downstream_hops})")
+        return (
+            f"Diamond in {self.model_id}: "
+            f"{self.source_activity_id} -> "
+            f"[{', '.join(self.parallel_activity_ids)}] -> "
+            f"{self.sink_activity_id} "
+            f"(type: {self.diamond_type}, hops: {self.upstream_hops}+{self.downstream_hops})"
+        )
 
 
 class DiamondDetector:
@@ -77,27 +83,34 @@ class DiamondDetector:
 
         # Extract gene/complex information
         if activity.enabled_by:
-            if hasattr(activity.enabled_by, 'term'):
-                details['gene'] = activity.enabled_by.term
+            if hasattr(activity.enabled_by, "term"):
+                details["gene"] = activity.enabled_by.term or "Unknown"
             else:
-                details['gene'] = 'Unknown'
+                details["gene"] = "Unknown"
         else:
-            details['gene'] = 'Unknown'
+            details["gene"] = "Unknown"
 
         # Extract molecular function
         if activity.molecular_function:
-            if hasattr(activity.molecular_function, 'term'):
-                details['molecular_function'] = activity.molecular_function.term
+            if hasattr(activity.molecular_function, "term"):
+                details["molecular_function"] = (
+                    activity.molecular_function.term or "Unknown"
+                )
             else:
-                details['molecular_function'] = 'Unknown'
+                details["molecular_function"] = "Unknown"
         else:
-            details['molecular_function'] = 'Unknown'
+            details["molecular_function"] = "Unknown"
 
         return details
 
-    def _check_diamond_purity(self, source: str, parallel_activities: List[str],
-                               sink: str, downstream_map: Dict[str, Set[str]],
-                               upstream_map: Dict[str, Set[str]]) -> bool:
+    def _check_diamond_purity(
+        self,
+        source: str,
+        parallel_activities: List[str],
+        sink: str,
+        downstream_map: Dict[str, Set[str]],
+        upstream_map: Dict[str, Set[str]],
+    ) -> bool:
         """
         Check if a diamond is pure (no extra edges beyond the diamond pattern).
 
@@ -132,7 +145,9 @@ class DiamondDetector:
 
         return True
 
-    def _find_path_length(self, start: str, end: str, graph: Dict[str, Set[str]]) -> Tuple[int, List[str]]:
+    def _find_path_length(
+        self, start: str, end: str, graph: Dict[str, Set[str]]
+    ) -> Tuple[int, List[str]]:
         """
         Find the shortest path length and intermediate nodes between two activities.
         Uses BFS to find shortest path.
@@ -179,14 +194,18 @@ class DiamondDetector:
         activity_map = {activity.id: activity for activity in model.activities}
 
         # Build adjacency lists for the causal graph
-        downstream_map = defaultdict(set)  # activity_id -> set of downstream activity_ids
-        upstream_map = defaultdict(set)    # activity_id -> set of upstream activity_ids
+        downstream_map = defaultdict(
+            set
+        )  # activity_id -> set of downstream activity_ids
+        upstream_map = defaultdict(set)  # activity_id -> set of upstream activity_ids
 
         for activity in model.activities:
             if activity.causal_associations:
                 for causal_assoc in activity.causal_associations:
                     if causal_assoc.downstream_activity:
-                        downstream_map[activity.id].add(causal_assoc.downstream_activity)
+                        downstream_map[activity.id].add(
+                            causal_assoc.downstream_activity
+                        )
                         upstream_map[causal_assoc.downstream_activity].add(activity.id)
 
         diamonds_found = []
@@ -207,7 +226,9 @@ class DiamondDetector:
                     activity2 = downstream_list[j]
 
                     # Find common downstream activities (sinks)
-                    common_downstream = downstream_map[activity1] & downstream_map[activity2]
+                    common_downstream = (
+                        downstream_map[activity1] & downstream_map[activity2]
+                    )
 
                     for sink_id in common_downstream:
                         # Check if this is a true diamond (no direct connection from source to sink)
@@ -228,36 +249,56 @@ class DiamondDetector:
                             downstream_hops = []
 
                             for parallel_id in parallel_activities:
-                                up_hop, _ = self._find_path_length(source_id, parallel_id, downstream_map)
-                                down_hop, _ = self._find_path_length(parallel_id, sink_id, downstream_map)
+                                up_hop, _ = self._find_path_length(
+                                    source_id, parallel_id, downstream_map
+                                )
+                                down_hop, _ = self._find_path_length(
+                                    parallel_id, sink_id, downstream_map
+                                )
                                 upstream_hops.append(up_hop)
                                 downstream_hops.append(down_hop)
 
                             # Check if all parallel paths have same length (true diamond)
                             # If not, use the most common length or log a warning
                             upstream_hop = upstream_hops[0] if upstream_hops else 0
-                            downstream_hop = downstream_hops[0] if downstream_hops else 0
+                            downstream_hop = (
+                                downstream_hops[0] if downstream_hops else 0
+                            )
 
                             # Check and record if path lengths are consistent
-                            path_length_consistent = (len(set(upstream_hops)) == 1 and
-                                                     len(set(downstream_hops)) == 1)
+                            path_length_consistent = (
+                                len(set(upstream_hops)) == 1
+                                and len(set(downstream_hops)) == 1
+                            )
 
                             if not path_length_consistent:
-                                logger.debug(f"Inconsistent path lengths in diamond: upstream={upstream_hops}, downstream={downstream_hops}")
+                                logger.debug(
+                                    f"Inconsistent path lengths in diamond: upstream={upstream_hops}, downstream={downstream_hops}"
+                                )
 
                             # Check if diamond is pure (no extra edges)
                             is_pure = self._check_diamond_purity(
-                                source_id, parallel_activities, sink_id,
-                                downstream_map, upstream_map
+                                source_id,
+                                parallel_activities,
+                                sink_id,
+                                downstream_map,
+                                upstream_map,
                             )
 
                             # Extract activity details for enriched reporting
                             activity_details = {}
                             for act_id in [source_id] + parallel_activities + [sink_id]:
                                 if act_id in activity_map:
-                                    activity_details[act_id] = self._extract_activity_details(activity_map[act_id])
+                                    activity_details[act_id] = (
+                                        self._extract_activity_details(
+                                            activity_map[act_id]
+                                        )
+                                    )
                                 else:
-                                    activity_details[act_id] = {'gene': 'Unknown', 'molecular_function': 'Unknown'}
+                                    activity_details[act_id] = {
+                                        "gene": "Unknown",
+                                        "molecular_function": "Unknown",
+                                    }
 
                             diamond = DiamondPattern(
                                 source_activity_id=source_id,
@@ -269,7 +310,7 @@ class DiamondDetector:
                                 upstream_hops=upstream_hop,
                                 downstream_hops=downstream_hop,
                                 is_pure=is_pure,
-                                path_length_consistent=path_length_consistent
+                                path_length_consistent=path_length_consistent,
                             )
 
                             # Avoid duplicates
@@ -278,12 +319,17 @@ class DiamondDetector:
 
         return diamonds_found
 
-    def _is_duplicate_diamond(self, diamond: DiamondPattern, existing_diamonds: List[DiamondPattern]) -> bool:
+    def _is_duplicate_diamond(
+        self, diamond: DiamondPattern, existing_diamonds: List[DiamondPattern]
+    ) -> bool:
         """Check if a diamond pattern already exists in the list."""
         for existing in existing_diamonds:
-            if (existing.source_activity_id == diamond.source_activity_id and
-                existing.sink_activity_id == diamond.sink_activity_id and
-                set(existing.parallel_activity_ids) == set(diamond.parallel_activity_ids)):
+            if (
+                existing.source_activity_id == diamond.source_activity_id
+                and existing.sink_activity_id == diamond.sink_activity_id
+                and set(existing.parallel_activity_ids)
+                == set(diamond.parallel_activity_ids)
+            ):
                 return True
         return False
 
@@ -311,12 +357,16 @@ class DiamondDetector:
                 # Continue processing other models instead of failing entirely
 
         if failed_models:
-            logger.warning(f"Failed to process {len(failed_models)} model(s): {[m[0] for m in failed_models[:5]]}")
+            logger.warning(
+                f"Failed to process {len(failed_models)} model(s): {[m[0] for m in failed_models[:5]]}"
+            )
 
         self.diamonds = all_diamonds
         return all_diamonds
 
-    def get_paralog_candidates(self, models: List[Model]) -> Dict[str, List[DiamondPattern]]:
+    def get_paralog_candidates(
+        self, models: List[Model]
+    ) -> Dict[str, List[DiamondPattern]]:
         """
         Group diamond patterns by their parallel activities to identify potential paralogs.
 
@@ -329,11 +379,11 @@ class DiamondDetector:
         paralog_groups = defaultdict(list)
 
         # Build activity ID to enabled_by mapping
-        activity_to_gene = {}
+        activity_to_gene: dict[str, str] = {}
         for model in models:
             if model.activities:
                 for activity in model.activities:
-                    if activity.enabled_by and hasattr(activity.enabled_by, 'term'):
+                    if activity.enabled_by and activity.enabled_by.term:
                         activity_to_gene[activity.id] = activity.enabled_by.term
 
         # Group diamonds by their parallel gene products
@@ -387,8 +437,12 @@ class DiamondDetector:
                 impure_count += 1
 
         report.append("\nDiamond Purity:")
-        report.append(f"  Pure diamonds: {pure_count} ({round(pure_count * 100 / len(self.diamonds)) if self.diamonds else 0}%)")
-        report.append(f"  Impure diamonds: {impure_count} ({round(impure_count * 100 / len(self.diamonds)) if self.diamonds else 0}%)")
+        report.append(
+            f"  Pure diamonds: {pure_count} ({round(pure_count * 100 / len(self.diamonds)) if self.diamonds else 0}%)"
+        )
+        report.append(
+            f"  Impure diamonds: {impure_count} ({round(impure_count * 100 / len(self.diamonds)) if self.diamonds else 0}%)"
+        )
 
         report.append("\nDiamond Type Distribution:")
         for dtype, count in sorted(type_counts.items()):
@@ -415,14 +469,22 @@ class DiamondDetector:
             for i, diamond in enumerate(model_diamonds, 1):
                 report.append(f"  Diamond {i}:")
                 report.append(f"    Type: {diamond.diamond_type}")
-                report.append(f"    Purity: {'Pure' if diamond.is_pure else 'Impure (has extra edges)'}")
-                report.append(f"    Structure: {diamond.upstream_hops} hop(s) upstream, {diamond.downstream_hops} hop(s) downstream")
+                report.append(
+                    f"    Purity: {'Pure' if diamond.is_pure else 'Impure (has extra edges)'}"
+                )
+                report.append(
+                    f"    Structure: {diamond.upstream_hops} hop(s) upstream, {diamond.downstream_hops} hop(s) downstream"
+                )
                 report.append(f"    Width: {diamond.num_parallel_paths} parallel paths")
 
                 # Source activity details
-                source_details = diamond.activity_details.get(diamond.source_activity_id, {}) if diamond.activity_details else {}
-                source_gene = source_details.get('gene', 'Unknown')
-                source_mf = source_details.get('molecular_function', 'Unknown')
+                source_details = (
+                    diamond.activity_details.get(diamond.source_activity_id, {})
+                    if diamond.activity_details
+                    else {}
+                )
+                source_gene = source_details.get("gene", "Unknown")
+                source_mf = source_details.get("molecular_function", "Unknown")
                 report.append(f"    Source: {diamond.source_activity_id}")
                 report.append(f"      Gene: {source_gene}")
                 report.append(f"      MF: {source_mf}")
@@ -430,17 +492,25 @@ class DiamondDetector:
                 # Parallel activities details
                 report.append(f"    Parallel paths ({diamond.num_parallel_paths}):")
                 for parallel_id in diamond.parallel_activity_ids:
-                    parallel_details = diamond.activity_details.get(parallel_id, {}) if diamond.activity_details else {}
-                    parallel_gene = parallel_details.get('gene', 'Unknown')
-                    parallel_mf = parallel_details.get('molecular_function', 'Unknown')
+                    parallel_details = (
+                        diamond.activity_details.get(parallel_id, {})
+                        if diamond.activity_details
+                        else {}
+                    )
+                    parallel_gene = parallel_details.get("gene", "Unknown")
+                    parallel_mf = parallel_details.get("molecular_function", "Unknown")
                     report.append(f"      - {parallel_id}")
                     report.append(f"        Gene: {parallel_gene}")
                     report.append(f"        MF: {parallel_mf}")
 
                 # Sink activity details
-                sink_details = diamond.activity_details.get(diamond.sink_activity_id, {}) if diamond.activity_details else {}
-                sink_gene = sink_details.get('gene', 'Unknown')
-                sink_mf = sink_details.get('molecular_function', 'Unknown')
+                sink_details = (
+                    diamond.activity_details.get(diamond.sink_activity_id, {})
+                    if diamond.activity_details
+                    else {}
+                )
+                sink_gene = sink_details.get("gene", "Unknown")
+                sink_mf = sink_details.get("molecular_function", "Unknown")
                 report.append(f"    Sink: {diamond.sink_activity_id}")
                 report.append(f"      Gene: {sink_gene}")
                 report.append(f"      MF: {sink_mf}")
