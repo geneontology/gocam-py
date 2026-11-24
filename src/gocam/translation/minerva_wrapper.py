@@ -12,10 +12,11 @@ from gocam.datamodel import (
     CausalAssociation,
     CellTypeAssociation,
     CellularAnatomicalEntityAssociation,
-    EnabledByAssociation,
     EnabledByGeneProductAssociation,
+    EnabledByGeneProductSetAssociation,
     EnabledByProteinComplexAssociation,
     EvidenceItem,
+    GeneProductSetMemberAssociation,
     GrossAnatomyAssociation,
     Model,
     ModelStateEnum,
@@ -461,8 +462,24 @@ class MinervaTranslator:
         term: str,
         evidence: list[EvidenceItem],
         prov: ProvenanceInfo,
-    ) -> EnabledByAssociation:
-        """Build an EnabledByAssociation (GeneProduct or ProteinComplex)."""
+    ) -> (
+        EnabledByGeneProductAssociation
+        | EnabledByProteinComplexAssociation
+        | EnabledByGeneProductSetAssociation
+    ):
+        """Build an EnabledByAssociation (GeneProduct, ProteinComplex or GeneProductSet).
+
+        An individual is treated as a set of substitutable gene products if it has at least one
+        outgoing has substitutable entity (RO:0019003) fact. See
+        https://github.com/geneontology/pathways2GO/issues/352
+        """
+        if self.view.get_facts(
+            subject=individual_id, property=Relation.HAS_SUBSTITUTABLE_ENTITY
+        ):
+            return self._build_gene_product_set_association(
+                individual_id, term, evidence, prov
+            )
+
         if self.view.is_type(individual_id, PROTEIN_CONTAINING_COMPLEX):
             return self._build_protein_complex_association(
                 individual_id, term, evidence, prov
@@ -510,6 +527,46 @@ class MinervaTranslator:
             enabled_by_association.has_part.append(has_part_association)
 
         return enabled_by_association
+
+    def _build_gene_product_set_association(
+        self,
+        individual_id: str,
+        term: str,
+        evidence: list[EvidenceItem],
+        prov: ProvenanceInfo,
+    ) -> EnabledByGeneProductSetAssociation:
+        """Build an EnabledByGeneProductSetAssociation by gathering member facts.
+
+        The evidence and provenance passed in come from the enabled by fact, and apply to the set
+        as a whole.
+        """
+        return EnabledByGeneProductSetAssociation(
+            term=term,
+            label=self.view.get_annotations(individual_id).get("rdfs:label"),
+            members=self._build_gene_product_set_members(individual_id),
+            evidence=evidence,
+            provenances=[prov],
+        )
+
+    def _build_gene_product_set_members(
+        self, set_individual_id: str
+    ) -> list[GeneProductSetMemberAssociation]:
+        """Build member associations from the has substitutable entity facts of a set."""
+        members = []
+        for fact in self.view.get_facts(
+            subject=set_individual_id, property=Relation.HAS_SUBSTITUTABLE_ENTITY
+        ):
+            evs, prov = self._process_fact(fact)
+            member_term = self.view.get_term(fact.object)
+            if member_term is None:
+                self._add_missing_term_warning(fact.object, fact)
+                continue
+            members.append(
+                GeneProductSetMemberAssociation(
+                    term=member_term, evidence=evs, provenances=[prov]
+                )
+            )
+        return members
 
     def _build_gene_product_association(
         self,
@@ -560,6 +617,11 @@ class MinervaTranslator:
             evidence=evs,
             provenances=[prov],
         )
+
+        # The part may itself be a set of substitutable gene products
+        members = self._build_gene_product_set_members(part_id)
+        if members:
+            has_part_association.members = members
 
         for part_of_fact in self.view.get_facts(
             subject=part_id, property=Relation.PART_OF

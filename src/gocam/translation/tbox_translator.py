@@ -29,6 +29,7 @@ from gocam.datamodel import (
     CellTypeAssociation,
     CellularAnatomicalEntityAssociation,
     EnabledByGeneProductAssociation,
+    EnabledByGeneProductSetAssociation,
     EnabledByProteinComplexAssociation,
     GrossAnatomyAssociation,
     Model,
@@ -151,6 +152,10 @@ class TBoxTranslator:
                 yield from self.translate_protein_complex(model, activity, mf_label, eb)
             elif isinstance(eb, EnabledByGeneProductAssociation):
                 yield from self.translate_gene_product(model, activity, mf_label, eb)
+            elif isinstance(eb, EnabledByGeneProductSetAssociation):
+                yield from self.translate_gene_product_set(
+                    model, activity, mf_label, eb
+                )
             else:
                 raise NotImplementedError(f"Cannot handle {eb}")
         else:
@@ -217,15 +222,45 @@ class TBoxTranslator:
             activity.id, RDFS_LABEL, f"{eb_label} ({mf_label})"
         )
 
+    def translate_gene_product_set(
+        self,
+        model: Model,
+        activity: Activity,
+        mf_label: str,
+        eb: EnabledByGeneProductSetAssociation,
+    ) -> Iterator[SIMPLE_AXIOM]:
+        if not eb.term:
+            return
+        member_terms = [m.term for m in eb.members if m.term]
+        set_id = self.make_id(model, eb.term, *member_terms)
+        yield from self.add_edge(activity.id, Relation.ENABLED_BY, set_id)
+        yield from self.add_edge(set_id, IS_A, eb.term)
+        for member_term in member_terms:
+            yield from self.add_edge(
+                set_id, Relation.HAS_SUBSTITUTABLE_ENTITY, member_term
+            )
+        member_labels = " | ".join(self._label(model, t) for t in member_terms)
+        eb_label = f"{eb.label or self._label(model, eb.term)}[{member_labels}]"
+        yield from self.add_annotation(set_id, RDFS_LABEL, eb_label)
+        yield from self.add_annotation(
+            activity.id, RDFS_LABEL, f"{eb_label} ({mf_label})"
+        )
+
     def translate_protein_complex_part(
         self, model: Model, child: str, ta: ProteinComplexHasPartAssociation
     ):
         if not ta.term:
             return
         gp_term_id = ta.term
-        gp_id = self.make_id(model, gp_term_id)
+        member_terms = [m.term for m in ta.members or [] if m.term]
+        gp_id = self.make_id(model, gp_term_id, *member_terms)
         yield from self.add_edge(child, HAS_PART, gp_id)
         yield from self.add_edge(gp_id, PART_OF, child)
+        # the part is a set of substitutable gene products
+        for member_term in member_terms:
+            yield from self.add_edge(
+                gp_id, Relation.HAS_SUBSTITUTABLE_ENTITY, member_term
+            )
         if ta.part_of:
             for p in ta.part_of:
                 yield from self.translate_part_of_protein_complex(model, ta.term, p)

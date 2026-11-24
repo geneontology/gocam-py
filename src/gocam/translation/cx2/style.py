@@ -43,6 +43,7 @@ class LineStyle(str, Enum):
 class NodeType(str, Enum):
     GENE = "gene"
     COMPLEX = "complex"
+    GENE_SET = "gene set"
     MOLECULE = "molecule"
 
 
@@ -205,6 +206,14 @@ NODE_STYLES = {
         label_font_size=15,
         label_max_width=100,
         shape=NodeShape.RECTANGLE,
+        width=110,
+    ),
+    NodeType.GENE_SET: NodeStyle(
+        color=Color.MINT_GREEN,
+        height=55,
+        label_font_size=12,
+        label_max_width=100,
+        shape=NodeShape.OCTAGON,
         width=110,
     ),
     NodeType.MOLECULE: NodeStyle(

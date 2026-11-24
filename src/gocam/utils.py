@@ -14,6 +14,7 @@ from gocam.datamodel import (
     CellularAnatomicalEntityAssociation,
     EnabledByAssociation,
     EnabledByGeneProductAssociation,
+    EnabledByGeneProductSetAssociation,
     EnabledByProteinComplexAssociation,
     EvidenceItem,
     GrossAnatomyAssociation,
@@ -185,11 +186,22 @@ def all_associations(obj: Any) -> Iterator[Association]:
             if obj.located_in:
                 yield from all_associations(obj.located_in)
 
-        case EnabledByGeneProductAssociation() | ProteinComplexHasPartAssociation():
+        case EnabledByGeneProductAssociation():
             yield obj
             if obj.part_of:
                 for assoc in obj.part_of:
                     yield from all_associations(assoc)
+
+        case ProteinComplexHasPartAssociation():
+            yield obj
+            yield from obj.members or []
+            if obj.part_of:
+                for assoc in obj.part_of:
+                    yield from all_associations(assoc)
+
+        case EnabledByGeneProductSetAssociation():
+            yield obj
+            yield from obj.members
 
         case EnabledByProteinComplexAssociation() | PartOfProteinComplexAssociation():
             yield obj
@@ -218,6 +230,58 @@ def all_associations(obj: Any) -> Iterator[Association]:
 
         case _:
             raise ValueError(f"Unsupported object type: {type(obj)}")
+
+
+def enabled_by_gene_products(enabled_by: EnabledByAssociation) -> list[str]:
+    """
+    Get the gene products that (may) carry out an activity, given its enabled_by association.
+
+    For a single gene product this is the gene product itself; for a protein complex it is the
+    gene products that are parts of the complex (including members of sets that are parts of the
+    complex); and for a set of substitutable gene products it is the members of the set.
+
+    Example:
+        >>> from gocam.datamodel import GeneProductSetMemberAssociation
+        >>> erk_set = EnabledByGeneProductSetAssociation(
+        ...     term="CHEBI:33695",
+        ...     members=[
+        ...         GeneProductSetMemberAssociation(term="UniProtKB:P27361"),  # ERK1
+        ...         GeneProductSetMemberAssociation(term="UniProtKB:P28482"),  # ERK2
+        ...     ],
+        ... )
+        >>> enabled_by_gene_products(erk_set)
+        ['UniProtKB:P27361', 'UniProtKB:P28482']
+        >>> enabled_by_gene_products(EnabledByGeneProductAssociation(term="UniProtKB:P27361"))
+        ['UniProtKB:P27361']
+        >>> complex_with_set = EnabledByProteinComplexAssociation(
+        ...     term="GO:0032991",
+        ...     has_part=[
+        ...         ProteinComplexHasPartAssociation(term="UniProtKB:Q02750"),  # MEK1
+        ...         ProteinComplexHasPartAssociation(term="CHEBI:33695", members=erk_set.members),
+        ...     ],
+        ... )
+        >>> enabled_by_gene_products(complex_with_set)
+        ['UniProtKB:Q02750', 'UniProtKB:P27361', 'UniProtKB:P28482']
+
+    Args:
+        enabled_by: The enabled_by association of an activity.
+
+    Returns:
+        A list of gene product IDs.
+    """
+    match enabled_by:
+        case EnabledByGeneProductSetAssociation():
+            return [m.term for m in enabled_by.members if m.term]
+        case EnabledByProteinComplexAssociation():
+            gene_products = []
+            for part in enabled_by.has_part or []:
+                if part.members:
+                    gene_products.extend(m.term for m in part.members if m.term)
+                elif part.term:
+                    gene_products.append(part.term)
+            return gene_products
+        case _:
+            return [enabled_by.term] if enabled_by.term else []
 
 
 @overload

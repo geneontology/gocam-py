@@ -5,8 +5,8 @@ description: |-
   
   This schema provides a way of representing causal pathway [Models](Model.md). A model consists of a set of
   [Activity](Activity.md) objects, where each activity object represents the function of either an [individual
-  gene product](EnabledByGeneProductAssociation), a [protein complex of gene products](EnabledByGeneProductAssociation),
-  or a set of possible gene products.
+  gene product](EnabledByGeneProductAssociation), a [protein complex of gene products](EnabledByProteinComplexAssociation),
+  or a [set of substitutable gene products](EnabledByGeneProductSetAssociation), such as a group of paralogs.
   
   Each [Models](Model.md) has associated metadata slots. Some slots such as [id](id.md), [title](title.md),
   and [status](status.md) are *required*.
@@ -373,6 +373,75 @@ classes:
           - value: ComplexPortal:CPX-969
             description: The human Caspase-2 complex
 
+  EnabledByGeneProductSetAssociation:
+    description: >-
+      An association between an activity and a set of substitutable gene products, any one of which
+      can carry out the activity. A typical example is a group of paralogs that are functionally
+      interchangeable in the context of the model, such as ERK1 and ERK2.
+    aliases:
+      - paralogy group
+      - gene product set
+      - OR set
+    comments:
+      - >-
+        Use this when it is known that the activity is carried out by a member of a set of
+        gene products, but it is not known (or it does not matter) which one. Contrast with
+        EnabledByProteinComplexAssociation, where the members act together as a single unit.
+      - >-
+        Evidence and provenance on this association apply to the set as a whole, i.e. to every
+        member of the set. A typical example is a review article that describes the
+        function of all of the paralogs. Evidence that applies only to a single member of the set
+        is not modeled here; if member-specific evidence is important then a separate activity
+        for that gene product should be used.
+      - >-
+        In the underlying OWL/Minerva representation the set is an individual of
+        information biomacromolecule (CHEBI:33695) that is the object of the enabled by
+        (RO:0002333) edge, and that is connected to each member via
+        has substitutable entity (RO:0019003). The evidence on the enabled by edge is the
+        evidence of this association.
+      - Sets of protein complexes are not currently supported; members must be gene products.
+    see_also:
+      - https://github.com/geneontology/gocam-py/issues/68
+      - https://github.com/geneontology/pathways2GO/issues/352
+    is_a: EnabledByAssociation
+    attributes:
+      label:
+        description: An optional human-readable name for the set, e.g. "ENO monomers".
+        range: string
+      members:
+        description: The gene products that can substitute for one another in this set.
+        aliases:
+          - has substitutable entity
+        slot_uri: RO:0019003
+        range: GeneProductSetMemberAssociation
+        multivalued: true
+        inlined_as_list: true
+        required: true
+    slot_usage:
+      term:
+        description: The class of the set. This is always information biomacromolecule (CHEBI:33695).
+        range: InformationBiomacromoleculeTermObject
+        examples:
+          - value: CHEBI:33695
+            description: information biomacromolecule
+
+  GeneProductSetMemberAssociation:
+    description: An association between a set of substitutable gene products and one of its members.
+    comments:
+      - >-
+        Evidence and provenance on this association are about the membership of the gene product
+        in the set (the has substitutable entity edge), not about the function of the activity.
+    is_a: TermAssociation
+    slot_usage:
+      term:
+        description: The gene product that is a member of the set.
+        range: GeneProductTermObject
+        examples:
+          - value: UniProtKB:P27361
+            description: ERK1 (MAPK3)
+          - value: UniProtKB:P28482
+            description: ERK2 (MAPK1)
+
   PartOfProteinComplexAssociation:
     description: An association between a gene product and a protein complex that it is a part of.
     is_a: TermAssociation
@@ -394,9 +463,22 @@ classes:
         description: Associations between the gene product and protein complexes it is a part of.
         range: PartOfProteinComplexAssociation
         multivalued: true
+      members:
+        description: >-
+          If the part is a set of substitutable gene products (any one of which can fill this
+          position in the complex), the members of that set. In this case `term` is
+          information biomacromolecule (CHEBI:33695).
+        aliases:
+          - has substitutable entity
+        slot_uri: RO:0019003
+        range: GeneProductSetMemberAssociation
+        multivalued: true
+        inlined_as_list: true
     slot_usage:
       term:
-        description: The gene product that is part of the protein complex.
+        description: The gene product that is part of the protein complex. If the part is a set of
+          substitutable gene products, this is information biomacromolecule (CHEBI:33695) and
+          the gene products are listed in `members`.
         range: GeneProductTermObject
 
   CausalAssociation:
@@ -646,7 +728,8 @@ classes:
         # equals_expression: "len(../activities)"
         range: integer
       number_of_enabled_by_terms:
-        description: The number of molecular entities or sets of entities in a model.
+        description: The number of molecular entities or sets of entities in a model. Each member of
+          a gene product set is counted as a distinct enabler, rather than counting the set itself.
         # equals_expression: "len(../activities/enabled_by)"
         range: integer
       number_of_causal_associations:
@@ -742,7 +825,8 @@ classes:
         multivalued: true
         inlined_as_list: true
       model_activity_enabled_by_genes:
-        description: All direct enabler genes and genes that are part of enabler complexes for all activities
+        description: All direct enabler genes, genes that are part of enabler complexes, and genes that
+          are members of enabler sets, for all activities
         range: TermObject
         multivalued: true
         inlined_as_list: true
