@@ -195,6 +195,15 @@
 </a>
 </li>
 <li class="md-nav__item">
+<a class="md-nav__link" href="#comments">
+<span class="md-ellipsis">
+      
+        Comments
+      
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
 <a class="md-nav__link" href="#identifier-and-mapping-information">
 <span class="md-ellipsis">
       
@@ -295,6 +304,17 @@
 
 
 
+      PartOfProteinComplexAssociation : predicate
+
+
+
+
+
+        PartOfProteinComplexAssociation --&gt; "0..1" PredicateTermObject : predicate
+        click PredicateTermObject href "../PredicateTermObject/"
+
+
+
       PartOfProteinComplexAssociation : provenances
 
 
@@ -342,6 +362,12 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../predicate/">predicate</a></td>
+<td>0..1 <br/> <a href="../PredicateTermObject/">PredicateTermObject</a></td>
+<td>The relation between the gene product and the protein complex</td>
+<td>direct</td>
+</tr>
 <tr>
 <td><a href="../has_part/">has_part</a></td>
 <td>* <br/> <a href="../ProteinComplexHasPartAssociation/">ProteinComplexHasPartAssociation</a></td>
@@ -399,6 +425,10 @@
 </tr>
 </tbody>
 </table>
+<h2 id="comments">Comments</h2>
+<ul>
+<li>The name of this class reflects the general "part of" relation. The specific relation between the gene product and the protein complex is captured by the <code>predicate</code> slot.</li>
+</ul>
 <h2 id="identifier-and-mapping-information">Identifier and Mapping Information</h2>
 <h3 id="schema-source">Schema Source</h3>
 <ul>
@@ -430,6 +460,10 @@
 <pre><code class="language-yaml">name: PartOfProteinComplexAssociation
 description: An association between a gene product and a protein complex that it is
   a part of.
+comments:
+- The name of this class reflects the general "part of" relation. The specific relation
+  between the gene product and the protein complex is captured by the `predicate`
+  slot.
 from_schema: https://w3id.org/gocam
 is_a: TermAssociation
 slot_usage:
@@ -438,10 +472,27 @@ slot_usage:
     description: The protein complex that the gene product is a part of.
     range: ProteinComplexTermObject
 attributes:
+  predicate:
+    name: predicate
+    description: The relation between the gene product and the protein complex.
+    comments:
+    - If not specified, the general "part of" (BFO:0000050) relation is assumed.
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    domain_of:
+    - PartOfProteinComplexAssociation
+    - ProteinComplexHasPartAssociation
+    - CausalAssociation
+    - MoleculeAssociation
+    range: PredicateTermObject
   has_part:
     name: has_part
     description: Associations between the complex and gene products that are part
       of it.
+    comments:
+    - The name of this slot reflects the general "has part" relation. The specific
+      relation (such as "has active component") is captured by the `predicate` slot
+      of each association.
     from_schema: https://w3id.org/gocam
     domain_of:
     - EnabledByProteinComplexAssociation
@@ -456,6 +507,10 @@ attributes:
 <pre><code class="language-yaml">name: PartOfProteinComplexAssociation
 description: An association between a gene product and a protein complex that it is
   a part of.
+comments:
+- The name of this class reflects the general "part of" relation. The specific relation
+  between the gene product and the protein complex is captured by the `predicate`
+  slot.
 from_schema: https://w3id.org/gocam
 is_a: TermAssociation
 slot_usage:
@@ -464,10 +519,28 @@ slot_usage:
     description: The protein complex that the gene product is a part of.
     range: ProteinComplexTermObject
 attributes:
+  predicate:
+    name: predicate
+    description: The relation between the gene product and the protein complex.
+    comments:
+    - If not specified, the general "part of" (BFO:0000050) relation is assumed.
+    from_schema: https://w3id.org/gocam
+    rank: 1000
+    owner: PartOfProteinComplexAssociation
+    domain_of:
+    - PartOfProteinComplexAssociation
+    - ProteinComplexHasPartAssociation
+    - CausalAssociation
+    - MoleculeAssociation
+    range: PredicateTermObject
   has_part:
     name: has_part
     description: Associations between the complex and gene products that are part
       of it.
+    comments:
+    - The name of this slot reflects the general "has part" relation. The specific
+      relation (such as "has active component") is captured by the `predicate` slot
+      of each association.
     from_schema: https://w3id.org/gocam
     owner: PartOfProteinComplexAssociation
     domain_of:

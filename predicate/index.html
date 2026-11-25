@@ -425,6 +425,16 @@
 </thead>
 <tbody>
 <tr>
+<td><a href="../PartOfProteinComplexAssociation/">PartOfProteinComplexAssociation</a></td>
+<td>An association between a gene product and a protein complex that it is a part...</td>
+<td>no</td>
+</tr>
+<tr>
+<td><a href="../ProteinComplexHasPartAssociation/">ProteinComplexHasPartAssociation</a></td>
+<td>An association between a protein complex and one of its parts</td>
+<td>no</td>
+</tr>
+<tr>
 <td><a href="../CausalAssociation/">CausalAssociation</a></td>
 <td>A causal association between two activities</td>
 <td>no</td>
@@ -452,7 +462,7 @@
 </tr>
 <tr>
 <td>Domain Of</td>
-<td><a href="../CausalAssociation/">CausalAssociation</a>, <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
+<td><a href="../PartOfProteinComplexAssociation/">PartOfProteinComplexAssociation</a>, <a href="../ProteinComplexHasPartAssociation/">ProteinComplexHasPartAssociation</a>, <a href="../CausalAssociation/">CausalAssociation</a>, <a href="../MoleculeAssociation/">MoleculeAssociation</a></td>
 </tr>
 </tbody>
 </table>
@@ -481,6 +491,8 @@
 
 <pre><code class="language-yaml">name: predicate
 domain_of:
+- PartOfProteinComplexAssociation
+- ProteinComplexHasPartAssociation
 - CausalAssociation
 - MoleculeAssociation
 range: string

@@ -351,6 +351,18 @@
 </thead>
 <tbody>
 <tr>
+<td><a href="../PartOfProteinComplexAssociation/">PartOfProteinComplexAssociation</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">PredicateTermObject</a></td>
+</tr>
+<tr>
+<td><a href="../ProteinComplexHasPartAssociation/">ProteinComplexHasPartAssociation</a></td>
+<td><a href="../predicate/">predicate</a></td>
+<td>range</td>
+<td><a href="./">PredicateTermObject</a></td>
+</tr>
+<tr>
 <td><a href="../CausalAssociation/">CausalAssociation</a></td>
 <td><a href="../predicate/">predicate</a></td>
 <td>range</td>
@@ -368,7 +380,12 @@
 <h3 id="valid-id-prefixes">Valid ID Prefixes</h3>
 <p>Instances of this class <em>should</em> have identifiers with one of the following prefixes:</p>
 <ul>
-<li>RO</li>
+<li>
+<p>RO</p>
+</li>
+<li>
+<p>BFO</p>
+</li>
 </ul>
 <h3 id="schema-source">Schema Source</h3>
 <ul>
@@ -400,6 +417,7 @@
 <pre><code class="language-yaml">name: PredicateTermObject
 id_prefixes:
 - RO
+- BFO
 description: A term object that represents an OWL relation from the OBO Relations
   Ontology
 from_schema: https://w3id.org/gocam
@@ -412,6 +430,7 @@ is_a: TermObject
 <pre><code class="language-yaml">name: PredicateTermObject
 id_prefixes:
 - RO
+- BFO
 description: A term object that represents an OWL relation from the OBO Relations
   Ontology
 from_schema: https://w3id.org/gocam
