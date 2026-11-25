@@ -12,7 +12,6 @@ from gocam.datamodel import (
     CausalAssociation,
     CellTypeAssociation,
     CellularAnatomicalEntityAssociation,
-    EnabledByAssociation,
     EnabledByGeneProductAssociation,
     EnabledByProteinComplexAssociation,
     EvidenceItem,
@@ -64,6 +63,26 @@ MOLECULAR_ASSOCIATION_INVERSE_PROPERTIES = {
     Relation.IS_SMALL_MOLECULE_ACTIVATOR_OF: Relation.HAS_SMALL_MOLECULE_ACTIVATOR,
     Relation.IS_SMALL_MOLECULE_INHIBITOR_OF: Relation.HAS_SMALL_MOLECULE_INHIBITOR,
 }
+
+# These are properties which occur in facts that represent associations between a protein complex
+# (subject) and one of its parts (object). These facts are translated into
+# ProteinComplexHasPartAssociation objects. The general "has part" relation is retained for
+# backwards compatibility with models that predate the more specific relations.
+PROTEIN_COMPLEX_HAS_PART_PROPERTIES = (
+    Relation.HAS_PART,
+    Relation.HAS_ACTIVE_COMPONENT,
+    Relation.HAS_ACCESSORY_COMPONENT,
+)
+
+# These are properties which occur in facts that represent associations between a part of a
+# protein complex (subject) and the complex (object). These facts are translated into
+# PartOfProteinComplexAssociation objects. The general "part of" relation is retained for
+# backwards compatibility with models that predate the more specific relations.
+PART_OF_PROTEIN_COMPLEX_PROPERTIES = (
+    Relation.PART_OF,
+    Relation.IS_ACTIVE_COMPONENT_OF,
+    Relation.IS_ACCESSORY_COMPONENT_OF,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -461,7 +480,7 @@ class MinervaTranslator:
         term: str,
         evidence: list[EvidenceItem],
         prov: ProvenanceInfo,
-    ) -> EnabledByAssociation:
+    ) -> EnabledByGeneProductAssociation | EnabledByProteinComplexAssociation:
         """Build an EnabledByAssociation (GeneProduct or ProteinComplex)."""
         if self.view.is_type(individual_id, PROTEIN_CONTAINING_COMPLEX):
             return self._build_protein_complex_association(
@@ -497,8 +516,8 @@ class MinervaTranslator:
             provenances=[prov],
         )
 
-        for has_part_fact in self.view.get_facts(
-            subject=individual_id, property=Relation.HAS_PART
+        for has_part_fact in self._get_facts_for_properties(
+            subject=individual_id, properties=PROTEIN_COMPLEX_HAS_PART_PROPERTIES
         ):
             has_part_association = self._build_protein_complex_has_part_association(
                 has_part_fact
@@ -526,8 +545,8 @@ class MinervaTranslator:
             provenances=[prov],
         )
 
-        for part_of_fact in self.view.get_facts(
-            subject=individual_id, property=Relation.PART_OF
+        for part_of_fact in self._get_facts_for_properties(
+            subject=individual_id, properties=PART_OF_PROTEIN_COMPLEX_PROPERTIES
         ):
             part_of_association = self._build_part_of_protein_complex_association(
                 part_of_fact
@@ -540,10 +559,20 @@ class MinervaTranslator:
 
         return enabled_by_association
 
+    def _get_facts_for_properties(
+        self, *, subject: str, properties: tuple[Relation, ...]
+    ) -> list[Fact]:
+        """Get facts with the given subject and any of the given properties."""
+        return [
+            fact
+            for property in properties
+            for fact in self.view.get_facts(subject=subject, property=property)
+        ]
+
     def _build_protein_complex_has_part_association(
         self, fact: Fact, visited: frozenset[str] | None = None
     ) -> ProteinComplexHasPartAssociation | None:
-        """Build a ProteinComplexHasPartAssociation from a has_part fact."""
+        """Build a ProteinComplexHasPartAssociation from a has part (or subproperty) fact."""
         if visited is None:
             visited = frozenset()
 
@@ -557,12 +586,13 @@ class MinervaTranslator:
 
         has_part_association = ProteinComplexHasPartAssociation(
             term=part_term,
+            predicate=fact.property,
             evidence=evs,
             provenances=[prov],
         )
 
-        for part_of_fact in self.view.get_facts(
-            subject=part_id, property=Relation.PART_OF
+        for part_of_fact in self._get_facts_for_properties(
+            subject=part_id, properties=PART_OF_PROTEIN_COMPLEX_PROPERTIES
         ):
             part_of_object = part_of_fact.object
             if part_of_object in visited:
@@ -588,7 +618,7 @@ class MinervaTranslator:
     def _build_part_of_protein_complex_association(
         self, fact: Fact, visited: frozenset[str] | None = None
     ) -> PartOfProteinComplexAssociation | None:
-        """Build a PartOfProteinComplexAssociation from a part_of fact."""
+        """Build a PartOfProteinComplexAssociation from a part of (or subproperty) fact."""
         if visited is None:
             visited = frozenset()
 
@@ -601,12 +631,13 @@ class MinervaTranslator:
 
         part_of_association = PartOfProteinComplexAssociation(
             term=complex_term,
+            predicate=fact.property,
             evidence=evs,
             provenances=[prov],
         )
 
-        for has_part_fact in self.view.get_facts(
-            subject=complex_id, property=Relation.HAS_PART
+        for has_part_fact in self._get_facts_for_properties(
+            subject=complex_id, properties=PROTEIN_COMPLEX_HAS_PART_PROPERTIES
         ):
             has_part_object = has_part_fact.object
             if has_part_object in visited:

@@ -1163,3 +1163,126 @@ def test_translation_warning_for_individuals_with_multiple_types():
     assert (
         translation_result.result.activities[0].molecular_function.term == "GO:0046923"
     )
+
+
+# (has part relation, part of relation) pairs that relate protein complexes and their components
+PROTEIN_COMPLEX_COMPONENT_RELATIONS = [
+    pytest.param("BFO:0000051", "BFO:0000050", id="has_part"),
+    pytest.param("RO:0019005", "RO:0019007", id="active_component"),
+    pytest.param("RO:0019006", "RO:0019008", id="accessory_component"),
+]
+
+
+def _protein_complex_minerva_object(facts: list[tuple[str, str, str]]) -> dict:
+    """Build a Minerva object with an activity, two complexes, and two gene products."""
+
+    def individual(local_id: str, term: str, root_types: list[str]) -> dict:
+        return {
+            "id": f"gomodel:test_complex/{local_id}",
+            "type": [{"type": "class", "id": term}],
+            "root-type": [{"type": "class", "id": t} for t in root_types],
+            "annotations": [],
+        }
+
+    return {
+        "id": "gomodel:test_complex",
+        "annotations": [{"key": "title", "value": "Test protein complex model"}],
+        "individuals": [
+            individual("mf", "GO:0003824", ["GO:0003674"]),
+            individual("complex_a", "GO:0032991", ["GO:0032991"]),
+            individual("complex_b", "GO:0005840", ["GO:0032991"]),
+            individual("gp_1", "UniProtKB:P00001", ["CHEBI:33695"]),
+            individual("gp_2", "UniProtKB:P00002", ["CHEBI:33695"]),
+        ],
+        "facts": [
+            {
+                "subject": f"gomodel:test_complex/{s}",
+                "property": p,
+                "object": f"gomodel:test_complex/{o}",
+                "annotations": [],
+            }
+            for s, p, o in facts
+        ],
+    }
+
+
+@pytest.mark.parametrize(
+    "has_part_relation,part_of_relation", [*PROTEIN_COMPLEX_COMPONENT_RELATIONS]
+)
+def test_protein_complex_component_relations_enabled_by_complex(
+    has_part_relation, part_of_relation
+):
+    """Test that complex component relations are translated when a complex enables an activity."""
+    minerva_object = _protein_complex_minerva_object(
+        [
+            ("mf", Relation.ENABLED_BY, "complex_a"),
+            ("complex_a", has_part_relation, "gp_1"),
+            ("gp_1", part_of_relation, "complex_b"),
+        ]
+    )
+    model = MinervaWrapper.translate(minerva_object).result
+
+    assert model.activities is not None
+    enabled_by = model.activities[0].enabled_by
+    assert isinstance(enabled_by, EnabledByProteinComplexAssociation)
+    assert enabled_by.has_part is not None
+    assert len(enabled_by.has_part) == 1
+    has_part = enabled_by.has_part[0]
+    assert has_part.term == "UniProtKB:P00001"
+    assert has_part.predicate == has_part_relation
+    assert has_part.part_of is not None
+    assert len(has_part.part_of) == 1
+    part_of = has_part.part_of[0]
+    assert part_of.term == "GO:0005840"
+    assert part_of.predicate == part_of_relation
+
+
+@pytest.mark.parametrize(
+    "has_part_relation,part_of_relation", [*PROTEIN_COMPLEX_COMPONENT_RELATIONS]
+)
+def test_protein_complex_component_relations_enabled_by_gene_product(
+    has_part_relation, part_of_relation
+):
+    """Test that complex component relations are translated when a gene product enables an activity."""
+    minerva_object = _protein_complex_minerva_object(
+        [
+            ("mf", Relation.ENABLED_BY, "gp_1"),
+            ("gp_1", part_of_relation, "complex_b"),
+            ("complex_b", has_part_relation, "gp_2"),
+        ]
+    )
+    model = MinervaWrapper.translate(minerva_object).result
+
+    assert model.activities is not None
+    enabled_by = model.activities[0].enabled_by
+    assert isinstance(enabled_by, EnabledByGeneProductAssociation)
+    assert enabled_by.part_of is not None
+    assert len(enabled_by.part_of) == 1
+    part_of = enabled_by.part_of[0]
+    assert part_of.term == "GO:0005840"
+    assert part_of.predicate == part_of_relation
+    assert part_of.has_part is not None
+    assert len(part_of.has_part) == 1
+    has_part = part_of.has_part[0]
+    assert has_part.term == "UniProtKB:P00002"
+    assert has_part.predicate == has_part_relation
+
+
+def test_protein_complex_with_mixed_component_relations():
+    """Test that a complex can have components related by different relations."""
+    minerva_object = _protein_complex_minerva_object(
+        [
+            ("mf", Relation.ENABLED_BY, "complex_a"),
+            ("complex_a", "RO:0019005", "gp_1"),
+            ("complex_a", "RO:0019006", "gp_2"),
+        ]
+    )
+    model = MinervaWrapper.translate(minerva_object).result
+
+    assert model.activities is not None
+    enabled_by = model.activities[0].enabled_by
+    assert isinstance(enabled_by, EnabledByProteinComplexAssociation)
+    assert {(m.term, m.predicate) for m in enabled_by.has_part or []} == {
+        ("UniProtKB:P00001", "RO:0019005"),
+        ("UniProtKB:P00002", "RO:0019006"),
+    }
