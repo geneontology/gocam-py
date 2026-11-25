@@ -243,7 +243,6 @@ class MinervaView:
 
     def get_facts(
         self,
-        *,
         subject: str | None = None,
         object: str | None = None,
         property: str | None = None,
