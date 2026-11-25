@@ -316,6 +316,9 @@ classes:
     attributes:
       part_of:
         description: Associations between the gene product and protein complexes it is a part of.
+        comments:
+          - The name of this slot reflects the general "part of" relation. The specific relation (such as
+            "is active component of") is captured by the `predicate` slot of each association.
         range: PartOfProteinComplexAssociation
         multivalued: true
     slot_usage:
@@ -361,6 +364,9 @@ classes:
     attributes:
       has_part:
         description: Associations between the complex and gene products that are part of it.
+        comments:
+          - The name of this slot reflects the general "has part" relation. The specific relation (such as
+            "has active component") is captured by the `predicate` slot of each association.
         range: ProteinComplexHasPartAssociation
         multivalued: true
     slot_usage:
@@ -375,10 +381,21 @@ classes:
 
   PartOfProteinComplexAssociation:
     description: An association between a gene product and a protein complex that it is a part of.
+    comments:
+      - The name of this class reflects the general "part of" relation. The specific relation between the
+        gene product and the protein complex is captured by the `predicate` slot.
     is_a: TermAssociation
     attributes:
+      predicate:
+        description: The relation between the gene product and the protein complex.
+        comments:
+          - If not specified, the general "part of" (BFO:0000050) relation is assumed.
+        range: PredicateTermObject
       has_part:
         description: Associations between the complex and gene products that are part of it.
+        comments:
+          - The name of this slot reflects the general "has part" relation. The specific relation (such as
+            "has active component") is captured by the `predicate` slot of each association.
         range: ProteinComplexHasPartAssociation
         multivalued: true
     slot_usage:
@@ -388,10 +405,21 @@ classes:
 
   ProteinComplexHasPartAssociation:
     description: An association between a protein complex and one of its parts.
+    comments:
+      - The name of this class reflects the general "has part" relation. The specific relation between the
+        protein complex and the gene product is captured by the `predicate` slot.
     is_a: TermAssociation
     attributes:
+      predicate:
+        description: The relation between the protein complex and the gene product.
+        comments:
+          - If not specified, the general "has part" (BFO:0000051) relation is assumed.
+        range: PredicateTermObject
       part_of:
         description: Associations between the gene product and protein complexes it is a part of.
+        comments:
+          - The name of this slot reflects the general "part of" relation. The specific relation (such as
+            "is active component of") is captured by the `predicate` slot of each association.
         range: PartOfProteinComplexAssociation
         multivalued: true
     slot_usage:
@@ -614,6 +642,7 @@ classes:
     is_a: TermObject
     id_prefixes:
       - RO
+      - BFO
 
   ProvenanceInfo:
     description: Provenance information for an object

@@ -62,3 +62,23 @@ def test_protein_complex_association_rules(
     else:
         assert len(report.results) == 1
         assert "has_part" in report.results[0].message
+
+
+@pytest.mark.parametrize(
+    "target_class,term,predicate",
+    [
+        ("ProteinComplexHasPartAssociation", "UniProtKB:O75425", "BFO:0000051"),
+        ("ProteinComplexHasPartAssociation", "UniProtKB:O75425", "RO:0019005"),
+        ("ProteinComplexHasPartAssociation", "UniProtKB:O75425", "RO:0019006"),
+        ("PartOfProteinComplexAssociation", "GO:0032991", "BFO:0000050"),
+        ("PartOfProteinComplexAssociation", "GO:0032991", "RO:0019007"),
+        ("PartOfProteinComplexAssociation", "GO:0032991", "RO:0019008"),
+    ],
+)
+def test_protein_complex_part_association_predicate(
+    target_class, term, predicate, validator
+):
+    """Test that protein complex part associations accept a predicate."""
+    instance = {"type": target_class, "term": term, "predicate": predicate}
+    report = validator.validate(instance, target_class=target_class)
+    assert not report.results
